@@ -21,6 +21,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-unused-vars": "off",
     "indent": [
       "error",
       4
@@ -43,20 +44,6 @@
     ],
     "no-duplicate-imports": [
       "error"
-    ],
-    "sort-imports": [
-      "error",
-      {
-        "ignoreCase": false,
-        "ignoreDeclarationSort": true,
-        "ignoreMemberSort": false,
-        "memberSyntaxSortOrder": [
-          "none",
-          "all",
-          "multiple",
-          "single"
-        ]
-      }
     ]
   }
 }

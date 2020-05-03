@@ -1,16 +1,11 @@
-import express from 'express';
-import { config } from './config';
-import { logger } from './loaders/logger';
+import 'reflect-metadata';
+import { connectToDatabase } from './loaders/mongodb';
+import { createGraphQLServer } from './loaders/graphql';
 
 
-const app = express();
+async function setupServer() {
+    await connectToDatabase();
+    await createGraphQLServer();
+}
 
-app.listen(config.port, (error) => {
-    if (error) {
-        logger.error(error);
-    } else {
-        logger.info(`Server is listening on ${config.port}.`);
-    }
-});
-
-logger.silly('hello world!');
+setupServer();
