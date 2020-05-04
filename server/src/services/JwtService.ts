@@ -1,4 +1,5 @@
 import cookie from 'cookie';
+import { Service } from 'typedi';
 import { sign, verify } from 'jsonwebtoken';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
@@ -17,6 +18,7 @@ export interface JwtPayload {
 /**
  * Static class with JWT related methods.
  */
+@Service()
 export class JwtService {
 
     private static JWT_COOKIE_NAME = 'jwt';
@@ -30,10 +32,10 @@ export class JwtService {
     /**
      * Generate JWT and create cookie for storing it.
      */
-    static generate(context: ExpressContext, user: User): void {
+    generate(context: ExpressContext, user: User): void {
         const jwtPayload = { userId: user.id };
         const jwt = sign(jwtPayload, config.auth.jwtPrivateKey);
-        context.res.cookie(this.JWT_COOKIE_NAME, jwt, this.JWT_COOKIE_OPTIONS);
+        context.res.cookie(JwtService.JWT_COOKIE_NAME, jwt, JwtService.JWT_COOKIE_OPTIONS);
     }
 
     /**
@@ -41,7 +43,7 @@ export class JwtService {
      *
      * @throws will throw an error if request is not properly authenticated.
      */
-    static verify(context: ExpressContext): JwtPayload {
+    verify(context: ExpressContext): JwtPayload {
         const { jwt: tokenToVerify } = cookie.parse(context.req.headers.cookie!);
         return verify(tokenToVerify, config.auth.jwtPrivateKey) as JwtPayload;
     }
@@ -49,8 +51,8 @@ export class JwtService {
     /**
      * Invalidate JWT cookie.
      */
-    static invalidate(context: ExpressContext): void {
-        context.res.cookie(this.JWT_COOKIE_NAME, '', { ...this.JWT_COOKIE_OPTIONS, maxAge: 0 });
+    invalidate(context: ExpressContext): void {
+        context.res.cookie(JwtService.JWT_COOKIE_NAME, '', { ...JwtService.JWT_COOKIE_OPTIONS, maxAge: 0 });
     }
 
 }

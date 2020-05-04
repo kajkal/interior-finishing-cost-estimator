@@ -1,4 +1,5 @@
-import { createConnection } from 'typeorm';
+import { Container } from 'typedi';
+import { createConnection, useContainer } from 'typeorm';
 
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
@@ -7,6 +8,7 @@ import { User } from '../entities/User';
 
 export async function connectToDatabase(): Promise<void> {
     try {
+        useContainer(Container);
         await createConnection({
             type: 'mongodb',
             url: config.dataBase.mongodbUrl,

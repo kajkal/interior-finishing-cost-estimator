@@ -1,10 +1,11 @@
+import { ContextFunction } from 'apollo-server-core';
+import { ExpressContext } from 'apollo-server-express/src/ApolloServer';
+
 import { MockApolloServer, MockApolloServerConstructor } from '../../__mocks__/libraries/apollo-server-express';
 import { MockExpress, MockExpressFunction } from '../../__mocks__/libraries/express';
 import { LoggerMockManager } from '../../__mocks__/utils/LoggerMockManager';
 
 import { createGraphQLServer } from '../../../src/loaders/graphql';
-import { ContextFunction } from 'apollo-server-core';
-import { ExpressContext } from 'apollo-server-express/src/ApolloServer';
 
 
 describe('graphql loader', () => {

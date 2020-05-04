@@ -7,6 +7,8 @@ import { User } from '../../../src/entities/User';
 
 describe('JwtService class', () => {
 
+    const serviceUnderTest = new JwtService();
+
     beforeEach(() => {
         jest.spyOn(jwt, 'sign');
         jest.spyOn(jwt, 'verify');
@@ -23,7 +25,7 @@ describe('JwtService class', () => {
         const user = { id: 'TEST_USER_ID' } as unknown as User;
 
         // when
-        JwtService.generate(context, user);
+        serviceUnderTest.generate(context, user);
 
         // then
         expect(jwt.sign).toHaveBeenCalledTimes(1);
@@ -41,7 +43,7 @@ describe('JwtService class', () => {
         const context = { req: { headers: { cookie: `jwt=${validSampleToken}` } } } as unknown as ExpressContext;
 
         // when
-        const extractedPayload = JwtService.verify(context);
+        const extractedPayload = serviceUnderTest.verify(context);
 
         // then
         expect(extractedPayload).toMatchObject(samplePayload);
@@ -56,7 +58,7 @@ describe('JwtService class', () => {
         const context = { req: { headers: { cookie: `jwt=${validSampleToken}` } } } as unknown as ExpressContext;
 
         // when/then
-        expect(() => JwtService.verify(context)).toThrow(new JsonWebTokenError('invalid signature'));
+        expect(() => serviceUnderTest.verify(context)).toThrow(new JsonWebTokenError('invalid signature'));
         expect(jwt.verify).toHaveBeenCalledTimes(1);
         expect(jwt.verify).toHaveBeenCalledWith(validSampleToken, 'JWT_PRIVATE_KEY_TEST_VALUE');
     });
@@ -66,7 +68,7 @@ describe('JwtService class', () => {
         const context = { req: { headers: { cookie: '' } } } as unknown as ExpressContext;
 
         // when/then
-        expect(() => JwtService.verify(context)).toThrow(new JsonWebTokenError('jwt must be provided'));
+        expect(() => serviceUnderTest.verify(context)).toThrow(new JsonWebTokenError('jwt must be provided'));
         expect(jwt.verify).toHaveBeenCalledTimes(1);
         expect(jwt.verify).toHaveBeenCalledWith(undefined, 'JWT_PRIVATE_KEY_TEST_VALUE');
     });
@@ -76,7 +78,7 @@ describe('JwtService class', () => {
         const context = { res: { cookie: jest.fn() } } as unknown as ExpressContext;
 
         // when
-        JwtService.invalidate(context);
+        serviceUnderTest.invalidate(context);
 
         // then
         expect(context.res.cookie).toHaveBeenCalledTimes(1);

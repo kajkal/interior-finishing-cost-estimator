@@ -1,4 +1,5 @@
-import { createConnection } from 'typeorm';
+import { Container } from 'typedi';
+import { createConnection, useContainer } from 'typeorm';
 import { LoggerMockManager } from '../../__mocks__/utils/LoggerMockManager';
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 
@@ -16,15 +17,18 @@ describe('mongodb loader', () => {
 
     afterEach(() => {
         (createConnection as jest.Mock).mockClear();
+        (useContainer as jest.Mock).mockClear();
     });
 
     it('should connect to database', async () => {
-        expect.assertions(4);
+        expect.assertions(6);
 
         // given/when
         await connectToDatabase();
 
         // then
+        expect(useContainer).toHaveBeenCalledTimes(1);
+        expect(useContainer).toHaveBeenCalledWith(Container);
         expect(createConnection).toHaveBeenCalledTimes(1);
         expect(createConnection).toHaveBeenCalledWith(expect.objectContaining({
             type: 'mongodb',

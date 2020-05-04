@@ -1,23 +1,24 @@
+import { Container } from 'typedi';
 import { ResolverData } from 'type-graphql';
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { GraphQLLoggerMockManager } from '../../__mocks__/utils/LoggerMockManager';
-import { JwtServiceSpiesManager } from '../../__mocks__/services/JwtServiceSpiesManager';
+import { MockJwtService } from '../../__mocks__/services/MockJwtService';
 
-import { JwtPayload } from '../../../src/services/JwtService';
+import { JwtPayload, JwtService } from '../../../src/services/JwtService';
 import { authChecker } from '../../../src/utils/authChecker';
 
 
 describe('authChecker function', () => {
 
-    beforeEach(() => {
-        JwtServiceSpiesManager.setupSpies();
-        GraphQLLoggerMockManager.setupMocks();
+    beforeAll(() => {
+        Container.set(JwtService, MockJwtService);
     });
 
-    afterEach(() => {
-        JwtServiceSpiesManager.restoreSpies();
+    beforeEach(() => {
+        MockJwtService.setupMocks();
+        GraphQLLoggerMockManager.setupMocks();
     });
 
     it('should return true and add JWT payload to context', () => {
@@ -27,15 +28,15 @@ describe('authChecker function', () => {
         const sampleResolverData = {
             context: sampleContext,
         } as unknown as ResolverData<ExpressContext>;
-        JwtServiceSpiesManager.verify.mockReturnValue(samplePayload);
+        MockJwtService.verify.mockReturnValue(samplePayload);
 
         // when
         const result = authChecker(sampleResolverData, []);
 
         // then
         expect(result).toBe(true);
-        expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
-        expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(sampleContext);
+        expect(MockJwtService.verify).toHaveBeenCalledTimes(1);
+        expect(MockJwtService.verify).toHaveBeenCalledWith(sampleContext);
         expect(sampleContext).toEqual({
             jwtPayload: samplePayload, // context was mutated
         });
@@ -43,7 +44,7 @@ describe('authChecker function', () => {
 
     it('should throw error when request is not properly authenticated', () => {
         // given
-        JwtServiceSpiesManager.verify.mockImplementation(() => {
+        MockJwtService.verify.mockImplementation(() => {
             throw new Error();
         });
         const sampleContext = {};
@@ -54,8 +55,8 @@ describe('authChecker function', () => {
 
         // when/then
         expect(() => authChecker(sampleResolverData, [])).toThrow(new AuthenticationError('INVALID_TOKEN'));
-        expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
-        expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(sampleContext);
+        expect(MockJwtService.verify).toHaveBeenCalledTimes(1);
+        expect(MockJwtService.verify).toHaveBeenCalledWith(sampleContext);
         expect(sampleContext).toEqual({});
         expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledTimes(1);
         expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledWith({

@@ -1,3 +1,4 @@
+import { Container } from 'typedi';
 import { AuthChecker } from 'type-graphql';
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
@@ -22,7 +23,7 @@ export interface AuthorizedContext extends ExpressContext {
 export const authChecker: AuthChecker<ExpressContext> = ({ context, info }, _roles): boolean => {
     try {
         const enrichedContent = context as AuthorizedContext;
-        enrichedContent.jwtPayload = JwtService.verify(context);
+        enrichedContent.jwtPayload = Container.get(JwtService).verify(context);
         return true;
     } catch (error) {
         graphQLLogger.warn({ message: 'invalid token', info });

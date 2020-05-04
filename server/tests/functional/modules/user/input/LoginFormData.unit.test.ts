@@ -14,8 +14,6 @@ describe('Login form data class', () => {
         }: Partial<LoginFormData>,
         expectedErrors: DeepPartial<ValidationError>[],
     ) {
-        expect.assertions(1);
-
         // given
         const objectToValidate = new LoginFormData();
         objectToValidate.email = email;
@@ -34,11 +32,28 @@ describe('Login form data class', () => {
             expectToReturnErrors({
                 email: 'valid.email@domain.com',
             }, []);
+            expectToReturnErrors({
+                email: 'valid_email@domain.com',
+            }, []);
         });
 
         it('should reject invalid email', () => {
             expectToReturnErrors({
                 email: 'invalid-email',
+            }, [ {
+                constraints: {
+                    isEmail: expect.stringMatching(/email must be an email/),
+                },
+            } ]);
+            expectToReturnErrors({
+                email: 'invalid.email@domain',
+            }, [ {
+                constraints: {
+                    isEmail: expect.stringMatching(/email must be an email/),
+                },
+            } ]);
+            expectToReturnErrors({
+                email: 'invalid.email.domain.com',
             }, [ {
                 constraints: {
                     isEmail: expect.stringMatching(/email must be an email/),

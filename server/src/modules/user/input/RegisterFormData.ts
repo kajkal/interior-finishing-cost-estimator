@@ -1,22 +1,13 @@
 import { Field, InputType } from 'type-graphql';
-import { IsEmail, Length } from 'class-validator';
-import { IsEmailAvailable } from '../validators/IsEmailAvailable';
+import { Length } from 'class-validator';
+import { LoginFormData } from './LoginFormData';
 
 
 @InputType()
-export class RegisterFormData {
+export class RegisterFormData extends LoginFormData {
 
     @Field()
     @Length(3, 255)
     name!: string;
-
-    @Field()
-    @IsEmail()
-    @IsEmailAvailable()
-    email!: string;
-
-    @Field()
-    @Length(6, 255)
-    password!: string;
 
 }

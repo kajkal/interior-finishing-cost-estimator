@@ -1,5 +1,6 @@
 import cors from 'cors';
 import Express from 'express';
+import { Container } from 'typedi';
 import { GraphQLSchema } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
@@ -17,6 +18,7 @@ export function buildGraphQLSchema(): Promise<GraphQLSchema> {
     return buildSchema({
         resolvers: [ UserResolver ],
         authChecker,
+        container: Container,
     });
 }
 
