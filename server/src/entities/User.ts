@@ -1,5 +1,6 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { DateTime } from 'luxon';
 import { Field, ID, ObjectType } from 'type-graphql';
+import { Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
 
 
 @ObjectType()
@@ -21,7 +22,10 @@ export class User {
     @Column()
     password!: string;
 
-    @Column()
-    createdAt!: string;
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt!: DateTime;
+
+    @UpdateDateColumn({ type: 'timestamp', nullable: true  })
+    updatedAt?: DateTime
 
 }

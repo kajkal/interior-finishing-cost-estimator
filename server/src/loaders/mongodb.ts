@@ -4,6 +4,9 @@ import { createConnection, useContainer } from 'typeorm';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 import { User } from '../entities/User';
+import { Product } from '../entities/Product';
+import { Project } from '../entities/Project';
+import { Offer } from '../entities/Offer';
 
 
 export async function connectToDatabase(): Promise<void> {
@@ -17,6 +20,9 @@ export async function connectToDatabase(): Promise<void> {
             useUnifiedTopology: true,
             entities: [
                 User,
+                Product,
+                Project,
+                Offer,
             ],
         });
         logger.info('Successfully connected to the database.');

@@ -3,7 +3,7 @@ import { hash, verify } from 'argon2';
 import { UserInputError } from 'apollo-server-express';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
 import { RegisterFormData } from './input/RegisterFormData';
 import { InitialData } from '../common/output/InitialData';
@@ -11,6 +11,7 @@ import { JwtService } from '../../services/JwtService';
 import { LoginFormData } from './input/LoginFormData';
 import { logAccess } from '../../utils/logAccess';
 import { User } from '../../entities/User';
+import { AuthorizedContext } from '../../utils/authChecker';
 import { UserRepository } from '../../repositories/UserRepository';
 
 
@@ -42,7 +43,7 @@ export class UserResolver {
         const userToBeSaved = this.userRepository.create({
             ...data,
             password: encodedPassword,
-            createdAt: new Date().toISOString(),
+            // createdAt: new Date().toISOString(),
         });
         const savedUser = await this.userRepository.save(userToBeSaved);
 
