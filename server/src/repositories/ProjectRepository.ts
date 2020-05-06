@@ -1,11 +1,9 @@
-import { Service } from 'typedi';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository } from 'mikro-orm';
 
-import { Project } from '../entities/Project';
+import { Project } from '../entities/project/Project';
 
 
-@Service()
-@EntityRepository(Project)
-export class ProjectRepository extends Repository<Project> {
+@Repository(Project)
+export class ProjectRepository extends EntityRepository<Project> {
 
 }

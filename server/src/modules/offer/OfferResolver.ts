@@ -1,26 +1,25 @@
-import { Service } from 'typedi';
-import { InjectRepository } from 'typeorm-typedi-extensions';
-import { ApolloError } from 'apollo-server-errors/src/index';
+import { Inject, Service } from 'typedi';
+import { ApolloError } from 'apollo-server-express';
 import { Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
 import { OfferRepository } from '../../repositories/OfferRepository';
 import { AuthorizedContext } from '../../utils/authChecker';
 import { logAccess } from '../../utils/logAccess';
-import { Offer } from '../../entities/Offer';
+import { Offer } from '../../entities/offer/Offer';
 
 
 @Service()
-@Resolver()
+@Resolver(() => Offer)
 export class OfferResolver {
 
-    @InjectRepository()
+    @Inject()
     private readonly offerRepository!: OfferRepository;
 
     @Authorized()
     @UseMiddleware(logAccess)
     @Query(() => [ Offer ])
     async products(@Ctx() context: AuthorizedContext): Promise<Offer[]> {
-        return this.offerRepository.find();
+        return this.offerRepository.findAll();
     }
 
     @Authorized()

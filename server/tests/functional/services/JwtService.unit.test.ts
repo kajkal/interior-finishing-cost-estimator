@@ -2,7 +2,7 @@ import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { JwtService } from '../../../src/services/JwtService';
-import { User } from '../../../src/entities/User';
+import { User } from '../../../src/entities/user/User';
 
 
 describe('JwtService class', () => {

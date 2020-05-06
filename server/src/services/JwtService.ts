@@ -4,7 +4,7 @@ import { sign, verify } from 'jsonwebtoken';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { config } from '../config/config';
-import { User } from '../entities/User';
+import { User } from '../entities/user/User';
 
 
 /**
@@ -32,7 +32,7 @@ export class JwtService {
     /**
      * Generate JWT and create cookie for storing it.
      */
-    generate(context: ExpressContext, user: User): void {
+    generate(context: ExpressContext, user: Pick<User, 'id'>): void {
         const jwtPayload = { userId: user.id };
         const jwt = sign(jwtPayload, config.auth.jwtPrivateKey);
         context.res.cookie(JwtService.JWT_COOKIE_NAME, jwt, JwtService.JWT_COOKIE_OPTIONS);

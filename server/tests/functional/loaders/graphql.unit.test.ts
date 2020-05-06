@@ -1,3 +1,5 @@
+import { Container } from 'typedi';
+import { EntityManager, RequestContext } from 'mikro-orm';
 import { ContextFunction } from 'apollo-server-core';
 import { ExpressContext } from 'apollo-server-express/src/ApolloServer';
 
@@ -9,6 +11,12 @@ import { createGraphQLServer } from '../../../src/loaders/graphql';
 
 
 describe('graphql loader', () => {
+
+    const MockEntityManager = 'ENTITY_MANAGER_TEST_VALUE';
+
+    beforeAll(() => {
+        Container.set(EntityManager, MockEntityManager);
+    });
 
     beforeEach(() => {
         LoggerMockManager.setupMocks();
@@ -24,8 +32,8 @@ describe('graphql loader', () => {
         MockApolloServer.applyMiddleware.mockClear();
     });
 
-    it('should create ApolloServer', async () => {
-        expect.assertions(13);
+    it('should create ApolloServer with correct settings', async () => {
+        expect.assertions(16);
 
         // when
         let apolloServerContextGenerator: ContextFunction<ExpressContext, ExpressContext>;
@@ -48,8 +56,9 @@ describe('graphql loader', () => {
         });
 
         expect(MockExpressFunction).toHaveBeenCalledTimes(1);
-        expect(MockExpress.use).toHaveBeenCalledTimes(1);
-        expect(MockExpress.use).toHaveBeenCalledWith(expect.any(Function));
+        expect(MockExpress.use).toHaveBeenCalledTimes(2);
+        expect(MockExpress.use).toHaveBeenNthCalledWith(1, expect.any(Function));
+        expect(MockExpress.use).toHaveBeenNthCalledWith(2, expect.any(Function));
 
         expect(MockApolloServer.applyMiddleware).toHaveBeenCalledTimes(1);
         expect(MockApolloServer.applyMiddleware).toHaveBeenCalledWith({
@@ -68,6 +77,14 @@ describe('graphql loader', () => {
         const expressContext = {};
         const apolloContext = apolloServerContextGenerator!(expressContext as ExpressContext);
         expect(expressContext).toBe(apolloContext);
+
+        // test MicroORM create context function
+        const microOrmCreateReqContextSpy = jest.spyOn(RequestContext, 'create').mockReturnValueOnce(undefined);
+        const microOrmCreateReqContextFn = MockExpress.use.mock.calls[ 1 ][ 0 ];
+        microOrmCreateReqContextFn('REQ', 'RES', 'NEXT_FN_TEST_VALUE');
+        expect(microOrmCreateReqContextSpy).toHaveBeenCalledTimes(1);
+        expect(microOrmCreateReqContextSpy).toHaveBeenCalledWith(MockEntityManager, 'NEXT_FN_TEST_VALUE');
+
     });
 
 });

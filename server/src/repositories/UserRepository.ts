@@ -1,12 +1,10 @@
-import { Service } from 'typedi';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository } from 'mikro-orm';
 
-import { User } from '../entities/User';
+import { User } from '../entities/user/User';
 
 
-@Service()
-@EntityRepository(User)
-export class UserRepository extends Repository<User> {
+@Repository(User)
+export class UserRepository extends EntityRepository<User> {
 
     async isEmailTaken(email: string): Promise<boolean> {
         const user = await this.findOne({ email });

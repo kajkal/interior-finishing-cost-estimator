@@ -1,8 +1,6 @@
 import { hash } from 'argon2';
 import { Container } from 'typedi';
-import { ConnectionManager } from 'typeorm';
 
-import { MockConnectionManager } from '../../../__mocks__/repositories/ConnectionManager';
 import { MockUserRepository } from '../../../__mocks__/repositories/MockUserRepository';
 import { GraphQLLoggerMockManager } from '../../../__mocks__/utils/LoggerMockManager';
 import { MockJwtService } from '../../../__mocks__/services/MockJwtService';
@@ -10,9 +8,10 @@ import { MockJwtService } from '../../../__mocks__/services/MockJwtService';
 import { executeGraphQLOperation } from '../../../test-utils/executeGraphQLOperation';
 import { RegisterFormData } from '../../../../src/modules/user/input/RegisterFormData';
 import { LoginFormData } from '../../../../src/modules/user/input/LoginFormData';
-import { UserRepository } from '../../../../src/repositories/UserRepository';
 import { JwtService } from '../../../../src/services/JwtService';
-import { User } from '../../../../src/entities/User';
+import { User } from '../../../../src/entities/user/User';
+import { UserRepository } from '../../../../src/repositories/UserRepository';
+import { RequestContextUtils } from '../../../test-utils/RequestContextUtils';
 
 
 describe('UserResolver class', () => {
@@ -20,7 +19,6 @@ describe('UserResolver class', () => {
     beforeAll(() => {
         Container.set(UserRepository, MockUserRepository);
         Container.set(JwtService, MockJwtService);
-        Container.set(ConnectionManager, MockConnectionManager);
     });
 
     beforeEach(() => {
@@ -29,12 +27,120 @@ describe('UserResolver class', () => {
         MockJwtService.setupSpies();
     });
 
-    describe('register', () => {
+    describe('me query', () => {
+
+        const meQuery = `
+            query Me {
+              me {
+                name
+                email
+                products {
+                  name
+                }
+                projects {
+                  name
+                }
+                offers {
+                  name
+                }
+              }
+            }
+        `;
+
+        it('should return data of the currently authenticated user if user is authenticated', async () => {
+            expect.assertions(10);
+
+            // mock user from db
+            const mockLoadProductItems = jest.fn().mockResolvedValue([]);
+            const mockLoadProjectItems = jest.fn().mockResolvedValue([]);
+            const mockLoadOfferItems = jest.fn().mockResolvedValue([]);
+            const userObjectFromDb = Object.assign(new User(), {
+                id: 'TEST_ID_VALUE',
+                name: 'John Smith',
+                email: 'john.smith@domain.com',
+                products: { loadItems: mockLoadProductItems },
+                projects: { loadItems: mockLoadProjectItems },
+                offers: { loadItems: mockLoadOfferItems },
+            });
+            MockUserRepository.findOneOrFail.mockResolvedValue(userObjectFromDb as User);
+
+            const requestContext = RequestContextUtils.createWithValidCookie(userObjectFromDb);
+            const response = await executeGraphQLOperation({
+                source: meQuery,
+                contextValue: requestContext,
+            });
+
+            // verify if JWT cookie was verified
+            expect(MockJwtService.verify).toHaveBeenCalledTimes(1);
+            expect(MockJwtService.verify).toHaveBeenCalledWith(requestContext);
+
+            // verify if the database was queried
+            expect(MockUserRepository.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(MockUserRepository.findOneOrFail).toHaveBeenCalledWith({ id: 'TEST_ID_VALUE' });
+
+            // verify if field resolvers was called
+            expect(mockLoadProductItems).toHaveBeenCalledTimes(1);
+            expect(mockLoadProjectItems).toHaveBeenCalledTimes(1);
+            expect(mockLoadOfferItems).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if query response is correct
+            expect(response).toEqual({
+                data: {
+                    me: {
+                        name: 'John Smith',
+                        email: 'john.smith@domain.com',
+                        products: [],
+                        projects: [],
+                        offers: [],
+                    },
+                },
+            });
+        });
+
+        it('should return error if user is not authenticated', async () => {
+            expect.assertions(6);
+
+            const requestContext = RequestContextUtils.createWithInvalidCookie();
+            const response = await executeGraphQLOperation({
+                source: meQuery,
+                contextValue: requestContext,
+            });
+
+            // verify if JWT cookie was verified
+            expect(MockJwtService.verify).toHaveBeenCalledTimes(1);
+            expect(MockJwtService.verify).toHaveBeenCalledWith(requestContext);
+
+            // verify if functions reserved for authenticated users were not called
+            expect(MockUserRepository.findOneOrFail).toHaveBeenCalledTimes(0);
+
+            // verify if access error was logged
+            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
+
+            // verify if query response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'INVALID_TOKEN',
+                    }),
+                ],
+            });
+        });
+
+    });
+
+    describe('register mutation', () => {
 
         const registerMutation = `
             mutation Register($data: RegisterFormData!) {
               register(data: $data) {
-                projects
+                name
+                email
               }
             }
         `;
@@ -60,35 +166,36 @@ describe('UserResolver class', () => {
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
-            // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
-
             // verify if email was check for availability
             expect(MockUserRepository.isEmailTaken).toHaveBeenCalledTimes(1);
             expect(MockUserRepository.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
 
             // verify if new user object was created and saved in db
             expect(MockUserRepository.create).toHaveBeenCalledTimes(1);
-            expect(MockUserRepository.save).toHaveBeenCalledTimes(1);
+            expect(MockUserRepository.persistAndFlush).toHaveBeenCalledTimes(1);
 
             // verify if JWT is generated and added to cookie
             expect(MockJwtService.generate).toHaveBeenCalledTimes(1);
-            expect(MockJwtService.generate).toHaveBeenCalledWith(expect.any(Object), {
+            expect(MockJwtService.generate).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
                 name: 'John Smith',
                 email: 'john.smith@domain.com',
                 password: expect.any(String),
-                createdAt: expect.any(String),
+                createdAt: expect.any(Date),
                 id: 'TEST_ID_FOR_john.smith@domain.com',
-            });
+            }));
             expect(mockCookieSetter).toHaveBeenCalledTimes(1);
             expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
                 data: {
                     register: {
-                        projects: [],
+                        name: 'John Smith',
+                        email: 'john.smith@domain.com',
                     },
                 },
             });
@@ -117,7 +224,7 @@ describe('UserResolver class', () => {
 
             // verify if functions reserved for valid user data are not called
             expect(MockUserRepository.create).toHaveBeenCalledTimes(0);
-            expect(MockUserRepository.save).toHaveBeenCalledTimes(0);
+            expect(MockUserRepository.persistAndFlush).toHaveBeenCalledTimes(0);
             expect(MockJwtService.generate).toHaveBeenCalledTimes(0);
 
             // verify if mutation response is correct
@@ -133,12 +240,12 @@ describe('UserResolver class', () => {
 
     });
 
-    describe('login', () => {
+    describe('login mutation', () => {
 
         const loginMutation = `
             mutation Login($data: LoginFormData!) {
               login(data: $data) {
-                projects
+                email
               }
             }
         `;
@@ -169,21 +276,21 @@ describe('UserResolver class', () => {
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
-            // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
-
             // verify if JWT is generated and added to cookie
             expect(MockJwtService.generate).toHaveBeenCalledTimes(1);
             expect(MockJwtService.generate).toHaveBeenCalledWith(expect.any(Object), userObjectFromDb);
             expect(mockCookieSetter).toHaveBeenCalledTimes(1);
             expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
 
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
             // verify if mutation response is correct
             expect(response).toEqual({
                 data: {
                     login: {
-                        projects: [],
+                        email: 'john.smith@domain.com',
                     },
                 },
             });
@@ -195,7 +302,7 @@ describe('UserResolver class', () => {
             const loginFormData = { ...basicLoginFormData };
 
             // mock check if email is in db
-            MockUserRepository.findOne.mockResolvedValue(undefined);
+            MockUserRepository.findOne.mockResolvedValue(null);
 
             const response = await executeGraphQLOperation({
                 source: loginMutation,
@@ -204,12 +311,12 @@ describe('UserResolver class', () => {
                 },
             });
 
+            // verify if functions reserved for valid user credentials are not called
+            expect(MockJwtService.generate).toHaveBeenCalledTimes(0);
+
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify if functions reserved for valid user credentials are not called
-            expect(MockJwtService.generate).toHaveBeenCalledTimes(0);
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -241,12 +348,12 @@ describe('UserResolver class', () => {
                 },
             });
 
+            // verify if functions reserved for valid user credentials are not called
+            expect(MockJwtService.generate).toHaveBeenCalledTimes(0);
+
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify if functions reserved for valid user credentials are not called
-            expect(MockJwtService.generate).toHaveBeenCalledTimes(0);
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -261,7 +368,7 @@ describe('UserResolver class', () => {
 
     });
 
-    describe('logout', () => {
+    describe('logout mutation', () => {
 
         const logoutMutation = `
             mutation Logout {
@@ -278,12 +385,12 @@ describe('UserResolver class', () => {
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
+            // verify if JWT is invalidated
+            expect(MockJwtService.invalidate).toHaveBeenCalledTimes(1);
+
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
-
-            // verify if JWT is invalidated
-            expect(MockJwtService.invalidate).toHaveBeenCalledTimes(1);
 
             // verify if mutation response is correct
             expect(response).toEqual({

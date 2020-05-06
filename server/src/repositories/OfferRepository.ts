@@ -1,11 +1,9 @@
-import { Service } from 'typedi';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository } from 'mikro-orm';
 
-import { Offer } from '../entities/Offer';
+import { Offer } from '../entities/offer/Offer';
 
 
-@Service()
-@EntityRepository(Offer)
-export class OfferRepository extends Repository<Offer> {
+@Repository(Offer)
+export class OfferRepository extends EntityRepository<Offer> {
 
 }

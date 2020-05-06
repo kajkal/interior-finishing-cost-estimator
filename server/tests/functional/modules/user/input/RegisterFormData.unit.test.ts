@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { DeepPartial } from 'typeorm';
 import { validateSync, ValidationError } from 'class-validator';
 
 import { RegisterFormData } from '../../../../../src/modules/user/input/RegisterFormData';
 import { LoginFormData } from '../../../../../src/modules/user/input/LoginFormData';
+import { DeepPartial } from '../../../../test-utils/DeepPartial';
 
 
 describe('Register form data class', () => {

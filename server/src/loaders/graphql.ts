@@ -4,11 +4,15 @@ import { Container } from 'typedi';
 import { GraphQLSchema } from 'graphql';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
+import { EntityManager, RequestContext } from 'mikro-orm';
 
-import { UserResolver } from '../modules/user/UserResolver';
-import { authChecker } from '../utils/authChecker';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
+import { authChecker } from '../utils/authChecker';
+import { UserResolver } from '../modules/user/UserResolver';
+import { ProductResolver } from '../modules/product/ProductResolver';
+import { ProjectResolver } from '../modules/project/ProjectResolver';
+import { OfferResolver } from '../modules/offer/OfferResolver';
 
 
 /**
@@ -16,7 +20,12 @@ import { logger } from '../utils/logger';
  */
 export function buildGraphQLSchema(): Promise<GraphQLSchema> {
     return buildSchema({
-        resolvers: [ UserResolver ],
+        resolvers: [
+            UserResolver,
+            ProductResolver,
+            ProjectResolver,
+            OfferResolver,
+        ],
         authChecker,
         container: Container,
     });
@@ -35,6 +44,9 @@ export async function createGraphQLServer() {
             credentials: true,
         }),
     );
+
+    const em = Container.get(EntityManager);
+    app.use((req, res, next) => RequestContext.create(em, next));
 
     apolloServer.applyMiddleware({ app, cors: false });
 

@@ -1,7 +1,7 @@
 import { graphql, GraphQLSchema } from 'graphql';
-import { DeepPartial } from 'typeorm';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { buildGraphQLSchema } from '../../src/loaders/graphql';
+import { DeepPartial } from './DeepPartial';
 
 
 export interface ExecuteGraphQLOperationOptions {
