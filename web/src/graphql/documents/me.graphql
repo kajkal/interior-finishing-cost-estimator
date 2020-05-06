@@ -1,0 +1,15 @@
+query Me {
+    me {
+        name
+        email
+        products {
+            name
+        }
+        projects {
+            name
+        }
+        offers {
+            name
+        }
+    }
+}

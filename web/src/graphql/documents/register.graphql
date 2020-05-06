@@ -1,0 +1,15 @@
+mutation Register($data: RegisterFormData!) {
+    register(data: $data) {
+        name
+        email
+        products {
+            name
+        }
+        projects {
+            name
+        }
+        offers {
+            name
+        }
+    }
+}

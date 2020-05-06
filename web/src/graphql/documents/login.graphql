@@ -1,0 +1,15 @@
+mutation Login($data: LoginFormData!) {
+    login(data: $data) {
+        name
+        email
+        products {
+            name
+        }
+        projects {
+            name
+        }
+        offers {
+            name
+        }
+    }
+}
