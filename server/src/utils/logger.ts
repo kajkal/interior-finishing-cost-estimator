@@ -1,11 +1,12 @@
+import { Service } from 'typedi';
 import { DateTime } from 'luxon';
 import { createLogger, format, transports } from 'winston';
-import {TransformFunction} from 'logform';
+import { TransformFunction } from 'logform';
 
 import { config } from '../config/config';
 
 
-export const graphqlLogTransformer: TransformFunction = ({info, jwtPayload, ...rest}) => ({
+export const graphqlLogTransformer: TransformFunction = ({ info, jwtPayload, ...rest }) => ({
     ...rest,
     path: `${info?.parentType?.name}.${info?.fieldName}`,
     userId: jwtPayload?.userId,
@@ -14,7 +15,8 @@ export const graphqlLogTransformer: TransformFunction = ({info, jwtPayload, ...r
 /**
  * Logs GraphQL related actions.
  */
-export const graphQLLogger = createLogger({
+const graphqlLogFilePath = createLogFilePath(config.logger.graphqlLogFilename);
+export const GraphQLLogger = Service(() => createLogger({
     level: 'info',
     format: format.combine(
         format(graphqlLogTransformer)(),
@@ -23,15 +25,16 @@ export const graphQLLogger = createLogger({
     ),
     transports: [
         new transports.File({
-            filename: createLogFilePath(config.logger.graphqlLogFilename),
+            filename: graphqlLogFilePath,
         }),
     ],
-});
+}));
 
 /**
  * Logs server related actions.
  */
-export const logger = createLogger({
+const serverLogFilePath = createLogFilePath(config.logger.serverLogFilename);
+export const Logger = Service(() => createLogger({
     level: config.logger.logLevel,
     format: format.combine(
         format.timestamp(),
@@ -41,7 +44,7 @@ export const logger = createLogger({
     ),
     transports: [
         new transports.File({
-            filename: createLogFilePath(config.logger.serverLogFilename),
+            filename: serverLogFilePath,
         }),
         new transports.Console({
             format: format.combine(
@@ -50,7 +53,7 @@ export const logger = createLogger({
             ),
         }),
     ],
-});
+}));
 
 function createLogFilePath(filename: string): string {
     const directory = 'logs';

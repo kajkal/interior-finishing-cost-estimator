@@ -2,7 +2,7 @@ import { Container } from 'typedi';
 import { EntityManager, MikroORM } from 'mikro-orm';
 
 import { config } from '../config/config';
-import { logger } from '../utils/logger';
+import { Logger } from '../utils/logger';
 import { BaseEntity } from '../entities/BaseEntity';
 import { User } from '../entities/user/User';
 import { Product } from '../entities/product/Product';
@@ -36,9 +36,9 @@ export async function connectToDatabase(): Promise<void> {
         Container.set(ProjectRepository, orm.em.getRepository(Project));
         Container.set(OfferRepository, orm.em.getRepository(Offer));
 
-        logger.info('Successfully connected to the database.');
+        Container.get(Logger).info('Successfully connected to the database.');
     } catch (error) {
-        logger.error('Cannot connect to database. ', error);
+        Container.get(Logger).error('Cannot connect to database. ', error);
         process.exit();
     }
 }

@@ -4,7 +4,7 @@ import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { JwtPayload, JwtService } from '../services/JwtService';
-import { graphQLLogger } from './logger';
+import { GraphQLLogger } from './logger';
 
 
 /**
@@ -26,7 +26,7 @@ export const authChecker: AuthChecker<ExpressContext> = ({ context, info }, _rol
         enrichedContent.jwtPayload = Container.get(JwtService).verify(context);
         return true;
     } catch (error) {
-        graphQLLogger.warn({ message: 'invalid token', info });
+        Container.get(GraphQLLogger).warn({ message: 'invalid token', info });
         throw new AuthenticationError('INVALID_TOKEN');
     }
 };

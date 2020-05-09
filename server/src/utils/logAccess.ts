@@ -1,6 +1,7 @@
+import { Container } from 'typedi';
 import { MiddlewareFn } from 'type-graphql';
 
-import { graphQLLogger } from './logger';
+import { GraphQLLogger } from './logger';
 import { AuthorizedContext } from './authChecker';
 
 
@@ -10,9 +11,9 @@ import { AuthorizedContext } from './authChecker';
 export const logAccess: MiddlewareFn<AuthorizedContext> = async ({ context, info }, next) => {
     try {
         await next();
-        graphQLLogger.info({ message: 'access', info, jwtPayload: context?.jwtPayload });
+        Container.get(GraphQLLogger).info({ message: 'access', info, jwtPayload: context?.jwtPayload });
     } catch (error) {
-        graphQLLogger.info({ message: 'access-error', info, jwtPayload: context?.jwtPayload, error: error.message });
+        Container.get(GraphQLLogger).info({ message: 'access-error', info, jwtPayload: context?.jwtPayload, error: error.message });
         throw error;
     }
 };

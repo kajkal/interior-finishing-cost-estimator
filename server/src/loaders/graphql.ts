@@ -7,7 +7,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { EntityManager, RequestContext } from 'mikro-orm';
 
 import { config } from '../config/config';
-import { logger } from '../utils/logger';
+import { Logger } from '../utils/logger';
 import { authChecker } from '../utils/authChecker';
 import { UserResolver } from '../modules/user/UserResolver';
 import { ProductResolver } from '../modules/product/ProductResolver';
@@ -51,6 +51,6 @@ export async function createGraphQLServer() {
     apolloServer.applyMiddleware({ app, cors: false });
 
     app.listen(config.server.port, () => {
-        logger.info(`Server started at http://localhost:${config.server.port}/graphql`);
+        Container.get(Logger).info(`Server started at http://localhost:${config.server.port}/graphql`);
     });
 }

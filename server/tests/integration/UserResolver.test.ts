@@ -1,0 +1,393 @@
+import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
+import { JwtServiceSpiesManager } from '../__utils__/spies-managers/JwtServiceSpiesManager';
+import { executeGraphQLOperation } from '../__utils__/integration-utils/executeGraphQLOperation';
+import { GraphQLLoggerMockManager } from '../__utils__/mocks-managers/LoggerMockManager';
+import { TestDatabaseManager } from '../__utils__/integration-utils/TestDatabaseManager';
+import { RequestContextUtils } from '../__utils__/integration-utils/RequestContextUtils';
+import { generator } from '../__utils__/generator';
+
+import { RegisterFormData } from '../../src/modules/user/input/RegisterFormData';
+import { LoginFormData } from '../../src/modules/user/input/LoginFormData';
+import { Product } from '../../src/entities/product/Product';
+import { User } from '../../src/entities/user/User';
+
+
+describe('UserResolver class', () => {
+
+    const correctPassword = 'qwer.1234';
+
+    let existingUser: User;
+    let existingProduct: Product;
+
+    beforeAll(async () => {
+        await TestDatabaseManager.connect();
+        existingUser = await TestDatabaseManager.populateWithUser({
+            name: generator.name(),
+            email: generator.email(),
+            password: correctPassword,
+        });
+        existingProduct = await TestDatabaseManager.populateWithProduct({
+            user: existingUser.id,
+            name: 'Lamp',
+        });
+    });
+
+    afterAll(async () => {
+        await TestDatabaseManager.disconnect();
+    });
+
+    beforeEach(() => {
+        UserRepositorySpiesManager.setupSpies();
+        JwtServiceSpiesManager.setupSpies();
+        GraphQLLoggerMockManager.setupMocks();
+    });
+
+    describe('me query', () => {
+
+        const meQuery = `
+            query Me {
+              me {
+                name
+                email
+                products {
+                  name
+                }
+                projects {
+                  name
+                }
+                offers {
+                  name
+                }
+              }
+            }
+        `;
+
+        it('should return data of the currently authenticated user if user is authenticated', async () => {
+            expect.assertions(7);
+
+            const requestContext = RequestContextUtils.createWithValidCookie(existingUser);
+            const response = await executeGraphQLOperation({
+                source: meQuery,
+                contextValue: requestContext,
+            });
+
+            // verify if JWT cookie was verified
+            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(requestContext);
+
+            // verify if the database was queried
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: existingUser.id });
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if query response is correct
+            expect(response).toEqual({
+                data: {
+                    me: {
+                        name: existingUser.name,
+                        email: existingUser.email,
+                        products: [
+                            { name: existingProduct.name },
+                        ],
+                        projects: [],
+                        offers: [],
+                    },
+                },
+            });
+        });
+
+        it('should return error if user is not authenticated', async () => {
+            expect.assertions(6);
+
+            const requestContext = RequestContextUtils.createWithInvalidCookie();
+            const response = await executeGraphQLOperation({
+                source: meQuery,
+                contextValue: requestContext,
+            });
+
+            // verify if JWT cookie was verified
+            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(requestContext);
+
+            // verify if functions reserved for authenticated users are not called
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
+
+            // verify if access error was logged
+            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
+
+            // verify if query response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'INVALID_TOKEN',
+                    }),
+                ],
+            });
+        });
+
+    });
+
+    describe('register mutation', () => {
+
+        const registerMutation = `
+            mutation Register($data: RegisterFormData!) {
+              register(data: $data) {
+                name
+                email
+              }
+            }
+        `;
+
+        it('should create new user and return initial data if form data are valid', async () => {
+            expect.assertions(11);
+
+            const mockCookieSetter = jest.fn();
+            const registerFormData: RegisterFormData = {
+                name: generator.name(),
+                email: generator.email(),
+                password: generator.string({ length: 8 }),
+            };
+            const response = await executeGraphQLOperation({
+                source: registerMutation,
+                variableValues: {
+                    data: registerFormData,
+                },
+                contextValue: { res: { cookie: mockCookieSetter } },
+            });
+
+            // verify if email was check for availability
+            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
+
+            // verify if new user object was created and saved in db
+            expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
+
+            // verify if JWT is generated and added to cookie
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(1);
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
+                name: registerFormData.name,
+                email: registerFormData.email,
+                password: expect.any(String),
+                createdAt: expect.any(Date),
+                id: expect.any(String),
+            }));
+            expect(mockCookieSetter).toHaveBeenCalledTimes(1);
+            expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: {
+                    register: {
+                        name: registerFormData.name,
+                        email: registerFormData.email,
+                    },
+                },
+            });
+        });
+
+        it('should return error if user with given email address already exists', async () => {
+            expect.assertions(8);
+
+            const registerFormData: RegisterFormData = {
+                name: generator.name(),
+                email: existingUser.email,
+                password: generator.string({ length: 8 }),
+            };
+            const response = await executeGraphQLOperation({
+                source: registerMutation,
+                variableValues: {
+                    data: registerFormData,
+                },
+            });
+
+            // verify if email was check for availability
+            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
+
+            // verify if functions reserved for valid user data are not called
+            expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'EMAIL_NOT_AVAILABLE',
+                    }),
+                ],
+            });
+        });
+
+    });
+
+    describe('login mutation', () => {
+
+        const loginMutation = `
+            mutation Login($data: LoginFormData!) {
+              login(data: $data) {
+                name
+                email
+              }
+            }
+        `;
+
+        it('should login user and return initial data if credentials are correct', async () => {
+            expect.assertions(7);
+
+            const mockCookieSetter = jest.fn();
+            const loginFormData: LoginFormData = {
+                email: existingUser.email,
+                password: correctPassword,
+            };
+            const response = await executeGraphQLOperation({
+                source: loginMutation,
+                variableValues: {
+                    data: loginFormData,
+                },
+                contextValue: { res: { cookie: mockCookieSetter } },
+            });
+
+            // verify if JWT is generated and added to cookie
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(1);
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledWith(expect.any(Object), existingUser);
+            expect(mockCookieSetter).toHaveBeenCalledTimes(1);
+            expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: {
+                    login: {
+                        name: existingUser.name,
+                        email: existingUser.email,
+                    },
+                },
+            });
+        });
+
+        it('should return error if provided password is incorrect', async () => {
+            expect.assertions(5);
+
+            const mockCookieSetter = jest.fn();
+            const loginFormData: LoginFormData = {
+                email: existingUser.email,
+                password: 'wrong password',
+            };
+            const response = await executeGraphQLOperation({
+                source: loginMutation,
+                variableValues: {
+                    data: loginFormData,
+                },
+                contextValue: { res: { cookie: mockCookieSetter } },
+            });
+
+            // verify if functions reserved for valid credentials are not called
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+            expect(mockCookieSetter).toHaveBeenCalledTimes(0);
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'BAD_CREDENTIALS',
+                    }),
+                ],
+            });
+        });
+
+        it('should return error if there is no registered user with given email', async () => {
+            expect.assertions(5);
+
+            const mockCookieSetter = jest.fn();
+            const loginFormData: LoginFormData = {
+                email: 'not.registered@domain.com',
+                password: correctPassword,
+            };
+            const response = await executeGraphQLOperation({
+                source: loginMutation,
+                variableValues: {
+                    data: loginFormData,
+                },
+                contextValue: { res: { cookie: mockCookieSetter } },
+            });
+
+            // verify if functions reserved for valid credentials are not called
+            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+            expect(mockCookieSetter).toHaveBeenCalledTimes(0);
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'BAD_CREDENTIALS',
+                    }),
+                ],
+            });
+        });
+
+    });
+
+    describe('logout mutation', () => {
+
+        const logoutMutation = `
+            mutation Logout {
+              logout
+            }
+        `;
+
+        it('should invalidate user\' JWT', async () => {
+            expect.assertions(4);
+
+            const mockCookieSetter = jest.fn();
+            const response = await executeGraphQLOperation({
+                source: logoutMutation,
+                contextValue: { res: { cookie: mockCookieSetter } },
+            });
+
+            // verify if JWT is invalidated
+            expect(JwtServiceSpiesManager.invalidate).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
+            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: {
+                    logout: true,
+                },
+            });
+        });
+
+    });
+
+});
