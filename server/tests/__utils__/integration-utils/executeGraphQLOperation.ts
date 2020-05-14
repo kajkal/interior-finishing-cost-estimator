@@ -1,7 +1,7 @@
 import { graphql, GraphQLSchema } from 'graphql';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
-import { buildGraphQLSchema } from '../../../src/loaders/graphql';
+import { buildGraphQLSchema } from '../../../src/loaders/apollo';
 import { DeepPartial } from '../DeepPartial';
 
 

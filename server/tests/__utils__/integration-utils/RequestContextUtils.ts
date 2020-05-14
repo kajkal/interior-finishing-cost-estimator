@@ -1,39 +1,26 @@
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { JwtService } from '../../../src/services/JwtService';
+import { AuthService } from '../../../src/services/AuthService';
 import { User } from '../../../src/entities/user/User';
 
 
 export class RequestContextUtils {
 
-    static createWithInvalidCookie(): ExpressContext {
+    static createWithInvalidAccessToken(): ExpressContext {
         return {
             req: {
                 headers: {
-                    cookie: '',
+                    authorization: '',
                 },
             },
         } as ExpressContext;
     }
 
-    static createWithValidCookie(user: Pick<User, 'id'>): ExpressContext {
-        // get valid jwt:
-        let jwtCookieName;
-        let jwtCookieValue;
-        new JwtService().generate({
-            res: {
-                cookie: (cookieName: string, cookieValue: string) => {
-                    jwtCookieName = cookieName;
-                    jwtCookieValue = cookieValue;
-                },
-            },
-        } as ExpressContext, user);
-
-        // create context:
-        const jwtCookie = `${jwtCookieName}=${jwtCookieValue}`;
+    static createWithValidAccessToken(userData: Pick<User, 'id'>): ExpressContext {
+        const jwt = new AuthService().generateAccessToken(userData);
         return {
             req: {
                 headers: {
-                    cookie: jwtCookie,
+                    authorization: `Bearer ${jwt}`,
                 },
             },
         } as ExpressContext;

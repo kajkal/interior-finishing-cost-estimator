@@ -1,11 +1,13 @@
 import 'reflect-metadata';
 import { connectToDatabase } from './loaders/mongodb';
-import { createGraphQLServer } from './loaders/graphql';
+import { createApolloServer } from './loaders/apollo';
+import { createExpressServer } from './loaders/express';
 
 
 async function setupServer() {
     await connectToDatabase();
-    await createGraphQLServer();
+    const apolloServer = await createApolloServer();
+    await createExpressServer(apolloServer);
 }
 
 setupServer();

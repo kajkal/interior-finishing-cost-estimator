@@ -47,6 +47,7 @@ describe('config object', () => {
             expect(config).toEqual({
                 server: expect.objectContaining({
                     port: expect.any(Number),
+                    corsOrigin: expect.any(String),
                 }),
                 logger: expect.objectContaining({
                     logLevel: expect.any(String),
@@ -55,7 +56,8 @@ describe('config object', () => {
                     mongodbUrl: expect.any(String),
                 }),
                 auth: expect.objectContaining({
-                    jwtPrivateKey: expect.any(String),
+                    accessTokenPrivateKey: expect.any(String),
+                    refreshTokenPrivateKey: expect.any(String),
                 }),
             });
             expect(MockDotenv.config).toHaveBeenCalledTimes(1);
@@ -75,6 +77,7 @@ describe('config object', () => {
         expect(config).toEqual({
             server: expect.objectContaining({
                 port: 4005,
+                corsOrigin: 'CORS_ORIGIN_TEST_VALUE',
             }),
             logger: expect.objectContaining({
                 logLevel: 'info',
@@ -83,7 +86,8 @@ describe('config object', () => {
                 mongodbUrl: 'mongodb://localhost:27017/estimator-test',
             }),
             auth: expect.objectContaining({
-                jwtPrivateKey: 'JWT_PRIVATE_KEY_TEST_VALUE',
+                accessTokenPrivateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
+                refreshTokenPrivateKey: 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
             }),
         });
         expect(MockDotenv.config).toHaveBeenCalledTimes(1);

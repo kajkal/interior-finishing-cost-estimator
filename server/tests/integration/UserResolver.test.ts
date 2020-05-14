@@ -1,5 +1,5 @@
 import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
-import { JwtServiceSpiesManager } from '../__utils__/spies-managers/JwtServiceSpiesManager';
+import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
 import { executeGraphQLOperation } from '../__utils__/integration-utils/executeGraphQLOperation';
 import { GraphQLLoggerMockManager } from '../__utils__/mocks-managers/LoggerMockManager';
 import { TestDatabaseManager } from '../__utils__/integration-utils/TestDatabaseManager';
@@ -38,7 +38,7 @@ describe('UserResolver class', () => {
 
     beforeEach(() => {
         UserRepositorySpiesManager.setupSpies();
-        JwtServiceSpiesManager.setupSpies();
+        AuthServiceSpiesManager.setupSpies();
         GraphQLLoggerMockManager.setupMocks();
     });
 
@@ -65,15 +65,15 @@ describe('UserResolver class', () => {
         it('should return data of the currently authenticated user if user is authenticated', async () => {
             expect.assertions(7);
 
-            const requestContext = RequestContextUtils.createWithValidCookie(existingUser);
+            const requestContext = RequestContextUtils.createWithValidAccessToken(existingUser);
             const response = await executeGraphQLOperation({
                 source: meQuery,
                 contextValue: requestContext,
             });
 
-            // verify if JWT cookie was verified
-            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
-            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(requestContext);
+            // verify if access token was verified
+            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(requestContext.req);
 
             // verify if the database was queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
@@ -102,15 +102,15 @@ describe('UserResolver class', () => {
         it('should return error if user is not authenticated', async () => {
             expect.assertions(6);
 
-            const requestContext = RequestContextUtils.createWithInvalidCookie();
+            const requestContext = RequestContextUtils.createWithInvalidAccessToken();
             const response = await executeGraphQLOperation({
                 source: meQuery,
                 contextValue: requestContext,
             });
 
-            // verify if JWT cookie was verified
-            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledTimes(1);
-            expect(JwtServiceSpiesManager.verify).toHaveBeenCalledWith(requestContext);
+            // verify if access token was verified
+            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(requestContext.req);
 
             // verify if functions reserved for authenticated users are not called
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
@@ -124,7 +124,7 @@ describe('UserResolver class', () => {
                 data: null,
                 errors: [
                     expect.objectContaining({
-                        message: 'INVALID_TOKEN',
+                        message: 'INVALID_ACCESS_TOKEN',
                     }),
                 ],
             });
@@ -137,14 +137,17 @@ describe('UserResolver class', () => {
         const registerMutation = `
             mutation Register($data: RegisterFormData!) {
               register(data: $data) {
-                name
-                email
+                accessToken
+                user {
+                  name
+                  email
+                }
               }
             }
         `;
 
         it('should create new user and return initial data if form data are valid', async () => {
-            expect.assertions(11);
+            expect.assertions(13);
 
             const mockCookieSetter = jest.fn();
             const registerFormData: RegisterFormData = {
@@ -168,9 +171,9 @@ describe('UserResolver class', () => {
             expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(1);
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
 
-            // verify if JWT is generated and added to cookie
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(1);
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
+            // verify if refresh token is generated and added to cookie
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
                 name: registerFormData.name,
                 email: registerFormData.email,
                 password: expect.any(String),
@@ -178,7 +181,11 @@ describe('UserResolver class', () => {
                 id: expect.any(String),
             }));
             expect(mockCookieSetter).toHaveBeenCalledTimes(1);
-            expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
+            expect(mockCookieSetter).toHaveBeenCalledWith('rt', expect.any(String), expect.any(Object));
+
+            // verify if access token is generated
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(expect.any(User));
 
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
@@ -188,15 +195,18 @@ describe('UserResolver class', () => {
             expect(response).toEqual({
                 data: {
                     register: {
-                        name: registerFormData.name,
-                        email: registerFormData.email,
+                        accessToken: expect.any(String),
+                        user: {
+                            name: registerFormData.name,
+                            email: registerFormData.email,
+                        },
                     },
                 },
             });
         });
 
         it('should return error if user with given email address already exists', async () => {
-            expect.assertions(8);
+            expect.assertions(9);
 
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
@@ -217,7 +227,8 @@ describe('UserResolver class', () => {
             // verify if functions reserved for valid user data are not called
             expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(0);
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
@@ -241,14 +252,17 @@ describe('UserResolver class', () => {
         const loginMutation = `
             mutation Login($data: LoginFormData!) {
               login(data: $data) {
-                name
-                email
+                accessToken
+                user {
+                  name
+                  email
+                }
               }
             }
         `;
 
         it('should login user and return initial data if credentials are correct', async () => {
-            expect.assertions(7);
+            expect.assertions(9);
 
             const mockCookieSetter = jest.fn();
             const loginFormData: LoginFormData = {
@@ -263,11 +277,15 @@ describe('UserResolver class', () => {
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
-            // verify if JWT is generated and added to cookie
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(1);
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledWith(expect.any(Object), existingUser);
+            // verify if refresh token is generated and added to cookie
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), existingUser);
             expect(mockCookieSetter).toHaveBeenCalledTimes(1);
-            expect(mockCookieSetter).toHaveBeenCalledWith('jwt', expect.any(String), expect.any(Object));
+            expect(mockCookieSetter).toHaveBeenCalledWith('rt', expect.any(String), expect.any(Object));
+
+            // verify if access token is generated
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(existingUser);
 
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
@@ -277,15 +295,18 @@ describe('UserResolver class', () => {
             expect(response).toEqual({
                 data: {
                     login: {
-                        name: existingUser.name,
-                        email: existingUser.email,
+                        accessToken: expect.any(String),
+                        user: {
+                            name: existingUser.name,
+                            email: existingUser.email,
+                        },
                     },
                 },
             });
         });
 
         it('should return error if provided password is incorrect', async () => {
-            expect.assertions(5);
+            expect.assertions(6);
 
             const mockCookieSetter = jest.fn();
             const loginFormData: LoginFormData = {
@@ -301,7 +322,8 @@ describe('UserResolver class', () => {
             });
 
             // verify if functions reserved for valid credentials are not called
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
             expect(mockCookieSetter).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
@@ -320,7 +342,7 @@ describe('UserResolver class', () => {
         });
 
         it('should return error if there is no registered user with given email', async () => {
-            expect.assertions(5);
+            expect.assertions(6);
 
             const mockCookieSetter = jest.fn();
             const loginFormData: LoginFormData = {
@@ -336,7 +358,8 @@ describe('UserResolver class', () => {
             });
 
             // verify if functions reserved for valid credentials are not called
-            expect(JwtServiceSpiesManager.generate).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
             expect(mockCookieSetter).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
@@ -374,7 +397,7 @@ describe('UserResolver class', () => {
             });
 
             // verify if JWT is invalidated
-            expect(JwtServiceSpiesManager.invalidate).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
 
             // verify if access was logged
             expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);

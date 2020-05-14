@@ -1,5 +1,6 @@
 export const MockExpress = {
     use: jest.fn(),
+    post: jest.fn(),
     listen: jest.fn(),
 };
 

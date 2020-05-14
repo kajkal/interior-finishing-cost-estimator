@@ -5,7 +5,7 @@ import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { Arg, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { RegisterFormData } from './input/RegisterFormData';
-import { JwtService } from '../../services/JwtService';
+import { AuthService } from '../../services/AuthService';
 import { LoginFormData } from './input/LoginFormData';
 import { logAccess } from '../../utils/logAccess';
 import { User } from '../../entities/user/User';
@@ -14,6 +14,7 @@ import { UserRepository } from '../../repositories/UserRepository';
 import { Product } from '../../entities/product/Product';
 import { Project } from '../../entities/project/Project';
 import { Offer } from '../../entities/offer/Offer';
+import { InitialData } from './output/InitialData';
 
 
 @Service()
@@ -21,7 +22,7 @@ import { Offer } from '../../entities/offer/Offer';
 export class UserResolver {
 
     @Inject()
-    private readonly jwtService!: JwtService;
+    private readonly authService!: AuthService;
 
     @Inject()
     private readonly userRepository!: UserRepository;
@@ -54,32 +55,35 @@ export class UserResolver {
     }
 
     @UseMiddleware(logAccess)
-    @Mutation(() => User)
-    async register(@Arg('data') data: RegisterFormData, @Ctx() context: ExpressContext): Promise<User> {
+    @Mutation(() => InitialData)
+    async register(@Arg('data') data: RegisterFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
         if (await this.userRepository.isEmailTaken(data.email)) {
             throw new UserInputError('EMAIL_NOT_AVAILABLE');
         }
 
         const encodedPassword = await hash(data.password);
 
-        const userToSave = this.userRepository.create({ ...data, password: encodedPassword });
-        await this.userRepository.persistAndFlush(userToSave);
+        const user = this.userRepository.create({ ...data, password: encodedPassword });
+        await this.userRepository.persistAndFlush(user);
 
-        this.jwtService.generate(context, userToSave);
+        this.authService.generateRefreshToken(context.res, user);
+        const accessToken = this.authService.generateAccessToken(user);
 
-        return userToSave;
+        return { user, accessToken };
     }
 
     @UseMiddleware(logAccess)
-    @Mutation(() => User)
-    async login(@Arg('data') data: LoginFormData, @Ctx() context: ExpressContext): Promise<User> {
+    @Mutation(() => InitialData)
+    async login(@Arg('data') data: LoginFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
         const user = await this.userRepository.findOne({ email: data.email });
 
         if (user) {
             const isPasswordCorrect = await verify(user.password, data.password);
             if (isPasswordCorrect) {
-                this.jwtService.generate(context, user);
-                return user;
+                this.authService.generateRefreshToken(context.res, user);
+                const accessToken = this.authService.generateAccessToken(user);
+
+                return { user, accessToken };
             }
         }
 
@@ -89,7 +93,7 @@ export class UserResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async logout(@Ctx() context: ExpressContext): Promise<boolean> {
-        this.jwtService.invalidate(context);
+        this.authService.invalidateRefreshToken(context.res);
         return true;
     }
 

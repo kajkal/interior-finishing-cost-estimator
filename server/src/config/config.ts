@@ -16,12 +16,12 @@ dotenv.config({
 export const config = {
 
     server: {
-        port: parseInt(process.env.PORT || '4000'),
-        corsOrigin: 'http://localhost:3000',
+        port: parseInt(process.env.PORT!),
+        corsOrigin: process.env.CORS_ORIGIN!,
     },
 
     logger: {
-        logLevel: process.env.LOG_LEVEL || 'silly',
+        logLevel: process.env.LOG_LEVEL!,
         graphqlLogFilename: 'graphql.log',
         serverLogFilename: 'server.log',
     },
@@ -31,7 +31,8 @@ export const config = {
     },
 
     auth: {
-        jwtPrivateKey: process.env.JWT_PRIVATE_KEY!,
+        accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY!,
+        refreshTokenPrivateKey: process.env.REFRESH_TOKEN_PRIVATE_KEY!,
     },
 
 } as const;
