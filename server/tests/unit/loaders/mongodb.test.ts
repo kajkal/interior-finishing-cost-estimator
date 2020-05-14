@@ -1,7 +1,8 @@
 import { Container } from 'typedi';
 import { MikroORM } from 'mikro-orm';
 
-import { LoggerMockManager } from '../../__utils__/mocks-managers/LoggerMockManager';
+import { MockLogger } from '../../__mocks__/utils/logger';
+
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 import { BaseEntity } from '../../../src/entities/BaseEntity';
 import { User } from '../../../src/entities/user/User';
@@ -17,7 +18,7 @@ describe('mongodb loader', () => {
     beforeEach(() => {
         jest.spyOn(MikroORM, 'init').mockResolvedValue(MockOrm as any);
         jest.spyOn(Container, 'set').mockImplementation();
-        LoggerMockManager.setupMocks();
+        MockLogger.setupMocks();
     });
 
     afterEach(() => {
@@ -47,8 +48,8 @@ describe('mongodb loader', () => {
         }));
         expect(Container.set).toHaveBeenCalledTimes(2 + 4);
         expect(MockOrm.em.getRepository).toHaveBeenCalledTimes(4);
-        expect(LoggerMockManager.info).toHaveBeenCalledTimes(1);
-        expect(LoggerMockManager.info).toHaveBeenCalledWith(expect.stringMatching(/Successfully connected/));
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/Successfully connected/));
     });
 
     it('should log error and exit when cannot connect to database', async () => {
@@ -64,8 +65,8 @@ describe('mongodb loader', () => {
         await connectToDatabase();
 
         // then
-        expect(LoggerMockManager.error).toHaveBeenCalledTimes(1);
-        expect(LoggerMockManager.error).toHaveBeenCalledWith(expect.stringMatching(/Cannot connect/), expect.any(Error));
+        expect(MockLogger.error).toHaveBeenCalledTimes(1);
+        expect(MockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Cannot connect/), expect.any(Error));
         expect(process.exit).toHaveBeenCalledTimes(1);
     });
 

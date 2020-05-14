@@ -7,7 +7,7 @@ if (!process.env.NODE_ENV) {
 }
 
 dotenv.config({
-    path: resolve(process.cwd(), (process.env.NODE_ENV === 'test') ? '.env.test' : '.env'),
+    path: resolve((process.env.NODE_ENV === 'test') ? '.env.test' : '.env'),
 });
 
 /**
@@ -22,12 +22,11 @@ export const config = {
 
     logger: {
         logLevel: process.env.LOG_LEVEL!,
-        graphqlLogFilename: 'graphql.log',
-        serverLogFilename: 'server.log',
     },
 
     dataBase: {
         mongodbUrl: process.env.MONGODB_URL!,
+        cacheDir: process.env.DB_CACHE_DIR!,
     },
 
     auth: {

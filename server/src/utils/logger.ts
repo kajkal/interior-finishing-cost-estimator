@@ -1,62 +1,27 @@
-import { Service } from 'typedi';
-import { DateTime } from 'luxon';
-import { createLogger, format, transports } from 'winston';
 import { TransformFunction } from 'logform';
+import { createLogger, format, transports } from 'winston';
 
 import { config } from '../config/config';
 
 
 export const graphqlLogTransformer: TransformFunction = ({ info, jwtPayload, ...rest }) => ({
     ...rest,
-    path: `${info?.parentType?.name}.${info?.fieldName}`,
+    path: info && `${info?.parentType?.name}.${info?.fieldName}`,
     userId: jwtPayload?.userId,
 });
 
-/**
- * Logs GraphQL related actions.
- */
-const graphqlLogFilePath = createLogFilePath(config.logger.graphqlLogFilename);
-export const GraphQLLogger = Service(() => createLogger({
-    level: 'info',
-    format: format.combine(
-        format(graphqlLogTransformer)(),
-        format.timestamp(),
-        format.json(),
-    ),
-    transports: [
-        new transports.File({
-            filename: graphqlLogFilePath,
-        }),
-    ],
-}));
+const loggerFormat = (process.env.NODE_ENV === 'production')
+    ? format.combine(format.json())
+    : format.combine(format.colorize(), format.simple());
 
-/**
- * Logs server related actions.
- */
-const serverLogFilePath = createLogFilePath(config.logger.serverLogFilename);
-export const Logger = Service(() => createLogger({
+export const logger = createLogger({
     level: config.logger.logLevel,
     format: format.combine(
-        format.timestamp(),
-        format.errors({ stack: true }),
-        format.splat(),
-        format.json(),
+        format(graphqlLogTransformer)(),
     ),
     transports: [
-        new transports.File({
-            filename: serverLogFilePath,
-        }),
         new transports.Console({
-            format: format.combine(
-                format.cli(),
-                format.splat(),
-            ),
+            format: loggerFormat,
         }),
     ],
-}));
-
-function createLogFilePath(filename: string): string {
-    const directory = 'logs';
-    const datePrefix = DateTime.utc().toFormat('yyyy-MM-dd_HHmm');
-    return `${directory}/${datePrefix}_${filename}`;
-}
+});

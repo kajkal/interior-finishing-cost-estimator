@@ -1,7 +1,8 @@
+import { MockLogger } from '../__mocks__/utils/logger';
+
 import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
 import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
 import { executeGraphQLOperation } from '../__utils__/integration-utils/executeGraphQLOperation';
-import { GraphQLLoggerMockManager } from '../__utils__/mocks-managers/LoggerMockManager';
 import { TestDatabaseManager } from '../__utils__/integration-utils/TestDatabaseManager';
 import { RequestContextUtils } from '../__utils__/integration-utils/RequestContextUtils';
 import { generator } from '../__utils__/generator';
@@ -39,7 +40,7 @@ describe('UserResolver class', () => {
     beforeEach(() => {
         UserRepositorySpiesManager.setupSpies();
         AuthServiceSpiesManager.setupSpies();
-        GraphQLLoggerMockManager.setupMocks();
+        MockLogger.setupMocks();
     });
 
     describe('me query', () => {
@@ -80,8 +81,8 @@ describe('UserResolver class', () => {
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: existingUser.id });
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify if query response is correct
             expect(response).toEqual({
@@ -116,8 +117,8 @@ describe('UserResolver class', () => {
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
 
             // verify if access error was logged
-            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
+            expect(MockLogger.warn).toHaveBeenCalledTimes(1);
+            expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
 
             // verify if query response is correct
             expect(response).toEqual({
@@ -188,8 +189,8 @@ describe('UserResolver class', () => {
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(expect.any(User));
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -231,8 +232,8 @@ describe('UserResolver class', () => {
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -288,8 +289,8 @@ describe('UserResolver class', () => {
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(existingUser);
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -327,8 +328,8 @@ describe('UserResolver class', () => {
             expect(mockCookieSetter).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -363,8 +364,8 @@ describe('UserResolver class', () => {
             expect(mockCookieSetter).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({
@@ -400,8 +401,8 @@ describe('UserResolver class', () => {
             expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
 
             // verify if access was logged
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-            expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify if mutation response is correct
             expect(response).toEqual({

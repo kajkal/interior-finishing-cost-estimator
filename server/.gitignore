@@ -1,6 +1,5 @@
 /node_modules
 /build
-/logs
 /coverage
 npm-debug.log
 /.idea

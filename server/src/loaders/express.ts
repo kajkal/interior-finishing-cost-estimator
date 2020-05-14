@@ -6,7 +6,7 @@ import { EntityManager, RequestContext } from 'mikro-orm';
 import { ApolloServer } from 'apollo-server-express';
 import { AuthService } from '../services/AuthService';
 import { config } from '../config/config';
-import { Logger } from '../utils/logger';
+import { logger } from '../utils/logger';
 
 
 /**
@@ -19,11 +19,11 @@ export async function handleRefreshTokenRequest(req: Request, res: Response) {
         const userData = { id: jwtPayload.userId };
         authService.generateRefreshToken(res, userData);
         res.status(200).json({ accessToken: authService.generateAccessToken(userData) });
-        Container.get(Logger).debug('refresh token success!'); // TODO: remove
+        logger.debug('refresh token success!'); // TODO: remove
     } catch (error) {
         authService.invalidateRefreshToken(res);
         res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' });
-        Container.get(Logger).warn(`invalid refresh token, '${error.message}'`);
+        logger.warn(`invalid refresh token, '${error.message}'`);
     }
 }
 
@@ -41,6 +41,6 @@ export async function createExpressServer(apolloServer: ApolloServer) {
     apolloServer.applyMiddleware({ app, cors: false });
 
     app.listen(config.server.port, () => {
-        Container.get(Logger).info(`Server started at http://localhost:${config.server.port}/graphql`);
+        logger.info(`Server started at http://localhost:${config.server.port}/graphql`);
     });
 }

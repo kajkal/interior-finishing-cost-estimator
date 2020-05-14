@@ -1,6 +1,6 @@
 import { ResolverData } from 'type-graphql';
 
-import { GraphQLLoggerMockManager } from '../../__utils__/mocks-managers/LoggerMockManager';
+import { MockLogger } from '../../__mocks__/utils/logger';
 
 import { AuthorizedContext } from '../../../src/utils/authChecker';
 import { logAccess } from '../../../src/utils/logAccess';
@@ -9,7 +9,7 @@ import { logAccess } from '../../../src/utils/logAccess';
 describe('logAccess function', () => {
 
     beforeEach(() => {
-        GraphQLLoggerMockManager.setupMocks();
+        MockLogger.setupMocks();
     });
 
     it('should log access', async () => {
@@ -28,8 +28,8 @@ describe('logAccess function', () => {
         await logAccess(sampleAction, mockNextFunction);
 
         // then
-        expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-        expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith({
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith({
             message: 'access',
             info: sampleAction.info,
             jwtPayload: sampleAction.context.jwtPayload,
@@ -52,8 +52,8 @@ describe('logAccess function', () => {
 
         // when/then
         await expect(logAccess(sampleAction, mockNextFunction)).rejects.toThrow('TEST_ERROR_MESSAGE');
-        expect(GraphQLLoggerMockManager.info).toHaveBeenCalledTimes(1);
-        expect(GraphQLLoggerMockManager.info).toHaveBeenCalledWith({
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith({
             message: 'access-error',
             info: sampleAction.info,
             jwtPayload: sampleAction.context.jwtPayload,

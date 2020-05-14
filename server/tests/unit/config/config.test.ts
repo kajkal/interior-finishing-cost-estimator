@@ -54,6 +54,7 @@ describe('config object', () => {
                 }),
                 dataBase: expect.objectContaining({
                     mongodbUrl: expect.any(String),
+                    cacheDir: './tmp',
                 }),
                 auth: expect.objectContaining({
                     accessTokenPrivateKey: expect.any(String),
@@ -84,6 +85,7 @@ describe('config object', () => {
             }),
             dataBase: expect.objectContaining({
                 mongodbUrl: 'mongodb://localhost:27017/estimator-test',
+                cacheDir: './tmp',
             }),
             auth: expect.objectContaining({
                 accessTokenPrivateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',

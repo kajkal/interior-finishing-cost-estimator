@@ -2,8 +2,9 @@ import { ResolverData } from 'type-graphql';
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
+import { MockLogger } from '../../__mocks__/utils/logger';
+
 import { AuthServiceSpiesManager } from '../../__utils__/spies-managers/AuthServiceSpiesManager';
-import { GraphQLLoggerMockManager } from '../../__utils__/mocks-managers/LoggerMockManager';
 
 import { JwtPayload } from '../../../src/services/AuthService';
 import { authChecker } from '../../../src/utils/authChecker';
@@ -13,7 +14,7 @@ describe('authChecker function', () => {
 
     beforeEach(() => {
         AuthServiceSpiesManager.setupSpiesAndMockImplementations();
-        GraphQLLoggerMockManager.setupMocks();
+        MockLogger.setupMocks();
     });
 
     it('should return true and add JWT payload to context', () => {
@@ -54,8 +55,8 @@ describe('authChecker function', () => {
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
         expect(sampleContext).toEqual({ req: 'REQ_TEST_VALUE' });
-        expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledTimes(1);
-        expect(GraphQLLoggerMockManager.warn).toHaveBeenCalledWith({
+        expect(MockLogger.warn).toHaveBeenCalledTimes(1);
+        expect(MockLogger.warn).toHaveBeenCalledWith({
             message: 'invalid token',
             info: 'INFO_TEST_VALUE',
         });

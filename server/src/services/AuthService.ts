@@ -1,11 +1,11 @@
 import cookie from 'cookie';
-import { Container, Service } from 'typedi';
-import { Request, Response, CookieOptions } from 'express';
+import { Service } from 'typedi';
+import { CookieOptions, Request, Response } from 'express';
 import { sign, SignOptions, verify } from 'jsonwebtoken';
 
 import { config } from '../config/config';
 import { User } from '../entities/user/User';
-import { Logger } from '../utils/logger';
+import { logger } from '../utils/logger';
 
 
 /**
@@ -65,7 +65,7 @@ export class AuthService {
      */
     verifyRefreshToken(req: Request): JwtPayload {
         const { [ AuthService.config.refreshToken.cookie.name ]: tokenToVerify } = cookie.parse(req.headers.cookie!);
-        Container.get(Logger).debug('refreshToken cookie value', tokenToVerify); // TODO: remove
+        logger.debug('refreshToken cookie value', tokenToVerify); // TODO: remove
         return verify(tokenToVerify, config.auth.refreshTokenPrivateKey) as JwtPayload;
     }
 

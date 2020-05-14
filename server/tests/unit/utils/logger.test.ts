@@ -1,10 +1,5 @@
 import winston from 'winston';
-import { Container } from 'typedi';
 
-import { GraphQLLogger, Logger } from '../../../src/utils/logger';
-
-
-jest.mock('fs'); // to prevent unnecessary log files creation
 
 describe('logger objects', () => {
 
@@ -17,25 +12,17 @@ describe('logger objects', () => {
         (winston.createLogger as jest.Mock).mockRestore();
     });
 
-    it('should create GraphQL and server loggers with correct config', async () => {
-        expect.assertions(5);
+    it('should create logger with correct config', async () => {
+        expect.assertions(3);
 
         // given/when
-        const graphQLLogger = Container.of('test').get(GraphQLLogger);
-        const logger = Container.of('test').get(Logger);
+        const { logger } = await import('../../../src/utils/logger');
 
         // then
-        expect(graphQLLogger).toBeDefined();
         expect(logger).toBeDefined();
-        expect(winston.createLogger).toHaveBeenCalledTimes(2);
-        expect(winston.createLogger).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        expect(winston.createLogger).toHaveBeenCalledTimes(1);
+        expect(winston.createLogger).toHaveBeenCalledWith(expect.objectContaining({
             transports: [
-                expect.any(winston.transports.File),
-            ],
-        }));
-        expect(winston.createLogger).toHaveBeenNthCalledWith(2, expect.objectContaining({
-            transports: [
-                expect.any(winston.transports.File),
                 expect.any(winston.transports.Console),
             ],
         }));

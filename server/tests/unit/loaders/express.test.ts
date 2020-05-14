@@ -5,9 +5,9 @@ import { EntityManager, RequestContext } from 'mikro-orm';
 
 import { MockExpress, MockExpressFunction } from '../../__mocks__/libraries/express';
 import { MockApolloServer } from '../../__mocks__/libraries/apollo-server-express';
+import { MockLogger } from '../../__mocks__/utils/logger';
 
 import { AuthServiceSpiesManager } from '../../__utils__/spies-managers/AuthServiceSpiesManager';
-import { LoggerMockManager } from '../../__utils__/mocks-managers/LoggerMockManager';
 
 import { createExpressServer, handleRefreshTokenRequest } from '../../../src/loaders/express';
 import { AuthService, JwtPayload } from '../../../src/services/AuthService';
@@ -20,10 +20,10 @@ describe('express loader', () => {
     beforeAll(() => {
         Container.set(EntityManager, MockEntityManager);
         Container.set(AuthService, AuthServiceSpiesManager);
-        LoggerMockManager.setupMocks();
     });
 
     beforeEach(() => {
+        MockLogger.setupMocks();
         AuthServiceSpiesManager.setupSpiesAndMockImplementations();
     });
 
@@ -64,8 +64,8 @@ describe('express loader', () => {
         expect(MockExpress.listen).toHaveBeenCalledTimes(1);
         expect(MockExpress.listen).toHaveBeenCalledWith(4005, expect.any(Function));
 
-        expect(LoggerMockManager.info).toHaveBeenCalledTimes(1);
-        expect(LoggerMockManager.info).toHaveBeenCalledWith(expect.stringMatching(/Server started/));
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/Server started/));
 
         // test MicroORM create context function
         const microOrmCreateReqContextSpy = jest.spyOn(RequestContext, 'create').mockReturnValueOnce(undefined);

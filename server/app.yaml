@@ -1,0 +1,6 @@
+runtime: nodejs12
+
+env_variables:
+  CORS_ORIGIN: "https://interior-finishing-cost-estimator.karolesniak.com"
+  LOG_LEVEL: "info"
+  DB_CACHE_DIR: "/tmp"
