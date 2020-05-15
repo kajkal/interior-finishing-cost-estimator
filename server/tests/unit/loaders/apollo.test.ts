@@ -1,5 +1,6 @@
 import { ExpressContext } from 'apollo-server-express/src/ApolloServer';
 
+import '../../__mocks__/utils/logger';
 import { MockApolloServer, MockApolloServerConstructor } from '../../__mocks__/libraries/apollo-server-express';
 
 import { createApolloServer } from '../../../src/loaders/apollo';

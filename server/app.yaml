@@ -1,5 +1,7 @@
 runtime: nodejs12
 
+instance_class: F1
+
 env_variables:
   CORS_ORIGIN: "https://interior-finishing-cost-estimator.karolesniak.com"
   LOG_LEVEL: "info"

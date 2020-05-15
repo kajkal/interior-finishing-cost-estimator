@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 
+import '../../__mocks__/utils/logger';
+
 import { AuthService } from '../../../src/services/AuthService';
 
 

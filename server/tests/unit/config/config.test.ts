@@ -60,6 +60,9 @@ describe('config object', () => {
                     accessTokenPrivateKey: expect.any(String),
                     refreshTokenPrivateKey: expect.any(String),
                 }),
+                gc: expect.objectContaining({
+                    credentialsFile: expect.any(String),
+                }),
             });
             expect(MockDotenv.config).toHaveBeenCalledTimes(1);
             expect(MockDotenv.config).toHaveBeenCalledWith({
@@ -90,6 +93,9 @@ describe('config object', () => {
             auth: expect.objectContaining({
                 accessTokenPrivateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
                 refreshTokenPrivateKey: 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
+            }),
+            gc: expect.objectContaining({
+                credentialsFile: expect.stringMatching(/^.*server.*GC_CREDENTIALS_FILE_TEST_VALUE$/),
             }),
         });
         expect(MockDotenv.config).toHaveBeenCalledTimes(1);

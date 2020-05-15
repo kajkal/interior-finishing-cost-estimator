@@ -1,27 +1,49 @@
+import winston from 'winston';
 import { TransformFunction } from 'logform';
-import { createLogger, format, transports } from 'winston';
+import TransportStream from 'winston-transport';
+import { LoggingWinston } from '@google-cloud/logging-winston';
 
 import { config } from '../config/config';
 
 
-export const graphqlLogTransformer: TransformFunction = ({ info, jwtPayload, ...rest }) => ({
-    ...rest,
-    path: info && `${info?.parentType?.name}.${info?.fieldName}`,
-    userId: jwtPayload?.userId,
-});
+class TransportStreamManager {
 
-const loggerFormat = (process.env.NODE_ENV === 'production')
-    ? format.combine(format.json())
-    : format.combine(format.colorize(), format.simple());
+    static readonly transports = (process.env.NODE_ENV === 'production')
+        ? TransportStreamManager.createProductionTransports()
+        : TransportStreamManager.createStandardTransports();
 
-export const logger = createLogger({
+    private static createStandardTransports(): TransportStream | TransportStream[] {
+        return [
+            new winston.transports.Console({
+                format: winston.format.combine(
+                    winston.format.colorize(),
+                    winston.format.simple(),
+                ),
+            }),
+        ];
+    }
+
+    private static createProductionTransports(): TransportStream | TransportStream[] {
+        return [
+            new LoggingWinston({
+                keyFilename: config.gc.credentialsFile,
+            }),
+        ];
+    }
+
+}
+
+export const graphqlLogTransformer: TransformFunction = ({ info, jwtPayload, ...rest }) => {
+    const path = info && `${info?.parentType?.name}.${info?.fieldName}`;
+    const message = (path && `[${path}] ${rest.message}`) || rest.message;
+    return { ...rest, message, userId: jwtPayload?.userId };
+};
+
+
+export const logger = winston.createLogger({
     level: config.logger.logLevel,
-    format: format.combine(
-        format(graphqlLogTransformer)(),
+    format: winston.format.combine(
+        winston.format(graphqlLogTransformer)(),
     ),
-    transports: [
-        new transports.Console({
-            format: loggerFormat,
-        }),
-    ],
+    transports: TransportStreamManager.transports,
 });

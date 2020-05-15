@@ -34,4 +34,8 @@ export const config = {
         refreshTokenPrivateKey: process.env.REFRESH_TOKEN_PRIVATE_KEY!,
     },
 
+    gc: {
+        credentialsFile: resolve(process.env.GC_CREDENTIALS_FILE!),
+    },
+
 } as const;

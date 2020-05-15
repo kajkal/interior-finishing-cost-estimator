@@ -14,6 +14,7 @@
   "author": "Karol Leśniak",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/logging-winston": "^3.0.6",
     "apollo-server-express": "^2.12.0",
     "argon2": "^0.26.2",
     "class-validator": "^0.12.2",

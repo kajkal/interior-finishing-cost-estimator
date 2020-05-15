@@ -1,34 +1,67 @@
-import winston from 'winston';
-
+const MockLoggingWinston = jest.fn();
+jest.mock('@google-cloud/logging-winston', () => ({
+    LoggingWinston: MockLoggingWinston,
+}));
 
 describe('logger objects', () => {
 
+    let originalProcessEnv: NodeJS.ProcessEnv;
+    let MockCreateLogger: jest.SpyInstance;
+
     beforeEach(() => {
-        jest.spyOn(winston, 'createLogger');
+        MockCreateLogger = jest.spyOn(require('winston'), 'createLogger').mockReturnValue('LOGGER');
+
+        originalProcessEnv = process.env;
+        process.env = { ...originalProcessEnv };
     });
 
     afterEach(() => {
         jest.resetModules();
-        (winston.createLogger as jest.Mock).mockRestore();
+
+        MockCreateLogger.mockClear();
+        MockLoggingWinston.mockClear();
+
+        process.env = originalProcessEnv;
     });
 
-    it('should create logger with correct config', async () => {
+    it('should create logger with standard config', async () => {
         expect.assertions(3);
 
         // given/when
         const { logger } = await import('../../../src/utils/logger');
 
         // then
-        expect(logger).toBeDefined();
-        expect(winston.createLogger).toHaveBeenCalledTimes(1);
-        expect(winston.createLogger).toHaveBeenCalledWith(expect.objectContaining({
+        expect(logger).toBe('LOGGER');
+        expect(MockCreateLogger).toHaveBeenCalledTimes(1);
+        expect(MockCreateLogger).toHaveBeenCalledWith(expect.objectContaining({
             transports: [
-                expect.any(winston.transports.Console),
+                expect.any(require('winston').transports.Console),
+            ],
+        }));
+    });
+
+    it('should create logger with production config', async () => {
+        expect.assertions(3);
+
+        // given
+        process.env = { ...originalProcessEnv, NODE_ENV: 'production' };
+
+        // when
+        const { logger } = await import('../../../src/utils/logger');
+
+        // then
+        expect(logger).toBe('LOGGER');
+        expect(MockCreateLogger).toHaveBeenCalledTimes(1);
+        expect(MockCreateLogger).toHaveBeenCalledWith(expect.objectContaining({
+            transports: [
+                expect.any(MockLoggingWinston),
             ],
         }));
     });
 
     it('should transform graphql logs correctly', async () => {
+        expect.assertions(3);
+
         // given
         const basicLogData = {
             message: 'TEST_MESSAGE',
@@ -38,6 +71,7 @@ describe('logger objects', () => {
         const { graphqlLogTransformer } = await import('../../../src/utils/logger');
 
         // when
+        const transformedStandardLog = graphqlLogTransformer({ ...basicLogData, info: undefined });
         const transformedWithoutJwtPayload = graphqlLogTransformer(basicLogData);
         const transformedWithJwtPayload = graphqlLogTransformer({
             ...basicLogData,
@@ -45,16 +79,19 @@ describe('logger objects', () => {
         });
 
         // then
-        expect(transformedWithoutJwtPayload).toEqual({
-            message: basicLogData.message,
+        expect(transformedStandardLog).toStrictEqual({
             level: basicLogData.level,
-            path: 'Query.queryName',
+            message: basicLogData.message,
             userId: undefined,
         });
-        expect(transformedWithJwtPayload).toEqual({
-            message: basicLogData.message,
+        expect(transformedWithoutJwtPayload).toStrictEqual({
             level: basicLogData.level,
-            path: 'Query.queryName',
+            message: `[Query.queryName] ${basicLogData.message}`,
+            userId: undefined,
+        });
+        expect(transformedWithJwtPayload).toStrictEqual({
+            level: basicLogData.level,
+            message: `[Query.queryName] ${basicLogData.message}`,
             userId: 'TEST_USER_ID',
         });
     });
