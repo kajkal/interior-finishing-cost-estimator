@@ -7,7 +7,7 @@ import { createExpressServer } from './loaders/express';
 async function setupServer() {
     await connectToDatabase();
     const apolloServer = await createApolloServer();
-    await createExpressServer(apolloServer);
+    createExpressServer(apolloServer);
 }
 
 setupServer();
