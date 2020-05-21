@@ -1,15 +1,18 @@
 mutation Register($data: RegisterFormData!) {
     register(data: $data) {
-        name
-        email
-        products {
+        accessToken
+        user {
             name
-        }
-        projects {
-            name
-        }
-        offers {
-            name
+            email
+            products {
+                name
+            }
+            projects {
+                name
+            }
+            offers {
+                name
+            }
         }
     }
 }

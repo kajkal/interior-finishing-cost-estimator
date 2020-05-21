@@ -37,11 +37,8 @@ describe('index file', () => {
             await import('../../index');
         });
 
-        // when
-        const app = await screen.getByText('Mock App');
-
-        // then
-        expect(app).toBeInstanceOf(HTMLSpanElement);
+        // when/then
+        expect(screen.getByText('Mock App')).toBeInTheDocument();
     });
 
     it('should create ApolloClient with correct config', async () => {
@@ -55,8 +52,9 @@ describe('index file', () => {
         // then
         expect(MockApolloClientConstructor).toHaveBeenCalledTimes(1);
         expect(MockApolloClientConstructor).toHaveBeenCalledWith({
-            uri: 'GRAPHQL_URL_TEST_VALUE',
+            uri: 'http://localhost:4000/graphql',
             credentials: 'include',
+            request: expect.any(Function),
         });
     });
 

@@ -1,15 +1,18 @@
 mutation Login($data: LoginFormData!) {
     login(data: $data) {
-        name
-        email
-        products {
+        accessToken
+        user {
             name
-        }
-        projects {
-            name
-        }
-        offers {
-            name
+            email
+            products {
+                name
+            }
+            projects {
+                name
+            }
+            offers {
+                name
+            }
         }
     }
 }

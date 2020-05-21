@@ -1,8 +1,10 @@
 /// <reference types="react-scripts" />
 
 declare namespace NodeJS {
+
     interface ProcessEnv {
-        NODE_ENV: 'development' | 'production' | 'test'
-        REACT_APP_GRAPHQL_URL: string
+        NODE_ENV: 'development' | 'production' | 'test';
+        REACT_APP_SERVER_URL: string;
     }
+
 }

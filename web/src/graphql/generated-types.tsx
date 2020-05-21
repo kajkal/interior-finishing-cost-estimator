@@ -13,10 +13,22 @@ export type Scalars = {
 
 export type Query = {
    __typename?: 'Query';
-  /** Data of the currently authenticated user */
-  me: User;
   products: Array<Offer>;
   projects: Array<Project>;
+  /** Data of the currently authenticated user */
+  me: User;
+};
+
+export type Offer = {
+   __typename?: 'Offer';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type Project = {
+   __typename?: 'Project';
+  id: Scalars['ID'];
+  name: Scalars['String'];
 };
 
 export type User = {
@@ -34,23 +46,8 @@ export type Product = {
   name: Scalars['String'];
 };
 
-export type Project = {
-   __typename?: 'Project';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-};
-
-export type Offer = {
-   __typename?: 'Offer';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-};
-
 export type Mutation = {
    __typename?: 'Mutation';
-  register: User;
-  login: User;
-  logout: Scalars['Boolean'];
   createProduct: Product;
   updateProduct: Product;
   deleteProduct: Scalars['Boolean'];
@@ -60,6 +57,9 @@ export type Mutation = {
   createOffer: Offer;
   updateOffer: Offer;
   deleteOffer: Scalars['Boolean'];
+  register: InitialData;
+  login: InitialData;
+  logout: Scalars['Boolean'];
 };
 
 
@@ -78,6 +78,13 @@ export type RegisterFormData = {
   name: Scalars['String'];
 };
 
+/** Data returned after successful login or registration */
+export type InitialData = {
+   __typename?: 'InitialData';
+  user: User;
+  accessToken: Scalars['String'];
+};
+
 export type LoginFormData = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -91,18 +98,22 @@ export type LoginMutationVariables = {
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'User' }
-    & Pick<User, 'name' | 'email'>
-    & { products: Array<(
-      { __typename?: 'Product' }
-      & Pick<Product, 'name'>
-    )>, projects: Array<(
-      { __typename?: 'Project' }
-      & Pick<Project, 'name'>
-    )>, offers: Array<(
-      { __typename?: 'Offer' }
-      & Pick<Offer, 'name'>
-    )> }
+    { __typename?: 'InitialData' }
+    & Pick<InitialData, 'accessToken'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'name' | 'email'>
+      & { products: Array<(
+        { __typename?: 'Product' }
+        & Pick<Product, 'name'>
+      )>, projects: Array<(
+        { __typename?: 'Project' }
+        & Pick<Project, 'name'>
+      )>, offers: Array<(
+        { __typename?: 'Offer' }
+        & Pick<Offer, 'name'>
+      )> }
+    ) }
   ) }
 );
 
@@ -143,18 +154,22 @@ export type RegisterMutationVariables = {
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
-    { __typename?: 'User' }
-    & Pick<User, 'name' | 'email'>
-    & { products: Array<(
-      { __typename?: 'Product' }
-      & Pick<Product, 'name'>
-    )>, projects: Array<(
-      { __typename?: 'Project' }
-      & Pick<Project, 'name'>
-    )>, offers: Array<(
-      { __typename?: 'Offer' }
-      & Pick<Offer, 'name'>
-    )> }
+    { __typename?: 'InitialData' }
+    & Pick<InitialData, 'accessToken'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'name' | 'email'>
+      & { products: Array<(
+        { __typename?: 'Product' }
+        & Pick<Product, 'name'>
+      )>, projects: Array<(
+        { __typename?: 'Project' }
+        & Pick<Project, 'name'>
+      )>, offers: Array<(
+        { __typename?: 'Offer' }
+        & Pick<Offer, 'name'>
+      )> }
+    ) }
   ) }
 );
 
@@ -162,16 +177,19 @@ export type RegisterMutation = (
 export const LoginDocument = gql`
     mutation Login($data: LoginFormData!) {
   login(data: $data) {
-    name
-    email
-    products {
+    accessToken
+    user {
       name
-    }
-    projects {
-      name
-    }
-    offers {
-      name
+      email
+      products {
+        name
+      }
+      projects {
+        name
+      }
+      offers {
+        name
+      }
     }
   }
 }
@@ -273,16 +291,19 @@ export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariab
 export const RegisterDocument = gql`
     mutation Register($data: RegisterFormData!) {
   register(data: $data) {
-    name
-    email
-    products {
+    accessToken
+    user {
       name
-    }
-    projects {
-      name
-    }
-    offers {
-      name
+      email
+      products {
+        name
+      }
+      projects {
+        name
+      }
+      offers {
+        name
+      }
     }
   }
 }

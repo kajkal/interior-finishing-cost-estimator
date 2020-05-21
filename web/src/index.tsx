@@ -3,26 +3,34 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
+import { CssBaseline, ThemeProvider } from '@material-ui/core';
 
 import './styles/index.scss';
 
 import * as serviceWorker from './serviceWorker';
+import { SnackbarContextProvider } from './code/components/snackbars/SnackbarContextProvider';
+import { authService } from './code/services/auth/AuthService';
+import { theme } from './code/config/theme';
 import { App } from './code/App';
 
 
 const client = new ApolloClient({
-    uri: process.env.REACT_APP_GRAPHQL_URL,
+    uri: `${process.env.REACT_APP_SERVER_URL}/graphql`,
     credentials: 'include',
+    request: authService.prepareRequest.bind(authService),
 });
 
 ReactDOM.render(
-    <React.StrictMode>
-        <ApolloProvider client={client}>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </ApolloProvider>
-    </React.StrictMode>
+    <ApolloProvider client={client}>
+        <BrowserRouter>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <SnackbarContextProvider>
+                    <App />
+                </SnackbarContextProvider>
+            </ThemeProvider>
+        </BrowserRouter>
+    </ApolloProvider>
     ,
     document.getElementById('root'),
 );
