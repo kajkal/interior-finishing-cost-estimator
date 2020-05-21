@@ -25,7 +25,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
     "eject": "react-scripts eject",
-    "generate": "graphql-codegen --config codegen.yml"
+    "generate": "graphql-codegen --config codegen.yml",
+    "deploy": "gsutil rsync -r -d ./build gs://interior-finishing-cost-estimator.karolesniak.com"
   },
   "eslintConfig": {
     "extends": "react-app"
