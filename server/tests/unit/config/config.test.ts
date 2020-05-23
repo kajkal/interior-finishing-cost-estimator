@@ -47,7 +47,12 @@ describe('config object', () => {
             expect(config).toEqual({
                 server: expect.objectContaining({
                     port: expect.any(Number),
-                    corsOrigin: expect.any(String),
+                }),
+                webClient: expect.objectContaining({
+                    url: expect.any(String),
+                }),
+                email: expect.objectContaining({
+                    apiKey: expect.any(String),
                 }),
                 logger: expect.objectContaining({
                     logLevel: expect.any(String),
@@ -56,9 +61,22 @@ describe('config object', () => {
                     mongodbUrl: expect.any(String),
                     cacheDir: './tmp',
                 }),
-                auth: expect.objectContaining({
-                    accessTokenPrivateKey: expect.any(String),
-                    refreshTokenPrivateKey: expect.any(String),
+                token: expect.objectContaining({
+                    access: expect.objectContaining({
+                        jwt: expect.objectContaining({
+                            privateKey: expect.any(String),
+                        }),
+                    }),
+                    refresh: expect.objectContaining({
+                        jwt: expect.objectContaining({
+                            privateKey: expect.any(String),
+                        }),
+                    }),
+                    emailAddressConfirmation: expect.objectContaining({
+                        jwt: expect.objectContaining({
+                            privateKey: expect.any(String),
+                        }),
+                    }),
                 }),
                 gc: expect.objectContaining({
                     credentialsFile: expect.any(String),
@@ -81,18 +99,36 @@ describe('config object', () => {
         expect(config).toEqual({
             server: expect.objectContaining({
                 port: 4005,
-                corsOrigin: 'CORS_ORIGIN_TEST_VALUE',
+            }),
+            webClient: expect.objectContaining({
+                url: 'WEB_CLIENT_URL_TEST_VALUE',
+            }),
+            email: expect.objectContaining({
+                apiKey: 'SENDGRID_API_KEY_TEST_VALUE',
             }),
             logger: expect.objectContaining({
-                logLevel: 'info',
+                logLevel: 'debug',
             }),
             dataBase: expect.objectContaining({
                 mongodbUrl: 'mongodb://localhost:27017/estimator-test',
                 cacheDir: './tmp',
             }),
-            auth: expect.objectContaining({
-                accessTokenPrivateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
-                refreshTokenPrivateKey: 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
+            token: expect.objectContaining({
+                access: expect.objectContaining({
+                    jwt: expect.objectContaining({
+                        privateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
+                    }),
+                }),
+                refresh: expect.objectContaining({
+                    jwt: expect.objectContaining({
+                        privateKey: 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
+                    }),
+                }),
+                emailAddressConfirmation: expect.objectContaining({
+                    jwt: expect.objectContaining({
+                        privateKey: 'EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY_TEST_VALUE',
+                    }),
+                }),
             }),
             gc: expect.objectContaining({
                 credentialsFile: expect.stringMatching(/^.*server.*GC_CREDENTIALS_FILE_TEST_VALUE$/),

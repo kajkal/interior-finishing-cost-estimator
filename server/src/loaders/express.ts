@@ -39,7 +39,7 @@ function handleErrorResponse(err: any, req: Request, res: Response, _next: NextF
 export function createExpressServer(apolloServer: ApolloServer): Server {
     const app = Express();
     app.use(cors({
-        origin: config.server.corsOrigin,
+        origin: config.webClient.url,
         credentials: true,
     }));
     app.post('/refresh_token', handleRefreshTokenRequest);

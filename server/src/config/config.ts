@@ -1,5 +1,9 @@
 import dotenv from 'dotenv';
 import { resolve } from 'path';
+import { SignOptions } from 'jsonwebtoken';
+import { CookieOptions } from 'express';
+
+import { EmailData } from '../types/email-generation/EmailData';
 
 
 if (!process.env.NODE_ENV) {
@@ -17,7 +21,23 @@ export const config = {
 
     server: {
         port: parseInt(process.env.PORT!),
-        corsOrigin: process.env.CORS_ORIGIN!,
+    },
+
+    webClient: {
+        url: process.env.WEB_CLIENT_URL!,
+    },
+
+    email: {
+        apiKey: process.env.SENDGRID_API_KEY!,
+        accounts: {
+            support: {
+                name: 'Karol Leśniak Bot',
+                email: 'support@karolesniak.com',
+            } as EmailData,
+        },
+        templateIds: {
+            confirmEmailAddress: 'd-4ccacbb2149e4c349ae661164aa64d34',
+        },
     },
 
     logger: {
@@ -29,9 +49,41 @@ export const config = {
         cacheDir: process.env.DB_CACHE_DIR!,
     },
 
-    auth: {
-        accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY!,
-        refreshTokenPrivateKey: process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+    token: {
+        access: {
+            jwt: {
+                privateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY!,
+                options: {
+                    expiresIn: '15m',
+                } as SignOptions,
+            },
+        },
+        refresh: {
+            jwt: {
+                privateKey: process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+                options: {
+                    expiresIn: '7d',
+                } as SignOptions,
+            },
+            cookie: {
+                name: 'rt',
+                options: {
+                    httpOnly: true,
+                    path: '/refresh_token',
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+                    // secure: process.env.NODE_ENV === 'production',
+                } as CookieOptions,
+            },
+        },
+        emailAddressConfirmation: {
+            jwt: {
+                privateKey: process.env.EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY!,
+                options: {
+                    noTimestamp: true,
+                } as SignOptions,
+            },
+            urlBase: `${process.env.WEB_CLIENT_URL}/confirm-email-address`,
+        },
     },
 
     gc: {
