@@ -2,7 +2,7 @@ import { ResolverData } from 'type-graphql';
 
 import { MockLogger } from '../../__mocks__/utils/logger';
 
-import { AuthorizedContext } from '../../../src/utils/authChecker';
+import { AuthorizedContext } from '../../../src/types/context/AuthorizedContext';
 import { logAccess } from '../../../src/utils/logAccess';
 
 

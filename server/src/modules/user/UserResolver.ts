@@ -9,7 +9,7 @@ import { AuthService } from '../../services/AuthService';
 import { LoginFormData } from './input/LoginFormData';
 import { logAccess } from '../../utils/logAccess';
 import { User } from '../../entities/user/User';
-import { AuthorizedContext } from '../../utils/authChecker';
+import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { UserRepository } from '../../repositories/UserRepository';
 import { Product } from '../../entities/product/Product';
 import { Project } from '../../entities/project/Project';
@@ -51,7 +51,7 @@ export class UserResolver {
     @UseMiddleware(logAccess)
     @Query(() => User, { description: 'Data of the currently authenticated user' })
     async me(@Ctx() context: AuthorizedContext) {
-        return await this.userRepository.findOneOrFail({ id: context.jwtPayload.userId });
+        return await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
     }
 
     @UseMiddleware(logAccess)

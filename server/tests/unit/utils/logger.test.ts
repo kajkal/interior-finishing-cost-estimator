@@ -75,7 +75,7 @@ describe('logger objects', () => {
         const transformedWithoutJwtPayload = graphqlLogTransformer(basicLogData);
         const transformedWithJwtPayload = graphqlLogTransformer({
             ...basicLogData,
-            jwtPayload: { userId: 'TEST_USER_ID' },
+            jwtPayload: { sub: 'TEST_USER_ID' },
         });
 
         // then

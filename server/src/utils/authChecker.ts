@@ -3,16 +3,10 @@ import { AuthChecker } from 'type-graphql';
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
-import { AuthService, JwtPayload } from '../services/AuthService';
+import { AuthorizedContext } from '../types/context/AuthorizedContext';
+import { AuthService } from '../services/AuthService';
 import { logger } from './logger';
 
-
-/**
- * Enriched basic context with JWT payload.
- */
-export interface AuthorizedContext extends ExpressContext {
-    jwtPayload: JwtPayload;
-}
 
 /**
  * TypeGraphQL authorization checker.

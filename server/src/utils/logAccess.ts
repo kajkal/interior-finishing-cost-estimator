@@ -1,6 +1,6 @@
 import { MiddlewareFn } from 'type-graphql';
 
-import { AuthorizedContext } from './authChecker';
+import { AuthorizedContext } from '../types/context/AuthorizedContext';
 import { logger } from './logger';
 
 

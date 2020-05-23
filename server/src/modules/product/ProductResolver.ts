@@ -3,7 +3,7 @@ import { ApolloError } from 'apollo-server-express';
 import { Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
 import { ProductRepository } from '../../repositories/ProductRepository';
-import { AuthorizedContext } from '../../utils/authChecker';
+import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { logAccess } from '../../utils/logAccess';
 import { Product } from '../../entities/product/Product';
 

@@ -34,7 +34,7 @@ describe('AuthService class', () => {
             // then
             expect(jwt.sign).toHaveBeenCalledTimes(1);
             expect(jwt.sign).toHaveBeenCalledWith(
-                { userId: 'TEST_USER_ID' },
+                { sub: 'TEST_USER_ID' },
                 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
                 { expiresIn: expect.any(String) },
             );
@@ -47,7 +47,7 @@ describe('AuthService class', () => {
 
         it('should verify and return token payload if token from cookie is valid', () => {
             // given
-            const samplePayload = { userId: 'TEST_USER_ID' };
+            const samplePayload = { sub: 'TEST_USER_ID' };
             const validSampleToken = jwt.sign(samplePayload, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
             const req = { headers: { cookie: `rt=${validSampleToken}` } } as Request;
 
@@ -62,7 +62,7 @@ describe('AuthService class', () => {
 
         it('should throw error if refresh token from cookie is invalid', () => {
             // given
-            const samplePayload = { userId: 'TEST_USER_ID' };
+            const samplePayload = { sub: 'TEST_USER_ID' };
             const invalidSampleToken = jwt.sign(samplePayload, 'WRONG_PRIVATE_KEY');
             const req = { headers: { cookie: `rt=${invalidSampleToken}` } } as Request;
 
@@ -111,7 +111,7 @@ describe('AuthService class', () => {
             expect(accessToken).toMatch(jwtRegExp);
             expect(jwt.sign).toHaveBeenCalledTimes(1);
             expect(jwt.sign).toHaveBeenCalledWith(
-                { userId: 'TEST_USER_ID' },
+                { sub: 'TEST_USER_ID' },
                 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
                 { expiresIn: expect.any(String) },
             );
@@ -119,7 +119,7 @@ describe('AuthService class', () => {
 
         it('should verify and return token payload if access token from req header is valid', () => {
             // given
-            const samplePayload = { userId: 'TEST_USER_ID' };
+            const samplePayload = { sub: 'TEST_USER_ID' };
             const validSampleToken = jwt.sign(samplePayload, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
             const req = { headers: { authorization: `Bearer ${validSampleToken}` } } as Request;
 
@@ -134,7 +134,7 @@ describe('AuthService class', () => {
 
         it('should throw error if access token from req header is invalid', () => {
             // given
-            const samplePayload = { userId: 'TEST_USER_ID' };
+            const samplePayload = { sub: 'TEST_USER_ID' };
             const invalidSampleToken = jwt.sign(samplePayload, 'WRONG_PRIVATE_KEY');
             const req = { headers: { authorization: `Bearer ${invalidSampleToken}` } } as Request;
 

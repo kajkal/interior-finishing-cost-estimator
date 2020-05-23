@@ -36,7 +36,7 @@ class TransportStreamManager {
 export const graphqlLogTransformer: TransformFunction = ({ info, jwtPayload, ...rest }) => {
     const path = info && `${info?.parentType?.name}.${info?.fieldName}`;
     const message = (path && `[${path}] ${rest.message}`) || rest.message;
-    return { ...rest, message, userId: jwtPayload?.userId };
+    return { ...rest, message, userId: jwtPayload?.sub };
 };
 
 

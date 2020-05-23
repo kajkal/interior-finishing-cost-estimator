@@ -3,19 +3,12 @@ import { Service } from 'typedi';
 import { CookieOptions, Request, Response } from 'express';
 import { sign, SignOptions, verify } from 'jsonwebtoken';
 
+import { RefreshTokenPayload } from '../types/token/RefreshTokenPayload';
+import { AccessTokenPayload } from '../types/token/AccessTokenPayload';
 import { config } from '../config/config';
 import { User } from '../entities/user/User';
 import { logger } from '../utils/logger';
 
-
-/**
- * JSON web token payload shape for access and refresh tokens
- */
-export interface JwtPayload {
-    userId: string; // user id
-    iat: number; // issued at - as timestamp in sec
-    exp: number; // expiration time - as timestamp in sec
-}
 
 /**
  * Class with auth related methods.
@@ -53,7 +46,7 @@ export class AuthService {
      * Generate refresh token and create cookie for storing it.
      */
     generateRefreshToken(res: Response, userData: Pick<User, 'id'>): void {
-        const jwtPayload = { userId: userData.id };
+        const jwtPayload = { sub: userData.id };
         const jwt = sign(jwtPayload, config.auth.refreshTokenPrivateKey, AuthService.config.refreshToken.jwt.options);
         res.cookie(AuthService.config.refreshToken.cookie.name, jwt, AuthService.config.refreshToken.cookie.options);
     }
@@ -63,10 +56,10 @@ export class AuthService {
      *
      * @throws will throw an error if refresh token cookie is invalid
      */
-    verifyRefreshToken(req: Request): JwtPayload {
+    verifyRefreshToken(req: Request): RefreshTokenPayload {
         const { [ AuthService.config.refreshToken.cookie.name ]: tokenToVerify } = cookie.parse(req.headers.cookie!);
         logger.debug('refreshToken cookie value', tokenToVerify); // TODO: remove
-        return verify(tokenToVerify, config.auth.refreshTokenPrivateKey) as JwtPayload;
+        return verify(tokenToVerify, config.auth.refreshTokenPrivateKey) as RefreshTokenPayload;
     }
 
     /**
@@ -81,7 +74,7 @@ export class AuthService {
      * Generate access token and return it.
      */
     generateAccessToken(userData: Pick<User, 'id'>): string {
-        const jwtPayload = { userId: userData.id };
+        const jwtPayload = { sub: userData.id };
         return sign(jwtPayload, config.auth.accessTokenPrivateKey, AuthService.config.accessToken.jwt.options);
     }
 
@@ -90,10 +83,10 @@ export class AuthService {
      *
      * @throws will throw an error if access token is invalid
      */
-    verifyAccessToken(req: Request): JwtPayload {
+    verifyAccessToken(req: Request): AccessTokenPayload {
         const accessToken = req.headers[ 'authorization' ];
         const tokenToVerify = accessToken?.split('Bearer ')[ 1 ];
-        return verify(tokenToVerify!, config.auth.accessTokenPrivateKey) as JwtPayload;
+        return verify(tokenToVerify!, config.auth.accessTokenPrivateKey) as AccessTokenPayload;
     }
 
 }

@@ -6,7 +6,7 @@ import { MockLogger } from '../../__mocks__/utils/logger';
 
 import { AuthServiceSpiesManager } from '../../__utils__/spies-managers/AuthServiceSpiesManager';
 
-import { JwtPayload } from '../../../src/services/AuthService';
+import { AccessTokenPayload } from '../../../src/types/token/AccessTokenPayload';
 import { authChecker } from '../../../src/utils/authChecker';
 
 
@@ -19,7 +19,7 @@ describe('authChecker function', () => {
 
     it('should return true and add JWT payload to context', () => {
         // given
-        const samplePayload = { userId: 'TEST_USER_ID' } as JwtPayload;
+        const samplePayload = { sub: 'TEST_USER_ID' } as AccessTokenPayload;
         const sampleContext = { req: 'REQ_TEST_VALUE' };
         const sampleResolverData = {
             context: sampleContext,
