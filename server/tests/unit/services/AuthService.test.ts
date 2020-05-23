@@ -1,7 +1,9 @@
+import { sign } from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 
 import '../../__mocks__/utils/logger';
+
+import { JsonWebTokenSpiesManager } from '../../__utils__/spies-managers/JsonWebTokenSpiesManager';
 
 import { AuthService } from '../../../src/services/AuthService';
 
@@ -12,13 +14,7 @@ describe('AuthService class', () => {
     const serviceUnderTest = new AuthService();
 
     beforeEach(() => {
-        jest.spyOn(jwt, 'sign');
-        jest.spyOn(jwt, 'verify');
-    });
-
-    afterEach(() => {
-        (jwt.sign as jest.Mock).mockRestore();
-        (jwt.verify as jest.Mock).mockRestore();
+        JsonWebTokenSpiesManager.setupSpies();
     });
 
     describe('refresh token', () => {
@@ -32,8 +28,8 @@ describe('AuthService class', () => {
             serviceUnderTest.generateRefreshToken(res, userData);
 
             // then
-            expect(jwt.sign).toHaveBeenCalledTimes(1);
-            expect(jwt.sign).toHaveBeenCalledWith(
+            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledWith(
                 { sub: 'TEST_USER_ID' },
                 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
                 { expiresIn: expect.any(String) },
@@ -48,7 +44,7 @@ describe('AuthService class', () => {
         it('should verify and return token payload if token from cookie is valid', () => {
             // given
             const samplePayload = { sub: 'TEST_USER_ID' };
-            const validSampleToken = jwt.sign(samplePayload, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            const validSampleToken = sign(samplePayload, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
             const req = { headers: { cookie: `rt=${validSampleToken}` } } as Request;
 
             // when
@@ -56,20 +52,20 @@ describe('AuthService class', () => {
 
             // then
             expect(extractedPayload).toMatchObject(samplePayload);
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(validSampleToken, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(validSampleToken, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
         it('should throw error if refresh token from cookie is invalid', () => {
             // given
             const samplePayload = { sub: 'TEST_USER_ID' };
-            const invalidSampleToken = jwt.sign(samplePayload, 'WRONG_PRIVATE_KEY');
+            const invalidSampleToken = sign(samplePayload, 'WRONG_PRIVATE_KEY');
             const req = { headers: { cookie: `rt=${invalidSampleToken}` } } as Request;
 
             // when/then
-            expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow(new JsonWebTokenError('invalid signature'));
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(invalidSampleToken, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow('invalid signature');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(invalidSampleToken, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
         it('should throw error if refresh token from cookie is missing', () => {
@@ -77,9 +73,9 @@ describe('AuthService class', () => {
             const req = { headers: { cookie: '' } } as Request;
 
             // when/then
-            expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow(new JsonWebTokenError('jwt must be provided'));
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(undefined, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow('jwt must be provided');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(undefined, 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
         it('should invalidate cookie with refresh token', () => {
@@ -109,8 +105,8 @@ describe('AuthService class', () => {
 
             // then
             expect(accessToken).toMatch(jwtRegExp);
-            expect(jwt.sign).toHaveBeenCalledTimes(1);
-            expect(jwt.sign).toHaveBeenCalledWith(
+            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledWith(
                 { sub: 'TEST_USER_ID' },
                 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
                 { expiresIn: expect.any(String) },
@@ -120,7 +116,7 @@ describe('AuthService class', () => {
         it('should verify and return token payload if access token from req header is valid', () => {
             // given
             const samplePayload = { sub: 'TEST_USER_ID' };
-            const validSampleToken = jwt.sign(samplePayload, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            const validSampleToken = sign(samplePayload, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
             const req = { headers: { authorization: `Bearer ${validSampleToken}` } } as Request;
 
             // when
@@ -128,20 +124,20 @@ describe('AuthService class', () => {
 
             // then
             expect(extractedPayload).toMatchObject(samplePayload);
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(validSampleToken, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(validSampleToken, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
         it('should throw error if access token from req header is invalid', () => {
             // given
             const samplePayload = { sub: 'TEST_USER_ID' };
-            const invalidSampleToken = jwt.sign(samplePayload, 'WRONG_PRIVATE_KEY');
+            const invalidSampleToken = sign(samplePayload, 'WRONG_PRIVATE_KEY');
             const req = { headers: { authorization: `Bearer ${invalidSampleToken}` } } as Request;
 
             // when/then
-            expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow(new JsonWebTokenError('invalid signature'));
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(invalidSampleToken, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow('invalid signature');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(invalidSampleToken, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
         it('should throw error if access token from req header is missing', () => {
@@ -149,9 +145,9 @@ describe('AuthService class', () => {
             const req = { headers: { authorization: '' } } as Request;
 
             // when/then
-            expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow(new JsonWebTokenError('jwt must be provided'));
-            expect(jwt.verify).toHaveBeenCalledTimes(1);
-            expect(jwt.verify).toHaveBeenCalledWith(undefined, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
+            expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow('jwt must be provided');
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
+            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(undefined, 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE');
         });
 
     });

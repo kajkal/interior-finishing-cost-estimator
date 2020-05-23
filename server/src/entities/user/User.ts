@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Collection, Entity, OneToMany, Property, wrap } from 'mikro-orm';
+import { Collection, Entity, OneToMany, Property } from 'mikro-orm';
 
 import { BaseEntity } from '../BaseEntity';
 import { Product } from '../product/Product';
@@ -21,6 +21,12 @@ export class User extends BaseEntity {
 
     @Property()
     password!: string;
+
+    /**
+     * Indicates whether the user has confirmed that the given email address is his.
+     */
+    @Property()
+    isEmailAddressConfirmed?: boolean = false;
 
     /**
      * @see UserResolver#products

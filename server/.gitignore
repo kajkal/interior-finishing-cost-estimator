@@ -1,6 +1,7 @@
 /node_modules
 /build
 /coverage
+/tmp
 npm-debug.log
 /.idea
 /keys/*.json

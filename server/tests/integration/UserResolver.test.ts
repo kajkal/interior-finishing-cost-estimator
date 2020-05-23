@@ -1,6 +1,10 @@
 import { MockLogger } from '../__mocks__/utils/logger';
 
+import '../__mocks__/libraries/sendgrid';
+
+import { AccountServiceSpiesManager } from '../__utils__/spies-managers/AccountServiceSpiesManager';
 import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
+import { EmailServiceSpiesManager } from '../__utils__/spies-managers/EmailServiceSpiesManager';
 import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
 import { executeGraphQLOperation } from '../__utils__/integration-utils/executeGraphQLOperation';
 import { TestDatabaseManager } from '../__utils__/integration-utils/TestDatabaseManager';
@@ -9,6 +13,7 @@ import { generator } from '../__utils__/generator';
 
 import { RegisterFormData } from '../../src/modules/user/input/RegisterFormData';
 import { LoginFormData } from '../../src/modules/user/input/LoginFormData';
+import { AccountService } from '../../src/services/AccountService';
 import { Product } from '../../src/entities/product/Product';
 import { User } from '../../src/entities/user/User';
 
@@ -38,9 +43,11 @@ describe('UserResolver class', () => {
     });
 
     beforeEach(() => {
-        UserRepositorySpiesManager.setupSpies();
-        AuthServiceSpiesManager.setupSpies();
         MockLogger.setupMocks();
+        AuthServiceSpiesManager.setupSpies();
+        EmailServiceSpiesManager.setupSpiesAndMockImplementations();
+        AccountServiceSpiesManager.setupSpies();
+        UserRepositorySpiesManager.setupSpies();
     });
 
     describe('me query', () => {
@@ -148,7 +155,7 @@ describe('UserResolver class', () => {
         `;
 
         it('should create new user and return initial data if form data are valid', async () => {
-            expect.assertions(13);
+            expect.assertions(15);
 
             const mockCookieSetter = jest.fn();
             const registerFormData: RegisterFormData = {
@@ -171,6 +178,13 @@ describe('UserResolver class', () => {
             // verify if new user object was created and saved in db
             expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(1);
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
+
+            // verify if 'Confirm your email address' email was send
+            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(1);
+            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledWith(expect.objectContaining({
+                name: registerFormData.name,
+                email: registerFormData.email,
+            }));
 
             // verify if refresh token is generated and added to cookie
             expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
@@ -207,7 +221,7 @@ describe('UserResolver class', () => {
         });
 
         it('should return error if user with given email address already exists', async () => {
-            expect.assertions(9);
+            expect.assertions(10);
 
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
@@ -228,6 +242,7 @@ describe('UserResolver class', () => {
             // verify if functions reserved for valid user data are not called
             expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(0);
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
 
@@ -409,6 +424,94 @@ describe('UserResolver class', () => {
                 data: {
                     logout: true,
                 },
+            });
+        });
+
+    });
+
+    describe('confirm email address mutation', () => {
+
+        const logoutMutation = `
+            mutation ConfirmEmailAddress($data: EmailAddressConfirmationData!) {
+              confirmEmailAddress(data: $data)
+            }
+        `;
+
+        it('should mark user email as confirmed if token is valid', async () => {
+            expect.assertions(10);
+
+            expect(existingUser.isEmailAddressConfirmed).toBe(false);
+
+            const validToken = new AccountService().generateEmailAddressConfirmationToken(existingUser);
+            const response = await executeGraphQLOperation({
+                source: logoutMutation,
+                variableValues: {
+                    data: {
+                        token: validToken,
+                    },
+                },
+            });
+
+            // verify if token was verified
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(validToken);
+
+            // verify if the database was queried
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: existingUser.id });
+
+            // verify if user was updated
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
+            expect(existingUser.isEmailAddressConfirmed).toBe(true);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: {
+                    confirmEmailAddress: true,
+                },
+            });
+        });
+
+        it('should return error if token is invalid', async () => {
+            expect.assertions(8);
+
+            const invalidToken = new AccountService().generateEmailAddressConfirmationToken({ id: 'invalid_id' });
+            const response = await executeGraphQLOperation({
+                source: logoutMutation,
+                variableValues: {
+                    data: {
+                        token: invalidToken,
+                    },
+                },
+            });
+
+            // verify if token was verified
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(invalidToken);
+
+            // verify if the database was queried and if user was updated
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: 'invalid_id' });
+
+            // verify if functions reserved for valid token were not called
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN',
+                    }),
+                ],
             });
         });
 

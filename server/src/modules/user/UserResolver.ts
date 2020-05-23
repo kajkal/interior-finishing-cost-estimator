@@ -4,7 +4,10 @@ import { UserInputError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { Arg, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
+import { EmailAddressConfirmationData } from './input/EmailAddressConfirmationData';
+import { AccountService } from '../../services/AccountService';
 import { RegisterFormData } from './input/RegisterFormData';
+import { EmailService } from '../../services/EmailService';
 import { AuthService } from '../../services/AuthService';
 import { LoginFormData } from './input/LoginFormData';
 import { logAccess } from '../../utils/logAccess';
@@ -23,6 +26,12 @@ export class UserResolver {
 
     @Inject()
     private readonly authService!: AuthService;
+
+    @Inject()
+    private readonly emailService!: EmailService;
+
+    @Inject()
+    private readonly accountService!: AccountService;
 
     @Inject()
     private readonly userRepository!: UserRepository;
@@ -66,6 +75,8 @@ export class UserResolver {
         const user = this.userRepository.create({ ...data, password: encodedPassword });
         await this.userRepository.persistAndFlush(user);
 
+        this.emailService.sendConfirmEmailAddressEmail(user); // no need to await
+
         this.authService.generateRefreshToken(context.res, user);
         const accessToken = this.authService.generateAccessToken(user);
 
@@ -95,6 +106,20 @@ export class UserResolver {
     async logout(@Ctx() context: ExpressContext): Promise<boolean> {
         this.authService.invalidateRefreshToken(context.res);
         return true;
+    }
+
+    @UseMiddleware(logAccess)
+    @Mutation(() => Boolean)
+    async confirmEmailAddress(@Arg('data') data: EmailAddressConfirmationData): Promise<boolean> {
+        try {
+            const { sub } = this.accountService.verifyEmailAddressConfirmationToken(data.token);
+            const user = await this.userRepository.findOneOrFail({ id: sub });
+            user.isEmailAddressConfirmed = true;
+            await this.userRepository.persistAndFlush(user);
+            return true;
+        } catch (error) {
+            throw new UserInputError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN');
+        }
     }
 
 }

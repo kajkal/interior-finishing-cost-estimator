@@ -42,7 +42,7 @@ export class TestDatabaseManager {
         await this.orm.close();
     }
 
-    static async populateWithUser(userData: Partial<Pick<User, 'name' | 'email' | 'password'>>) {
+    static async populateWithUser(userData: Partial<Omit<User, 'products' | 'projects' | 'offers'>>) {
         const repository = this.orm.em.getRepository(User);
         const user = repository.create({
             ...userData,
@@ -52,7 +52,7 @@ export class TestDatabaseManager {
         return user;
     }
 
-    static async populateWithProduct(productData: Partial<Pick<Product, 'name'>> & { user: string }) {
+    static async populateWithProduct(productData: Partial<Omit<Product, 'user'>> & { user: string }) {
         const repository = this.orm.em.getRepository(Product);
         const product = repository.create(productData);
         await repository.persistAndFlush(product);
