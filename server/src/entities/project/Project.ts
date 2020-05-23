@@ -6,7 +6,7 @@ import { User } from '../user/User';
 
 
 @ObjectType()
-@Entity({ tableName: 'products' })
+@Entity({ tableName: 'projects' })
 export class Project extends BaseEntity {
 
     @Field(() => ID)
