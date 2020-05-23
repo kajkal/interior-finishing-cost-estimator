@@ -14,7 +14,7 @@ async function handleRefreshTokenRequest(req: Request, res: Response) {
     const authService = Container.get(AuthService);
     try {
         const jwtPayload = authService.verifyRefreshToken(req);
-        const userData = { id: jwtPayload.userId };
+        const userData = { id: jwtPayload.sub };
         authService.generateRefreshToken(res, userData);
         res.status(200).json({ accessToken: authService.generateAccessToken(userData) });
         logger.debug('refresh token success!'); // TODO: remove
@@ -25,16 +25,10 @@ async function handleRefreshTokenRequest(req: Request, res: Response) {
     }
 }
 
-class NotFoundError extends Error {
-    status = 404;
-    constructor() {
-        super('NOT_FOUND');
-        this.name = 'NotFoundError';
-    }
-}
-
 function handleNotRegisteredPath(req: Request, res: Response, next: NextFunction) {
-    next(new NotFoundError());
+    const notFoundError = new Error('NOT_FOUND');
+    Object.defineProperty(notFoundError, 'status', { value: 404 });
+    next(notFoundError);
 }
 
 function handleErrorResponse(err: any, req: Request, res: Response, _next: NextFunction) {
