@@ -12,7 +12,7 @@ export type Scalars = {
 };
 
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   products: Array<Offer>;
   projects: Array<Project>;
   /** Data of the currently authenticated user */
@@ -20,19 +20,19 @@ export type Query = {
 };
 
 export type Offer = {
-   __typename?: 'Offer';
+  __typename?: 'Offer';
   id: Scalars['ID'];
   name: Scalars['String'];
 };
 
 export type Project = {
-   __typename?: 'Project';
+  __typename?: 'Project';
   id: Scalars['ID'];
   name: Scalars['String'];
 };
 
 export type User = {
-   __typename?: 'User';
+  __typename?: 'User';
   name: Scalars['String'];
   email: Scalars['String'];
   products: Array<Product>;
@@ -41,13 +41,13 @@ export type User = {
 };
 
 export type Product = {
-   __typename?: 'Product';
+  __typename?: 'Product';
   id: Scalars['ID'];
   name: Scalars['String'];
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   createProduct: Product;
   updateProduct: Product;
   deleteProduct: Scalars['Boolean'];
@@ -60,6 +60,7 @@ export type Mutation = {
   register: InitialData;
   login: InitialData;
   logout: Scalars['Boolean'];
+  confirmEmailAddress: Scalars['Boolean'];
 };
 
 
@@ -72,6 +73,11 @@ export type MutationLoginArgs = {
   data: LoginFormData;
 };
 
+
+export type MutationConfirmEmailAddressArgs = {
+  data: EmailAddressConfirmationData;
+};
+
 export type RegisterFormData = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -80,7 +86,7 @@ export type RegisterFormData = {
 
 /** Data returned after successful login or registration */
 export type InitialData = {
-   __typename?: 'InitialData';
+  __typename?: 'InitialData';
   user: User;
   accessToken: Scalars['String'];
 };
@@ -89,6 +95,21 @@ export type LoginFormData = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
+
+export type EmailAddressConfirmationData = {
+  /** Email address confirmation token sent by email */
+  token: Scalars['String'];
+};
+
+export type ConfirmEmailAddressMutationVariables = {
+  data: EmailAddressConfirmationData;
+};
+
+
+export type ConfirmEmailAddressMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'confirmEmailAddress'>
+);
 
 export type LoginMutationVariables = {
   data: LoginFormData;
@@ -174,6 +195,35 @@ export type RegisterMutation = (
 );
 
 
+export const ConfirmEmailAddressDocument = gql`
+    mutation ConfirmEmailAddress($data: EmailAddressConfirmationData!) {
+  confirmEmailAddress(data: $data)
+}
+    `;
+
+/**
+ * __useConfirmEmailAddressMutation__
+ *
+ * To run a mutation, you first call `useConfirmEmailAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmEmailAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmEmailAddressMutation, { data, loading, error }] = useConfirmEmailAddressMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useConfirmEmailAddressMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>) {
+        return ApolloReactHooks.useMutation<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>(ConfirmEmailAddressDocument, baseOptions);
+      }
+export type ConfirmEmailAddressMutationHookResult = ReturnType<typeof useConfirmEmailAddressMutation>;
+export type ConfirmEmailAddressMutationResult = ApolloReactCommon.MutationResult<ConfirmEmailAddressMutation>;
+export type ConfirmEmailAddressMutationOptions = ApolloReactCommon.BaseMutationOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($data: LoginFormData!) {
   login(data: $data) {

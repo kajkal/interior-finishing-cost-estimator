@@ -1,0 +1,3 @@
+mutation ConfirmEmailAddress($data: EmailAddressConfirmationData!) {
+    confirmEmailAddress(data: $data)
+}

@@ -8,6 +8,7 @@ import { routes } from './config/routes';
 import { ProtectedRoute } from './components/common/router/ProtectedRoute';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import MuiLink from '@material-ui/core/Link';
+import { ConfirmEmailAddressPage } from './components/pages/confirm-email-address/ConfirmEmailAddressPage';
 
 
 export function App(): React.ReactElement {
@@ -45,6 +46,10 @@ export function App(): React.ReactElement {
 
                 <Route exact path={routes.signup()}>
                     <SignupPage />
+                </Route>
+
+                <Route exact path={routes.confirmEmailAddress()}>
+                    <ConfirmEmailAddressPage />
                 </Route>
 
                 <ProtectedRoute exact path={routes.projects()}>

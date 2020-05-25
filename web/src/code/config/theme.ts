@@ -9,6 +9,18 @@ export const theme = responsiveFontSizes(createMuiTheme({
         },
         secondary: pink,
         // type: 'dark',
-    }
+    },
+    props: {
+        MuiButton: {
+            disableElevation: true,
+            size: 'large'
+        },
+    },
+    typography: {
+        button: {
+            textTransform: 'none',
+            fontWeight: 'normal',
+        },
+    },
 }));
 

@@ -7,7 +7,7 @@ import { JwtPayload } from './JwtPayload';
 
 export class AuthService {
 
-    private static readonly PUBLIC_OPERATIONS = [ 'Login', 'Register', 'Logout' ];
+    private static readonly PUBLIC_OPERATIONS = [ 'Login', 'Register', 'Logout', 'ConfirmEmailAddress' ];
     private static readonly REFRESH_TOKEN_URL = `${process.env.REACT_APP_SERVER_URL}/refresh_token`;
 
     private accessToken: string | undefined;
