@@ -403,7 +403,7 @@ describe('UserResolver class', () => {
             }
         `;
 
-        it('should invalidate user\' JWT', async () => {
+        it('should invalidate user\' refresh token', async () => {
             expect.assertions(4);
 
             const mockCookieSetter = jest.fn();
@@ -412,7 +412,7 @@ describe('UserResolver class', () => {
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
-            // verify if JWT is invalidated
+            // verify if refresh token was invalidated
             expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
 
             // verify if access was logged
@@ -437,12 +437,22 @@ describe('UserResolver class', () => {
             }
         `;
 
+        async function createUserWithValidToken(withConfirmedEmail: boolean): Promise<User> {
+            const user = await TestDatabaseManager.populateWithUser({
+                name: generator.name(),
+                email: generator.email(),
+                password: generator.string({ length: 8 }),
+                isEmailAddressConfirmed: withConfirmedEmail,
+            });
+            UserRepositorySpiesManager.setupSpies();
+            return user;
+        }
+
         it('should mark user email as confirmed if token is valid', async () => {
-            expect.assertions(10);
+            expect.assertions(9);
 
-            expect(existingUser.isEmailAddressConfirmed).toBe(false);
-
-            const validToken = new AccountService().generateEmailAddressConfirmationToken(existingUser);
+            const user = await createUserWithValidToken(false);
+            const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
                 variableValues: {
@@ -458,11 +468,11 @@ describe('UserResolver class', () => {
 
             // verify if the database was queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: existingUser.id });
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
             // verify if user was updated
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
-            expect(existingUser.isEmailAddressConfirmed).toBe(true);
+            expect(user.isEmailAddressConfirmed).toBe(true);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -510,6 +520,47 @@ describe('UserResolver class', () => {
                 errors: [
                     expect.objectContaining({
                         message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN',
+                    }),
+                ],
+            });
+        });
+
+        it('should return error if email address is already confirmed', async () => {
+            expect.assertions(9);
+
+            const user = await createUserWithValidToken(true);
+            const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
+            const response = await executeGraphQLOperation({
+                source: logoutMutation,
+                variableValues: {
+                    data: {
+                        token: validToken,
+                    },
+                },
+            });
+
+            // verify if token was verified
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
+            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(validToken);
+
+            // verify if the database was queried
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
+
+            // verify if user was updated
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(user.isEmailAddressConfirmed).toBe(true);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify if mutation response is correct
+            expect(response).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'EMAIL_ADDRESS_ALREADY_CONFIRMED',
                     }),
                 ],
             });

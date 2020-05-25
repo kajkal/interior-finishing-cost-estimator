@@ -111,15 +111,22 @@ export class UserResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async confirmEmailAddress(@Arg('data') data: EmailAddressConfirmationData): Promise<boolean> {
+        let user: User | undefined;
+
         try {
             const { sub } = this.accountService.verifyEmailAddressConfirmationToken(data.token);
-            const user = await this.userRepository.findOneOrFail({ id: sub });
-            user.isEmailAddressConfirmed = true;
-            await this.userRepository.persistAndFlush(user);
-            return true;
+            user = await this.userRepository.findOneOrFail({ id: sub });
         } catch (error) {
             throw new UserInputError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN');
         }
+
+        if (user.isEmailAddressConfirmed) {
+            throw new UserInputError('EMAIL_ADDRESS_ALREADY_CONFIRMED');
+        }
+
+        user.isEmailAddressConfirmed = true;
+        await this.userRepository.persistAndFlush(user);
+        return true;
     }
 
 }
