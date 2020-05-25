@@ -1,20 +1,19 @@
 import * as React from 'react';
 import { GraphQLError } from 'graphql';
-import { Router } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { MockedProvider, MockedResponse } from '@apollo/react-testing';
+import { createMemoryHistory } from 'history';
+import { MockedResponse } from '@apollo/react-testing';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
-import { MockSnackbarContextData, MockSnackbarProvider } from '../../../__utils__/mocks/MockSnackbarProvider';
+import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloCacheSpiesManager } from '../../../__utils__/spies-managers/ApolloCacheSpiesManager';
 import { AuthServiceSpiesManager } from '../../../__utils__/spies-managers/AuthServiceSpiesManager';
+import { InputValidationHelper } from '../../../__utils__/InputValidationHelper';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { generator } from '../../../__utils__/generator';
 
 import { LoginDocument, MeDocument } from '../../../../graphql/generated-types';
 import { LoginPage } from '../../../../code/components/pages/login/LoginPage';
 import { routes } from '../../../../code/config/routes';
-import { InputValidationHelper } from '../../../__utils__/InputValidationHelper';
 
 
 describe('LoginPage component', () => {
@@ -24,12 +23,6 @@ describe('LoginPage component', () => {
         AuthServiceSpiesManager.setupSpies();
     });
 
-    interface LoginPageRenderOptions {
-        history?: MemoryHistory;
-        mocks?: ReadonlyArray<MockedResponse>;
-        snackbarMocks?: MockSnackbarContextData;
-    }
-
     interface LoginPageElements {
         emailInput: HTMLInputElement;
         passwordInput: HTMLInputElement;
@@ -38,18 +31,11 @@ describe('LoginPage component', () => {
         signupPageLink: HTMLAnchorElement;
     }
 
-    type LoginPageRenderResult = [ LoginPageElements, RenderResult ];
-
-    function renderLoginPageWithContext(options: LoginPageRenderOptions): LoginPageRenderResult {
-        const { history = createMemoryHistory(), mocks = [], snackbarMocks } = options;
+    function renderLoginPageInMockContext(mocks?: PageContextMocks): [ LoginPageElements, RenderResult ] {
         const renderResult = render(
-            <MockedProvider mocks={mocks}>
-                <Router history={history}>
-                    <MockSnackbarProvider mocks={snackbarMocks}>
-                        <LoginPage />
-                    </MockSnackbarProvider>
-                </Router>
-            </MockedProvider>,
+            <PageMockContextProvider mocks={mocks}>
+                <LoginPage />
+            </PageMockContextProvider>,
         );
 
         return [ {
@@ -63,7 +49,7 @@ describe('LoginPage component', () => {
 
     it('should navigate to new page on \'forgot password\' link click', () => {
         const history = createMemoryHistory();
-        const [ { forgotPasswordPageLink } ] = renderLoginPageWithContext({ history });
+        const [ { forgotPasswordPageLink } ] = renderLoginPageInMockContext({ history });
 
         fireEvent.click(forgotPasswordPageLink);
 
@@ -72,7 +58,7 @@ describe('LoginPage component', () => {
 
     it('should navigate to new page on \'sign up\' link click', () => {
         const history = createMemoryHistory();
-        const [ { signupPageLink } ] = renderLoginPageWithContext({ history });
+        const [ { signupPageLink } ] = renderLoginPageInMockContext({ history });
 
         fireEvent.click(signupPageLink);
 
@@ -149,7 +135,7 @@ describe('LoginPage component', () => {
         describe('validation', () => {
 
             it('should validate email input value', async (done) => {
-                const [ { emailInput } ] = renderLoginPageWithContext({});
+                const [ { emailInput } ] = renderLoginPageInMockContext();
                 const validator = new InputValidationHelper(emailInput, '#login-email-input-helper-text.Mui-error');
                 await validator.expectError('', 'Email is required');
                 await validator.expectError('invalid-email-address', 'Invalid email');
@@ -158,7 +144,7 @@ describe('LoginPage component', () => {
             });
 
             it('should validate password input value', async (done) => {
-                const [ { passwordInput } ] = renderLoginPageWithContext({});
+                const [ { passwordInput } ] = renderLoginPageInMockContext();
                 const validator = new InputValidationHelper(passwordInput, '#login-password-input-helper-text.Mui-error');
                 await validator.expectError('', 'Password is required');
                 await validator.expectError('bad', 'Password is too short');
@@ -171,7 +157,7 @@ describe('LoginPage component', () => {
         it('should successfully log in and navigate to projects page', async (done) => {
             const history = createMemoryHistory();
             const mocks = [ loginSuccessMock ];
-            const [ elements ] = renderLoginPageWithContext({ history, mocks });
+            const [ elements ] = renderLoginPageInMockContext({ history, mocks });
 
             await fillAndSubmitForm(elements, loginSuccessMock);
 
@@ -195,7 +181,7 @@ describe('LoginPage component', () => {
             const history = createMemoryHistory();
             const mocks = [ loginBadCredentialsMock ];
             const snackbarMocks = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageWithContext({ history, mocks, snackbarMocks });
+            const [ elements ] = renderLoginPageInMockContext({ history, mocks, snackbarMocks });
 
             await fillAndSubmitForm(elements, loginBadCredentialsMock);
 
@@ -217,7 +203,7 @@ describe('LoginPage component', () => {
             const history = createMemoryHistory();
             const mocks = [ loginNetworkErrorMock ];
             const snackbarMocks = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageWithContext({ history, mocks, snackbarMocks });
+            const [ elements ] = renderLoginPageInMockContext({ history, mocks, snackbarMocks });
 
             await fillAndSubmitForm(elements, loginNetworkErrorMock);
 

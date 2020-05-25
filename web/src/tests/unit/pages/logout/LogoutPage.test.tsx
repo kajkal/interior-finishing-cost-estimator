@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { Router } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { MockedProvider, MockedResponse } from '@apollo/react-testing';
+import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
-import { MockSnackbarContextData, MockSnackbarProvider } from '../../../__utils__/mocks/MockSnackbarProvider';
+import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
 import { AuthServiceSpiesManager } from '../../../__utils__/spies-managers/AuthServiceSpiesManager';
 
@@ -20,22 +18,11 @@ describe('LogoutPage component', () => {
         AuthServiceSpiesManager.setupSpies();
     });
 
-    interface LogoutPageRenderOptions {
-        history?: MemoryHistory;
-        mocks?: ReadonlyArray<MockedResponse>;
-        snackbarMocks?: MockSnackbarContextData;
-    }
-
-    function renderLogoutPageWithContext(options: LogoutPageRenderOptions): RenderResult {
-        const { history = createMemoryHistory(), mocks = [], snackbarMocks } = options;
+    function renderLogoutPageInMockContext(mocks?: PageContextMocks): RenderResult {
         return render(
-            <MockedProvider mocks={mocks}>
-                <Router history={history}>
-                    <MockSnackbarProvider mocks={snackbarMocks}>
-                        <LogoutPage />
-                    </MockSnackbarProvider>
-                </Router>
-            </MockedProvider>,
+            <PageMockContextProvider mocks={mocks}>
+                <LogoutPage />
+            </PageMockContextProvider>,
         );
     }
 
@@ -60,7 +47,7 @@ describe('LogoutPage component', () => {
     it('should logout on mount and navigate to login page', async (done) => {
         const history = createMemoryHistory();
         const mocks = [ logoutSuccessMock ];
-        renderLogoutPageWithContext({ history, mocks });
+        renderLogoutPageInMockContext({ history, mocks });
 
         // verify if navigation occurred
         await waitFor(() => expect(history.location.pathname).toMatch(routes.login()));
@@ -78,7 +65,7 @@ describe('LogoutPage component', () => {
         const history = createMemoryHistory();
         const mocks = [ logoutNetworkErrorMock ];
         const snackbarMocks = { errorSnackbar: jest.fn() };
-        renderLogoutPageWithContext({ history, mocks, snackbarMocks });
+        renderLogoutPageInMockContext({ history, mocks, snackbarMocks });
 
         // verify if error alert has been displayed
         await waitFor(() => {
