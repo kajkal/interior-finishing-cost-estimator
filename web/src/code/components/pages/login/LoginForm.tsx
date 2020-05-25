@@ -7,9 +7,9 @@ import { LocationDescriptorObject } from 'history';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 
 import { LoginFormData, MeDocument, MeQuery, useLoginMutation } from '../../../../graphql/generated-types';
+import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { passwordSchema } from '../../../validation/passwordSchema';
@@ -104,16 +104,14 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
                         fullWidth
                     />
 
-                    <Button
+                    <ButtonWithSpinner
                         className={classes.submit}
                         disabled={isSubmitting}
-                        type='submit'
-                        variant='contained'
-                        color='primary'
+                        isSpinning={isSubmitting}
                         fullWidth
                     >
-                        Log in
-                    </Button>
+                        {'Log in'}
+                    </ButtonWithSpinner>
 
                     {/*<div>*/}
                     {/*    <pre>*/}
