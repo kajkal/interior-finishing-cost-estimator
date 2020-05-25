@@ -1,75 +1,64 @@
 import * as React from 'react';
-import { Route, Router, Switch } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { MockedProvider, MockedResponse } from '@apollo/react-testing';
+import { Route, Switch } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
-
-import { MockSnackbarContextData, MockSnackbarProvider } from '../../__utils__/mocks/MockSnackbarProvider';
 
 import { ProtectedRoute } from '../../../code/components/common/router/ProtectedRoute';
 import { UnauthorizedError } from '../../../code/services/auth/UnauthorizedError';
 import { MeDocument } from '../../../graphql/generated-types';
 import { routes } from '../../../code/config/routes';
+import { PageContextMocks, PageMockContextProvider } from '../../__utils__/PageMockContextProvider';
 
 
 describe('ProtectedRoute component', () => {
 
-    interface ProtectedRouteRenderOptions {
-        history?: MemoryHistory;
-        mocks?: ReadonlyArray<MockedResponse>;
-        snackbarMocks?: MockSnackbarContextData;
-    }
+    const protectedRoute = '/protected'; // initial location
 
-    function renderProtectedRouteWithContext(options: ProtectedRouteRenderOptions): RenderResult {
-        const { history = createMemoryHistory(), mocks = [], snackbarMocks } = options;
-        history.push('/protected');
+    function renderProtectedRouteInMockContext(mocks?: PageContextMocks): RenderResult {
         return render(
-            <MockedProvider mocks={mocks}>
-                <Router history={history}>
-                    <MockSnackbarProvider mocks={snackbarMocks}>
-                        <Switch>
-                            <Route exact path={routes.login()}>
-                                login component
-                            </Route>
-                            <ProtectedRoute exact path='/protected'>
-                                protected component
-                            </ProtectedRoute>
-                        </Switch>
-                    </MockSnackbarProvider>
-                </Router>
-            </MockedProvider>,
+            <PageMockContextProvider mocks={mocks}>
+                <Switch>
+                    <Route exact path={routes.login()}>
+                        login component
+                    </Route>
+                    <ProtectedRoute exact path={protectedRoute}>
+                        protected component
+                    </ProtectedRoute>
+                </Switch>
+            </PageMockContextProvider>,
         );
     }
 
-    const meSuccessMock = {
-        request: {
-            query: MeDocument,
-        },
-        result: {
-            data: {
-                me: {
-                    name: '',
-                    email: '',
-                    products: [],
-                    projects: [],
-                    offers: [],
-                    '__typename': 'User',
+    const mockResponseGenerator = {
+        success: () => ({
+            request: {
+                query: MeDocument,
+            },
+            result: {
+                data: {
+                    me: {
+                        name: '',
+                        email: '',
+                        products: [],
+                        projects: [],
+                        offers: [],
+                        '__typename': 'User',
+                    },
                 },
             },
-        },
-    };
-
-    const meUnauthorizedErrorMock = {
-        request: {
-            query: MeDocument,
-        },
-        error: new UnauthorizedError('INVALID_REFRESH_TOKEN'),
+        }),
+        unauthorizedError: () => ({
+            request: {
+                query: MeDocument,
+            },
+            error: new UnauthorizedError('INVALID_REFRESH_TOKEN'),
+        }),
     };
 
     it('should render protected component when user is successfully authenticated', async (done) => {
-        const history = createMemoryHistory();
-        const mocks = [ meSuccessMock ];
-        const { queryByRole, getByText } = renderProtectedRouteWithContext({ history, mocks });
+        const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
+        const mockResponses = [ mockResponseGenerator.success() ];
+        const { queryByRole, getByText } = renderProtectedRouteInMockContext({ history, mockResponses });
 
         // verify if progressbar is visible
         expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
@@ -83,10 +72,10 @@ describe('ProtectedRoute component', () => {
     });
 
     it('should navigate to login page and display warning notification when user is not authenticated', async (done) => {
-        const history = createMemoryHistory();
-        const mocks = [ meUnauthorizedErrorMock ];
-        const snackbarMocks = { warningSnackbar: jest.fn() };
-        const { queryByRole, getByText } = renderProtectedRouteWithContext({ history, mocks, snackbarMocks });
+        const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
+        const mockResponses = [ mockResponseGenerator.unauthorizedError() ];
+        const mockSnackbars = { warningSnackbar: jest.fn() };
+        const { queryByRole, getByText } = renderProtectedRouteInMockContext({ history, mockResponses, mockSnackbars });
 
         // verify if progressbar is visible
         expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
@@ -99,10 +88,9 @@ describe('ProtectedRoute component', () => {
         expect(getByText('login component')).toBeInTheDocument();
 
         // verify if warning alert has been displayed
-        expect(snackbarMocks.warningSnackbar).toHaveBeenCalledTimes(1);
-        expect(snackbarMocks.warningSnackbar).toHaveBeenCalledWith('Authorization required');
+        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledTimes(1);
+        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledWith('Authorization required');
         done();
     });
-
 
 });

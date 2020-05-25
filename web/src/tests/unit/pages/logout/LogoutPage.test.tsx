@@ -26,28 +26,29 @@ describe('LogoutPage component', () => {
         );
     }
 
-    const logoutSuccessMock = {
-        request: {
-            query: LogoutDocument,
-        },
-        result: {
-            data: {
-                logout: true,
+    const mockResponseGenerator = {
+        success: () => ({
+            request: {
+                query: LogoutDocument,
             },
-        },
-    };
-
-    const logoutNetworkErrorMock = {
-        request: {
-            query: LogoutDocument,
-        },
-        error: new Error('network error'),
+            result: {
+                data: {
+                    logout: true,
+                },
+            },
+        }),
+        networkError: () => ({
+            request: {
+                query: LogoutDocument,
+            },
+            error: new Error('network error'),
+        }),
     };
 
     it('should logout on mount and navigate to login page', async (done) => {
         const history = createMemoryHistory();
-        const mocks = [ logoutSuccessMock ];
-        renderLogoutPageInMockContext({ history, mocks });
+        const mockResponses = [ mockResponseGenerator.success() ];
+        renderLogoutPageInMockContext({ history, mockResponses });
 
         // verify if navigation occurred
         await waitFor(() => expect(history.location.pathname).toMatch(routes.login()));
@@ -63,14 +64,14 @@ describe('LogoutPage component', () => {
 
     it('should display notification about network error', async (done) => {
         const history = createMemoryHistory();
-        const mocks = [ logoutNetworkErrorMock ];
-        const snackbarMocks = { errorSnackbar: jest.fn() };
-        renderLogoutPageInMockContext({ history, mocks, snackbarMocks });
+        const mockResponses = [ mockResponseGenerator.networkError() ];
+        const mockSnackbars = { errorSnackbar: jest.fn() };
+        renderLogoutPageInMockContext({ history, mockResponses, mockSnackbars });
 
         // verify if error alert has been displayed
         await waitFor(() => {
-            expect(snackbarMocks.errorSnackbar).toHaveBeenCalledTimes(1);
-            expect(snackbarMocks.errorSnackbar).toHaveBeenCalledWith('Network error');
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
         });
         done();
     });

@@ -67,63 +67,63 @@ describe('LoginPage component', () => {
 
     describe('log in form', () => {
 
-        const loginSuccessMock = {
-            request: {
-                query: LoginDocument,
-                variables: {
-                    data: {
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
-                    },
-                },
-            },
-            result: {
-                data: {
-                    login: {
-                        accessToken: 'ACCESS_TOKEN_TEST_VALUE',
-                        user: {
-                            name: '',
-                            email: '',
-                            products: [],
-                            projects: [],
-                            offers: [],
-                            '__typename': 'User',
+        const mockResponseGenerator = {
+            success: () => ({
+                request: {
+                    query: LoginDocument,
+                    variables: {
+                        data: {
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
                         },
-                        '__typename': 'InitialData',
                     },
                 },
-            },
-        };
-
-        const loginBadCredentialsMock = {
-            request: {
-                query: LoginDocument,
-                variables: {
+                result: {
                     data: {
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
+                        login: {
+                            accessToken: 'ACCESS_TOKEN_TEST_VALUE',
+                            user: {
+                                name: '',
+                                email: '',
+                                products: [],
+                                projects: [],
+                                offers: [],
+                                '__typename': 'User',
+                            },
+                            '__typename': 'InitialData',
+                        },
                     },
                 },
-            },
-            result: {
-                data: null,
-                errors: [
-                    { message: 'BAD_CREDENTIALS' } as unknown as GraphQLError,
-                ],
-            },
-        };
-
-        const loginNetworkErrorMock = {
-            request: {
-                query: LoginDocument,
-                variables: {
-                    data: {
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
+            }),
+            badCredentials: () => ({
+                request: {
+                    query: LoginDocument,
+                    variables: {
+                        data: {
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
+                        },
                     },
                 },
-            },
-            error: new Error('network error'),
+                result: {
+                    data: null,
+                    errors: [
+                        { message: 'BAD_CREDENTIALS' } as unknown as GraphQLError,
+                    ],
+                },
+            }),
+            networkError: () => ({
+                request: {
+                    query: LoginDocument,
+                    variables: {
+                        data: {
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
+                        },
+                    },
+                },
+                error: new Error('network error'),
+            }),
         };
 
         async function fillAndSubmitForm(elements: LoginPageElements, mock: MockedResponse) {
@@ -156,39 +156,39 @@ describe('LoginPage component', () => {
 
         it('should successfully log in and navigate to projects page', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ loginSuccessMock ];
-            const [ elements ] = renderLoginPageInMockContext({ history, mocks });
+            const mockResponse = mockResponseGenerator.success();
+            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses: [ mockResponse ] });
 
-            await fillAndSubmitForm(elements, loginSuccessMock);
+            await fillAndSubmitForm(elements, mockResponse);
 
             // verify if navigation occurred
             await waitFor(() => expect(history.location.pathname).toMatch(routes.projects()));
 
             // verify if auth service has been informed about new access token
             expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(loginSuccessMock.result.data.login.accessToken);
+            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(mockResponse.result.data.login.accessToken);
 
             // verify if apollo cache has been updated
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(1);
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledWith({
                 query: MeDocument,
-                data: { me: loginSuccessMock.result.data.login.user },
+                data: { me: mockResponse.result.data.login.user },
             });
             done();
         });
 
         it('should display notification about bad credentials error ', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ loginBadCredentialsMock ];
-            const snackbarMocks = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageInMockContext({ history, mocks, snackbarMocks });
+            const mockResponses = [ mockResponseGenerator.badCredentials() ];
+            const mockSnackbars = { errorSnackbar: jest.fn() };
+            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses, mockSnackbars });
 
-            await fillAndSubmitForm(elements, loginBadCredentialsMock);
+            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
             // verify if error alert has been displayed
             await waitFor(() => {
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledWith('Bad email or password');
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Bad email or password');
             });
 
             // verify if auth service has been not informed about new access token
@@ -201,16 +201,16 @@ describe('LoginPage component', () => {
 
         it('should display notification about network error', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ loginNetworkErrorMock ];
-            const snackbarMocks = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageInMockContext({ history, mocks, snackbarMocks });
+            const mockResponses = [ mockResponseGenerator.networkError() ];
+            const mockSnackbars = { errorSnackbar: jest.fn() };
+            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses, mockSnackbars });
 
-            await fillAndSubmitForm(elements, loginNetworkErrorMock);
+            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
             // verify if error alert has been displayed
             await waitFor(() => {
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledWith('Network error');
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
             });
 
             // verify if auth service has been not informed about new access token

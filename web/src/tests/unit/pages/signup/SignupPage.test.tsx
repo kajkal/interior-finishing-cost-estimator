@@ -60,66 +60,66 @@ describe('SignupPage component', () => {
 
     describe('sign up form', () => {
 
-        const signupSuccessMock = {
-            request: {
-                query: RegisterDocument,
-                variables: {
-                    data: {
-                        name: generator.name(),
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
-                    },
-                },
-            },
-            result: {
-                data: {
-                    register: {
-                        accessToken: 'ACCESS_TOKEN_TEST_VALUE',
-                        user: {
-                            name: '',
-                            email: '',
-                            products: [],
-                            projects: [],
-                            offers: [],
-                            '__typename': 'User',
+        const mockResponseGenerator = {
+            success: () => ({
+                request: {
+                    query: RegisterDocument,
+                    variables: {
+                        data: {
+                            name: generator.name(),
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
                         },
-                        '__typename': 'InitialData',
                     },
                 },
-            },
-        };
-
-        const signupEmailNotAvailableMock = {
-            request: {
-                query: RegisterDocument,
-                variables: {
+                result: {
                     data: {
-                        name: generator.name(),
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
+                        register: {
+                            accessToken: 'ACCESS_TOKEN_TEST_VALUE',
+                            user: {
+                                name: '',
+                                email: '',
+                                products: [],
+                                projects: [],
+                                offers: [],
+                                '__typename': 'User',
+                            },
+                            '__typename': 'InitialData',
+                        },
                     },
                 },
-            },
-            result: {
-                data: null,
-                errors: [
-                    { message: 'EMAIL_NOT_AVAILABLE' } as unknown as GraphQLError,
-                ],
-            },
-        };
-
-        const signupNetworkErrorMock = {
-            request: {
-                query: RegisterDocument,
-                variables: {
-                    data: {
-                        name: generator.name(),
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
+            }),
+            emailNotAvailable: () => ({
+                request: {
+                    query: RegisterDocument,
+                    variables: {
+                        data: {
+                            name: generator.name(),
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
+                        },
                     },
                 },
-            },
-            error: new Error('network error'),
+                result: {
+                    data: null,
+                    errors: [
+                        { message: 'EMAIL_NOT_AVAILABLE' } as unknown as GraphQLError,
+                    ],
+                },
+            }),
+            networkError: () => ({
+                request: {
+                    query: RegisterDocument,
+                    variables: {
+                        data: {
+                            name: generator.name(),
+                            email: generator.email(),
+                            password: generator.string({ length: 8 }),
+                        },
+                    },
+                },
+                error: new Error('network error'),
+            }),
         };
 
         async function fillAndSubmitForm(elements: SignupPageElements, mock: MockedResponse) {
@@ -176,33 +176,33 @@ describe('SignupPage component', () => {
 
         it('should successfully sign up and navigate to projects page', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ signupSuccessMock ];
-            const [ elements ] = renderSignupPageInMockContext({ history, mocks });
+            const mockResponse = mockResponseGenerator.success();
+            const [ elements ] = renderSignupPageInMockContext({ history, mockResponses: [ mockResponse ] });
 
-            await fillAndSubmitForm(elements, signupSuccessMock);
+            await fillAndSubmitForm(elements, mockResponse);
 
             // verify if navigation occurred
             await waitFor(() => expect(history.location.pathname).toMatch(routes.projects()));
 
             // verify if auth service has been informed about new access token
             expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(signupSuccessMock.result.data.register.accessToken);
+            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(mockResponse.result.data.register.accessToken);
 
             // verify if apollo cache has been updated
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(1);
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledWith({
                 query: MeDocument,
-                data: { me: signupSuccessMock.result.data.register.user },
+                data: { me: mockResponse.result.data.register.user },
             });
             done();
         });
 
         it('should display information about not available email', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ signupEmailNotAvailableMock ];
-            const [ elements ] = renderSignupPageInMockContext({ history, mocks });
+            const mockResponses = [ mockResponseGenerator.emailNotAvailable() ];
+            const [ elements ] = renderSignupPageInMockContext({ history, mockResponses });
 
-            await fillAndSubmitForm(elements, signupEmailNotAvailableMock);
+            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
             // verify if error has been displayed
             await waitFor(() => {
@@ -221,16 +221,16 @@ describe('SignupPage component', () => {
 
         it('should display notification about network error', async (done) => {
             const history = createMemoryHistory();
-            const mocks = [ signupNetworkErrorMock ];
-            const snackbarMocks = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderSignupPageInMockContext({ history, mocks, snackbarMocks });
+            const mockResponses = [ mockResponseGenerator.networkError() ];
+            const mockSnackbars = { errorSnackbar: jest.fn() };
+            const [ elements ] = renderSignupPageInMockContext({ history, mockResponses, mockSnackbars });
 
-            await fillAndSubmitForm(elements, signupNetworkErrorMock);
+            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
             // verify if error alert has been displayed
             await waitFor(() => {
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(snackbarMocks.errorSnackbar).toHaveBeenCalledWith('Network error');
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
             });
 
             // verify if auth service has been not informed about new access token

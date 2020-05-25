@@ -8,8 +8,8 @@ import { MockSnackbarContextData, MockSnackbarProvider } from './mocks/MockSnack
 
 export interface PageContextMocks {
     history?: MemoryHistory;
-    mocks?: ReadonlyArray<MockedResponse>;
-    snackbarMocks?: MockSnackbarContextData;
+    mockResponses?: ReadonlyArray<MockedResponse>;
+    mockSnackbars?: MockSnackbarContextData;
 }
 
 export interface PageMockContextProviderProps {
@@ -18,11 +18,11 @@ export interface PageMockContextProviderProps {
 }
 
 export function PageMockContextProvider(props: PageMockContextProviderProps): React.ReactElement {
-    const { history = createMemoryHistory(), mocks = [], snackbarMocks } = props.mocks || {};
+    const { history = createMemoryHistory(), mockResponses = [], mockSnackbars } = props.mocks || {};
     return (
-        <MockedProvider mocks={mocks}>
+        <MockedProvider mocks={mockResponses}>
             <Router history={history}>
-                <MockSnackbarProvider mocks={snackbarMocks}>
+                <MockSnackbarProvider mocks={mockSnackbars}>
                     {props.children}
                 </MockSnackbarProvider>
             </Router>
