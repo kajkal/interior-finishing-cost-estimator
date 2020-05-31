@@ -5,7 +5,7 @@ import { render, RenderResult, waitFor } from '@testing-library/react';
 
 import { PageContextMocks, PageMockContextProvider } from '../../__utils__/PageMockContextProvider';
 
-import { UnauthorizedError } from '../../../code/components/providers/apollo/auth/UnauthorizedError';
+import { UnauthorizedError } from '../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { ProtectedRoute } from '../../../code/components/common/router/ProtectedRoute';
 import { MeDocument } from '../../../graphql/generated-types';
 import { routes } from '../../../code/config/routes';

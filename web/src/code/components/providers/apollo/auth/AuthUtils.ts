@@ -3,7 +3,7 @@ import { InMemoryCache, Operation } from 'apollo-boost';
 
 import { ApolloCacheManager } from '../ApolloCacheManager';
 import { AccessTokenPayload } from './AccessTokenPayload';
-import { UnauthorizedError } from './UnauthorizedError';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 
 /**

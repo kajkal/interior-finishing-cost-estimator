@@ -3,7 +3,7 @@ import { InMemoryCache, Operation } from 'apollo-boost';
 
 import { ApolloCacheSpiesManager } from '../../../../__utils__/spies-managers/ApolloCacheSpiesManager';
 
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/auth/UnauthorizedError';
+import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { LocalStateDocument, LocalStateQuery } from '../../../../../graphql/generated-types';
 import { AuthUtils } from '../../../../../code/components/providers/apollo/auth/AuthUtils';
 
