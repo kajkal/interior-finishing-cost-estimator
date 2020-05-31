@@ -7,15 +7,15 @@ import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { MeDocument, MeQuery, RegisterFormData, useRegisterMutation } from '../../../../graphql/generated-types';
+import { RegisterFormData, useRegisterMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
+import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
+import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { passwordSchema } from '../../../validation/passwordSchema';
-import { authService } from '../../../services/auth/AuthService';
 import { emailSchema } from '../../../validation/emailSchema';
 import { nameSchema } from '../../../validation/nameSchema';
-import { useSnackbar } from '../../snackbars/useSnackbar';
 import { routes } from '../../../config/routes';
 
 
@@ -39,19 +39,13 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
 
     const handleSubmit: SignupFormSubmitHandler = React.useCallback(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
         try {
-            const response = await registerMutation({
+            await registerMutation({
                 variables: { data: values },
                 update: (cache, { data }) => {
-                    data && cache.writeQuery<MeQuery>({
-                        query: MeDocument,
-                        data: {
-                            me: data.register.user,
-                        },
-                    });
+                    data && ApolloCacheManager.handleAccessMutationResponse(cache, data.register);
                 },
             });
             successSnackbar('register success!');
-            authService.setAccessToken(response.data?.register.accessToken);
             push(routes.projects());
         } catch (error) {
             if (error instanceof ApolloError) {

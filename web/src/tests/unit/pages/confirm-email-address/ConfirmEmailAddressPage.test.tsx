@@ -109,7 +109,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
-        // verify if success alert has been displayed
+        // verify if success alert was displayed
         expect(mockSnackbars.successSnackbar).toHaveBeenCalledTimes(1);
         expect(mockSnackbars.successSnackbar).toHaveBeenCalledWith('Your email address has been confirmed');
         done();
@@ -121,7 +121,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
-        // verify if info alert has been displayed
+        // verify if info alert was displayed
         expect(mockSnackbars.infoSnackbar).toHaveBeenCalledTimes(1);
         expect(mockSnackbars.infoSnackbar).toHaveBeenCalledWith('This email has already been confirmed');
         done();
@@ -133,7 +133,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
-        // verify if error alert has been displayed
+        // verify if error alert was displayed
         expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
         expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
         done();

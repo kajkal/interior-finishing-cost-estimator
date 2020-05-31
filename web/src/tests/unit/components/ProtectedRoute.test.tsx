@@ -3,11 +3,12 @@ import { Route, Switch } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
+import { PageContextMocks, PageMockContextProvider } from '../../__utils__/PageMockContextProvider';
+
+import { UnauthorizedError } from '../../../code/components/providers/apollo/auth/UnauthorizedError';
 import { ProtectedRoute } from '../../../code/components/common/router/ProtectedRoute';
-import { UnauthorizedError } from '../../../code/services/auth/UnauthorizedError';
 import { MeDocument } from '../../../graphql/generated-types';
 import { routes } from '../../../code/config/routes';
-import { PageContextMocks, PageMockContextProvider } from '../../__utils__/PageMockContextProvider';
 
 
 describe('ProtectedRoute component', () => {
@@ -87,7 +88,7 @@ describe('ProtectedRoute component', () => {
         expect(history.location.pathname).toMatch(routes.login());
         expect(getByText('login component')).toBeInTheDocument();
 
-        // verify if warning alert has been displayed
+        // verify if warning alert was displayed
         expect(mockSnackbars.warningSnackbar).toHaveBeenCalledTimes(1);
         expect(mockSnackbars.warningSnackbar).toHaveBeenCalledWith('Authorization required');
         done();

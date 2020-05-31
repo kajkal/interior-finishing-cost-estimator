@@ -1,27 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from '@apollo/react-hooks';
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 
 import './styles/index.scss';
 
 import * as serviceWorker from './serviceWorker';
-import { SnackbarContextProvider } from './code/components/snackbars/SnackbarContextProvider';
-import { authService } from './code/services/auth/AuthService';
+import { ApolloContextProvider } from './code/components/providers/apollo/ApolloContextProvider';
+import { SnackbarContextProvider } from './code/components/providers/snackbars/SnackbarContextProvider';
 import { theme } from './code/config/theme';
 import { App } from './code/App';
 
 
-const client = new ApolloClient({
-    uri: `${process.env.REACT_APP_SERVER_URL}/graphql`,
-    credentials: 'include',
-    request: authService.prepareRequest.bind(authService),
-});
-
 ReactDOM.render(
-    <ApolloProvider client={client}>
+    <ApolloContextProvider>
         <BrowserRouter>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
@@ -30,7 +22,7 @@ ReactDOM.render(
                 </SnackbarContextProvider>
             </ThemeProvider>
         </BrowserRouter>
-    </ApolloProvider>
+    </ApolloContextProvider>
     ,
     document.getElementById('root'),
 );

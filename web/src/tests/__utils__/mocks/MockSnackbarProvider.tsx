@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShowSnackbarFn, SnackbarContext } from '../../../code/components/snackbars/SnackbarContext';
+import { ShowSnackbarFn, SnackbarContext } from '../../../code/components/providers/snackbars/SnackbarContext';
 
 
 export interface MockSnackbarContextData {

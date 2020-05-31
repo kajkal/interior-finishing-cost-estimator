@@ -3,8 +3,8 @@ import { RouteProps } from 'react-router';
 import { Redirect, Route } from 'react-router-dom';
 
 import { BackdropSpinner } from '../progress-indicators/BackdropSpinner';
+import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { useMeQuery } from '../../../../graphql/generated-types';
-import { useSnackbar } from '../../snackbars/useSnackbar';
 import { routes } from '../../../config/routes';
 
 

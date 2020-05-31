@@ -3,7 +3,7 @@ import Alert, { Color } from '@material-ui/lab/Alert';
 import Snackbar, { SnackbarCloseReason } from '@material-ui/core/Snackbar/Snackbar';
 
 import { SnackbarContext } from './SnackbarContext';
-import { snackbar } from '../../config/snackbar';
+import { snackbar } from '../../../config/snackbar';
 
 
 export interface SnackbarProviderProps {

@@ -8,14 +8,14 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { LoginFormData, MeDocument, MeQuery, useLoginMutation } from '../../../../graphql/generated-types';
+import { LoginFormData, useLoginMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
+import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
+import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { passwordSchema } from '../../../validation/passwordSchema';
 import { emailSchema } from '../../../validation/emailSchema';
-import { authService } from '../../../services/auth/AuthService';
-import { useSnackbar } from '../../snackbars/useSnackbar';
 import { routes } from '../../../config/routes';
 
 
@@ -40,22 +40,16 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
 
     const handleSubmit: LoginFormSubmitHandler = React.useCallback(async (values) => {
         try {
-            const response = await loginMutation({
+            await loginMutation({
                 variables: { data: values },
                 update: (cache, { data }) => {
-                    data && cache.writeQuery<MeQuery>({
-                        query: MeDocument,
-                        data: {
-                            me: data.login.user,
-                        },
-                    });
+                    data && ApolloCacheManager.handleAccessMutationResponse(cache, data.login);
                 },
             });
             successSnackbar('login success!');
-            authService.setAccessToken(response.data?.login.accessToken);
             push(state.from);
         } catch (error) {
-            console.log('FORM ERROR', {graphql: error.graphQLErrors, network: error.networkError});
+            console.log('FORM ERROR', { graphql: error.graphQLErrors, network: error.networkError });
             if (error instanceof ApolloError) {
                 if (error.graphQLErrors) {
                     if (error.graphQLErrors[ 0 ]?.message === 'BAD_CREDENTIALS') {

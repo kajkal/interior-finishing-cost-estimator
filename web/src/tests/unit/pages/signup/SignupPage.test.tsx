@@ -6,12 +6,11 @@ import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react
 
 import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloCacheSpiesManager } from '../../../__utils__/spies-managers/ApolloCacheSpiesManager';
-import { AuthServiceSpiesManager } from '../../../__utils__/spies-managers/AuthServiceSpiesManager';
 import { InputValidationHelper } from '../../../__utils__/InputValidationHelper';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { generator } from '../../../__utils__/generator';
 
-import { MeDocument, RegisterDocument } from '../../../../graphql/generated-types';
+import { LocalStateDocument, MeDocument, RegisterDocument } from '../../../../graphql/generated-types';
 import { SignupPage } from '../../../../code/components/pages/signup/SignupPage';
 import { routes } from '../../../../code/config/routes';
 
@@ -20,7 +19,6 @@ describe('SignupPage component', () => {
 
     beforeEach(() => {
         ApolloCacheSpiesManager.setupSpies();
-        AuthServiceSpiesManager.setupSpies();
     });
 
     interface SignupPageElements {
@@ -184,15 +182,24 @@ describe('SignupPage component', () => {
             // verify if navigation occurred
             await waitFor(() => expect(history.location.pathname).toMatch(routes.projects()));
 
-            // verify if auth service has been informed about new access token
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(mockResponse.result.data.register.accessToken);
+            // verify if apollo cache was updated
+            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(2);
 
-            // verify if apollo cache has been updated
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(1);
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledWith({
+            // verify if Me query result was saved in cache
+            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenNthCalledWith(1, {
                 query: MeDocument,
                 data: { me: mockResponse.result.data.register.user },
+            });
+
+            // verify if access token was saved in cache
+            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenNthCalledWith(2, {
+                query: LocalStateDocument,
+                data: {
+                    localState: {
+                        __typename: 'LocalState',
+                        accessToken: mockResponse.result.data.register.accessToken,
+                    },
+                },
             });
             done();
         });
@@ -204,17 +211,14 @@ describe('SignupPage component', () => {
 
             await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
-            // verify if error has been displayed
+            // verify if error alert was displayed
             await waitFor(() => {
                 const errorMessageElement = document.querySelector('#signup-email-input-helper-text.Mui-error');
                 expect(errorMessageElement).toBeInTheDocument();
                 expect(errorMessageElement).toHaveTextContent('Email not available');
             });
 
-            // verify if auth service has been not informed about new access token
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(0);
-
-            // verify if apollo cache has been not updated
+            // verify if apollo cache was not updated
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(0);
             done();
         });
@@ -227,16 +231,13 @@ describe('SignupPage component', () => {
 
             await fillAndSubmitForm(elements, mockResponses[ 0 ]);
 
-            // verify if error alert has been displayed
+            // verify if error alert was displayed
             await waitFor(() => {
                 expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
                 expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
             });
 
-            // verify if auth service has been not informed about new access token
-            expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(0);
-
-            // verify if apollo cache has been not updated
+            // verify if apollo cache was not updated
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(0);
             done();
         });

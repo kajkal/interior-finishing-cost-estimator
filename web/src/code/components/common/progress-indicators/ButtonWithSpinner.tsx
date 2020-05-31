@@ -1,5 +1,5 @@
 import React from 'react';
-import Button, {ButtonProps} from '@material-ui/core/Button';
+import Button, { ButtonProps } from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 
@@ -17,7 +17,6 @@ export function ButtonWithSpinner({ children, isSpinning, ...rest }: ButtonWithS
             type='submit'
             variant='contained'
             color='primary'
-            fullWidth
         >
             {isSpinning ? <CircularProgress color='inherit' size='26px' /> : children}
         </Button>

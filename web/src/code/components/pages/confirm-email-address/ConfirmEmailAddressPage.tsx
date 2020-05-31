@@ -6,7 +6,7 @@ import { Redirect } from 'react-router-dom';
 import { useConfirmEmailAddressMutation } from '../../../../graphql/generated-types';
 import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
 import { useSearchParams } from '../../common/router/useSearchParams';
-import { useSnackbar } from '../../snackbars/useSnackbar';
+import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { routes } from '../../../config/routes';
 
 

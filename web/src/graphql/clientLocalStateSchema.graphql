@@ -1,0 +1,7 @@
+type LocalState {
+    accessToken: String!
+}
+
+type Query {
+    localState: LocalState!
+}

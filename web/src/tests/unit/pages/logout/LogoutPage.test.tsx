@@ -4,7 +4,6 @@ import { render, RenderResult, waitFor } from '@testing-library/react';
 
 import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
-import { AuthServiceSpiesManager } from '../../../__utils__/spies-managers/AuthServiceSpiesManager';
 
 import { LogoutPage } from '../../../../code/components/pages/logout/LogoutPage';
 import { LogoutDocument } from '../../../../graphql/generated-types';
@@ -15,7 +14,6 @@ describe('LogoutPage component', () => {
 
     beforeEach(() => {
         ApolloClientSpiesManager.setupSpies();
-        AuthServiceSpiesManager.setupSpies();
     });
 
     function renderLogoutPageInMockContext(mocks?: PageContextMocks): RenderResult {
@@ -53,12 +51,8 @@ describe('LogoutPage component', () => {
         // verify if navigation occurred
         await waitFor(() => expect(history.location.pathname).toMatch(routes.login()));
 
-        // verify if apollo cache has been cleared
+        // verify if apollo cache was cleared
         expect(ApolloClientSpiesManager.clearStore).toHaveBeenCalledTimes(1);
-
-        // verify if auth service has been informed about access token reset
-        expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledTimes(1);
-        expect(AuthServiceSpiesManager.setAccessToken).toHaveBeenCalledWith(undefined);
         done();
     });
 
@@ -68,7 +62,7 @@ describe('LogoutPage component', () => {
         const mockSnackbars = { errorSnackbar: jest.fn() };
         renderLogoutPageInMockContext({ history, mockResponses, mockSnackbars });
 
-        // verify if error alert has been displayed
+        // verify if error alert was displayed
         await waitFor(() => {
             expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
             expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');

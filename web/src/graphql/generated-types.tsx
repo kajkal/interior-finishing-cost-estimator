@@ -13,10 +13,11 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  products: Array<Offer>;
-  projects: Array<Project>;
+  localState: LocalState;
   /** Data of the currently authenticated user */
   me: User;
+  products: Array<Offer>;
+  projects: Array<Project>;
 };
 
 export type Offer = {
@@ -101,6 +102,11 @@ export type EmailAddressConfirmationData = {
   token: Scalars['String'];
 };
 
+export type LocalState = {
+  __typename?: 'LocalState';
+  accessToken: Scalars['String'];
+};
+
 export type ConfirmEmailAddressMutationVariables = {
   data: EmailAddressConfirmationData;
 };
@@ -109,6 +115,17 @@ export type ConfirmEmailAddressMutationVariables = {
 export type ConfirmEmailAddressMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'confirmEmailAddress'>
+);
+
+export type LocalStateQueryVariables = {};
+
+
+export type LocalStateQuery = (
+  { __typename?: 'Query' }
+  & { localState: (
+    { __typename?: 'LocalState' }
+    & Pick<LocalState, 'accessToken'>
+  ) }
 );
 
 export type LoginMutationVariables = {
@@ -224,6 +241,38 @@ export function useConfirmEmailAddressMutation(baseOptions?: ApolloReactHooks.Mu
 export type ConfirmEmailAddressMutationHookResult = ReturnType<typeof useConfirmEmailAddressMutation>;
 export type ConfirmEmailAddressMutationResult = ApolloReactCommon.MutationResult<ConfirmEmailAddressMutation>;
 export type ConfirmEmailAddressMutationOptions = ApolloReactCommon.BaseMutationOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>;
+export const LocalStateDocument = gql`
+    query LocalState {
+  localState @client {
+    accessToken
+  }
+}
+    `;
+
+/**
+ * __useLocalStateQuery__
+ *
+ * To run a query within a React component, call `useLocalStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLocalStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLocalStateQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLocalStateQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<LocalStateQuery, LocalStateQueryVariables>) {
+        return ApolloReactHooks.useQuery<LocalStateQuery, LocalStateQueryVariables>(LocalStateDocument, baseOptions);
+      }
+export function useLocalStateLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<LocalStateQuery, LocalStateQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<LocalStateQuery, LocalStateQueryVariables>(LocalStateDocument, baseOptions);
+        }
+export type LocalStateQueryHookResult = ReturnType<typeof useLocalStateQuery>;
+export type LocalStateLazyQueryHookResult = ReturnType<typeof useLocalStateLazyQuery>;
+export type LocalStateQueryResult = ApolloReactCommon.QueryResult<LocalStateQuery, LocalStateQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($data: LoginFormData!) {
   login(data: $data) {

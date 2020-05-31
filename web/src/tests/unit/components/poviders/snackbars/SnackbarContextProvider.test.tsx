@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
-import { SnackbarContextProvider } from '../../../code/components/snackbars/SnackbarContextProvider';
-import { useSnackbar } from '../../../code/components/snackbars/useSnackbar';
+import { SnackbarContextProvider } from '../../../../../code/components/providers/snackbars/SnackbarContextProvider';
+import { useSnackbar } from '../../../../../code/components/providers/snackbars/useSnackbar';
 
 
 describe('SnackbarContextProvider component', () => {

@@ -3,8 +3,7 @@ import { ApolloError } from 'apollo-boost';
 import { Redirect } from 'react-router-dom';
 
 import { useLogoutMutation } from '../../../../graphql/generated-types';
-import { useSnackbar } from '../../snackbars/useSnackbar';
-import { authService } from '../../../services/auth/AuthService';
+import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 
 
 export function LogoutPage(): React.ReactElement | null {
@@ -12,11 +11,10 @@ export function LogoutPage(): React.ReactElement | null {
     const [ logoutMutation, { data, client } ] = useLogoutMutation();
 
     React.useEffect(() => {
-        async function logout() {
+        void async function logout() {
             try {
                 await logoutMutation();
                 await client?.clearStore();
-                authService.setAccessToken(undefined);
                 successSnackbar('Logout successfully');
             } catch (error) {
                 if (error instanceof ApolloError && error.networkError) {
@@ -27,9 +25,7 @@ export function LogoutPage(): React.ReactElement | null {
                     console.error(error);
                 }
             }
-        }
-
-        logout();
+        }();
     }, []);
 
     if (data?.logout) {
