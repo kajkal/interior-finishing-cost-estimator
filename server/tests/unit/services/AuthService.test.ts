@@ -88,6 +88,8 @@ describe('AuthService class', () => {
             // then
             expect(res.cookie).toHaveBeenCalledTimes(1);
             expect(res.cookie).toHaveBeenCalledWith('rt', '', expect.objectContaining({
+                httpOnly: true,
+                path: '/refresh_token',
                 maxAge: 0,
             }));
         });

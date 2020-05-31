@@ -40,7 +40,7 @@ export class AuthService {
      * Invalidate refresh token cookie.
      */
     invalidateRefreshToken(res: Response): void {
-        const lethalTokenOptions = { ...config.token.refresh.jwt.options, maxAge: 0 };
+        const lethalTokenOptions = { ...config.token.refresh.cookie.options, maxAge: 0 };
         res.cookie(config.token.refresh.cookie.name, '', lethalTokenOptions);
     }
 
