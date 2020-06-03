@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -7,26 +8,27 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
-import { SignupForm } from './SignupForm';
 import { routes } from '../../../config/routes';
+import { SignupForm } from './SignupForm';
 
 
 export function SignupPage(): React.ReactElement {
+    const { t } = useTranslation();
     const classes = useStyles();
 
     return (
         <Container component='main' maxWidth='xs'>
 
             <Typography component='h1' variant='h5'>
-                Sign up
+                {t('signupPage.signUp')}
             </Typography>
 
             <SignupForm formClassName={classes.form} />
 
-            <Grid container direction="row-reverse">
+            <Grid container direction='row-reverse'>
                 <Grid item>
                     <MuiLink to={routes.login()} variant='body2' component={Link}>
-                        {'Log in instead'}
+                        {t('signupPage.logInLink')}
                     </MuiLink>
                 </Grid>
             </Grid>

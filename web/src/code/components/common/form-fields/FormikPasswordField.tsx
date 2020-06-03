@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TextFieldProps } from '@material-ui/core/TextField/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment/InputAdornment';
@@ -14,6 +15,7 @@ function preventDefault(event: React.MouseEvent) {
 }
 
 export function FormikPasswordField(props: TextFieldProps): React.ReactElement {
+    const { t } = useTranslation();
     const [ showPassword, setShowPassword ] = React.useState(false);
 
     const handleVisibilityIconClick = React.useCallback(() => {
@@ -28,7 +30,7 @@ export function FormikPasswordField(props: TextFieldProps): React.ReactElement {
                 endAdornment: (
                     <InputAdornment position='end'>
                         <IconButton
-                            aria-label='toggle password visibility'
+                            aria-label={t('form.password.toggleVisibility')}
                             onClick={handleVisibilityIconClick}
                             onMouseDown={preventDefault}
                         >

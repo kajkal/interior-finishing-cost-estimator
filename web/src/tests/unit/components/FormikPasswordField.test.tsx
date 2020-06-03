@@ -32,7 +32,7 @@ describe('FormikPasswordField component', () => {
         const passwordInput = getByLabelText('Password', { selector: 'input' });
         expect(passwordInput).toHaveAttribute('type', 'password');
 
-        const toggleButton = getByRole('button', { name: 'toggle password visibility' });
+        const toggleButton = getByRole('button', { name: 't:form.password.toggleVisibility' });
         fireEvent.mouseDown(toggleButton);
         fireEvent.click(toggleButton);
 

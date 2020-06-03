@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TmpMe } from './TmpMe';
 import { LogoutPage } from './components/pages/logout/LogoutPage';
 import { LoginPage } from './components/pages/login/LoginPage';
@@ -9,12 +10,15 @@ import { ProtectedRoute } from './components/common/router/ProtectedRoute';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import MuiLink from '@material-ui/core/Link';
 import { ConfirmEmailAddressPage } from './components/pages/confirm-email-address/ConfirmEmailAddressPage';
+import { LanguageMenu } from './components/common/language-menu/LanguageMenu';
 
 
 export function App(): React.ReactElement {
+    const { t } = useTranslation();
+
     return (
         <>
-            <Breadcrumbs aria-label="breadcrumb">
+            <Breadcrumbs aria-label='breadcrumb'>
 
                 <MuiLink to={routes.login()} component={Link}>
                     Log in
@@ -37,6 +41,10 @@ export function App(): React.ReactElement {
                 </MuiLink>
 
             </Breadcrumbs>
+
+            <LanguageMenu />
+
+            <h1>{t('common.appName')}</h1>
 
             <Switch>
 

@@ -56,6 +56,18 @@ describe('ConfirmEmailAddressPage component', () => {
                 ],
             },
         }),
+        invalidEmailConfirmationToken: () => ({
+            request: {
+                query: ConfirmEmailAddressDocument,
+                variables: { data: { token: createSampleValidToken() } },
+            },
+            result: {
+                data: null,
+                errors: [
+                    { message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN' } as unknown as GraphQLError,
+                ],
+            },
+        }),
         networkError: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
@@ -73,13 +85,18 @@ describe('ConfirmEmailAddressPage component', () => {
         paths.forEach((path: string) => {
             it(`should redirect to login page without creating new mutation for '${path}'`, () => {
                 const history = createMemoryHistory({ initialEntries: [ path ] });
-                renderConfirmEmailAddressPageInMockContext({ history });
+                const mockSnackbars = { errorSnackbar: jest.fn() };
+                renderConfirmEmailAddressPageInMockContext({ history, mockSnackbars });
 
                 // verify if navigation occurred
                 expect(history.location.pathname).toMatch(routes.login());
 
                 // verify if mutation was not created
                 expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(0);
+
+                // verify if error alert has been displayed
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.invalidEmailConfirmationToken');
             });
         });
 
@@ -111,7 +128,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
         // verify if success alert was displayed
         expect(mockSnackbars.successSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.successSnackbar).toHaveBeenCalledWith('Your email address has been confirmed');
+        expect(mockSnackbars.successSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.emailConfirmedSuccessfully');
         done();
     });
 
@@ -123,7 +140,19 @@ describe('ConfirmEmailAddressPage component', () => {
 
         // verify if info alert was displayed
         expect(mockSnackbars.infoSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.infoSnackbar).toHaveBeenCalledWith('This email has already been confirmed');
+        expect(mockSnackbars.infoSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.emailAlreadyConfirmed');
+        done();
+    });
+
+    it('should display notification about invalid email confirmation token', async (done) => {
+        const mockResponse = mockResponseGenerator.invalidEmailConfirmationToken();
+        const mockSnackbars = { errorSnackbar: jest.fn() };
+
+        await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
+
+        // verify if error alert has been displayed
+        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
+        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.invalidEmailConfirmationToken');
         done();
     });
 
@@ -135,7 +164,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
         // verify if error alert was displayed
         expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
+        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
         done();
     });
 

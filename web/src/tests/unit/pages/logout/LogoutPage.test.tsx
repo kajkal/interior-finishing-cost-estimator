@@ -65,7 +65,7 @@ describe('LogoutPage component', () => {
         // verify if error alert was displayed
         await waitFor(() => {
             expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
         });
         done();
     });

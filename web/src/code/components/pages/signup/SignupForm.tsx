@@ -1,21 +1,22 @@
 import React from 'react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
-import { ApolloError } from 'apollo-boost';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import { RegisterFormData, useRegisterMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
-import { passwordSchema } from '../../../validation/passwordSchema';
-import { emailSchema } from '../../../validation/emailSchema';
-import { nameSchema } from '../../../validation/nameSchema';
+import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
+import { createEmailSchema } from '../../../utils/validation/emailSchema';
+import { createNameSchema } from '../../../utils/validation/nameSchema';
 import { routes } from '../../../config/routes';
 
 
@@ -30,6 +31,7 @@ interface ExtendedSignupFormData extends RegisterFormData {
 type SignupFormSubmitHandler = FormikConfig<ExtendedSignupFormData>['onSubmit'];
 
 export function SignupForm(props: SignupFormProps): React.ReactElement {
+    const { t } = useTranslation();
     const { formClassName } = props;
     const classes = useStyles();
 
@@ -37,7 +39,18 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
     const [ registerMutation ] = useRegisterMutation();
     const { push } = useHistory();
 
-    const handleSubmit: SignupFormSubmitHandler = React.useCallback(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
+    const validationSchema = React.useMemo(() => Yup.object().shape<ExtendedSignupFormData>({
+        name: createNameSchema(t),
+        email: createEmailSchema(t),
+        password: createPasswordSchema(t),
+        passwordConfirmation: Yup.string()
+            .test('match', t('form.password.validation.passwordsNotMatch'),
+                function (passwordConfirmation: string) {
+                    return passwordConfirmation === this.parent.password;
+                }),
+    }), [ t ]);
+
+    const handleSubmit = React.useCallback<SignupFormSubmitHandler>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
         try {
             await registerMutation({
                 variables: { data: values },
@@ -45,23 +58,15 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
                     data && ApolloCacheManager.handleAccessMutationResponse(cache, data.register);
                 },
             });
-            successSnackbar('register success!');
+            successSnackbar('register success!'); // TODO
             push(routes.projects());
         } catch (error) {
-            if (error instanceof ApolloError) {
-                if (error.graphQLErrors) {
-                    if (error.graphQLErrors[ 0 ]?.message === 'EMAIL_NOT_AVAILABLE') {
-                        setFieldError('email', 'Email not available');
-                    }
-                }
-                if (error.networkError) {
-                    errorSnackbar('Network error');
-                    console.error(error.networkError);
-                }
-            } else {
-                errorSnackbar('An unexpected error occurred');
-                console.error(error);
-            }
+            ApolloErrorHandler.process(error)
+                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                .handleGraphQlErrors({
+                    'EMAIL_NOT_AVAILABLE': () => setFieldError('email', t('form.email.validation.notAvailable')),
+                })
+                .finish();
         }
     }, []);
 
@@ -73,7 +78,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
                 password: '',
                 passwordConfirmation: '',
             }}
-            validationSchema={signupFormDataSchema}
+            validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
             {({ isSubmitting }) => (
@@ -81,38 +86,38 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
 
                     <FormikTextField
                         id={'signup-name-input'}
-                        aria-label={'Enter your username'}
+                        aria-label={t('form.name.ariaLabel')}
                         name='name'
                         type='text'
-                        label='Name'
+                        label={t('form.name.label')}
                         autoComplete='name'
                         fullWidth
                     />
 
                     <FormikTextField
                         id={'signup-email-input'}
-                        aria-label={'Enter your email address'}
+                        aria-label={t('form.email.ariaLabel')}
                         name='email'
                         type='email'
-                        label='Email address'
+                        label={t('form.email.label')}
                         autoComplete='email'
                         fullWidth
                     />
 
                     <FormikPasswordField
                         id={'signup-password-input'}
-                        aria-label={'Create a secure password'}
+                        aria-label={t('signupPage.passwordAriaLabel')}
                         name='password'
-                        label='Password'
+                        label={t('form.password.label')}
                         autoComplete='new-password'
                         fullWidth
                     />
 
                     <FormikPasswordField
                         id={'signup-password-confirmation-input'}
-                        aria-label={'Confirm your password'}
+                        aria-label={t('signupPage.passwordConfirmationAriaLabel')}
                         name='passwordConfirmation'
-                        label='Confirm Password'
+                        label={t('signupPage.passwordConfirmationLabel')}
                         autoComplete='new-password'
                         fullWidth
                     />
@@ -123,7 +128,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
                         isSpinning={isSubmitting}
                         fullWidth
                     >
-                        {'Sign up'}
+                        {t('signupPage.signUp')}
                     </ButtonWithSpinner>
 
                     {/*<div>*/}
@@ -146,15 +151,3 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
 }));
-
-export const signupFormDataSchema = Yup.object().shape<ExtendedSignupFormData>({
-    name: nameSchema,
-    email: emailSchema,
-    password: passwordSchema,
-    passwordConfirmation: Yup.string()
-        .test('match',
-            'Passwords do not match',
-            function (passwordConfirmation: string) {
-                return passwordConfirmation === this.parent.password;
-            }),
-});

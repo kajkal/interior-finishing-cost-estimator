@@ -1,12 +1,15 @@
 import React from 'react';
-import { ApolloError } from 'apollo-boost';
 import { Redirect } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { useLogoutMutation } from '../../../../graphql/generated-types';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
+import { routes } from '../../../config/routes';
 
 
 export function LogoutPage(): React.ReactElement | null {
+    const { t } = useTranslation();
     const { successSnackbar, errorSnackbar } = useSnackbar();
     const [ logoutMutation, { data, client } ] = useLogoutMutation();
 
@@ -15,21 +18,17 @@ export function LogoutPage(): React.ReactElement | null {
             try {
                 await logoutMutation();
                 await client?.clearStore();
-                successSnackbar('Logout successfully');
+                successSnackbar('Logout successfully'); // TODO remove
             } catch (error) {
-                if (error instanceof ApolloError && error.networkError) {
-                    errorSnackbar('Network error');
-                    console.error(error.networkError);
-                } else {
-                    errorSnackbar('An unexpected error occurred');
-                    console.error(error);
-                }
+                ApolloErrorHandler.process(error)
+                    .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                    .finish();
             }
         }();
     }, []);
 
     if (data?.logout) {
-        return <Redirect to='/login' />;
+        return <Redirect to={routes.login()} />;
     }
 
     return null;

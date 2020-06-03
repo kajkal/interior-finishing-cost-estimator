@@ -8,30 +8,26 @@ import { LocalStateDocument } from '../../../../../graphql/generated-types';
 
 describe('ApolloContextProvider component', () => {
 
-    beforeEach(async () => {
+    // isolated components:
+    let ApolloContextProvider: React.FunctionComponent;
+
+    beforeEach(() => {
         MockApolloClient.setupMocks();
         MockApolloInMemoryCache.setupMocks();
+
+        jest.isolateModules(() => {
+            ApolloContextProvider = require('../../../../../code/components/providers/apollo/ApolloContextProvider').ApolloContextProvider;
+        });
     });
 
-    afterEach(() => {
-        jest.resetModules();
-    });
-
-    function SampleChildComponent() {
-        return <span>sample component</span>;
-    }
-
-    it('should initialize Apollo client correctly', async (done) => {
-        const { ApolloContextProvider } = await import('../../../../../code/components/providers/apollo/ApolloContextProvider');
-        const { getByText, debug } = render(
+    it('should initialize Apollo client correctly', () => {
+        const { getByText } = render(
             <ApolloContextProvider>
-                <SampleChildComponent />
+                <span>sample child component</span>
             </ApolloContextProvider>,
         );
 
-        debug();
-
-        expect(getByText('sample component')).toBeInTheDocument();
+        expect(getByText('sample child component')).toBeInTheDocument();
 
         // verify Apollo client creation
         expect(MockApolloClient.constructorFn).toHaveBeenCalledTimes(1);
@@ -64,7 +60,6 @@ describe('ApolloContextProvider component', () => {
         // verify 'on clear store' listener
         MockApolloClient.simulateClearStore();
         expect(MockApolloInMemoryCache.writeQuery).toHaveBeenCalledTimes(2); // one extra times
-        done();
     });
 
 });

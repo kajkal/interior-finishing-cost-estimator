@@ -38,12 +38,12 @@ describe('SignupPage component', () => {
         );
 
         return [ {
-            nameInput: renderResult.getByLabelText('Name', { selector: 'input' }) as HTMLInputElement,
-            emailInput: renderResult.getByLabelText('Email address', { selector: 'input' }) as HTMLInputElement,
-            passwordInput: renderResult.getByLabelText('Password', { selector: 'input' }) as HTMLInputElement,
-            passwordConfirmationInput: renderResult.getByLabelText('Confirm Password', { selector: 'input' }) as HTMLInputElement,
-            submitButton: renderResult.getByRole('button', { name: 'Sign up' }) as HTMLButtonElement,
-            loginPageLink: renderResult.getByText(/log in/i, { selector: 'a' }) as HTMLAnchorElement,
+            nameInput: renderResult.getByLabelText('t:form.name.label', { selector: 'input' }) as HTMLInputElement,
+            emailInput: renderResult.getByLabelText('t:form.email.label', { selector: 'input' }) as HTMLInputElement,
+            passwordInput: renderResult.getByLabelText('t:form.password.label', { selector: 'input' }) as HTMLInputElement,
+            passwordConfirmationInput: renderResult.getByLabelText('t:signupPage.passwordConfirmationLabel', { selector: 'input' }) as HTMLInputElement,
+            submitButton: renderResult.getByRole('button', { name: 't:signupPage.signUp' }) as HTMLButtonElement,
+            loginPageLink: renderResult.getByText('t:signupPage.logInLink', { selector: 'a' }) as HTMLAnchorElement,
         }, renderResult ];
     }
 
@@ -133,8 +133,8 @@ describe('SignupPage component', () => {
             it('should validate name input value', async (done) => {
                 const [ { nameInput } ] = renderSignupPageInMockContext();
                 const validator = new InputValidationHelper(nameInput, '#signup-name-input-helper-text.Mui-error');
-                await validator.expectError('', 'Name is required');
-                await validator.expectError(':<', 'Name is too short');
+                await validator.expectError('', 't:form.name.validation.required');
+                await validator.expectError(':<', 't:form.name.validation.tooShort');
                 await validator.expectNoError('Valid Name');
                 done();
             });
@@ -142,8 +142,8 @@ describe('SignupPage component', () => {
             it('should validate email input value', async (done) => {
                 const [ { emailInput } ] = renderSignupPageInMockContext();
                 const validator = new InputValidationHelper(emailInput, '#signup-email-input-helper-text.Mui-error');
-                await validator.expectError('', 'Email is required');
-                await validator.expectError('invalid-email-address', 'Invalid email');
+                await validator.expectError('', 't:form.email.validation.required');
+                await validator.expectError('invalid-email-address', 't:form.email.validation.invalid');
                 await validator.expectNoError('validEmail@domain.com');
                 done();
             });
@@ -151,8 +151,8 @@ describe('SignupPage component', () => {
             it('should validate password input value', async (done) => {
                 const [ { passwordInput } ] = renderSignupPageInMockContext();
                 const validator = new InputValidationHelper(passwordInput, '#signup-password-input-helper-text.Mui-error');
-                await validator.expectError('', 'Password is required');
-                await validator.expectError('bad', 'Password is too short');
+                await validator.expectError('', 't:form.password.validation.required');
+                await validator.expectError('bad', 't:form.password.validation.tooShort');
                 await validator.expectNoError('better password');
                 done();
             });
@@ -164,8 +164,8 @@ describe('SignupPage component', () => {
                 await changeInputValue(passwordInput, passwordValue);
 
                 const validator = new InputValidationHelper(passwordConfirmationInput, '#signup-password-confirmation-input-helper-text.Mui-error');
-                await validator.expectError('', 'Passwords do not match');
-                await validator.expectError('not equal', 'Passwords do not match');
+                await validator.expectError('', 't:form.password.validation.passwordsNotMatch');
+                await validator.expectError('not equal', 't:form.password.validation.passwordsNotMatch');
                 await validator.expectNoError(passwordValue);
                 done();
             });
@@ -215,7 +215,7 @@ describe('SignupPage component', () => {
             await waitFor(() => {
                 const errorMessageElement = document.querySelector('#signup-email-input-helper-text.Mui-error');
                 expect(errorMessageElement).toBeInTheDocument();
-                expect(errorMessageElement).toHaveTextContent('Email not available');
+                expect(errorMessageElement).toHaveTextContent('t:form.email.validation.notAvailable');
             });
 
             // verify if apollo cache was not updated
@@ -234,7 +234,7 @@ describe('SignupPage component', () => {
             // verify if error alert was displayed
             await waitFor(() => {
                 expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('Network error');
+                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
             });
 
             // verify if apollo cache was not updated

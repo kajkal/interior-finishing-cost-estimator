@@ -1,8 +1,8 @@
 import React from 'react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
-import { ApolloError } from 'apollo-boost';
 import { LocationDescriptorObject } from 'history';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -10,12 +10,13 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { LoginFormData, useLoginMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
-import { passwordSchema } from '../../../validation/passwordSchema';
-import { emailSchema } from '../../../validation/emailSchema';
+import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
+import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { routes } from '../../../config/routes';
 
 
@@ -30,15 +31,21 @@ interface LoginLocationState {
 type LoginFormSubmitHandler = FormikConfig<LoginFormData>['onSubmit'];
 
 export function LoginForm(props: LoginFormProps): React.ReactElement {
+    const { t } = useTranslation();
     const { formClassName } = props;
     const classes = useStyles();
 
-    const { successSnackbar, errorSnackbar } = useSnackbar();
+    const { errorSnackbar } = useSnackbar();
     const [ loginMutation ] = useLoginMutation();
     const { push } = useHistory();
     const { state = { from: { pathname: routes.projects() } } } = useLocation<LoginLocationState>();
 
-    const handleSubmit: LoginFormSubmitHandler = React.useCallback(async (values) => {
+    const validationSchema = React.useMemo(() => Yup.object().shape<LoginFormData>({
+        email: createEmailSchema(t),
+        password: createPasswordSchema(t),
+    }), [ t ]);
+
+    const handleSubmit = React.useCallback<LoginFormSubmitHandler>(async (values) => {
         try {
             await loginMutation({
                 variables: { data: values },
@@ -46,24 +53,15 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
                     data && ApolloCacheManager.handleAccessMutationResponse(cache, data.login);
                 },
             });
-            successSnackbar('login success!');
+            // TODO test
             push(state.from);
         } catch (error) {
-            console.log('FORM ERROR', { graphql: error.graphQLErrors, network: error.networkError });
-            if (error instanceof ApolloError) {
-                if (error.graphQLErrors) {
-                    if (error.graphQLErrors[ 0 ]?.message === 'BAD_CREDENTIALS') {
-                        errorSnackbar('Bad email or password');
-                    }
-                }
-                if (error.networkError) {
-                    errorSnackbar('Network error');
-                    console.error(error.networkError);
-                }
-            } else {
-                errorSnackbar('An unexpected error occurred');
-                console.error(error);
-            }
+            ApolloErrorHandler.process(error)
+                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                .handleGraphQlErrors({
+                    'BAD_CREDENTIALS': () => errorSnackbar(t('loginPage.badCredentials')),
+                })
+                .finish();
         }
     }, []);
 
@@ -73,27 +71,27 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
                 email: '',
                 password: '',
             }}
-            validationSchema={loginFormDataSchema}
+            validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
             {({ isSubmitting }) => (
                 <Form className={classNames('login-form', formClassName)}>
 
                     <FormikTextField
-                        id={'login-email-input'}
-                        aria-label={'Enter your email address'}
+                        id='login-email-input'
+                        aria-label={t('form.email.ariaLabel')}
                         name='email'
                         type='email'
-                        label='Email address'
+                        label={t('form.email.label')}
                         autoComplete='email'
                         fullWidth
                     />
 
                     <FormikPasswordField
-                        id={'login-password-input'}
-                        aria-label={'Enter your password'}
+                        id='login-password-input'
+                        aria-label={t('form.password.ariaLabel')}
                         name='password'
-                        label='Password'
+                        label={t('form.password.label')}
                         autoComplete='current-password'
                         fullWidth
                     />
@@ -104,7 +102,7 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
                         isSpinning={isSubmitting}
                         fullWidth
                     >
-                        {'Log in'}
+                        {t('loginPage.logIn')}
                     </ButtonWithSpinner>
 
                     {/*<div>*/}
@@ -127,8 +125,3 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
 }));
-
-export const loginFormDataSchema = Yup.object().shape<LoginFormData>({
-    email: emailSchema,
-    password: passwordSchema,
-});

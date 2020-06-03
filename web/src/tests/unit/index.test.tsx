@@ -9,10 +9,12 @@ import { MockServiceWorker } from '../__mocks__/other/serviceWorker';
 jest.mock('../../code/components/providers/apollo/ApolloContextProvider', () => ({
     ApolloContextProvider: (props: any) => <MockedProvider>{props.children}</MockedProvider>,
 }));
+jest.mock('../../code/components/providers/i18n/I18nContextProvider', () => ({
+    I18nContextProvider: (props: any) => <>{props.children}</>,
+}));
 jest.mock('../../code/App', () => ({
     App: () => <span>Mock App</span>,
 }));
-
 
 describe('index file', () => {
 
@@ -32,19 +34,7 @@ describe('index file', () => {
     });
 
     it('should render app root inside root element', async () => {
-        expect.assertions(1);
-
-        // given
-        await act(async () => {
-            await import('../../index');
-        });
-
-        // when/then
-        expect(screen.getByText('Mock App')).toBeInTheDocument();
-    });
-
-    it('should unregister service worker', async () => {
-        expect.assertions(2);
+        expect.assertions(3);
 
         // given/when
         await act(async () => {
@@ -52,6 +42,10 @@ describe('index file', () => {
         });
 
         // then
+        // verify if app is present in DOM
+        expect(screen.getByText('Mock App')).toBeInTheDocument();
+
+        // verify if service worker was unregistered
         expect(MockServiceWorker.unregister).toHaveBeenCalledTimes(1);
         expect(MockServiceWorker.register).toHaveBeenCalledTimes(0);
     });

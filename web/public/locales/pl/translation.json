@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appName": "Estymator kosztów wykończenia",
+    "changeLanguage": "Zmień język"
+  },
+  "loginPage": {
+    "logIn": "Zaloguj się",
+    "forgotPasswordLink": "Zapomniałeś hasła?",
+    "signUpLink": "Nie masz konta? Zarejestruj się",
+    "badCredentials": "Zły email lub hasło"
+  },
+  "signupPage": {
+    "signUp": "Zarejestruj się",
+    "logInLink": "Wróć do logowania",
+    "passwordAriaLabel": "Stwórz bezpieczne hasło",
+    "passwordConfirmationLabel": "Potwierdź hasło",
+    "passwordConfirmationAriaLabel": "Potwierdź swoje hasło"
+  },
+  "emailConfirmationPage": {
+    "emailConfirmedSuccessfully": "Twój adres email został potwierdzony",
+    "emailAlreadyConfirmed": "Ten adres email jest już potwierdzony",
+    "invalidEmailConfirmationToken": "Nieprawidłowy token potwierdzenia adresu email"
+  },
+  "form": {
+    "password": {
+      "label": "Hasło",
+      "ariaLabel": "Wprowadź swoje hasło",
+      "toggleVisibility": "Przełącz widoczność hasła",
+      "validation": {
+        "required": "Hasło jest wymagane",
+        "tooShort": "Wprowadzone hasło jest za krótkie",
+        "tooLong": "Wprowadzone hasło jest za długie",
+        "passwordsNotMatch": "Wprowadzone hasła nie są takie same"
+      }
+    },
+    "email": {
+      "label": "Adres email",
+      "ariaLabel": "Wprowadź swój adres email",
+      "validation": {
+        "required": "Adres email jest wymagany",
+        "invalid": "Niepoprawny adres email",
+        "notAvailable": "Ten adres email jest już zajęty"
+      }
+    },
+    "name": {
+      "label": "Nazwa użytkownika",
+      "ariaLabel": "Wprowadź swoją nazwę użytkownika",
+      "validation": {
+        "required": "Nazwa użytkownika jest wymagana",
+        "tooShort": "Wprowadzona nazwa jest za krótka",
+        "tooLong": "Wprowadzona nazwa jest za długa"
+      }
+    }
+  },
+  "error": {
+    "networkError": "Błąd połączenia z serwerem, spróbuj ponownie później",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd, spróbuj ponownie później",
+    "authorizationRequired": "Wymagana autoryzacja, zaloguj się i spróbuj ponownie"
+  }
+}

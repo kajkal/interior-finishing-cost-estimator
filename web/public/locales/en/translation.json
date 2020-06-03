@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appName": "Interior finishing cost estimator",
+    "changeLanguage": "Change language"
+  },
+  "loginPage": {
+    "logIn": "Log in",
+    "forgotPasswordLink": "Forgot password?",
+    "signUpLink": "Don't have an account? Sign Up",
+    "badCredentials": "Bad email or password"
+  },
+  "signupPage": {
+    "signUp": "Sign up",
+    "logInLink": "Log in instead",
+    "passwordAriaLabel": "Create a secure password",
+    "passwordConfirmationLabel": "Confirm Password",
+    "passwordConfirmationAriaLabel": "Confirm your password"
+  },
+  "emailConfirmationPage": {
+    "emailConfirmedSuccessfully": "Your email address has been confirmed",
+    "emailAlreadyConfirmed": "This email has already been confirmed",
+    "invalidEmailConfirmationToken": "Incorrect email confirmation token"
+  },
+  "form": {
+    "password": {
+      "label": "Password",
+      "ariaLabel": "Enter your password",
+      "toggleVisibility": "Toggle password visibility",
+      "validation": {
+        "required": "Password is required",
+        "tooShort": "Password is too short",
+        "tooLong": "Password is too long",
+        "passwordsNotMatch": "Passwords do not match"
+      }
+    },
+    "email": {
+      "label": "Email address",
+      "ariaLabel": "Enter your email address",
+      "validation": {
+        "required": "Email is required",
+        "invalid": "Invalid email",
+        "notAvailable": "Email not available"
+      }
+    },
+    "name": {
+      "label": "Username",
+      "ariaLabel": "Enter your username",
+      "validation": {
+        "required": "Name is required",
+        "tooShort": "Name is too short",
+        "tooLong": "Name is too long"
+      }
+    }
+  },
+  "error": {
+    "networkError": "Network error occurred, try again later",
+    "unexpectedError": "An unexpected error occurred, try again later",
+    "authorizationRequired": "Authorization required, log in and try again"
+  }
+}

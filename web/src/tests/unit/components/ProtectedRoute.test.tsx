@@ -90,7 +90,7 @@ describe('ProtectedRoute component', () => {
 
         // verify if warning alert was displayed
         expect(mockSnackbars.warningSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledWith('Authorization required');
+        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledWith('t:error.authorizationRequired');
         done();
     });
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { decode } from 'jsonwebtoken';
-import { ApolloError } from 'apollo-boost';
 import { Redirect } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { useConfirmEmailAddressMutation } from '../../../../graphql/generated-types';
 import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
 import { useSearchParams } from '../../common/router/useSearchParams';
@@ -28,6 +29,7 @@ function useValidatedEmailAddressConfirmationToken(): string | undefined {
 }
 
 export function ConfirmEmailAddressPage(): React.ReactElement {
+    const { t } = useTranslation();
     const { infoSnackbar, successSnackbar, errorSnackbar } = useSnackbar();
     const [ confirmEmailAddressMutation, { data, error } ] = useConfirmEmailAddressMutation();
     const emailAddressConfirmationToken = useValidatedEmailAddressConfirmationToken();
@@ -39,25 +41,19 @@ export function ConfirmEmailAddressPage(): React.ReactElement {
                     await confirmEmailAddressMutation({
                         variables: { data: { token: emailAddressConfirmationToken } },
                     });
-                    successSnackbar('Your email address has been confirmed');
+                    successSnackbar(t('emailConfirmationPage.emailConfirmedSuccessfully'));
                 } catch (error) {
-                    console.log('error :<', error);
-                    if (error instanceof ApolloError) {
-                        if (error.graphQLErrors) {
-                            if (error.graphQLErrors[ 0 ]?.message === 'EMAIL_ADDRESS_ALREADY_CONFIRMED') {
-                                infoSnackbar('This email has already been confirmed');
-                            }
-                        }
-                        if (error.networkError) {
-                            errorSnackbar('Network error');
-                            console.error(error.networkError);
-                        }
-                    } else {
-                        errorSnackbar('An unexpected error occurred');
-                        console.error(error);
-                    }
+                    ApolloErrorHandler.process(error)
+                        .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                        .handleGraphQlErrors({
+                            'EMAIL_ADDRESS_ALREADY_CONFIRMED': () => infoSnackbar(t('emailConfirmationPage.emailAlreadyConfirmed')),
+                            'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN': () => errorSnackbar(t('emailConfirmationPage.invalidEmailConfirmationToken')),
+                        })
+                        .finish();
                 }
             }();
+        } else {
+            errorSnackbar(t('emailConfirmationPage.invalidEmailConfirmationToken'));
         }
     }, []);
 
