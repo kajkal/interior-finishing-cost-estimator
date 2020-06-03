@@ -184,6 +184,26 @@ describe('LoginPage component', () => {
             done();
         });
 
+        /**
+         * User try to access protected page, but is not authenticated, so he is redirected to login page.
+         * After successful authentication he is redirected to initially requested protected page.
+         */
+        it('should successfully log in and navigate to initially requested protected page', async (done) => {
+            const history = createMemoryHistory();
+            history.push('/login-page', { from: { pathname: '/protected-page' } }); // simulate redirection done by ProtectedRoute component
+            const mockResponse = mockResponseGenerator.success();
+            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses: [ mockResponse ] });
+
+            // verify current location
+            expect(history.location.pathname).toMatch('/login-page');
+
+            await fillAndSubmitForm(elements, mockResponse);
+
+            // verify if navigation to initially requested protected page occurred
+            await waitFor(() => expect(history.location.pathname).toMatch('/protected-page'));
+            done();
+        });
+
         it('should display notification about bad credentials error ', async (done) => {
             const history = createMemoryHistory();
             const mockResponses = [ mockResponseGenerator.badCredentials() ];

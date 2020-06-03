@@ -53,7 +53,6 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
                     data && ApolloCacheManager.handleAccessMutationResponse(cache, data.login);
                 },
             });
-            // TODO test
             push(state.from);
         } catch (error) {
             ApolloErrorHandler.process(error)
