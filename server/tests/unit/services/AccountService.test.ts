@@ -19,7 +19,7 @@ describe('AccountService class', () => {
             // verify url generation
             const confirmationUrl = serviceUnderTest.generateEmailAddressConfirmationUrl(userData);
 
-            expect(confirmationUrl).toMatch(/WEB_CLIENT_URL_TEST_VALUE\/confirm-email-address\?token=.*/);
+            expect(confirmationUrl).toMatch(/^http:\/\/localhost:3005\/confirm-email-address\?token=.*/);
             expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledTimes(1);
             expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledWith(
                 { sub: 'TEST_USER_ID' },

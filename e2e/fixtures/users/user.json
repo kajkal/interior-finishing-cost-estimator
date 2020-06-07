@@ -1,0 +1,13 @@
+{
+  "dbRecord": {
+    "name": "sample user",
+    "email": "sampleUser@domain.com",
+    "password": "$argon2i$v=19$m=4096,t=3,p=1$Wna8FX7odai5i3Boh99jgA$XAmjdnq6mlqo7cyNwpXkZME6TA0gz4nNmASm5RcUgik",
+    "isEmailAddressConfirmed": false,
+    "createdAt": "2020-01-01T00:00:00.000Z"
+  },
+  "credentials": {
+    "email": "sampleUser@domain.com",
+    "password": "Strong Password"
+  }
+}

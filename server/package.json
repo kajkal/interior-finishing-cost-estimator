@@ -7,6 +7,7 @@
     "gcp-build": "rimraf ./build && tsc",
     "start": "node build/index.js",
     "start:dev": "cross-env NODE_ENV=development nodemon",
+    "start:e2e": "cross-env NODE_ENV=test MONGODB_URL=mongodb://localhost:27017/estimator-e2e-test nodemon",
     "test": "cross-env NODE_ENV=test jest",
     "deploy": "gcloud app deploy"
   },

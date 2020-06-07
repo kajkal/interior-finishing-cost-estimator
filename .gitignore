@@ -1,0 +1,9 @@
+# Dependency directory
+node_modules
+
+# Webstorm metadata
+.idea
+
+# Cypress
+e2e/screenshots
+e2e/videos

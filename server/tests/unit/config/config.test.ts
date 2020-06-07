@@ -101,7 +101,7 @@ describe('config object', () => {
                 port: 4005,
             }),
             webClient: expect.objectContaining({
-                url: 'WEB_CLIENT_URL_TEST_VALUE',
+                url: 'http://localhost:3005',
             }),
             email: expect.objectContaining({
                 apiKey: 'SENDGRID_API_KEY_TEST_VALUE',

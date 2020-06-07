@@ -1,0 +1,26 @@
+{
+  "name": "interior-finishing-cost-estimator",
+  "version": "1.0.0",
+  "description": "Interior Finishing Cost Estimator app",
+  "scripts": {
+    "start:e2e": "concurrently -k -n server,web \"npm run start:e2e --prefix server\" \"npm run start:e2e --prefix web\"",
+    "test:e2e:open": "cypress open",
+    "test:e2e:run": "cypress run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kajkal/interior-finishing-cost-estimator.git"
+  },
+  "keywords": [],
+  "author": "Karol Leśniak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kajkal/interior-finishing-cost-estimator/issues"
+  },
+  "homepage": "https://github.com/kajkal/interior-finishing-cost-estimator#readme",
+  "devDependencies": {
+    "concurrently": "^5.2.0",
+    "cypress": "^4.7.0",
+    "mongodb": "^3.5.8"
+  }
+}
