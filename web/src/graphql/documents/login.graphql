@@ -1,5 +1,5 @@
-mutation Login($data: LoginFormData!) {
-    login(data: $data) {
+mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
         accessToken
         user {
             name

@@ -70,10 +70,8 @@ describe('LoginPage component', () => {
                 request: {
                     query: LoginDocument,
                     variables: {
-                        data: {
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 result: {
@@ -97,10 +95,8 @@ describe('LoginPage component', () => {
                 request: {
                     query: LoginDocument,
                     variables: {
-                        data: {
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 result: {
@@ -114,10 +110,8 @@ describe('LoginPage component', () => {
                 request: {
                     query: LoginDocument,
                     variables: {
-                        data: {
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 error: new Error('network error'),
@@ -125,8 +119,8 @@ describe('LoginPage component', () => {
         };
 
         async function fillAndSubmitForm(elements: LoginPageElements, mock: MockedResponse) {
-            await changeInputValue(elements.emailInput, mock.request.variables!.data.email);
-            await changeInputValue(elements.passwordInput, mock.request.variables!.data.password);
+            await changeInputValue(elements.emailInput, mock.request.variables!.email);
+            await changeInputValue(elements.passwordInput, mock.request.variables!.password);
             fireEvent.click(elements.submitButton);
         }
 

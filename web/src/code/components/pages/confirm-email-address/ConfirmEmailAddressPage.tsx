@@ -39,7 +39,7 @@ export function ConfirmEmailAddressPage(): React.ReactElement {
             void async function confirmEmailAddress() {
                 try {
                     await confirmEmailAddressMutation({
-                        variables: { data: { token: emailAddressConfirmationToken } },
+                        variables: { token: emailAddressConfirmationToken },
                     });
                     successSnackbar(t('emailConfirmationPage.emailConfirmedSuccessfully'));
                 } catch (error) {

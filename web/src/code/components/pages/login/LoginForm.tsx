@@ -8,7 +8,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { LoginFormData, useLoginMutation } from '../../../../graphql/generated-types';
+import { MutationLoginArgs, useLoginMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
@@ -28,6 +28,7 @@ interface LoginLocationState {
     from: LocationDescriptorObject;
 }
 
+type LoginFormData = MutationLoginArgs;
 type LoginFormSubmitHandler = FormikConfig<LoginFormData>['onSubmit'];
 
 export function LoginForm(props: LoginFormProps): React.ReactElement {
@@ -48,7 +49,7 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
     const handleSubmit = React.useCallback<LoginFormSubmitHandler>(async (values) => {
         try {
             await loginMutation({
-                variables: { data: values },
+                variables: values,
                 update: (cache, { data }) => {
                     data && ApolloCacheManager.handleAccessMutationResponse(cache, data.login);
                 },

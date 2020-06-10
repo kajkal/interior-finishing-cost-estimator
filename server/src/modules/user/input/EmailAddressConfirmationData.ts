@@ -1,8 +1,8 @@
-import { Field, InputType } from 'type-graphql';
+import { ArgsType, Field } from 'type-graphql';
 import { IsJWT } from 'class-validator';
 
 
-@InputType()
+@ArgsType()
 export class EmailAddressConfirmationData {
 
     @Field({ description: 'Email address confirmation token sent by email' })

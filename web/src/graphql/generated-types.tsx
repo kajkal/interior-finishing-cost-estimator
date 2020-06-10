@@ -66,23 +66,20 @@ export type Mutation = {
 
 
 export type MutationRegisterArgs = {
-  data: RegisterFormData;
+  email: Scalars['String'];
+  password: Scalars['String'];
+  name: Scalars['String'];
 };
 
 
 export type MutationLoginArgs = {
-  data: LoginFormData;
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
 export type MutationConfirmEmailAddressArgs = {
-  data: EmailAddressConfirmationData;
-};
-
-export type RegisterFormData = {
-  email: Scalars['String'];
-  password: Scalars['String'];
-  name: Scalars['String'];
+  token: Scalars['String'];
 };
 
 /** Data returned after successful login or registration */
@@ -92,23 +89,13 @@ export type InitialData = {
   accessToken: Scalars['String'];
 };
 
-export type LoginFormData = {
-  email: Scalars['String'];
-  password: Scalars['String'];
-};
-
-export type EmailAddressConfirmationData = {
-  /** Email address confirmation token sent by email */
-  token: Scalars['String'];
-};
-
 export type LocalState = {
   __typename?: 'LocalState';
   accessToken: Scalars['String'];
 };
 
 export type ConfirmEmailAddressMutationVariables = {
-  data: EmailAddressConfirmationData;
+  token: Scalars['String'];
 };
 
 
@@ -129,7 +116,8 @@ export type LocalStateQuery = (
 );
 
 export type LoginMutationVariables = {
-  data: LoginFormData;
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -185,7 +173,9 @@ export type MeQuery = (
 );
 
 export type RegisterMutationVariables = {
-  data: RegisterFormData;
+  name: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -213,8 +203,8 @@ export type RegisterMutation = (
 
 
 export const ConfirmEmailAddressDocument = gql`
-    mutation ConfirmEmailAddress($data: EmailAddressConfirmationData!) {
-  confirmEmailAddress(data: $data)
+    mutation ConfirmEmailAddress($token: String!) {
+  confirmEmailAddress(token: $token)
 }
     `;
 
@@ -231,7 +221,7 @@ export const ConfirmEmailAddressDocument = gql`
  * @example
  * const [confirmEmailAddressMutation, { data, loading, error }] = useConfirmEmailAddressMutation({
  *   variables: {
- *      data: // value for 'data'
+ *      token: // value for 'token'
  *   },
  * });
  */
@@ -274,8 +264,8 @@ export type LocalStateQueryHookResult = ReturnType<typeof useLocalStateQuery>;
 export type LocalStateLazyQueryHookResult = ReturnType<typeof useLocalStateLazyQuery>;
 export type LocalStateQueryResult = ApolloReactCommon.QueryResult<LocalStateQuery, LocalStateQueryVariables>;
 export const LoginDocument = gql`
-    mutation Login($data: LoginFormData!) {
-  login(data: $data) {
+    mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
     accessToken
     user {
       name
@@ -307,7 +297,8 @@ export const LoginDocument = gql`
  * @example
  * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
- *      data: // value for 'data'
+ *      email: // value for 'email'
+ *      password: // value for 'password'
  *   },
  * });
  */
@@ -388,8 +379,8 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
 export const RegisterDocument = gql`
-    mutation Register($data: RegisterFormData!) {
-  register(data: $data) {
+    mutation Register($name: String!, $email: String!, $password: String!) {
+  register(name: $name, email: $email, password: $password) {
     accessToken
     user {
       name
@@ -421,7 +412,9 @@ export const RegisterDocument = gql`
  * @example
  * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
- *      data: // value for 'data'
+ *      name: // value for 'name'
+ *      email: // value for 'email'
+ *      password: // value for 'password'
  *   },
  * });
  */

@@ -7,7 +7,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { RegisterFormData, useRegisterMutation } from '../../../../graphql/generated-types';
+import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
@@ -24,11 +24,10 @@ export interface SignupFormProps {
     formClassName: string;
 }
 
-interface ExtendedSignupFormData extends RegisterFormData {
+interface SignupFormData extends MutationRegisterArgs {
     passwordConfirmation: string;
 }
-
-type SignupFormSubmitHandler = FormikConfig<ExtendedSignupFormData>['onSubmit'];
+type SignupFormSubmitHandler = FormikConfig<SignupFormData>['onSubmit'];
 
 export function SignupForm(props: SignupFormProps): React.ReactElement {
     const { t } = useTranslation();
@@ -39,7 +38,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
     const [ registerMutation ] = useRegisterMutation();
     const { push } = useHistory();
 
-    const validationSchema = React.useMemo(() => Yup.object().shape<ExtendedSignupFormData>({
+    const validationSchema = React.useMemo(() => Yup.object().shape<SignupFormData>({
         name: createNameSchema(t),
         email: createEmailSchema(t),
         password: createPasswordSchema(t),
@@ -53,7 +52,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
     const handleSubmit = React.useCallback<SignupFormSubmitHandler>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
         try {
             await registerMutation({
-                variables: { data: values },
+                variables: values,
                 update: (cache, { data }) => {
                     data && ApolloCacheManager.handleAccessMutationResponse(cache, data.register);
                 },
@@ -71,7 +70,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
     }, []);
 
     return (
-        <Formik<ExtendedSignupFormData>
+        <Formik<SignupFormData>
             initialValues={{
                 name: '',
                 email: '',

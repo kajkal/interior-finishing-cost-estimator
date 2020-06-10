@@ -36,7 +36,7 @@ describe('ConfirmEmailAddressPage component', () => {
         success: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { data: { token: createSampleValidToken() } },
+                variables: { token: createSampleValidToken() },
             },
             result: {
                 data: {
@@ -47,7 +47,7 @@ describe('ConfirmEmailAddressPage component', () => {
         emailAddressAlreadyConfirmed: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { data: { token: createSampleValidToken() } },
+                variables: { token: createSampleValidToken() },
             },
             result: {
                 data: null,
@@ -59,7 +59,7 @@ describe('ConfirmEmailAddressPage component', () => {
         invalidEmailConfirmationToken: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { data: { token: createSampleValidToken() } },
+                variables: { token: createSampleValidToken() },
             },
             result: {
                 data: null,
@@ -71,7 +71,7 @@ describe('ConfirmEmailAddressPage component', () => {
         networkError: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { data: { token: createSampleValidToken() } },
+                variables: { token: createSampleValidToken() },
             },
             error: new Error('network error'),
         }),
@@ -103,7 +103,7 @@ describe('ConfirmEmailAddressPage component', () => {
     });
 
     async function renderAndAwaitMutationResponse(mockResponse: MockedResponse, mockSnackbars: MockSnackbarContextData) {
-        const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables?.data.token}` ] });
+        const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ] });
         const mockResponses = [ mockResponse ];
         const { queryByRole } = renderConfirmEmailAddressPageInMockContext({ history, mockResponses, mockSnackbars });
 

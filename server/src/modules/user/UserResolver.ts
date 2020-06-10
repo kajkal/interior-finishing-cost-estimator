@@ -2,7 +2,7 @@ import { Inject, Service } from 'typedi';
 import { hash, verify } from 'argon2';
 import { UserInputError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { Arg, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { EmailAddressConfirmationData } from './input/EmailAddressConfirmationData';
 import { AccountService } from '../../services/AccountService';
@@ -65,7 +65,7 @@ export class UserResolver {
 
     @UseMiddleware(logAccess)
     @Mutation(() => InitialData)
-    async register(@Arg('data') data: RegisterFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
+    async register(@Args() data: RegisterFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
         if (await this.userRepository.isEmailTaken(data.email)) {
             throw new UserInputError('EMAIL_NOT_AVAILABLE');
         }
@@ -85,7 +85,7 @@ export class UserResolver {
 
     @UseMiddleware(logAccess)
     @Mutation(() => InitialData)
-    async login(@Arg('data') data: LoginFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
+    async login(@Args() data: LoginFormData, @Ctx() context: ExpressContext): Promise<InitialData> {
         const user = await this.userRepository.findOne({ email: data.email });
 
         if (user) {
@@ -110,7 +110,7 @@ export class UserResolver {
 
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
-    async confirmEmailAddress(@Arg('data') data: EmailAddressConfirmationData): Promise<boolean> {
+    async confirmEmailAddress(@Args() data: EmailAddressConfirmationData): Promise<boolean> {
         let user: User | undefined;
 
         try {

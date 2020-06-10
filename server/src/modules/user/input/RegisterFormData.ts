@@ -1,9 +1,9 @@
-import { Field, InputType } from 'type-graphql';
+import { ArgsType, Field } from 'type-graphql';
 import { Length } from 'class-validator';
 import { LoginFormData } from './LoginFormData';
 
 
-@InputType()
+@ArgsType()
 export class RegisterFormData extends LoginFormData {
 
     @Field()

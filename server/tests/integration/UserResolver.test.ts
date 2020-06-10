@@ -143,8 +143,8 @@ describe('UserResolver class', () => {
     describe('register mutation', () => {
 
         const registerMutation = `
-            mutation Register($data: RegisterFormData!) {
-              register(data: $data) {
+            mutation Register($name: String!, $email: String!, $password: String!) {
+              register(name: $name, email: $email, password: $password) {
                 accessToken
                 user {
                   name
@@ -165,9 +165,7 @@ describe('UserResolver class', () => {
             };
             const response = await executeGraphQLOperation({
                 source: registerMutation,
-                variableValues: {
-                    data: registerFormData,
-                },
+                variableValues: registerFormData,
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
@@ -230,9 +228,7 @@ describe('UserResolver class', () => {
             };
             const response = await executeGraphQLOperation({
                 source: registerMutation,
-                variableValues: {
-                    data: registerFormData,
-                },
+                variableValues: registerFormData,
             });
 
             // verify if email was check for availability
@@ -266,8 +262,8 @@ describe('UserResolver class', () => {
     describe('login mutation', () => {
 
         const loginMutation = `
-            mutation Login($data: LoginFormData!) {
-              login(data: $data) {
+            mutation Login($email: String!, $password: String!) {
+              login(email: $email, password: $password) {
                 accessToken
                 user {
                   name
@@ -287,9 +283,7 @@ describe('UserResolver class', () => {
             };
             const response = await executeGraphQLOperation({
                 source: loginMutation,
-                variableValues: {
-                    data: loginFormData,
-                },
+                variableValues: loginFormData,
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
@@ -331,9 +325,7 @@ describe('UserResolver class', () => {
             };
             const response = await executeGraphQLOperation({
                 source: loginMutation,
-                variableValues: {
-                    data: loginFormData,
-                },
+                variableValues: loginFormData,
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
@@ -367,9 +359,7 @@ describe('UserResolver class', () => {
             };
             const response = await executeGraphQLOperation({
                 source: loginMutation,
-                variableValues: {
-                    data: loginFormData,
-                },
+                variableValues: loginFormData,
                 contextValue: { res: { cookie: mockCookieSetter } },
             });
 
@@ -432,8 +422,8 @@ describe('UserResolver class', () => {
     describe('confirm email address mutation', () => {
 
         const logoutMutation = `
-            mutation ConfirmEmailAddress($data: EmailAddressConfirmationData!) {
-              confirmEmailAddress(data: $data)
+            mutation ConfirmEmailAddress($token: String!) {
+              confirmEmailAddress(token: $token)
             }
         `;
 
@@ -455,11 +445,7 @@ describe('UserResolver class', () => {
             const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
-                variableValues: {
-                    data: {
-                        token: validToken,
-                    },
-                },
+                variableValues: { token: validToken },
             });
 
             // verify if token was verified
@@ -492,11 +478,7 @@ describe('UserResolver class', () => {
             const invalidToken = new AccountService().generateEmailAddressConfirmationToken({ id: 'invalid_id' });
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
-                variableValues: {
-                    data: {
-                        token: invalidToken,
-                    },
-                },
+                variableValues: { token: invalidToken },
             });
 
             // verify if token was verified
@@ -532,11 +514,7 @@ describe('UserResolver class', () => {
             const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
-                variableValues: {
-                    data: {
-                        token: validToken,
-                    },
-                },
+                variableValues: { token: validToken },
             });
 
             // verify if token was verified

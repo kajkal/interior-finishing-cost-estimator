@@ -63,11 +63,9 @@ describe('SignupPage component', () => {
                 request: {
                     query: RegisterDocument,
                     variables: {
-                        data: {
-                            name: generator.name(),
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        name: generator.name(),
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 result: {
@@ -91,11 +89,9 @@ describe('SignupPage component', () => {
                 request: {
                     query: RegisterDocument,
                     variables: {
-                        data: {
-                            name: generator.name(),
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        name: generator.name(),
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 result: {
@@ -109,11 +105,9 @@ describe('SignupPage component', () => {
                 request: {
                     query: RegisterDocument,
                     variables: {
-                        data: {
-                            name: generator.name(),
-                            email: generator.email(),
-                            password: generator.string({ length: 8 }),
-                        },
+                        name: generator.name(),
+                        email: generator.email(),
+                        password: generator.string({ length: 8 }),
                     },
                 },
                 error: new Error('network error'),
@@ -121,10 +115,10 @@ describe('SignupPage component', () => {
         };
 
         async function fillAndSubmitForm(elements: SignupPageElements, mock: MockedResponse) {
-            await changeInputValue(elements.nameInput, mock.request.variables!.data.name);
-            await changeInputValue(elements.emailInput, mock.request.variables!.data.email);
-            await changeInputValue(elements.passwordInput, mock.request.variables!.data.password);
-            await changeInputValue(elements.passwordConfirmationInput, mock.request.variables!.data.password);
+            await changeInputValue(elements.nameInput, mock.request.variables!.name);
+            await changeInputValue(elements.emailInput, mock.request.variables!.email);
+            await changeInputValue(elements.passwordInput, mock.request.variables!.password);
+            await changeInputValue(elements.passwordConfirmationInput, mock.request.variables!.password);
             fireEvent.click(elements.submitButton);
         }
 
