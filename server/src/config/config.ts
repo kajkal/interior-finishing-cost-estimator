@@ -36,7 +36,7 @@ export const config = {
             } as EmailData,
         },
         templateIds: {
-            confirmEmailAddress: 'd-4ccacbb2149e4c349ae661164aa64d34',
+            confirmEmailAddress: 'd-6b6473326e2d41089b768e1751795dc7',
         },
     },
 
