@@ -6,8 +6,8 @@ import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react
 
 import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloCacheSpiesManager } from '../../../__utils__/spies-managers/ApolloCacheSpiesManager';
-import { InputValidationHelper } from '../../../__utils__/InputValidationHelper';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
+import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
 import { LocalStateDocument, MeDocument, RegisterDocument } from '../../../../graphql/generated-types';
@@ -124,43 +124,41 @@ describe('SignupPage component', () => {
 
         describe('validation', () => {
 
-            it('should validate name input value', async (done) => {
+            it('should validate name input value', (done) => {
                 const [ { nameInput } ] = renderSignupPageInMockContext();
-                const validator = new InputValidationHelper(nameInput, '#signup-name-input-helper-text.Mui-error');
-                await validator.expectError('', 't:form.name.validation.required');
-                await validator.expectError(':<', 't:form.name.validation.tooShort');
-                await validator.expectNoError('Valid Name');
-                done();
+                InputValidator.basedOn(nameInput, '#signup-name-input-helper-text.Mui-error')
+                    .expectError('', 't:form.name.validation.required')
+                    .expectError(':<', 't:form.name.validation.tooShort')
+                    .expectNoError('Valid Name')
+                    .finish(done);
             });
 
-            it('should validate email input value', async (done) => {
+            it('should validate email input value', (done) => {
                 const [ { emailInput } ] = renderSignupPageInMockContext();
-                const validator = new InputValidationHelper(emailInput, '#signup-email-input-helper-text.Mui-error');
-                await validator.expectError('', 't:form.email.validation.required');
-                await validator.expectError('invalid-email-address', 't:form.email.validation.invalid');
-                await validator.expectNoError('validEmail@domain.com');
-                done();
+                InputValidator.basedOn(emailInput, '#signup-email-input-helper-text.Mui-error')
+                    .expectError('', 't:form.email.validation.required')
+                    .expectError('invalid-email-address', 't:form.email.validation.invalid')
+                    .expectNoError('validEmail@domain.com')
+                    .finish(done);
             });
 
-            it('should validate password input value', async (done) => {
+            it('should validate password input value', (done) => {
                 const [ { passwordInput } ] = renderSignupPageInMockContext();
-                const validator = new InputValidationHelper(passwordInput, '#signup-password-input-helper-text.Mui-error');
-                await validator.expectError('', 't:form.password.validation.required');
-                await validator.expectError('bad', 't:form.password.validation.tooShort');
-                await validator.expectNoError('better password');
-                done();
+                InputValidator.basedOn(passwordInput, '#signup-password-input-helper-text.Mui-error')
+                    .expectError('', 't:form.password.validation.required')
+                    .expectError('bad', 't:form.password.validation.tooShort')
+                    .expectNoError('better password')
+                    .finish(done);
             });
 
             it('should validate password confirmation input value', async (done) => {
                 const [ { passwordInput, passwordConfirmationInput } ] = renderSignupPageInMockContext();
-
                 const passwordValue = 'first password';
                 await changeInputValue(passwordInput, passwordValue);
-
-                const validator = new InputValidationHelper(passwordConfirmationInput, '#signup-password-confirmation-input-helper-text.Mui-error');
-                await validator.expectError('', 't:form.password.validation.passwordsNotMatch');
-                await validator.expectError('not equal', 't:form.password.validation.passwordsNotMatch');
-                await validator.expectNoError(passwordValue);
+                await InputValidator.basedOn(passwordConfirmationInput, '#signup-password-confirmation-input-helper-text.Mui-error')
+                    .expectError('', 't:form.password.validation.passwordsNotMatch')
+                    .expectError('not equal', 't:form.password.validation.passwordsNotMatch')
+                    .expectNoError(passwordValue);
                 done();
             });
 
