@@ -1,13 +1,12 @@
 import cookie from 'cookie';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { Request, Response } from 'express';
-import { sign, verify } from 'jsonwebtoken';
 
 import { RefreshTokenPayload } from '../types/token/RefreshTokenPayload';
 import { AccessTokenPayload } from '../types/token/AccessTokenPayload';
-import { config } from '../config/config';
+import { TokenService } from './TokenService';
 import { User } from '../entities/user/User';
-import { logger } from '../utils/logger';
+import { config } from '../config/config';
 
 
 /**
@@ -16,13 +15,16 @@ import { logger } from '../utils/logger';
 @Service()
 export class AuthService {
 
+    @Inject()
+    protected readonly tokenService!: TokenService;
+
     /**
      * Generate refresh token and create cookie for storing it.
      */
     generateRefreshToken(res: Response, userData: Pick<User, 'id'>): void {
-        const jwtPayload = { sub: userData.id };
-        const jwt = sign(jwtPayload, config.token.refresh.jwt.privateKey, config.token.refresh.jwt.options);
-        res.cookie(config.token.refresh.cookie.name, jwt, config.token.refresh.cookie.options);
+        const tokenPayload = { sub: userData.id };
+        const refreshToken = this.tokenService.refreshToken.generate(tokenPayload);
+        res.cookie(config.token.refresh.cookie.name, refreshToken, config.token.refresh.cookie.options);
     }
 
     /**
@@ -32,24 +34,23 @@ export class AuthService {
      */
     verifyRefreshToken(req: Request): RefreshTokenPayload {
         const { [ config.token.refresh.cookie.name ]: tokenToVerify } = cookie.parse(req.headers.cookie!);
-        logger.debug('refreshToken cookie value', tokenToVerify); // TODO: remove
-        return verify(tokenToVerify, config.token.refresh.jwt.privateKey) as RefreshTokenPayload;
+        return this.tokenService.refreshToken.verify(tokenToVerify);
     }
 
     /**
      * Invalidate refresh token cookie.
      */
     invalidateRefreshToken(res: Response): void {
-        const lethalTokenOptions = { ...config.token.refresh.cookie.options, maxAge: 0 };
-        res.cookie(config.token.refresh.cookie.name, '', lethalTokenOptions);
+        const lethalCookieOptions = { ...config.token.refresh.cookie.options, maxAge: 0 };
+        res.cookie(config.token.refresh.cookie.name, '', lethalCookieOptions);
     }
 
     /**
      * Generate access token and return it.
      */
     generateAccessToken(userData: Pick<User, 'id'>): string {
-        const jwtPayload = { sub: userData.id };
-        return sign(jwtPayload, config.token.access.jwt.privateKey, config.token.access.jwt.options);
+        const tokenPayload = { sub: userData.id };
+        return this.tokenService.accessToken.generate(tokenPayload);
     }
 
     /**
@@ -60,7 +61,7 @@ export class AuthService {
     verifyAccessToken(req: Request): AccessTokenPayload {
         const accessToken = req.headers[ 'authorization' ];
         const tokenToVerify = accessToken?.split('Bearer ')[ 1 ];
-        return verify(tokenToVerify!, config.token.access.jwt.privateKey) as AccessTokenPayload;
+        return this.tokenService.accessToken.verify(tokenToVerify);
     }
 
 }

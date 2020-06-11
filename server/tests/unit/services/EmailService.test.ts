@@ -11,7 +11,7 @@ import { Container } from 'typedi';
 
 describe('EmailService class', () => {
 
-    const serviceUnderTest = Container.of('test').get(EmailService);
+    const serviceUnderTest = Container.get(EmailService);
 
     beforeEach(() => {
         MockLogger.setupMocks();

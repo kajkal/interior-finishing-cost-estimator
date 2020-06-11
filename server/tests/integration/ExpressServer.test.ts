@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import request from 'supertest';
 import { Server } from 'http';
 import { Response } from 'express';
@@ -18,10 +20,6 @@ describe('ExpressServer', () => {
 
     const mockApolloServer = { applyMiddleware: jest.fn() } as unknown as ApolloServer;
     let serverUnderTest: Server;
-
-    beforeAll(() => {
-        Container.set(AuthService, AuthServiceSpiesManager);
-    });
 
     beforeEach(() => {
         MockRequestContext.setupMocks();
@@ -47,7 +45,7 @@ describe('ExpressServer', () => {
                         resolve(`${cookieName}=${cookieValue}`);
                     },
                 } as unknown as Response;
-                new AuthService().generateRefreshToken(mockResponse, userData);
+                Container.get(AuthService).generateRefreshToken(mockResponse, userData);
             });
         }
 

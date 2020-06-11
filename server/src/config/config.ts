@@ -1,9 +1,13 @@
 import dotenv from 'dotenv';
 import { resolve } from 'path';
-import { SignOptions } from 'jsonwebtoken';
 import { CookieOptions } from 'express';
 
+import { EmailAddressConfirmationTokenPayload } from '../types/token/EmailAddressConfirmationTokenPayload';
+import { PasswordResetTokenPayload } from '../types/token/PasswordResetTokenPayload';
+import { RefreshTokenPayload } from '../types/token/RefreshTokenPayload';
+import { AccessTokenPayload } from '../types/token/AccessTokenPayload';
 import { EmailData } from '../types/email-generation/EmailData';
+import { TokenConfig } from '../types/token/TokenConfig';
 
 
 if (!process.env.NODE_ENV) {
@@ -55,16 +59,16 @@ export const config = {
                 privateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY!,
                 options: {
                     expiresIn: '15m',
-                } as SignOptions,
-            },
+                },
+            } as TokenConfig<AccessTokenPayload>,
         },
         refresh: {
             jwt: {
                 privateKey: process.env.REFRESH_TOKEN_PRIVATE_KEY!,
                 options: {
                     expiresIn: '7d',
-                } as SignOptions,
-            },
+                },
+            } as TokenConfig<RefreshTokenPayload>,
             cookie: {
                 name: 'rt',
                 options: {
@@ -80,9 +84,18 @@ export const config = {
                 privateKey: process.env.EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY!,
                 options: {
                     noTimestamp: true,
-                } as SignOptions,
-            },
+                },
+            } as TokenConfig<EmailAddressConfirmationTokenPayload>,
             urlBase: `${process.env.WEB_CLIENT_URL}/confirm-email-address`,
+        },
+        passwordReset: {
+            jwt: {
+                privateKey: process.env.PASSWORD_RESET_TOKEN_PRIVATE_KEY!,
+                options: {
+                    expiresIn: '2h',
+                },
+            } as TokenConfig<PasswordResetTokenPayload>,
+            urlBase: `${process.env.WEB_CLIENT_URL}/reset-password`,
         },
     },
 

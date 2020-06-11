@@ -1,45 +1,64 @@
-import { JsonWebTokenSpiesManager } from '../../__utils__/spies-managers/JsonWebTokenSpiesManager';
+import 'reflect-metadata';
+
+import { Container } from 'typedi';
+
+import { MockTokenService } from '../../__utils__/mocks/MockTokenService';
+
 import { AccountService } from '../../../src/services/AccountService';
+import { TokenService } from '../../../src/services/TokenService';
 
 
 describe('AccountService class', () => {
 
-    const jwtRegExp = /^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/;
-    const serviceUnderTest = new AccountService();
+    let serviceUnderTest: AccountService;
+
+    beforeAll(() => {
+        Container.set(TokenService, MockTokenService);
+        serviceUnderTest = Container.get(AccountService);
+    });
 
     beforeEach(() => {
-        JsonWebTokenSpiesManager.setupSpies();
+        MockTokenService.setupMocks();
     });
 
     describe('email address confirmation token', () => {
 
-        it('should generate email address confirmation link url', () => {
+        it('should generate new email address confirmation token', () => {
+            // given
             const userData = { id: 'TEST_USER_ID' };
 
-            // verify url generation
+            // when
+            serviceUnderTest.generateEmailAddressConfirmationToken(userData);
+
+            // then
+            expect(MockTokenService.emailAddressConfirmationToken.generate).toHaveBeenCalledTimes(1);
+            expect(MockTokenService.emailAddressConfirmationToken.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
+        });
+
+        it('should generate email address confirmation url', () => {
+            // given
+            const userData = { id: 'TEST_USER_ID' };
+            jest.spyOn(serviceUnderTest, 'generateEmailAddressConfirmationToken').mockReturnValueOnce('TOKEN_TEST_VALUE');
+
+            // when
             const confirmationUrl = serviceUnderTest.generateEmailAddressConfirmationUrl(userData);
 
-            expect(confirmationUrl).toMatch(/^http:\/\/localhost:3005\/confirm-email-address\?token=.*/);
-            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledTimes(1);
-            expect(JsonWebTokenSpiesManager.sign).toHaveBeenCalledWith(
-                { sub: 'TEST_USER_ID' },
-                'EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY_TEST_VALUE',
-                { noTimestamp: true },
-            );
+            // then
+            expect(confirmationUrl).toBe('http://localhost:3005/confirm-email-address?token=TOKEN_TEST_VALUE');
+            expect(serviceUnderTest.generateEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
+            expect(serviceUnderTest.generateEmailAddressConfirmationToken).toHaveBeenCalledWith(userData);
+        });
 
-            // extract token from url
-            const emailAddressConfirmationToken = confirmationUrl.split('?token=')[ 1 ];
-            expect(emailAddressConfirmationToken).toMatch(jwtRegExp);
+        it('should verify email address confirmation token', () => {
+            // given
+            const tokenToVerify = 'TOKEN_TEST_VALUE';
 
-            // verify generated token
-            const extractedPayload = serviceUnderTest.verifyEmailAddressConfirmationToken(emailAddressConfirmationToken);
+            // when
+            serviceUnderTest.verifyEmailAddressConfirmationToken(tokenToVerify);
 
-            expect(extractedPayload).toEqual({ sub: 'TEST_USER_ID' });
-            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledTimes(1);
-            expect(JsonWebTokenSpiesManager.verify).toHaveBeenCalledWith(
-                emailAddressConfirmationToken,
-                'EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY_TEST_VALUE',
-            );
+            // then
+            expect(MockTokenService.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
+            expect(MockTokenService.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(tokenToVerify);
         });
 
     });

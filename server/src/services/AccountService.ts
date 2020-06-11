@@ -1,8 +1,8 @@
 import { format } from 'url';
-import { Service } from 'typedi';
-import { sign, verify } from 'jsonwebtoken';
+import { Inject, Service } from 'typedi';
 
 import { EmailAddressConfirmationTokenPayload } from '../types/token/EmailAddressConfirmationTokenPayload';
+import { TokenService } from './TokenService';
 import { User } from '../entities/user/User';
 import { config } from '../config/config';
 
@@ -12,6 +12,9 @@ import { config } from '../config/config';
  */
 @Service()
 export class AccountService {
+
+    @Inject()
+    protected readonly tokenService!: TokenService;
 
     /**
      * Generate email address confirmation link url.
@@ -30,15 +33,15 @@ export class AccountService {
      * Generate email address confirmation token and return it.
      */
     generateEmailAddressConfirmationToken(userData: Pick<User, 'id'>): string {
-        const jwtPayload = { sub: userData.id };
-        return sign(jwtPayload, config.token.emailAddressConfirmation.jwt.privateKey, config.token.emailAddressConfirmation.jwt.options);
+        const tokenPayload = { sub: userData.id };
+        return this.tokenService.emailAddressConfirmationToken.generate(tokenPayload);
     }
 
     /**
      * @throws will throw an error if email address confirmation token is invalid
      */
     verifyEmailAddressConfirmationToken(tokenToVerify: string): EmailAddressConfirmationTokenPayload {
-        return verify(tokenToVerify, config.token.emailAddressConfirmation.jwt.privateKey) as EmailAddressConfirmationTokenPayload;
+        return this.tokenService.emailAddressConfirmationToken.verify(tokenToVerify);
     }
 
 }

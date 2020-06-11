@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { ResolverData } from 'type-graphql';
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
@@ -20,10 +22,7 @@ describe('authChecker function', () => {
     it('should return true and add JWT payload to context', () => {
         // given
         const samplePayload = { sub: 'TEST_USER_ID' } as AccessTokenPayload;
-        const sampleContext = { req: 'REQ_TEST_VALUE' };
-        const sampleResolverData = {
-            context: sampleContext,
-        } as unknown as ResolverData<ExpressContext>;
+        const sampleResolverData = { context: { req: 'REQ_TEST_VALUE' } } as unknown as ResolverData<ExpressContext>;
         AuthServiceSpiesManager.verifyAccessToken.mockReturnValue(samplePayload);
 
         // when
@@ -33,28 +32,27 @@ describe('authChecker function', () => {
         expect(result).toBe(true);
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
-        expect(sampleContext).toEqual({
+        expect(sampleResolverData.context).toEqual({
             req: 'REQ_TEST_VALUE',
-            jwtPayload: samplePayload, // context was mutated
+            jwtPayload: samplePayload, // context was mutated, access token payload was added
         });
     });
 
     it('should throw error when request is not properly authenticated', () => {
         // given
+        const sampleResolverData = {
+            context: { req: 'REQ_TEST_VALUE' },
+            info: 'INFO_TEST_VALUE',
+        } as unknown as ResolverData<ExpressContext>;
         AuthServiceSpiesManager.verifyAccessToken.mockImplementation(() => {
             throw new Error();
         });
-        const sampleContext = { req: 'REQ_TEST_VALUE' };
-        const sampleResolverData = {
-            context: sampleContext,
-            info: 'INFO_TEST_VALUE',
-        } as unknown as ResolverData<ExpressContext>;
 
         // when/then
         expect(() => authChecker(sampleResolverData, [])).toThrow(new AuthenticationError('INVALID_ACCESS_TOKEN'));
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
         expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
-        expect(sampleContext).toEqual({ req: 'REQ_TEST_VALUE' });
+        expect(sampleResolverData.context).toEqual({ req: 'REQ_TEST_VALUE' });
         expect(MockLogger.warn).toHaveBeenCalledTimes(1);
         expect(MockLogger.warn).toHaveBeenCalledWith({
             message: 'invalid token',

@@ -1,4 +1,6 @@
+import { Container } from 'typedi';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+
 import { AuthService } from '../../../src/services/AuthService';
 import { User } from '../../../src/entities/user/User';
 
@@ -16,7 +18,7 @@ export class RequestContextUtils {
     }
 
     static createWithValidAccessToken(userData: Pick<User, 'id'>): ExpressContext {
-        const jwt = new AuthService().generateAccessToken(userData);
+        const jwt = Container.get(AuthService).generateAccessToken(userData);
         return {
             req: {
                 headers: {

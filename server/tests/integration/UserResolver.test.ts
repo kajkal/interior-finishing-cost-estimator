@@ -1,5 +1,8 @@
-import { MockLogger } from '../__mocks__/utils/logger';
+import 'reflect-metadata';
 
+import { Container } from 'typedi';
+
+import { MockLogger } from '../__mocks__/utils/logger';
 import '../__mocks__/libraries/sendgrid';
 
 import { AccountServiceSpiesManager } from '../__utils__/spies-managers/AccountServiceSpiesManager';
@@ -427,7 +430,7 @@ describe('UserResolver class', () => {
             }
         `;
 
-        async function createUserWithValidToken(withConfirmedEmail: boolean): Promise<User> {
+        async function createSampleUser(withConfirmedEmail: boolean): Promise<User> {
             const user = await TestDatabaseManager.populateWithUser({
                 name: generator.name(),
                 email: generator.email(),
@@ -438,11 +441,15 @@ describe('UserResolver class', () => {
             return user;
         }
 
+        function createSampleEmailAddressConfirmationToken(userData: Pick<User, 'id'>) {
+            return Container.get(AccountService).generateEmailAddressConfirmationToken(userData);
+        }
+
         it('should mark user email as confirmed if token is valid', async () => {
             expect.assertions(9);
 
-            const user = await createUserWithValidToken(false);
-            const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
+            const user = await createSampleUser(false);
+            const validToken = createSampleEmailAddressConfirmationToken(user);
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
                 variableValues: { token: validToken },
@@ -475,7 +482,7 @@ describe('UserResolver class', () => {
         it('should return error if token is invalid', async () => {
             expect.assertions(8);
 
-            const invalidToken = new AccountService().generateEmailAddressConfirmationToken({ id: 'invalid_id' });
+            const invalidToken = createSampleEmailAddressConfirmationToken({ id: 'invalid_id' });
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
                 variableValues: { token: invalidToken },
@@ -510,8 +517,8 @@ describe('UserResolver class', () => {
         it('should return error if email address is already confirmed', async () => {
             expect.assertions(9);
 
-            const user = await createUserWithValidToken(true);
-            const validToken = new AccountService().generateEmailAddressConfirmationToken(user);
+            const user = await createSampleUser(true);
+            const validToken = createSampleEmailAddressConfirmationToken(user);
             const response = await executeGraphQLOperation({
                 source: logoutMutation,
                 variableValues: { token: validToken },

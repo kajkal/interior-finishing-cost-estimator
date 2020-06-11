@@ -61,23 +61,32 @@ describe('config object', () => {
                     mongodbUrl: expect.any(String),
                     cacheDir: './tmp',
                 }),
-                token: expect.objectContaining({
+                token: {
                     access: expect.objectContaining({
-                        jwt: expect.objectContaining({
+                        jwt: {
                             privateKey: expect.any(String),
-                        }),
+                            options: expect.any(Object),
+                        },
                     }),
                     refresh: expect.objectContaining({
-                        jwt: expect.objectContaining({
+                        jwt: {
                             privateKey: expect.any(String),
-                        }),
+                            options: expect.any(Object),
+                        },
                     }),
                     emailAddressConfirmation: expect.objectContaining({
-                        jwt: expect.objectContaining({
+                        jwt: {
                             privateKey: expect.any(String),
-                        }),
+                            options: expect.any(Object),
+                        },
                     }),
-                }),
+                    passwordReset: expect.objectContaining({
+                        jwt: {
+                            privateKey: expect.any(String),
+                            options: expect.any(Object),
+                        },
+                    }),
+                },
                 gc: expect.objectContaining({
                     credentialsFile: expect.any(String),
                 }),
@@ -113,23 +122,32 @@ describe('config object', () => {
                 mongodbUrl: 'mongodb://localhost:27017/estimator-test',
                 cacheDir: './tmp',
             }),
-            token: expect.objectContaining({
+            token: {
                 access: expect.objectContaining({
-                    jwt: expect.objectContaining({
+                    jwt: {
                         privateKey: 'ACCESS_TOKEN_PRIVATE_KEY_TEST_VALUE',
-                    }),
+                        options: expect.any(Object),
+                    },
                 }),
                 refresh: expect.objectContaining({
-                    jwt: expect.objectContaining({
+                    jwt: {
                         privateKey: 'REFRESH_TOKEN_PRIVATE_KEY_TEST_VALUE',
-                    }),
+                        options: expect.any(Object),
+                    },
                 }),
                 emailAddressConfirmation: expect.objectContaining({
-                    jwt: expect.objectContaining({
+                    jwt: {
                         privateKey: 'EMAIL_ADDRESS_CONFIRMATION_TOKEN_PRIVATE_KEY_TEST_VALUE',
-                    }),
+                        options: expect.any(Object),
+                    },
                 }),
-            }),
+                passwordReset: expect.objectContaining({
+                    jwt: {
+                        privateKey: 'PASSWORD_RESET_TOKEN_PRIVATE_KEY_TEST_VALUE',
+                        options: expect.any(Object),
+                    },
+                }),
+            },
             gc: expect.objectContaining({
                 credentialsFile: expect.stringMatching(/^.*server.*GC_CREDENTIALS_FILE_TEST_VALUE$/),
             }),
