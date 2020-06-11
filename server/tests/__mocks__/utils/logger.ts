@@ -6,14 +6,13 @@ export class MockLogger {
     static error = jest.fn();
 
     static setupMocks() {
-        this.debug.mockClear();
-        this.info.mockClear();
-        this.warn.mockClear();
-        this.error.mockClear();
+        this.debug.mockReset();
+        this.info.mockReset();
+        this.warn.mockReset();
+        this.error.mockReset();
     }
 
 }
-
 
 jest.mock('../../../src/utils/logger', () => ({
     logger: MockLogger,

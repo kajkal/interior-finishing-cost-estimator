@@ -21,12 +21,12 @@ describe('ExpressServer', () => {
     const mockApolloServer = { applyMiddleware: jest.fn() } as unknown as ApolloServer;
     let serverUnderTest: Server;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         MockRequestContext.setupMocks();
         MockLogger.setupMocks();
         AuthServiceSpiesManager.setupSpies();
 
-        serverUnderTest = createExpressServer(mockApolloServer);
+        serverUnderTest = await createExpressServer(mockApolloServer);
     });
 
     afterEach(() => {
@@ -49,9 +49,7 @@ describe('ExpressServer', () => {
             });
         }
 
-        it('should responds with status 200 and new access token when refresh token\' cookie is valid', async () => {
-            expect.assertions(7);
-
+        it('should responds with status 200 and new access token when refresh token\' cookie is valid', async (done) => {
             // given
             const userData = { id: 'TEST_USER_ID' };
             const validRefreshTokenCookie = await createRefreshTokenCookie(userData);
@@ -67,11 +65,10 @@ describe('ExpressServer', () => {
             expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), userData);
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(userData);
+            done();
         });
 
-        it('should responds with status 401 and JSON error object when refresh token\' cookie is invalid', async () => {
-            expect.assertions(6);
-
+        it('should responds with status 401 and JSON error object when refresh token\' cookie is invalid', async (done) => {
             // given
             const invalidRefreshTokenCookie = 'invalid=refresh_token';
 
@@ -85,13 +82,12 @@ describe('ExpressServer', () => {
             expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
+            done();
         });
 
     });
 
-    it('should responds with status 404 and JSON error object', async () => {
-        expect.assertions(2);
-
+    it('should responds with status 404 and JSON error object', async (done) => {
         // given
         const url = '/not-registered-path';
 
@@ -105,6 +101,7 @@ describe('ExpressServer', () => {
             method: 'GET',
             path: url,
         });
+        done();
     });
 
 });

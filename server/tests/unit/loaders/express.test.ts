@@ -30,18 +30,19 @@ describe('express loader', () => {
         MockApolloServer.applyMiddleware.mockClear();
     });
 
-    it('should create Express server with correct settings', async () => {
-        expect.assertions(16);
-
+    it('should create Express server with correct settings', async (done) => {
         // given
+        const mockServer = { address: jest.fn().mockReturnValue('SERVER_ADDRESS_TEST_VALUE') };
         MockExpress.listen.mockImplementation((port, callback) => {
-            callback();
+            setTimeout(callback, 0);
+            return mockServer;
         });
 
-        // when
-        await createExpressServer(MockApolloServer as unknown as ApolloServer);
+        // given/when
+        const server = await createExpressServer(MockApolloServer as unknown as ApolloServer);
 
         // then
+        expect(server).toBe(mockServer);
         expect(MockExpressFunction).toHaveBeenCalledTimes(1);
         expect(MockExpress.use).toHaveBeenCalledTimes(4);
         expect(MockExpress.use).toHaveBeenNthCalledWith(1, expect.any(Function));
@@ -61,7 +62,7 @@ describe('express loader', () => {
         expect(MockExpress.listen).toHaveBeenCalledWith(4005, expect.any(Function));
 
         expect(MockLogger.info).toHaveBeenCalledTimes(1);
-        expect(MockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/Server started/));
+        expect(MockLogger.info).toHaveBeenCalledWith('Server started', 'SERVER_ADDRESS_TEST_VALUE');
 
         // test MicroORM create context function
         const microOrmCreateReqContextSpy = jest.spyOn(RequestContext, 'create').mockReturnValueOnce(undefined);
@@ -69,6 +70,7 @@ describe('express loader', () => {
         microOrmCreateReqContextFn('REQ', 'RES', 'NEXT_FN_TEST_VALUE');
         expect(microOrmCreateReqContextSpy).toHaveBeenCalledTimes(1);
         expect(microOrmCreateReqContextSpy).toHaveBeenCalledWith(MockEntityManager, 'NEXT_FN_TEST_VALUE');
+        done();
     });
 
 });

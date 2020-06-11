@@ -1,11 +1,11 @@
-import { hash } from 'argon2';
-import { Container } from 'typedi';
-import { MikroORM } from 'mikro-orm';
 import { Db } from 'mongodb';
+import { hash } from 'argon2';
+import { MikroORM, wrap } from 'mikro-orm';
 
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 import { Product } from '../../../src/entities/product/Product';
 import { User } from '../../../src/entities/user/User';
+import { generator } from '../generator';
 
 
 /**
@@ -13,24 +13,20 @@ import { User } from '../../../src/entities/user/User';
  */
 export class TestDatabaseManager {
 
-    private static orm: MikroORM;
+    private constructor(private orm: MikroORM) {
+    }
 
     /**
      * Connect to test database
      */
     static async connect() {
-        if (!this.orm) {
-            await connectToDatabase();
-            this.orm = Container.get(MikroORM);
-        } else {
-            await this.orm.connect();
-        }
+        return new this(await connectToDatabase());
     }
 
     /**
      * Clear test db and disconnect
      */
-    static async disconnect() {
+    async disconnect() {
         // @ts-ignore
         const db = this.orm.em.getConnection().getDb() as Db;
         const collections = await db.collections();
@@ -42,20 +38,41 @@ export class TestDatabaseManager {
         await this.orm.close();
     }
 
-    static async populateWithUser(userData: Partial<Omit<User, 'products' | 'projects' | 'offers'>>) {
-        const repository = this.orm.em.getRepository(User);
-        const user = repository.create({
-            ...userData,
-            password: await hash(userData.password!),
-        });
-        await repository.persistAndFlush(user);
-        return user;
+
+    /**
+     * User
+     */
+    async populateWithUser(partialUserData?: Partial<Omit<User, 'products' | 'projects' | 'offers'>>): Promise<User & { unencryptedPassword: string }> {
+        const userData = {
+            name: generator.name(),
+            email: generator.email(),
+            password: generator.string({ length: 8 }),
+            isEmailAddressConfirmed: false,
+            ...partialUserData,
+        };
+
+        const user = new User();
+        wrap(user).assign({ ...userData, password: await hash(userData.password) }, { em: this.orm.em });
+        await this.orm.em.persistAndFlush(user);
+
+        return Object.assign(user, { unencryptedPassword: userData.password });
     }
 
-    static async populateWithProduct(productData: Partial<Omit<Product, 'user'>> & { user: string }) {
-        const repository = this.orm.em.getRepository(Product);
-        const product = repository.create(productData);
-        await repository.persistAndFlush(product);
+
+    /**
+     * Product
+     */
+    async populateWithProduct(userId: string, partialProductData?: Partial<Omit<Product, 'user'>>): Promise<Product> {
+        const productData = {
+            user: userId,
+            name: generator.word(),
+            ...partialProductData,
+        };
+
+        const product = new Product();
+        wrap(product).assign(productData, { em: this.orm.em });
+        await this.orm.em.persistAndFlush(product);
+
         return product;
     }
 

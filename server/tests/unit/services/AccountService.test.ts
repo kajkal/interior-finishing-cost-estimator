@@ -2,10 +2,9 @@ import 'reflect-metadata';
 
 import { Container } from 'typedi';
 
-import { MockTokenService } from '../../__utils__/mocks/MockTokenService';
+import { TokenServiceSpiesManager } from '../../__utils__/spies-managers/TokenServiceSpiesManager';
 
 import { AccountService } from '../../../src/services/AccountService';
-import { TokenService } from '../../../src/services/TokenService';
 
 
 describe('AccountService class', () => {
@@ -13,12 +12,11 @@ describe('AccountService class', () => {
     let serviceUnderTest: AccountService;
 
     beforeAll(() => {
-        Container.set(TokenService, MockTokenService);
         serviceUnderTest = Container.get(AccountService);
     });
 
     beforeEach(() => {
-        MockTokenService.setupMocks();
+        TokenServiceSpiesManager.setupSpiesAndMockImplementations();
     });
 
     describe('email address confirmation token', () => {
@@ -31,8 +29,8 @@ describe('AccountService class', () => {
             serviceUnderTest.generateEmailAddressConfirmationToken(userData);
 
             // then
-            expect(MockTokenService.emailAddressConfirmationToken.generate).toHaveBeenCalledTimes(1);
-            expect(MockTokenService.emailAddressConfirmationToken.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.generate).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
         });
 
         it('should generate email address confirmation url', () => {
@@ -57,8 +55,8 @@ describe('AccountService class', () => {
             serviceUnderTest.verifyEmailAddressConfirmationToken(tokenToVerify);
 
             // then
-            expect(MockTokenService.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
-            expect(MockTokenService.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(tokenToVerify);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(tokenToVerify);
         });
 
     });

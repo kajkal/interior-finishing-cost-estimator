@@ -1,56 +1,33 @@
-import 'reflect-metadata';
-
 import { Container } from 'typedi';
+import { sign } from 'jsonwebtoken';
 
 import { MockLogger } from '../__mocks__/utils/logger';
 import '../__mocks__/libraries/sendgrid';
 
-import { AccountServiceSpiesManager } from '../__utils__/spies-managers/AccountServiceSpiesManager';
 import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
+import { useIntegrationTestsUtils } from '../__utils__/integration-utils/useIntegrationTestsUtils';
+import { TokenServiceSpiesManager } from '../__utils__/spies-managers/TokenServiceSpiesManager';
 import { EmailServiceSpiesManager } from '../__utils__/spies-managers/EmailServiceSpiesManager';
 import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
-import { executeGraphQLOperation } from '../__utils__/integration-utils/executeGraphQLOperation';
-import { TestDatabaseManager } from '../__utils__/integration-utils/TestDatabaseManager';
-import { RequestContextUtils } from '../__utils__/integration-utils/RequestContextUtils';
+import { createAccessToken } from '../__utils__/integration-utils/authUtils';
 import { generator } from '../__utils__/generator';
 
 import { RegisterFormData } from '../../src/modules/user/input/RegisterFormData';
 import { LoginFormData } from '../../src/modules/user/input/LoginFormData';
 import { AccountService } from '../../src/services/AccountService';
-import { Product } from '../../src/entities/product/Product';
 import { User } from '../../src/entities/user/User';
 
 
-describe('UserResolver class', () => {
+describe('UserResolver', () => {
 
-    const correctPassword = 'qwer.1234';
+    const testUtils = useIntegrationTestsUtils();
 
-    let existingUser: User;
-    let existingProduct: Product;
-
-    beforeAll(async () => {
-        await TestDatabaseManager.connect();
-        existingUser = await TestDatabaseManager.populateWithUser({
-            name: generator.name(),
-            email: generator.email(),
-            password: correctPassword,
-        });
-        existingProduct = await TestDatabaseManager.populateWithProduct({
-            user: existingUser.id,
-            name: 'Lamp',
-        });
-    });
-
-    afterAll(async () => {
-        await TestDatabaseManager.disconnect();
-    });
-
-    beforeEach(() => {
+    beforeEach(async () => {
         MockLogger.setupMocks();
-        AuthServiceSpiesManager.setupSpies();
-        EmailServiceSpiesManager.setupSpiesAndMockImplementations();
-        AccountServiceSpiesManager.setupSpies();
+        TokenServiceSpiesManager.setupSpies();
         UserRepositorySpiesManager.setupSpies();
+        EmailServiceSpiesManager.setupSpiesAndMockImplementations();
+        AuthServiceSpiesManager.setupSpies();
     });
 
     describe('me query', () => {
@@ -73,65 +50,63 @@ describe('UserResolver class', () => {
             }
         `;
 
-        it('should return data of the currently authenticated user if user is authenticated', async () => {
-            expect.assertions(7);
-
-            const requestContext = RequestContextUtils.createWithValidAccessToken(existingUser);
-            const response = await executeGraphQLOperation({
-                source: meQuery,
-                contextValue: requestContext,
-            });
+        it('should return data of the currently authenticated user if user is authenticated', async (done) => {
+            const user = await testUtils.db.populateWithUser();
+            const product1 = await testUtils.db.populateWithProduct(user.id);
+            const product2 = await testUtils.db.populateWithProduct(user.id);
+            const [ authHeader, validToken ] = createAccessToken(user);
+            const response = await testUtils.postGraphQL({
+                query: meQuery,
+            }).set('Authorization', authHeader);
 
             // verify if access token was verified
-            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(requestContext.req);
+            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: existingUser.id });
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
-            // verify if query response is correct
-            expect(response).toEqual({
+            // verify query response
+            expect(response.body).toEqual({
                 data: {
                     me: {
-                        name: existingUser.name,
-                        email: existingUser.email,
+                        name: user.name,
+                        email: user.email,
                         products: [
-                            { name: existingProduct.name },
+                            { name: product1.name },
+                            { name: product2.name },
                         ],
                         projects: [],
                         offers: [],
                     },
                 },
             });
+            done();
         });
 
-        it('should return error if user is not authenticated', async () => {
-            expect.assertions(6);
-
-            const requestContext = RequestContextUtils.createWithInvalidAccessToken();
-            const response = await executeGraphQLOperation({
-                source: meQuery,
-                contextValue: requestContext,
-            });
+        it('should return error if user is not authenticated', async (done) => {
+            const response = await testUtils.postGraphQL({
+                query: meQuery,
+            }); // without Authorization header with access token
 
             // verify if access token was verified
-            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(requestContext.req);
+            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(undefined);
 
-            // verify if functions reserved for authenticated users are not called
+            // verify if the database was not queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
 
             // verify if access error was logged
             expect(MockLogger.warn).toHaveBeenCalledTimes(1);
             expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
 
-            // verify if query response is correct
-            expect(response).toEqual({
+            // verify query response
+            expect(response.body).toEqual({
                 data: null,
                 errors: [
                     expect.objectContaining({
@@ -139,6 +114,7 @@ describe('UserResolver class', () => {
                     }),
                 ],
             });
+            done();
         });
 
     });
@@ -157,19 +133,15 @@ describe('UserResolver class', () => {
             }
         `;
 
-        it('should create new user and return initial data if form data are valid', async () => {
-            expect.assertions(15);
-
-            const mockCookieSetter = jest.fn();
+        it('should create new user and return initial data if form data are valid', async (done) => {
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
                 email: generator.email(),
                 password: generator.string({ length: 8 }),
             };
-            const response = await executeGraphQLOperation({
-                source: registerMutation,
-                variableValues: registerFormData,
-                contextValue: { res: { cookie: mockCookieSetter } },
+            const response = await testUtils.postGraphQL({
+                query: registerMutation,
+                variables: registerFormData,
             });
 
             // verify if email was check for availability
@@ -187,28 +159,23 @@ describe('UserResolver class', () => {
                 email: registerFormData.email,
             }));
 
-            // verify if refresh token is generated and added to cookie
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
-                name: registerFormData.name,
-                email: registerFormData.email,
-                password: expect.any(String),
-                createdAt: expect.any(Date),
-                id: expect.any(String),
-            }));
-            expect(mockCookieSetter).toHaveBeenCalledTimes(1);
-            expect(mockCookieSetter).toHaveBeenCalledWith('rt', expect.any(String), expect.any(Object));
+            // verify if refresh token was generated and added to cookie
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
+            expect(response.header[ 'set-cookie' ]).toEqual([
+                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly$/),
+            ]);
 
-            // verify if access token is generated
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(expect.any(User));
+            // verify if access token was generated
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: {
                     register: {
                         accessToken: expect.any(String),
@@ -219,38 +186,38 @@ describe('UserResolver class', () => {
                     },
                 },
             });
+            done();
         });
 
-        it('should return error if user with given email address already exists', async () => {
-            expect.assertions(10);
-
+        it('should return error if user with given email address already exists', async (done) => {
+            const existingUser = await testUtils.db.populateWithUser();
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
                 email: existingUser.email,
                 password: generator.string({ length: 8 }),
             };
-            const response = await executeGraphQLOperation({
-                source: registerMutation,
-                variableValues: registerFormData,
+            const response = await testUtils.postGraphQL({
+                query: registerMutation,
+                variables: registerFormData,
             });
 
             // verify if email was check for availability
             expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledTimes(1);
             expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
 
-            // verify if functions reserved for valid user data are not called
+            // verify if functions reserved for creating new user were not called
             expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(0);
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
             expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(0);
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: null,
                 errors: [
                     expect.objectContaining({
@@ -258,6 +225,7 @@ describe('UserResolver class', () => {
                     }),
                 ],
             });
+            done();
         });
 
     });
@@ -276,36 +244,33 @@ describe('UserResolver class', () => {
             }
         `;
 
-        it('should login user and return initial data if credentials are correct', async () => {
-            expect.assertions(9);
-
-            const mockCookieSetter = jest.fn();
-            const loginFormData: LoginFormData = {
-                email: existingUser.email,
-                password: correctPassword,
-            };
-            const response = await executeGraphQLOperation({
-                source: loginMutation,
-                variableValues: loginFormData,
-                contextValue: { res: { cookie: mockCookieSetter } },
+        it('should login user and return initial data if credentials are correct', async (done) => {
+            const existingUser = await testUtils.db.populateWithUser();
+            const response = await testUtils.postGraphQL({
+                query: loginMutation,
+                variables: {
+                    email: existingUser.email,
+                    password: existingUser.unencryptedPassword,
+                },
             });
 
-            // verify if refresh token is generated and added to cookie
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), existingUser);
-            expect(mockCookieSetter).toHaveBeenCalledTimes(1);
-            expect(mockCookieSetter).toHaveBeenCalledWith('rt', expect.any(String), expect.any(Object));
+            // verify if refresh token was generated and added to cookie
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledWith({ sub: existingUser.id });
+            expect(response.header[ 'set-cookie' ]).toEqual([
+                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly$/),
+            ]);
 
-            // verify if access token is generated
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(existingUser);
+            // verify if access token was generated
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledWith({ sub: existingUser.id });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: {
                     login: {
                         accessToken: expect.any(String),
@@ -316,74 +281,50 @@ describe('UserResolver class', () => {
                     },
                 },
             });
+            done();
         });
 
-        it('should return error if provided password is incorrect', async () => {
-            expect.assertions(6);
+        async function expectBadCredentialsError(loginFormData: LoginFormData) {
+            const response = await testUtils.postGraphQL({
+                query: loginMutation,
+                variables: loginFormData,
+            });
 
-            const mockCookieSetter = jest.fn();
-            const loginFormData: LoginFormData = {
+            // verify if any token was not generated
+            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(0);
+            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(0);
+            expect(response.header[ 'set-cookie' ]).toBe(undefined);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'BAD_CREDENTIALS',
+                    }),
+                ],
+            });
+        }
+
+        it('should return error if provided password is incorrect', async (done) => {
+            const existingUser = await testUtils.db.populateWithUser();
+            await expectBadCredentialsError({
                 email: existingUser.email,
                 password: 'wrong password',
-            };
-            const response = await executeGraphQLOperation({
-                source: loginMutation,
-                variableValues: loginFormData,
-                contextValue: { res: { cookie: mockCookieSetter } },
             });
-
-            // verify if functions reserved for valid credentials are not called
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
-            expect(mockCookieSetter).toHaveBeenCalledTimes(0);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify if mutation response is correct
-            expect(response).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'BAD_CREDENTIALS',
-                    }),
-                ],
-            });
+            done();
         });
 
-        it('should return error if there is no registered user with given email', async () => {
-            expect.assertions(6);
-
-            const mockCookieSetter = jest.fn();
-            const loginFormData: LoginFormData = {
+        it('should return error if there is no registered user with provided email', async (done) => {
+            await expectBadCredentialsError({
                 email: 'not.registered@domain.com',
-                password: correctPassword,
-            };
-            const response = await executeGraphQLOperation({
-                source: loginMutation,
-                variableValues: loginFormData,
-                contextValue: { res: { cookie: mockCookieSetter } },
+                password: 'Secure password',
             });
-
-            // verify if functions reserved for valid credentials are not called
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
-            expect(mockCookieSetter).toHaveBeenCalledTimes(0);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify if mutation response is correct
-            expect(response).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'BAD_CREDENTIALS',
-                    }),
-                ],
-            });
+            done();
         });
 
     });
@@ -396,68 +337,55 @@ describe('UserResolver class', () => {
             }
         `;
 
-        it('should invalidate user\' refresh token', async () => {
-            expect.assertions(4);
-
-            const mockCookieSetter = jest.fn();
-            const response = await executeGraphQLOperation({
-                source: logoutMutation,
-                contextValue: { res: { cookie: mockCookieSetter } },
+        it('should invalidate refresh token cookie', async (done) => {
+            const response = await testUtils.postGraphQL({
+                query: logoutMutation,
             });
 
             // verify if refresh token was invalidated
             expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(response.header[ 'set-cookie' ]).toEqual([
+                expect.stringMatching(/^rt=; Max-Age=0; Path=\/refresh_token; Expires=.+; HttpOnly$/),
+            ]);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: {
                     logout: true,
                 },
             });
+            done();
         });
 
     });
 
     describe('confirm email address mutation', () => {
 
-        const logoutMutation = `
+        const confirmEmailAddressMutation = `
             mutation ConfirmEmailAddress($token: String!) {
               confirmEmailAddress(token: $token)
             }
         `;
 
-        async function createSampleUser(withConfirmedEmail: boolean): Promise<User> {
-            const user = await TestDatabaseManager.populateWithUser({
-                name: generator.name(),
-                email: generator.email(),
-                password: generator.string({ length: 8 }),
-                isEmailAddressConfirmed: withConfirmedEmail,
-            });
-            UserRepositorySpiesManager.setupSpies();
-            return user;
-        }
-
         function createSampleEmailAddressConfirmationToken(userData: Pick<User, 'id'>) {
             return Container.get(AccountService).generateEmailAddressConfirmationToken(userData);
         }
 
-        it('should mark user email as confirmed if token is valid', async () => {
-            expect.assertions(9);
-
-            const user = await createSampleUser(false);
+        it('should mark user email as confirmed if token is valid', async (done) => {
+            const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: false });
             const validToken = createSampleEmailAddressConfirmationToken(user);
-            const response = await executeGraphQLOperation({
-                source: logoutMutation,
-                variableValues: { token: validToken },
+            const response = await testUtils.postGraphQL({
+                query: confirmEmailAddressMutation,
+                variables: { token: validToken },
             });
 
             // verify if token was verified
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(validToken);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
@@ -471,68 +399,32 @@ describe('UserResolver class', () => {
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: {
                     confirmEmailAddress: true,
                 },
             });
+            done();
         });
 
-        it('should return error if token is invalid', async () => {
-            expect.assertions(8);
-
-            const invalidToken = createSampleEmailAddressConfirmationToken({ id: 'invalid_id' });
-            const response = await executeGraphQLOperation({
-                source: logoutMutation,
-                variableValues: { token: invalidToken },
-            });
-
-            // verify if token was verified
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(invalidToken);
-
-            // verify if the database was queried and if user was updated
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: 'invalid_id' });
-
-            // verify if functions reserved for valid token were not called
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify if mutation response is correct
-            expect(response).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN',
-                    }),
-                ],
-            });
-        });
-
-        it('should return error if email address is already confirmed', async () => {
-            expect.assertions(9);
-
-            const user = await createSampleUser(true);
+        it('should return error is email address is already confirmed', async (done) => {
+            const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: true });
             const validToken = createSampleEmailAddressConfirmationToken(user);
-            const response = await executeGraphQLOperation({
-                source: logoutMutation,
-                variableValues: { token: validToken },
+            const response = await testUtils.postGraphQL({
+                query: confirmEmailAddressMutation,
+                variables: { token: validToken },
             });
 
             // verify if token was verified
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
-            expect(AccountServiceSpiesManager.verifyEmailAddressConfirmationToken).toHaveBeenCalledWith(validToken);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
+            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
             expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
-            // verify if user was updated
+            // verify if user was not updated
             expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
             expect(user.isEmailAddressConfirmed).toBe(true);
 
@@ -540,8 +432,8 @@ describe('UserResolver class', () => {
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
 
-            // verify if mutation response is correct
-            expect(response).toEqual({
+            // verify mutation response
+            expect(response.body).toEqual({
                 data: null,
                 errors: [
                     expect.objectContaining({
@@ -549,6 +441,36 @@ describe('UserResolver class', () => {
                     }),
                 ],
             });
+            done();
+        });
+
+        it('should return error if token is invalid', async (done) => {
+            const invalidToken = sign({ id: 'sample id' }, 'WRONG_PRIVATE_KEY');
+            const response = await testUtils.postGraphQL({
+                query: confirmEmailAddressMutation,
+                variables: { token: invalidToken },
+            });
+
+            // verify if the database was not queried
+            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
+
+            // verify if user was not updated
+            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: null,
+                errors: [
+                    expect.objectContaining({
+                        message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN',
+                    }),
+                ],
+            });
+            done();
         });
 
     });

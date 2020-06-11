@@ -57,7 +57,7 @@ describe('EmailService class', () => {
 
             // given
             AccountServiceSpiesManager.generateEmailAddressConfirmationUrl.mockReturnValue(emailAddressConfirmationUrl);
-            MockMailService.send.mockImplementation(() => {
+            MockMailService.send.mockImplementationOnce(() => {
                 throw new Error();
             });
 

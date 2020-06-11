@@ -14,7 +14,7 @@ import { ProjectRepository } from '../repositories/ProjectRepository';
 import { OfferRepository } from '../repositories/OfferRepository';
 
 
-export async function connectToDatabase(): Promise<void> {
+export async function connectToDatabase(): Promise<MikroORM> {
     try {
         const orm = await MikroORM.init({
             cache: { options: { cacheDir: config.dataBase.cacheDir } }, // google cloud requirement
@@ -38,6 +38,7 @@ export async function connectToDatabase(): Promise<void> {
         Container.set(OfferRepository, orm.em.getRepository(Offer));
 
         logger.info('Successfully connected to the database.');
+        return orm;
     } catch (error) {
         logger.error('Cannot connect to database. ', error);
         process.exit();

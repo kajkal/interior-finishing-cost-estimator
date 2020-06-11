@@ -4,8 +4,8 @@ export class MockMailService {
     static send = jest.fn();
 
     static setupMocks() {
-        this.setApiKey = jest.fn();
-        this.send = jest.fn();
+        this.setApiKey.mockReset();
+        this.send.mockReset();
     }
 
 }

@@ -36,7 +36,7 @@ function handleErrorResponse(err: any, req: Request, res: Response, _next: NextF
     res.status(err.status || 500).json({ errorMessage: err.message, method: req.method, path: req.path });
 }
 
-export function createExpressServer(apolloServer: ApolloServer): Server {
+export function createExpressServer(apolloServer: ApolloServer): Promise<Server> {
     const app = Express();
     app.use(cors({
         origin: config.webClient.url,
@@ -55,7 +55,10 @@ export function createExpressServer(apolloServer: ApolloServer): Server {
     app.use(handleNotRegisteredPath);
     app.use('/', handleErrorResponse);
 
-    return app.listen(config.server.port, () => {
-        logger.info(`Server started at http://localhost:${config.server.port}/graphql`);
+    return new Promise((resolve) => {
+        const server = app.listen(config.server.port, () => {
+            logger.info('Server started', server.address());
+            resolve(server);
+        });
     });
 }
