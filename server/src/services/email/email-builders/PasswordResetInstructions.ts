@@ -13,6 +13,11 @@ export interface PasswordResetInstructionsTemplateData {
     name: string;
 
     /**
+     * User email
+     */
+    email: string;
+
+    /**
      * Password reset link url
      */
     passwordResetLink: string;

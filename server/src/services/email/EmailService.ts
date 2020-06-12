@@ -52,6 +52,7 @@ export class EmailService {
                 .withRecipient(userData)
                 .withTemplateData({
                     name: userData.name,
+                    email: userData.email,
                     passwordResetLink: this.passwordResetService.generatePasswordResetUrl(userData),
                 })
                 .send();

@@ -89,6 +89,7 @@ describe('EmailService class', () => {
                 templateId: expect.any(String),
                 dynamicTemplateData: {
                     name: sampleUserData.name,
+                    email: sampleUserData.email,
                     passwordResetLink: 'PASSWORD_RESET_URL_TEST_VALUE',
                 },
             });

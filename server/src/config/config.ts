@@ -41,7 +41,7 @@ export const config = {
         },
         templateIds: {
             confirmEmailAddress: 'd-6b6473326e2d41089b768e1751795dc7',
-            passwordResetInstructions: 'TODO',
+            passwordResetInstructions: 'd-159845d4e18747acbd0e32a1de0a779a',
         },
     },
 
