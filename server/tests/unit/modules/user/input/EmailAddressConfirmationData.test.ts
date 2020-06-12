@@ -3,7 +3,7 @@ import { sign } from 'jsonwebtoken';
 import { tokenTestValue } from '../../../../__utils__/validation-utils/test-data/tokenTestData';
 import { expectValidationErrors } from '../../../../__utils__/validation-utils/validationUtils';
 
-import { EmailAddressConfirmationData } from '../../../../../src/modules/user/input/EmailAddressConfirmationData';
+import { EmailAddressConfirmationData } from '../../../../../src/resolvers/user/input/EmailAddressConfirmationData';
 
 
 describe('EmailAddressConfirmationData class', () => {

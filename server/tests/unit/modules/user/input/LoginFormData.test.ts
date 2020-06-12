@@ -2,7 +2,7 @@ import { passwordTestValue } from '../../../../__utils__/validation-utils/test-d
 import { emailTestValue } from '../../../../__utils__/validation-utils/test-data/emailTestData';
 import { expectValidationErrors } from '../../../../__utils__/validation-utils/validationUtils';
 
-import { LoginFormData } from '../../../../../src/modules/user/input/LoginFormData';
+import { LoginFormData } from '../../../../../src/resolvers/user/input/LoginFormData';
 
 
 describe('LoginFormData class', () => {

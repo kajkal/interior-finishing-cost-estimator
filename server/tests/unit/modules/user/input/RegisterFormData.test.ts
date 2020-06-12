@@ -1,7 +1,7 @@
 import { expectValidationErrors } from '../../../../__utils__/validation-utils/validationUtils';
 
-import { RegisterFormData } from '../../../../../src/modules/user/input/RegisterFormData';
-import { LoginFormData } from '../../../../../src/modules/user/input/LoginFormData';
+import { RegisterFormData } from '../../../../../src/resolvers/user/input/RegisterFormData';
+import { LoginFormData } from '../../../../../src/resolvers/user/input/LoginFormData';
 
 
 describe('RegisterFormData class', () => {

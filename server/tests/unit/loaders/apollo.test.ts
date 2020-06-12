@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { ExpressContext } from 'apollo-server-express/src/ApolloServer';
 
 import '../../__mocks__/utils/logger';
