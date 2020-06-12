@@ -3,10 +3,12 @@ import 'reflect-metadata';
 import { Container } from 'typedi';
 import { Request, Response } from 'express';
 
-import { TokenServiceSpiesManager } from '../../__utils__/spies-managers/TokenServiceSpiesManager';
-import '../../__mocks__/utils/logger';
+import '../../../__mocks__/utils/logger';
 
-import { AuthService } from '../../../src/services/AuthService';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+
+import { AuthService } from '../../../../src/services/auth/AuthService';
 
 
 describe('AuthService class', () => {
@@ -18,14 +20,15 @@ describe('AuthService class', () => {
     });
 
     beforeEach(() => {
-        TokenServiceSpiesManager.setupSpiesAndMockImplementations();
+        AccessTokenManagerSpy.setupSpiesAndMockImplementations();
+        RefreshTokenManagerSpy.setupSpiesAndMockImplementations();
     });
 
     describe('refresh token', () => {
 
         it('should generate new refresh token and create new cookie', () => {
             // given
-            TokenServiceSpiesManager.refreshToken.generate.mockReturnValue('MOCK_TOKEN_VALUE');
+            RefreshTokenManagerSpy.generate.mockReturnValue('MOCK_TOKEN_VALUE');
             const res = { cookie: jest.fn() } as unknown as Response;
             const userData = { id: 'TEST_USER_ID' };
 
@@ -33,8 +36,8 @@ describe('AuthService class', () => {
             serviceUnderTest.generateRefreshToken(res, userData);
 
             // then
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
             expect(res.cookie).toHaveBeenCalledTimes(1);
             expect(res.cookie).toHaveBeenCalledWith('rt', 'MOCK_TOKEN_VALUE', expect.objectContaining({
                 httpOnly: true,
@@ -44,7 +47,7 @@ describe('AuthService class', () => {
 
         it('should verify and return token payload if token from cookie is valid', () => {
             // given
-            TokenServiceSpiesManager.refreshToken.verify.mockReturnValue({ sub: 'TEST_USER_ID', iat: -1, exp: -1 });
+            RefreshTokenManagerSpy.verify.mockReturnValue({ sub: 'TEST_USER_ID', iat: -1, exp: -1 });
             const validSampleToken = 'TOKEN_TEST_VALUE';
             const req = { headers: { cookie: `rt=${validSampleToken}` } } as Request;
 
@@ -52,14 +55,14 @@ describe('AuthService class', () => {
             const extractedPayload = serviceUnderTest.verifyRefreshToken(req);
 
             // then
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledWith(validSampleToken);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledWith(validSampleToken);
             expect(extractedPayload).toMatchObject({ sub: 'TEST_USER_ID' });
         });
 
         it('should throw error if refresh token from cookie is invalid', () => {
             // given
-            TokenServiceSpiesManager.refreshToken.verify.mockImplementation(() => {
+            RefreshTokenManagerSpy.verify.mockImplementation(() => {
                 throw new Error('INVALID_TOKEN');
             });
             const invalidSampleToken = 'TOKEN_TEST_VALUE';
@@ -67,21 +70,21 @@ describe('AuthService class', () => {
 
             // when/then
             expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow('INVALID_TOKEN');
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledWith(invalidSampleToken);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledWith(invalidSampleToken);
         });
 
         it('should throw error if refresh token from cookie is missing', () => {
             // given
-            TokenServiceSpiesManager.refreshToken.verify.mockImplementation(() => {
+            RefreshTokenManagerSpy.verify.mockImplementation(() => {
                 throw new Error('INVALID_TOKEN');
             });
             const req = { headers: { cookie: '' } } as Request;
 
             // when/then
             expect(() => serviceUnderTest.verifyRefreshToken(req)).toThrow('INVALID_TOKEN');
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.verify).toHaveBeenCalledWith(undefined);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.verify).toHaveBeenCalledWith(undefined);
         });
 
         it('should invalidate cookie with refresh token', () => {
@@ -106,7 +109,7 @@ describe('AuthService class', () => {
 
         it('should generate new access token', () => {
             // given
-            TokenServiceSpiesManager.accessToken.generate.mockReturnValue('MOCK_TOKEN_VALUE');
+            AccessTokenManagerSpy.generate.mockReturnValue('MOCK_TOKEN_VALUE');
             const userData = { id: 'TEST_USER_ID' };
 
             // when
@@ -114,13 +117,13 @@ describe('AuthService class', () => {
 
             // then
             expect(accessToken).toBe('MOCK_TOKEN_VALUE');
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: 'TEST_USER_ID' });
         });
 
         it('should verify and return token payload if access token from req header is valid', () => {
             // given
-            TokenServiceSpiesManager.accessToken.verify.mockReturnValue({ sub: 'TEST_USER_ID', iat: -1, exp: -1 });
+            AccessTokenManagerSpy.verify.mockReturnValue({ sub: 'TEST_USER_ID', iat: -1, exp: -1 });
             const validSampleToken = 'TOKEN_TEST_VALUE';
             const req = { headers: { authorization: `Bearer ${validSampleToken}` } } as Request;
 
@@ -129,13 +132,13 @@ describe('AuthService class', () => {
 
             // then
             expect(extractedPayload).toMatchObject({ sub: 'TEST_USER_ID' });
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(validSampleToken);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(validSampleToken);
         });
 
         it('should throw error if access token from req header is invalid', () => {
             // given
-            TokenServiceSpiesManager.accessToken.verify.mockImplementation(() => {
+            AccessTokenManagerSpy.verify.mockImplementation(() => {
                 throw new Error('INVALID_TOKEN');
             });
             const invalidSampleToken = 'TOKEN_TEST_VALUE';
@@ -143,21 +146,21 @@ describe('AuthService class', () => {
 
             // when/then
             expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow('INVALID_TOKEN');
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(invalidSampleToken);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(invalidSampleToken);
         });
 
         it('should throw error if access token from req header is missing', () => {
             // given
-            TokenServiceSpiesManager.accessToken.verify.mockImplementation(() => {
+            AccessTokenManagerSpy.verify.mockImplementation(() => {
                 throw new Error('INVALID_TOKEN');
             });
             const req = { headers: { authorization: '' } } as Request;
 
             // when/then
             expect(() => serviceUnderTest.verifyAccessToken(req)).toThrow('INVALID_TOKEN');
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(undefined);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(undefined);
         });
 
     });

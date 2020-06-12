@@ -4,11 +4,11 @@ import { UserInputError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
+import { EmailAddressConfirmationService } from '../../services/email-address-confirmation/EmailAddressConfirmationService';
 import { EmailAddressConfirmationData } from './input/EmailAddressConfirmationData';
-import { AccountService } from '../../services/AccountService';
 import { RegisterFormData } from './input/RegisterFormData';
-import { EmailService } from '../../services/EmailService';
-import { AuthService } from '../../services/AuthService';
+import { EmailService } from '../../services/email/EmailService';
+import { AuthService } from '../../services/auth/AuthService';
 import { LoginFormData } from './input/LoginFormData';
 import { logAccess } from '../../utils/logAccess';
 import { User } from '../../entities/user/User';
@@ -31,7 +31,7 @@ export class UserResolver {
     private readonly emailService!: EmailService;
 
     @Inject()
-    private readonly accountService!: AccountService;
+    private readonly emailAddressConfirmationService!: EmailAddressConfirmationService;
 
     @Inject()
     private readonly userRepository!: UserRepository;
@@ -105,6 +105,7 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async logout(@Ctx() context: ExpressContext): Promise<boolean> {
         this.authService.invalidateRefreshToken(context.res);
+        console.log('logout', context.res);
         return true;
     }
 
@@ -114,7 +115,7 @@ export class UserResolver {
         let user: User | undefined;
 
         try {
-            const { sub } = this.accountService.verifyEmailAddressConfirmationToken(data.token);
+            const { sub } = this.emailAddressConfirmationService.verifyEmailAddressConfirmationToken(data.token);
             user = await this.userRepository.findOneOrFail({ id: sub });
         } catch (error) {
             throw new UserInputError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN');

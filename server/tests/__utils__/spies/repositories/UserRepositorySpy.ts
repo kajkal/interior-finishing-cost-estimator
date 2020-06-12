@@ -1,7 +1,7 @@
-import { UserRepository } from '../../../src/repositories/UserRepository';
+import { UserRepository } from '../../../../src/repositories/UserRepository';
 
 
-export class UserRepositorySpiesManager {
+export class UserRepositorySpy {
 
     static isEmailTaken: jest.SpiedFunction<typeof UserRepository.prototype.isEmailTaken>;
     static find: jest.SpiedFunction<typeof UserRepository.prototype.find>;

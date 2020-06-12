@@ -6,7 +6,7 @@ import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { MockLogger } from '../../__mocks__/utils/logger';
 
-import { AuthServiceSpiesManager } from '../../__utils__/spies-managers/AuthServiceSpiesManager';
+import { AuthServiceSpy } from '../../__utils__/spies/services/auth/AuthServiceSpy';
 
 import { AccessTokenPayload } from '../../../src/types/token/AccessTokenPayload';
 import { authChecker } from '../../../src/utils/authChecker';
@@ -15,7 +15,7 @@ import { authChecker } from '../../../src/utils/authChecker';
 describe('authChecker function', () => {
 
     beforeEach(() => {
-        AuthServiceSpiesManager.setupSpiesAndMockImplementations();
+        AuthServiceSpy.setupSpiesAndMockImplementations();
         MockLogger.setupMocks();
     });
 
@@ -23,15 +23,15 @@ describe('authChecker function', () => {
         // given
         const samplePayload = { sub: 'TEST_USER_ID' } as AccessTokenPayload;
         const sampleResolverData = { context: { req: 'REQ_TEST_VALUE' } } as unknown as ResolverData<ExpressContext>;
-        AuthServiceSpiesManager.verifyAccessToken.mockReturnValue(samplePayload);
+        AuthServiceSpy.verifyAccessToken.mockReturnValue(samplePayload);
 
         // when
         const result = authChecker(sampleResolverData, []);
 
         // then
         expect(result).toBe(true);
-        expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
-        expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
+        expect(AuthServiceSpy.verifyAccessToken).toHaveBeenCalledTimes(1);
+        expect(AuthServiceSpy.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
         expect(sampleResolverData.context).toEqual({
             req: 'REQ_TEST_VALUE',
             jwtPayload: samplePayload, // context was mutated, access token payload was added
@@ -44,14 +44,14 @@ describe('authChecker function', () => {
             context: { req: 'REQ_TEST_VALUE' },
             info: 'INFO_TEST_VALUE',
         } as unknown as ResolverData<ExpressContext>;
-        AuthServiceSpiesManager.verifyAccessToken.mockImplementation(() => {
+        AuthServiceSpy.verifyAccessToken.mockImplementation(() => {
             throw new Error();
         });
 
         // when/then
         expect(() => authChecker(sampleResolverData, [])).toThrow(new AuthenticationError('INVALID_ACCESS_TOKEN'));
-        expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledTimes(1);
-        expect(AuthServiceSpiesManager.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
+        expect(AuthServiceSpy.verifyAccessToken).toHaveBeenCalledTimes(1);
+        expect(AuthServiceSpy.verifyAccessToken).toHaveBeenCalledWith(sampleResolverData.context.req);
         expect(sampleResolverData.context).toEqual({ req: 'REQ_TEST_VALUE' });
         expect(MockLogger.warn).toHaveBeenCalledTimes(1);
         expect(MockLogger.warn).toHaveBeenCalledWith({

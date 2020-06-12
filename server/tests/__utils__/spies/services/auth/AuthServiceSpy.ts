@@ -1,7 +1,7 @@
-import { AuthService } from '../../../src/services/AuthService';
+import { AuthService } from '../../../../../src/services/auth/AuthService';
 
 
-export class AuthServiceSpiesManager {
+export class AuthServiceSpy {
 
     static generateRefreshToken: jest.SpiedFunction<typeof AuthService.prototype.generateRefreshToken>;
     static verifyRefreshToken: jest.SpiedFunction<typeof AuthService.prototype.verifyRefreshToken>;

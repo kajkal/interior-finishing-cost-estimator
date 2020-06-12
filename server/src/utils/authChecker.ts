@@ -4,7 +4,7 @@ import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 
 import { AuthorizedContext } from '../types/context/AuthorizedContext';
-import { AuthService } from '../services/AuthService';
+import { AuthService } from '../services/auth/AuthService';
 import { logger } from './logger';
 
 

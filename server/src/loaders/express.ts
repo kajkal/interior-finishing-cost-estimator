@@ -5,7 +5,7 @@ import Express, { NextFunction, Request, Response } from 'express';
 import { EntityManager, RequestContext } from 'mikro-orm';
 
 import { ApolloServer } from 'apollo-server-express';
-import { AuthService } from '../services/AuthService';
+import { AuthService } from '../services/auth/AuthService';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 

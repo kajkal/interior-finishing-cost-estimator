@@ -4,17 +4,22 @@ import { sign } from 'jsonwebtoken';
 import { MockLogger } from '../__mocks__/utils/logger';
 import '../__mocks__/libraries/sendgrid';
 
-import { UserRepositorySpiesManager } from '../__utils__/spies-managers/UserRepositorySpiesManager';
 import { useIntegrationTestsUtils } from '../__utils__/integration-utils/useIntegrationTestsUtils';
-import { TokenServiceSpiesManager } from '../__utils__/spies-managers/TokenServiceSpiesManager';
-import { EmailServiceSpiesManager } from '../__utils__/spies-managers/EmailServiceSpiesManager';
-import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
+import { UserRepositorySpy } from '../__utils__/spies/repositories/UserRepositorySpy';
+import { AuthServiceSpy } from '../__utils__/spies/services/auth/AuthServiceSpy';
+import { EmailServiceSpy } from '../__utils__/spies/services/email/EmailServiceSpy';
+import { EmailAddressConfirmationServiceSpy } from '../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationServiceSpy';
+import { PasswordResetServiceSpy } from '../__utils__/spies/services/password-reset/PasswordResetServiceSpy';
+import { AccessTokenManagerSpy } from '../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { RefreshTokenManagerSpy } from '../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+import { EmailAddressConfirmationTokenManagerSpy } from '../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationTokenManagerSpy';
+import { PasswordResetTokenManagerSpy } from '../__utils__/spies/services/password-reset/PasswordResetTokenManagerSpy';
 import { createAccessToken } from '../__utils__/integration-utils/authUtils';
 import { generator } from '../__utils__/generator';
 
+import { EmailAddressConfirmationService } from '../../src/services/email-address-confirmation/EmailAddressConfirmationService';
 import { RegisterFormData } from '../../src/modules/user/input/RegisterFormData';
 import { LoginFormData } from '../../src/modules/user/input/LoginFormData';
-import { AccountService } from '../../src/services/AccountService';
 import { User } from '../../src/entities/user/User';
 
 
@@ -24,10 +29,21 @@ describe('UserResolver', () => {
 
     beforeEach(async () => {
         MockLogger.setupMocks();
-        TokenServiceSpiesManager.setupSpies();
-        UserRepositorySpiesManager.setupSpies();
-        EmailServiceSpiesManager.setupSpiesAndMockImplementations();
-        AuthServiceSpiesManager.setupSpies();
+
+        // repositories
+        UserRepositorySpy.setupSpies();
+
+        // token managers
+        AccessTokenManagerSpy.setupSpies();
+        RefreshTokenManagerSpy.setupSpies();
+        EmailAddressConfirmationTokenManagerSpy.setupSpies();
+        PasswordResetTokenManagerSpy.setupSpies();
+
+        // services
+        AuthServiceSpy.setupSpies();
+        EmailServiceSpy.setupSpiesAndMockImplementations();
+        EmailAddressConfirmationServiceSpy.setupSpies();
+        PasswordResetServiceSpy.setupSpies();
     });
 
     describe('me query', () => {
@@ -60,12 +76,12 @@ describe('UserResolver', () => {
             }).set('Authorization', authHeader);
 
             // verify if access token was verified
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(validToken);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -95,11 +111,11 @@ describe('UserResolver', () => {
             }); // without Authorization header with access token
 
             // verify if access token was verified
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.verify).toHaveBeenCalledWith(undefined);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(undefined);
 
             // verify if the database was not queried
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(0);
 
             // verify if access error was logged
             expect(MockLogger.warn).toHaveBeenCalledTimes(1);
@@ -145,30 +161,30 @@ describe('UserResolver', () => {
             });
 
             // verify if email was check for availability
-            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
+            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
 
             // verify if new user object was created and saved in db
-            expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.create).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
 
             // verify if 'Confirm your email address' email was send
-            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(1);
-            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledWith(expect.objectContaining({
+            expect(EmailServiceSpy.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(1);
+            expect(EmailServiceSpy.sendConfirmEmailAddressEmail).toHaveBeenCalledWith(expect.objectContaining({
                 name: registerFormData.name,
                 email: registerFormData.email,
             }));
 
             // verify if refresh token was generated and added to cookie
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
             expect(response.header[ 'set-cookie' ]).toEqual([
                 expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly$/),
             ]);
 
             // verify if access token was generated
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -202,15 +218,15 @@ describe('UserResolver', () => {
             });
 
             // verify if email was check for availability
-            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
+            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
 
             // verify if functions reserved for creating new user were not called
-            expect(UserRepositorySpiesManager.create).toHaveBeenCalledTimes(0);
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
-            expect(EmailServiceSpiesManager.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(0);
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(0);
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.create).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(EmailServiceSpy.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(0);
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(0);
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -255,15 +271,15 @@ describe('UserResolver', () => {
             });
 
             // verify if refresh token was generated and added to cookie
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledWith({ sub: existingUser.id });
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: existingUser.id });
             expect(response.header[ 'set-cookie' ]).toEqual([
                 expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly$/),
             ]);
 
             // verify if access token was generated
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledWith({ sub: existingUser.id });
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: existingUser.id });
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -291,8 +307,8 @@ describe('UserResolver', () => {
             });
 
             // verify if any token was not generated
-            expect(TokenServiceSpiesManager.refreshToken.generate).toHaveBeenCalledTimes(0);
-            expect(TokenServiceSpiesManager.accessToken.generate).toHaveBeenCalledTimes(0);
+            expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(0);
+            expect(AccessTokenManagerSpy.generate).toHaveBeenCalledTimes(0);
             expect(response.header[ 'set-cookie' ]).toBe(undefined);
 
             // verify if access was logged
@@ -343,7 +359,7 @@ describe('UserResolver', () => {
             });
 
             // verify if refresh token was invalidated
-            expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.invalidateRefreshToken).toHaveBeenCalledTimes(1);
             expect(response.header[ 'set-cookie' ]).toEqual([
                 expect.stringMatching(/^rt=; Max-Age=0; Path=\/refresh_token; Expires=.+; HttpOnly$/),
             ]);
@@ -372,7 +388,7 @@ describe('UserResolver', () => {
         `;
 
         function createSampleEmailAddressConfirmationToken(userData: Pick<User, 'id'>) {
-            return Container.get(AccountService).generateEmailAddressConfirmationToken(userData);
+            return Container.get(EmailAddressConfirmationService).generateEmailAddressConfirmationToken(userData);
         }
 
         it('should mark user email as confirmed if token is valid', async (done) => {
@@ -384,15 +400,15 @@ describe('UserResolver', () => {
             });
 
             // verify if token was verified
-            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(validToken);
+            expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
             // verify if user was updated
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
             expect(user.isEmailAddressConfirmed).toBe(true);
 
             // verify if access was logged
@@ -417,15 +433,15 @@ describe('UserResolver', () => {
             });
 
             // verify if token was verified
-            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledTimes(1);
-            expect(TokenServiceSpiesManager.emailAddressConfirmationToken.verify).toHaveBeenCalledWith(validToken);
+            expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
+            expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledWith(validToken);
 
             // verify if the database was queried
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
 
             // verify if user was not updated
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(0);
             expect(user.isEmailAddressConfirmed).toBe(true);
 
             // verify if access was logged
@@ -452,10 +468,10 @@ describe('UserResolver', () => {
             });
 
             // verify if the database was not queried
-            expect(UserRepositorySpiesManager.findOneOrFail).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(0);
 
             // verify if user was not updated
-            expect(UserRepositorySpiesManager.persistAndFlush).toHaveBeenCalledTimes(0);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(0);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);

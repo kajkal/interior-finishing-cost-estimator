@@ -1,7 +1,7 @@
-import { OfferRepository } from '../../../src/repositories/OfferRepository';
+import { OfferRepository } from '../../../../src/repositories/OfferRepository';
 
 
-export class OfferRepositorySpiesManager {
+export class OfferRepositorySpy {
 
     static create: jest.SpiedFunction<typeof OfferRepository.prototype.create>;
     static persistAndFlush: jest.SpiedFunction<typeof OfferRepository.prototype.persistAndFlush>;

@@ -9,10 +9,10 @@ import { ApolloServer } from 'apollo-server-express';
 import { MockRequestContext } from '../__mocks__/libraries/mikro-orm';
 import { MockLogger } from '../__mocks__/utils/logger';
 
-import { AuthServiceSpiesManager } from '../__utils__/spies-managers/AuthServiceSpiesManager';
+import { AuthServiceSpy } from '../__utils__/spies/services/auth/AuthServiceSpy';
 
 import { createExpressServer } from '../../src/loaders/express';
-import { AuthService } from '../../src/services/AuthService';
+import { AuthService } from '../../src/services/auth/AuthService';
 import { User } from '../../src/entities/user/User';
 
 
@@ -24,7 +24,7 @@ describe('ExpressServer', () => {
     beforeEach(async () => {
         MockRequestContext.setupMocks();
         MockLogger.setupMocks();
-        AuthServiceSpiesManager.setupSpies();
+        AuthServiceSpy.setupSpies();
 
         serverUnderTest = await createExpressServer(mockApolloServer);
     });
@@ -41,7 +41,7 @@ describe('ExpressServer', () => {
             return new Promise((resolve) => {
                 const mockResponse = {
                     cookie: (cookieName: string, cookieValue: string) => {
-                        AuthServiceSpiesManager.generateRefreshToken.mockClear();
+                        AuthServiceSpy.generateRefreshToken.mockClear();
                         resolve(`${cookieName}=${cookieValue}`);
                     },
                 } as unknown as Response;
@@ -60,11 +60,11 @@ describe('ExpressServer', () => {
             // then
             expect(res.status).toBe(200);
             expect(res.body).toEqual({ accessToken: expect.any(String) });
-            expect(AuthServiceSpiesManager.verifyRefreshToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), userData);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledWith(userData);
+            expect(AuthServiceSpy.verifyRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.generateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), userData);
+            expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledWith(userData);
             done();
         });
 
@@ -78,10 +78,10 @@ describe('ExpressServer', () => {
             // then
             expect(res.status).toBe(401);
             expect(res.body).toEqual({ errorMessage: 'INVALID_REFRESH_TOKEN' });
-            expect(AuthServiceSpiesManager.verifyRefreshToken).toHaveBeenCalledTimes(1);
-            expect(AuthServiceSpiesManager.generateRefreshToken).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.generateAccessToken).toHaveBeenCalledTimes(0);
-            expect(AuthServiceSpiesManager.invalidateRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.verifyRefreshToken).toHaveBeenCalledTimes(1);
+            expect(AuthServiceSpy.generateRefreshToken).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledTimes(0);
+            expect(AuthServiceSpy.invalidateRefreshToken).toHaveBeenCalledTimes(1);
             done();
         });
 

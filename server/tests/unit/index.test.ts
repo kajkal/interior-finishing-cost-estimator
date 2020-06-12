@@ -34,7 +34,7 @@ describe('index file', () => {
 
         // when
         await import('../../src/index');
-        await (new Promise(setImmediate)); // waits for all promises to resolve
+        await new Promise(setImmediate); // waits for all promises to resolve
 
         // then
         expect(MockConnectToDatabase).toHaveBeenCalledTimes(1);

@@ -1,7 +1,7 @@
-import { ProductRepository } from '../../../src/repositories/ProductRepository';
+import { ProductRepository } from '../../../../src/repositories/ProductRepository';
 
 
-export class ProductRepositorySpiesManager {
+export class ProductRepositorySpy {
 
     static create: jest.SpiedFunction<typeof ProductRepository.prototype.create>;
     static persistAndFlush: jest.SpiedFunction<typeof ProductRepository.prototype.persistAndFlush>;

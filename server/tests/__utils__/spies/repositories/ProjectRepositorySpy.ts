@@ -1,7 +1,7 @@
-import { ProjectRepository } from '../../../src/repositories/ProjectRepository';
+import { ProjectRepository } from '../../../../src/repositories/ProjectRepository';
 
 
-export class ProjectRepositorySpiesManager {
+export class ProjectRepositorySpy {
 
     static create: jest.SpiedFunction<typeof ProjectRepository.prototype.create>;
     static persistAndFlush: jest.SpiedFunction<typeof ProjectRepository.prototype.persistAndFlush>;

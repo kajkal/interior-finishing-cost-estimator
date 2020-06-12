@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 
-import { AuthService } from '../../../src/services/AuthService';
+import { AuthService } from '../../../src/services/auth/AuthService';
 import { User } from '../../../src/entities/user/User';
 
 

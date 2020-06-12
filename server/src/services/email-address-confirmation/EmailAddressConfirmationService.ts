@@ -1,20 +1,18 @@
 import { format } from 'url';
 import { Inject, Service } from 'typedi';
 
-import { EmailAddressConfirmationTokenPayload } from '../types/token/EmailAddressConfirmationTokenPayload';
-import { TokenService } from './TokenService';
-import { User } from '../entities/user/User';
-import { config } from '../config/config';
+import { EmailAddressConfirmationTokenPayload } from '../../types/token/EmailAddressConfirmationTokenPayload';
+import { EmailAddressConfirmationTokenManager } from './EmailAddressConfirmationTokenManager';
+import { User } from '../../entities/user/User';
+import { config } from '../../config/config';
 
 
-/**
- * Class with with user account related methods.
- */
 @Service()
-export class AccountService {
+export class EmailAddressConfirmationService {
 
     @Inject()
-    protected readonly tokenService!: TokenService;
+    readonly emailAddressConfirmationTokenManager!: EmailAddressConfirmationTokenManager;
+
 
     /**
      * Generate email address confirmation link url.
@@ -29,19 +27,16 @@ export class AccountService {
         });
     }
 
-    /**
-     * Generate email address confirmation token and return it.
-     */
     generateEmailAddressConfirmationToken(userData: Pick<User, 'id'>): string {
         const tokenPayload = { sub: userData.id };
-        return this.tokenService.emailAddressConfirmationToken.generate(tokenPayload);
+        return this.emailAddressConfirmationTokenManager.generate(tokenPayload);
     }
 
     /**
      * @throws will throw an error if email address confirmation token is invalid
      */
     verifyEmailAddressConfirmationToken(tokenToVerify: string): EmailAddressConfirmationTokenPayload {
-        return this.tokenService.emailAddressConfirmationToken.verify(tokenToVerify);
+        return this.emailAddressConfirmationTokenManager.verify(tokenToVerify);
     }
 
 }
