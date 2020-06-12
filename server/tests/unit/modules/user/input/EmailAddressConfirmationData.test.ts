@@ -1,56 +1,32 @@
-import 'reflect-metadata';
 import { sign } from 'jsonwebtoken';
-import { validateSync, ValidationError } from 'class-validator';
 
-import { DeepPartial } from '../../../../__utils__/DeepPartial';
+import { tokenTestValue } from '../../../../__utils__/validation-utils/test-data/tokenTestData';
+import { expectValidationErrors } from '../../../../__utils__/validation-utils/validationUtils';
 
 import { EmailAddressConfirmationData } from '../../../../../src/modules/user/input/EmailAddressConfirmationData';
 
 
-describe('Email address confirmation data class', () => {
+describe('EmailAddressConfirmationData class', () => {
 
-    function createValidToken() {
-        return sign({}, 'shhh');
-    }
-
-    function expectToReturnErrors(
-        { token = createValidToken() }: Partial<EmailAddressConfirmationData>,
-        expectedErrors: DeepPartial<ValidationError>[],
-    ) {
-        // given
-        const objectToValidate = new EmailAddressConfirmationData();
-        objectToValidate.token = token;
-
-        // when
-        const validationErrors = validateSync(objectToValidate);
-
-        // then
-        expect(validationErrors).toMatchObject(expectedErrors);
+    function createEmailAddressConfirmationDataObject(data: Partial<EmailAddressConfirmationData>): EmailAddressConfirmationData {
+        const validDefaultData: EmailAddressConfirmationData = {
+            token: sign({}, 'shhh'),
+        };
+        return Object.assign(new EmailAddressConfirmationData(), validDefaultData, data);
     }
 
     describe('token field', () => {
 
         it('should accept valid token', () => {
-            expectToReturnErrors({
-                token: createValidToken(),
-            }, []);
+            tokenTestValue.valid.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createEmailAddressConfirmationDataObject(data), expectedErrors);
+            });
         });
 
         it('should reject invalid token', () => {
-            expectToReturnErrors({
-                token: '',
-            }, [ {
-                constraints: {
-                    isJwt: expect.stringMatching(/token must be a jwt string/),
-                },
-            } ]);
-            expectToReturnErrors({
-                token: 'invalid-token',
-            }, [ {
-                constraints: {
-                    isJwt: expect.stringMatching(/token must be a jwt string/),
-                },
-            } ]);
+            tokenTestValue.invalid.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createEmailAddressConfirmationDataObject(data), expectedErrors);
+            });
         });
 
     });

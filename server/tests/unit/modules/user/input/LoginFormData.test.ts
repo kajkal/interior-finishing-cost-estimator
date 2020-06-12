@@ -1,64 +1,32 @@
-import 'reflect-metadata';
-import { validateSync, ValidationError } from 'class-validator';
+import { passwordTestValue } from '../../../../__utils__/validation-utils/test-data/passwordTestData';
+import { emailTestValue } from '../../../../__utils__/validation-utils/test-data/emailTestData';
+import { expectValidationErrors } from '../../../../__utils__/validation-utils/validationUtils';
 
 import { LoginFormData } from '../../../../../src/modules/user/input/LoginFormData';
-import { DeepPartial } from '../../../../__utils__/DeepPartial';
 
 
-describe('Login form data class', () => {
+describe('LoginFormData class', () => {
 
-    function expectToReturnErrors(
-        {
-            email = 'valid.email@domain.com',
-            password = 'valid password',
-        }: Partial<LoginFormData>,
-        expectedErrors: DeepPartial<ValidationError>[],
-    ) {
-        // given
-        const objectToValidate = new LoginFormData();
-        objectToValidate.email = email;
-        objectToValidate.password = password;
-
-        // when
-        const validationErrors = validateSync(objectToValidate);
-
-        // then
-        expect(validationErrors).toMatchObject(expectedErrors);
+    function createLoginFormDataObject(data: Partial<LoginFormData>): LoginFormData {
+        const validDefaultData: LoginFormData = {
+            email: 'valid.email@domain.com',
+            password: 'valid password',
+        };
+        return Object.assign(new LoginFormData(), validDefaultData, data);
     }
 
     describe('email field', () => {
 
         it('should accept valid email', () => {
-            expectToReturnErrors({
-                email: 'valid.email@domain.com',
-            }, []);
-            expectToReturnErrors({
-                email: 'valid_email@domain.com',
-            }, []);
+            emailTestValue.valid.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createLoginFormDataObject(data), expectedErrors);
+            });
         });
 
         it('should reject invalid email', () => {
-            expectToReturnErrors({
-                email: 'invalid-email',
-            }, [ {
-                constraints: {
-                    isEmail: expect.stringMatching(/email must be an email/),
-                },
-            } ]);
-            expectToReturnErrors({
-                email: 'invalid.email@domain',
-            }, [ {
-                constraints: {
-                    isEmail: expect.stringMatching(/email must be an email/),
-                },
-            } ]);
-            expectToReturnErrors({
-                email: 'invalid.email.domain.com',
-            }, [ {
-                constraints: {
-                    isEmail: expect.stringMatching(/email must be an email/),
-                },
-            } ]);
+            emailTestValue.invalid.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createLoginFormDataObject(data), expectedErrors);
+            });
         });
 
     });
@@ -66,29 +34,21 @@ describe('Login form data class', () => {
     describe('password field', () => {
 
         it('should accept valid password', () => {
-            expectToReturnErrors({
-                password: 'valid password',
-            }, []);
+            passwordTestValue.valid.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createLoginFormDataObject(data), expectedErrors);
+            });
         });
 
         it('should reject too short password', () => {
-            expectToReturnErrors({
-                password: 'aa',
-            }, [ {
-                constraints: {
-                    length: expect.stringMatching(/password must be longer than or equal to \d+ characters/),
-                },
-            } ]);
+            passwordTestValue.tooShort.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createLoginFormDataObject(data), expectedErrors);
+            });
         });
 
         it('should reject too long password', () => {
-            expectToReturnErrors({
-                password: 'a'.repeat(256),
-            }, [ {
-                constraints: {
-                    length: expect.stringMatching(/password must be shorter than or equal to \d+ characters/),
-                },
-            } ]);
+            passwordTestValue.tooLong.forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createLoginFormDataObject(data), expectedErrors);
+            });
         });
 
     });
