@@ -1,7 +1,8 @@
-import { sign } from 'jsonwebtoken';
+import { TokenExpiredError } from 'jsonwebtoken';
 import { InMemoryCache, Operation } from 'apollo-boost';
 
 import { ApolloCacheSpiesManager } from '../../../../__utils__/spies-managers/ApolloCacheSpiesManager';
+import { TokenVerifierSpy } from '../../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { LocalStateDocument, LocalStateQuery } from '../../../../../graphql/generated-types';
@@ -18,6 +19,7 @@ describe('AuthUtils class', () => {
         // @ts-ignore
         fetchSpy = jest.spyOn(global, 'fetch').mockImplementation();
         ApolloCacheSpiesManager.setupSpies();
+        TokenVerifierSpy.setupSpiesAndMockImplementations();
     });
 
     afterEach(() => {
@@ -44,15 +46,6 @@ describe('AuthUtils class', () => {
             getContext: jest.fn().mockReturnValue({ cache: apolloCache }),
         } as unknown as Operation;
     }
-
-    const tokenGenerator = {
-        valid() {
-            return sign({}, '_', { expiresIn: '1h' });
-        },
-        expired() {
-            return sign({}, '_', { expiresIn: '0s' });
-        },
-    };
 
     const mockFetchManager = {
         mockSuccess(fetchedAccessToken: string) {
@@ -109,7 +102,7 @@ describe('AuthUtils class', () => {
 
         it('should use valid access token from memory', async (done) => {
             // given
-            const accessTokenFromMemory = tokenGenerator.valid();
+            const accessTokenFromMemory = 'ACCESS_TOKEN_FROM_MEMORY_TEST_VALUE';
             const operation = createSampleOperation();
 
             // when
@@ -125,8 +118,11 @@ describe('AuthUtils class', () => {
 
         it('should refresh token when access token from memory has expired', async (done) => {
             // given
-            const accessTokenFromMemory = tokenGenerator.expired();
-            const accessTokenFromRefreshOperation = tokenGenerator.valid();
+            TokenVerifierSpy.verifyTokenExpiration.mockImplementation(() => {
+                throw new TokenExpiredError('TOKEN_EXPIRED', new Date());
+            });
+            const accessTokenFromMemory = 'ACCESS_TOKEN_FROM_MEMORY_TEST_VALUE';
+            const accessTokenFromRefreshOperation = 'ACCESS_TOKEN_FROM_REFRESH_OPERATION_TEST_VALUE';
             const operation = createSampleOperation();
 
             // when
@@ -147,7 +143,7 @@ describe('AuthUtils class', () => {
 
         it('should refresh token when there is no available access token in memory', async (done) => {
             // given
-            const accessTokenFromRefreshOperation = tokenGenerator.valid();
+            const accessTokenFromRefreshOperation = 'ACCESS_TOKEN_FROM_REFRESH_OPERATION_TEST_VALUE';
             const operation = createSampleOperation();
 
             // when

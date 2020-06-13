@@ -1,9 +1,8 @@
-import { decode } from 'jsonwebtoken';
 import { InMemoryCache, Operation } from 'apollo-boost';
 
 import { ApolloCacheManager } from '../ApolloCacheManager';
-import { AccessTokenPayload } from './AccessTokenPayload';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
+import { TokenVerifier } from '../../../../utils/token/TokenVerifier';
 
 
 /**
@@ -56,13 +55,12 @@ export class AuthUtils {
      * Verifies is given token is valid and not expired.
      */
     private static verifyAccessToken(tokenToVerify: string | undefined): string | undefined {
-        const jwtPayload = decode(tokenToVerify!) as AccessTokenPayload | null;
-        const currentTimestamp = (Date.now() / 1000) + 10; // + 10s as margin
-        const isTokenValid = currentTimestamp <= jwtPayload?.exp!;
-
-        console.log('%cverifyAccessToken', 'color: deepskyblue;', { isTokenValid, jwtPayload });
-
-        return (isTokenValid) ? tokenToVerify : undefined;
+        try {
+            TokenVerifier.create(tokenToVerify).verifyTokenExpiration();
+            return tokenToVerify;
+        } catch (error) {
+            return undefined;
+        }
     }
 
     /**

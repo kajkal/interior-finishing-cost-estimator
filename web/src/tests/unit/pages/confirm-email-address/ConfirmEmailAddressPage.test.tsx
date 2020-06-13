@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { sign } from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
 import { createMemoryHistory } from 'history';
 import { MockedResponse } from '@apollo/react-testing';
@@ -8,6 +7,7 @@ import { render, RenderResult, waitFor } from '@testing-library/react';
 import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
 import { MockSnackbarContextData } from '../../../__utils__/mocks/MockSnackbarProvider';
+import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';
 import { ConfirmEmailAddressDocument } from '../../../../graphql/generated-types';
@@ -16,8 +16,17 @@ import { routes } from '../../../../code/config/routes';
 
 describe('ConfirmEmailAddressPage component', () => {
 
+    const validEmailAddressConfirmationToken = 'VALID_TOKEN';
+
     beforeEach(() => {
         ApolloClientSpiesManager.setupSpies();
+        TokenVerifierSpy.setupSpiesAndMockImplementations();
+        TokenVerifierSpy.create.mockImplementation((tokenToVerify?: string | null) => {
+            if (tokenToVerify === validEmailAddressConfirmationToken) {
+                return TokenVerifierSpy.validInstance;
+            }
+            throw new Error('INVALID_TOKEN_PAYLOAD');
+        });
     });
 
     function renderConfirmEmailAddressPageInMockContext(mocks?: PageContextMocks): RenderResult {
@@ -28,15 +37,11 @@ describe('ConfirmEmailAddressPage component', () => {
         );
     }
 
-    function createSampleValidToken() {
-        return sign({ sub: 'userId' }, '_');
-    }
-
     const mockResponseGenerator = {
         success: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: createSampleValidToken() },
+                variables: { token: validEmailAddressConfirmationToken },
             },
             result: {
                 data: {
@@ -47,7 +52,7 @@ describe('ConfirmEmailAddressPage component', () => {
         emailAddressAlreadyConfirmed: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: createSampleValidToken() },
+                variables: { token: validEmailAddressConfirmationToken },
             },
             result: {
                 data: null,
@@ -59,7 +64,7 @@ describe('ConfirmEmailAddressPage component', () => {
         invalidEmailConfirmationToken: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: createSampleValidToken() },
+                variables: { token: validEmailAddressConfirmationToken },
             },
             result: {
                 data: null,
@@ -71,7 +76,7 @@ describe('ConfirmEmailAddressPage component', () => {
         networkError: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: createSampleValidToken() },
+                variables: { token: validEmailAddressConfirmationToken },
             },
             error: new Error('network error'),
         }),
@@ -79,8 +84,7 @@ describe('ConfirmEmailAddressPage component', () => {
 
     describe('invalid token search param', () => {
 
-        const manipulatedToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdwIiOiJhIn0._'; // will throw error on decode
-        const paths = [ '/', '/?notToken=value', '/?token=invalid_token', `/?token=${manipulatedToken}` ];
+        const paths = [ '/', '/?notToken=value', '/?token=invalid_token' ];
 
         paths.forEach((path: string) => {
             it(`should redirect to login page without creating new mutation for '${path}'`, () => {
