@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { GraphQLError } from 'graphql';
 import { createMemoryHistory } from 'history';
-import { MockedResponse } from '@apollo/react-testing';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
 import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
@@ -10,7 +9,7 @@ import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
-import { LocalStateDocument, LoginDocument, MeDocument } from '../../../../graphql/generated-types';
+import { LocalStateDocument, LoginDocument, MeDocument, MutationLoginArgs } from '../../../../graphql/generated-types';
 import { LoginPage } from '../../../../code/components/pages/login/LoginPage';
 import { routes } from '../../../../code/config/routes';
 
@@ -21,33 +20,41 @@ describe('LoginPage component', () => {
         ApolloCacheSpiesManager.setupSpies();
     });
 
-    interface LoginPageElements {
-        emailInput: HTMLInputElement;
-        passwordInput: HTMLInputElement;
-        submitButton: HTMLButtonElement;
-        forgotPasswordPageLink: HTMLAnchorElement;
-        signupPageLink: HTMLAnchorElement;
-    }
-
-    function renderLoginPageInMockContext(mocks?: PageContextMocks): [ LoginPageElements, RenderResult ] {
-        const renderResult = render(
-            <PageMockContextProvider mocks={mocks}>
-                <LoginPage />
-            </PageMockContextProvider>,
-        );
-
-        return [ {
-            emailInput: renderResult.getByLabelText('t:form.email.label', { selector: 'input' }) as HTMLInputElement,
-            passwordInput: renderResult.getByLabelText('t:form.password.label', { selector: 'input' }) as HTMLInputElement,
-            submitButton: renderResult.getByRole('button', { name: 't:loginPage.logIn' }) as HTMLButtonElement,
-            forgotPasswordPageLink: renderResult.getByText('t:loginPage.forgotPasswordLink', { selector: 'a' }) as HTMLAnchorElement,
-            signupPageLink: renderResult.getByText('t:loginPage.signUpLink', { selector: 'a' }) as HTMLAnchorElement,
-        }, renderResult ];
+    class LoginPageTestFixture {
+        private constructor(public renderResult: RenderResult) {}
+        static renderInMockContext(mocks?: PageContextMocks) {
+            const renderResult = render(
+                <PageMockContextProvider mocks={mocks}>
+                    <LoginPage />
+                </PageMockContextProvider>,
+            );
+            return new this(renderResult);
+        }
+        get emailInput() {
+            return this.renderResult.getByLabelText('t:form.email.label', { selector: 'input' }) as HTMLInputElement;
+        }
+        get passwordInput() {
+            return this.renderResult.getByLabelText('t:form.password.label', { selector: 'input' }) as HTMLInputElement;
+        }
+        get submitButton() {
+            return this.renderResult.getByRole('button', { name: 't:loginPage.logIn' }) as HTMLButtonElement;
+        }
+        get forgotPasswordPageLink() {
+            return this.renderResult.getByText('t:loginPage.forgotPasswordLink', { selector: 'a' }) as HTMLAnchorElement;
+        }
+        get signupPageLink() {
+            return this.renderResult.getByText('t:loginPage.signUpLink', { selector: 'a' }) as HTMLAnchorElement;
+        }
+        async fillAndSubmitForm(data: MutationLoginArgs) {
+            await changeInputValue(this.emailInput, data.email);
+            await changeInputValue(this.passwordInput, data.password);
+            fireEvent.click(this.submitButton);
+        }
     }
 
     it('should navigate to new page on \'forgot password\' link click', () => {
         const history = createMemoryHistory();
-        const [ { forgotPasswordPageLink } ] = renderLoginPageInMockContext({ history });
+        const { forgotPasswordPageLink } = LoginPageTestFixture.renderInMockContext({ history });
 
         fireEvent.click(forgotPasswordPageLink);
 
@@ -56,7 +63,7 @@ describe('LoginPage component', () => {
 
     it('should navigate to new page on \'sign up\' link click', () => {
         const history = createMemoryHistory();
-        const [ { signupPageLink } ] = renderLoginPageInMockContext({ history });
+        const { signupPageLink } = LoginPageTestFixture.renderInMockContext({ history });
 
         fireEvent.click(signupPageLink);
 
@@ -118,16 +125,10 @@ describe('LoginPage component', () => {
             }),
         };
 
-        async function fillAndSubmitForm(elements: LoginPageElements, mock: MockedResponse) {
-            await changeInputValue(elements.emailInput, mock.request.variables!.email);
-            await changeInputValue(elements.passwordInput, mock.request.variables!.password);
-            fireEvent.click(elements.submitButton);
-        }
-
         describe('validation', () => {
 
             it('should validate email input value', (done) => {
-                const [ { emailInput } ] = renderLoginPageInMockContext();
+                const { emailInput } = LoginPageTestFixture.renderInMockContext();
                 InputValidator.basedOn(emailInput, '#login-email-input-helper-text.Mui-error')
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
@@ -136,7 +137,7 @@ describe('LoginPage component', () => {
             });
 
             it('should validate password input value', (done) => {
-                const [ { passwordInput } ] = renderLoginPageInMockContext();
+                const { passwordInput } = LoginPageTestFixture.renderInMockContext();
                 InputValidator.basedOn(passwordInput, '#login-password-input-helper-text.Mui-error')
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
@@ -149,9 +150,12 @@ describe('LoginPage component', () => {
         it('should successfully log in and navigate to projects page', async (done) => {
             const history = createMemoryHistory();
             const mockResponse = mockResponseGenerator.success();
-            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses: [ mockResponse ] });
+            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
+                history,
+                mockResponses: [ mockResponse ],
+            });
 
-            await fillAndSubmitForm(elements, mockResponse);
+            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
             await waitFor(() => expect(history.location.pathname).toMatch(routes.projects()));
@@ -186,12 +190,15 @@ describe('LoginPage component', () => {
             const history = createMemoryHistory();
             history.push('/login-page', { from: { pathname: '/protected-page' } }); // simulate redirection done by ProtectedRoute component
             const mockResponse = mockResponseGenerator.success();
-            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses: [ mockResponse ] });
+            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
+                history,
+                mockResponses: [ mockResponse ],
+            });
 
             // verify current location
             expect(history.location.pathname).toMatch('/login-page');
 
-            await fillAndSubmitForm(elements, mockResponse);
+            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation to initially requested protected page occurred
             await waitFor(() => expect(history.location.pathname).toMatch('/protected-page'));
@@ -199,12 +206,14 @@ describe('LoginPage component', () => {
         });
 
         it('should display notification about bad credentials error ', async (done) => {
-            const history = createMemoryHistory();
-            const mockResponses = [ mockResponseGenerator.badCredentials() ];
+            const mockResponse = mockResponseGenerator.badCredentials();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses, mockSnackbars });
+            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
+                mockResponses: [ mockResponse ],
+                mockSnackbars,
+            });
 
-            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
+            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
             await waitFor(() => {
@@ -218,12 +227,14 @@ describe('LoginPage component', () => {
         });
 
         it('should display notification about network error', async (done) => {
-            const history = createMemoryHistory();
-            const mockResponses = [ mockResponseGenerator.networkError() ];
+            const mockResponse = mockResponseGenerator.networkError();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const [ elements ] = renderLoginPageInMockContext({ history, mockResponses, mockSnackbars });
+            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
+                mockResponses: [ mockResponse ],
+                mockSnackbars,
+            });
 
-            await fillAndSubmitForm(elements, mockResponses[ 0 ]);
+            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
             await waitFor(() => {

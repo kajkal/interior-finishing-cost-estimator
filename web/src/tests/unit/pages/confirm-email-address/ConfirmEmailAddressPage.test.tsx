@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { GraphQLError } from 'graphql';
 import { createMemoryHistory } from 'history';
+import { JsonWebTokenError } from 'jsonwebtoken';
 import { MockedResponse } from '@apollo/react-testing';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
@@ -22,19 +23,25 @@ describe('ConfirmEmailAddressPage component', () => {
         ApolloClientSpiesManager.setupSpies();
         TokenVerifierSpy.setupSpiesAndMockImplementations();
         TokenVerifierSpy.create.mockImplementation((tokenToVerify?: string | null) => {
-            if (tokenToVerify === validEmailAddressConfirmationToken) {
-                return TokenVerifierSpy.validInstance;
+            switch (tokenToVerify) {
+                case validEmailAddressConfirmationToken:
+                    return TokenVerifierSpy.validInstance;
+                default:
+                    throw new JsonWebTokenError('INVALID_TOKEN_PAYLOAD');
             }
-            throw new Error('INVALID_TOKEN_PAYLOAD');
         });
     });
 
-    function renderConfirmEmailAddressPageInMockContext(mocks?: PageContextMocks): RenderResult {
-        return render(
-            <PageMockContextProvider mocks={mocks}>
-                <ConfirmEmailAddressPage />
-            </PageMockContextProvider>,
-        );
+    class ConfirmEmailAddressPageTestFixture {
+        private constructor(public renderResult: RenderResult) {}
+        static renderInMockContext(mocks?: PageContextMocks) {
+            const renderResult = render(
+                <PageMockContextProvider mocks={mocks}>
+                    <ConfirmEmailAddressPage />
+                </PageMockContextProvider>,
+            );
+            return new this(renderResult);
+        }
     }
 
     const mockResponseGenerator = {
@@ -84,13 +91,13 @@ describe('ConfirmEmailAddressPage component', () => {
 
     describe('invalid token search param', () => {
 
-        const paths = [ '/', '/?notToken=value', '/?token=invalid_token' ];
+        const invalidPaths = [ '/', '/?notToken=value', '/?token=invalid_token' ];
 
-        paths.forEach((path: string) => {
-            it(`should redirect to login page without creating new mutation for '${path}'`, () => {
+        invalidPaths.forEach((path: string) => {
+            it(`should redirect to login page and display alert about invalid token for '${path}'`, () => {
                 const history = createMemoryHistory({ initialEntries: [ path ] });
                 const mockSnackbars = { errorSnackbar: jest.fn() };
-                renderConfirmEmailAddressPageInMockContext({ history, mockSnackbars });
+                ConfirmEmailAddressPageTestFixture.renderInMockContext({ history, mockSnackbars });
 
                 // verify if navigation occurred
                 expect(history.location.pathname).toMatch(routes.login());
@@ -108,8 +115,11 @@ describe('ConfirmEmailAddressPage component', () => {
 
     async function renderAndAwaitMutationResponse(mockResponse: MockedResponse, mockSnackbars: MockSnackbarContextData) {
         const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ] });
-        const mockResponses = [ mockResponse ];
-        const { queryByRole } = renderConfirmEmailAddressPageInMockContext({ history, mockResponses, mockSnackbars });
+        const { renderResult: { queryByRole } } = ConfirmEmailAddressPageTestFixture.renderInMockContext({
+            history,
+            mockResponses: [ mockResponse ],
+            mockSnackbars,
+        });
 
         // verify if progressbar is visible
         expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();

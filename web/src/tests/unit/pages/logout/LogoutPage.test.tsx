@@ -16,12 +16,16 @@ describe('LogoutPage component', () => {
         ApolloClientSpiesManager.setupSpies();
     });
 
-    function renderLogoutPageInMockContext(mocks?: PageContextMocks): RenderResult {
-        return render(
-            <PageMockContextProvider mocks={mocks}>
-                <LogoutPage />
-            </PageMockContextProvider>,
-        );
+    class LogoutPageTestFixture {
+        private constructor(public renderResult: RenderResult) {}
+        static renderInMockContext(mocks?: PageContextMocks) {
+            const renderResult = render(
+                <PageMockContextProvider mocks={mocks}>
+                    <LogoutPage />
+                </PageMockContextProvider>,
+            );
+            return new this(renderResult);
+        }
     }
 
     const mockResponseGenerator = {
@@ -45,8 +49,8 @@ describe('LogoutPage component', () => {
 
     it('should logout on mount and navigate to login page', async (done) => {
         const history = createMemoryHistory();
-        const mockResponses = [ mockResponseGenerator.success() ];
-        renderLogoutPageInMockContext({ history, mockResponses });
+        const mockResponse = mockResponseGenerator.success();
+        LogoutPageTestFixture.renderInMockContext({ history, mockResponses: [ mockResponse ] });
 
         // verify if navigation occurred
         await waitFor(() => expect(history.location.pathname).toMatch(routes.login()));
@@ -58,9 +62,9 @@ describe('LogoutPage component', () => {
 
     it('should display notification about network error', async (done) => {
         const history = createMemoryHistory();
-        const mockResponses = [ mockResponseGenerator.networkError() ];
+        const mockResponse = mockResponseGenerator.networkError();
         const mockSnackbars = { errorSnackbar: jest.fn() };
-        renderLogoutPageInMockContext({ history, mockResponses, mockSnackbars });
+        LogoutPageTestFixture.renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
 
         // verify if error alert was displayed
         await waitFor(() => {
