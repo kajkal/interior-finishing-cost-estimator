@@ -72,6 +72,32 @@ describe('ApolloErrorHandler class ', () => {
             expect(mockHandler).toHaveBeenCalledTimes(0);
         });
 
+        it('should log details of unhandled validation error', () => {
+            // given
+            jest.spyOn(console, 'log');
+            const error = new ApolloError({
+                graphQLErrors: [ {
+                    message: 'Argument Validation Error',
+                    extensions: { code: 'INTERNAL_SERVER_ERROR' },
+                } as unknown as GraphQLError ],
+                networkError: null,
+            });
+
+            // when
+            const handled = ApolloErrorHandler.process(error)
+                .handleGraphQlErrors({})
+                .finish();
+
+            // then
+            expect(handled).toBe(false);
+            expect(console.log).toHaveBeenCalledTimes(1);
+            expect(console.log).toHaveBeenCalledWith('unexpected argument validation error', {
+                message: 'Argument Validation Error',
+                extensions: { code: 'INTERNAL_SERVER_ERROR' },
+            });
+            jest.spyOn(console, 'log').mockRestore();
+        });
+
     });
 
     describe('Network and Unauthorized error', () => {

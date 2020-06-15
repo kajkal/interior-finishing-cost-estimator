@@ -30,6 +30,9 @@ export class ApolloErrorHandler {
                 matchingErrorHandler(firstGraphQLError);
                 this.handled = true;
             }
+            if (!this.handled && firstGraphQLError?.message === 'Argument Validation Error') {
+                console.log('unexpected argument validation error', firstGraphQLError);
+            }
         }
         return this;
     }
