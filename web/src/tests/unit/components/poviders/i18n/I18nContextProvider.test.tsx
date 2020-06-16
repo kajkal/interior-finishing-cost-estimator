@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import React from 'react';
 import I18nReact from 'react-i18next';
 import { render, waitFor } from '@testing-library/react';
@@ -78,6 +80,32 @@ describe('I18nContextProvider component', () => {
 
         // verify if child component is visible and if it's translation is correct
         expect(queryByTestId('child-component')).toHaveTextContent('Translated text');
+        done();
+    });
+
+    /**
+     * Maps each value from translation files to '-' and then compares translation file structures.
+     */
+    it('should contain translation files with the same keys', async (done) => {
+        const rootDirectory = './public/locales';
+        const localeDirectories = await fs.promises.readdir(rootDirectory)
+        const locales = await Promise.all(localeDirectories.map(async (locale) => {
+            const translationFilePath = path.resolve(rootDirectory, locale, 'translation.json');
+            const translationFileContent = await fs.promises.readFile(translationFilePath, 'utf-8');
+            const normalizedTranslationFileContent = JSON.parse(translationFileContent, (key, value) => (
+                typeof value === 'string' ? '-' : value
+            ));
+            return {
+                name: locale,
+                translation: normalizedTranslationFileContent,
+            };
+        }));
+
+        const localeNames = locales.map(l => l.name);
+        expect(localeNames).toEqual(expect.arrayContaining([ 'en', 'pl' ]));
+        locales.forEach(({ translation }) => {
+            expect(translation).toEqual(locales[0].translation);
+        });
         done();
     });
 

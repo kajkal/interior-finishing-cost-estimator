@@ -2,6 +2,7 @@ const HOME_URL = '/';
 const LOGIN_URL = '/login';
 const SIGNUP_URL = '/signup';
 const CONFIRM_EMAIL_ADDRESS = '/confirm-email-address';
+const RESET_PASSWORD_URL = '/reset-password';
 const FORGOT_PASSWORD_URL = '/forgot-password';
 const LOGOUT_URL = '/logout';
 const PROJECTS_URL = '/projects';
@@ -26,6 +27,10 @@ export const routes = {
 
     forgotPassword(): Readonly<string> {
         return FORGOT_PASSWORD_URL;
+    },
+
+    passwordReset(): Readonly<string> {
+        return RESET_PASSWORD_URL;
     },
 
     logout(): Readonly<string> {

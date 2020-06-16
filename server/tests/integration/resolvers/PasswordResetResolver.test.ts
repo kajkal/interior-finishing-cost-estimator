@@ -190,11 +190,12 @@ describe('PasswordResetResolver', () => {
 
         it('should return error if token is expired', async (done) => {
             const user = await testUtils.db.populateWithUser();
+            jest.spyOn(Date, 'now').mockReturnValue(1592334600000); // 2020-06-16 19:10:00 <- creation time
             const passwordResetFormData: PasswordResetFormData = {
                 token: createSamplePasswordResetToken(user),
                 password: generator.string({ length: 8 }),
             };
-            jest.spyOn(Date, 'now').mockReturnValue(Date.now() + (3 * 60 * 60 * 1000)); // now + 3h
+            jest.spyOn(Date, 'now').mockReturnValue(1592342100000); // 2020-06-16 21:15:00 <- now
             const response = await testUtils.postGraphQL({
                 query: resetPasswordMutation,
                 variables: passwordResetFormData,
@@ -218,6 +219,9 @@ describe('PasswordResetResolver', () => {
                 errors: [
                     expect.objectContaining({
                         message: 'EXPIRED_PASSWORD_RESET_TOKEN',
+                        extensions: expect.objectContaining({
+                            expiredAt: '2020-06-16T21:10:00.000Z',
+                        }),
                     }),
                 ],
             });

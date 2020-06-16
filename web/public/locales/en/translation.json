@@ -6,20 +6,35 @@
   "loginPage": {
     "logIn": "Log in",
     "forgotPasswordLink": "Forgot password?",
-    "signUpLink": "Don't have an account? Sign Up",
+    "signUpLink": "Don't have an account? Sign up",
     "badCredentials": "Bad email or password"
   },
   "signupPage": {
     "signUp": "Sign up",
     "logInLink": "Log in instead",
     "passwordAriaLabel": "Create a secure password",
-    "passwordConfirmationLabel": "Confirm Password",
+    "passwordConfirmationLabel": "Confirm password",
     "passwordConfirmationAriaLabel": "Confirm your password"
   },
   "emailConfirmationPage": {
     "emailConfirmedSuccessfully": "Your email address has been confirmed",
     "emailAlreadyConfirmed": "This email has already been confirmed",
     "invalidEmailConfirmationToken": "Incorrect email confirmation token"
+  },
+  "passwordResetPage": {
+    "logInLink": "Back to Log in",
+    "signUpLink": "Give up, create new account",
+    "sendResetInstructionsDescription": "An email with password reset instructions will be send to this email address:",
+    "sendResetInstructions": "Send reset instructions",
+    "sendResetInstructionsSuccess": "If an account for {{email}} exists and has a confirmed email address, you will receive an email with a link to reset your password.",
+    "resetPassword": "Reset password",
+    "expiredPasswordResetToken": "This link has expired at {{date}}",
+    "invalidPasswordResetToken": "Incorrect password reset token",
+    "passwordLabel": "New password",
+    "passwordAriaLabel": "Create a secure password",
+    "passwordConfirmationLabel": "Confirm new password",
+    "passwordConfirmationAriaLabel": "Confirm your new password",
+    "passwordResetSuccess": "Your password has been reset!"
   },
   "form": {
     "password": {

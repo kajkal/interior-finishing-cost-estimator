@@ -56,7 +56,7 @@ export class PasswordResetResolver {
             user = await this.userRepository.findOneOrFail({ id: sub });
         } catch (error) {
             if (error instanceof TokenExpiredError) {
-                throw new UserInputError('EXPIRED_PASSWORD_RESET_TOKEN');
+                throw new UserInputError('EXPIRED_PASSWORD_RESET_TOKEN', { expiredAt: error.expiredAt });
             }
             throw new UserInputError('INVALID_PASSWORD_RESET_TOKEN');
         }

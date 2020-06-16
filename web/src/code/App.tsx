@@ -11,6 +11,8 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import MuiLink from '@material-ui/core/Link';
 import { ConfirmEmailAddressPage } from './components/pages/confirm-email-address/ConfirmEmailAddressPage';
 import { LanguageMenu } from './components/common/language-menu/LanguageMenu';
+import { PasswordResetPage } from './components/pages/password-reset/PasswordResetPage';
+import { PasswordResetRequestPage } from './components/pages/password-reset/PasswordResetRequestPage';
 
 
 export function App(): React.ReactElement {
@@ -50,6 +52,14 @@ export function App(): React.ReactElement {
 
                 <Route exact path={routes.login()}>
                     <LoginPage />
+                </Route>
+
+                <Route exact path={routes.forgotPassword()}>
+                    <PasswordResetRequestPage />
+                </Route>
+
+                <Route exact path={routes.passwordReset()}>
+                    <PasswordResetPage />
                 </Route>
 
                 <Route exact path={routes.signup()}>

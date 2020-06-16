@@ -21,6 +21,21 @@
     "emailAlreadyConfirmed": "Ten adres email jest już potwierdzony",
     "invalidEmailConfirmationToken": "Nieprawidłowy token potwierdzenia adresu email"
   },
+  "passwordResetPage": {
+    "logInLink": "Wróć do logowania",
+    "signUpLink": "Poddaj się, stwórz nowe konto",
+    "sendResetInstructionsDescription": "Email z instrukcją resetowania hasła zostanie wysłany na podany niżej adres email:",
+    "sendResetInstructions": "Wyślij instrukcję resetowania hasła",
+    "sendResetInstructionsSuccess": "Jeżeli konto zarejestrowane na {{email}} istnieje i posiada potwierdzony adres email, otrzymasz wiadomość email z odnośnikiem umożliwiającym zresetowanie Twojego hasła.",
+    "resetPassword": "Resetowanie hasła",
+    "expiredPasswordResetToken": "Ten link wygasł {{date}}",
+    "invalidPasswordResetToken": "Nieprawidłowy token resetowania hasła",
+    "passwordLabel": "Nowe hasło",
+    "passwordAriaLabel": "Stwórz bezpieczne hasło",
+    "passwordConfirmationLabel": "Potwierdź nowe hasło",
+    "passwordConfirmationAriaLabel": "Potwierdź swoje nowe hasło",
+    "passwordResetSuccess": "Twoje hasło zostało zresetowane!"
+  },
   "form": {
     "password": {
       "label": "Hasło",
