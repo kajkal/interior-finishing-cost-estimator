@@ -8,6 +8,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
+import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
 import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
@@ -42,11 +43,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
         name: createNameSchema(t),
         email: createEmailSchema(t),
         password: createPasswordSchema(t),
-        passwordConfirmation: Yup.string()
-            .test('match', t('form.password.validation.passwordsNotMatch'),
-                function (passwordConfirmation: string) {
-                    return passwordConfirmation === this.parent.password;
-                }),
+        passwordConfirmation: createPasswordConfirmationSchema(t),
     }), [ t ]);
 
     const handleSubmit = React.useCallback<SignupFormSubmitHandler>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
