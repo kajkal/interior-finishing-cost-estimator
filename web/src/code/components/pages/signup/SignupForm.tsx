@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
-import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
@@ -77,67 +77,54 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            {({ isSubmitting }) => (
-                <Form className={classNames('signup-form', formClassName)}>
+            <Form className={classNames('signup-form', formClassName)}>
 
-                    <FormikTextField
-                        id={'signup-name-input'}
-                        aria-label={t('form.name.ariaLabel')}
-                        name='name'
-                        type='text'
-                        label={t('form.name.label')}
-                        autoComplete='name'
-                        fullWidth
-                    />
+                <FormikTextField
+                    id={'signup-name-input'}
+                    aria-label={t('form.name.ariaLabel')}
+                    name='name'
+                    type='text'
+                    label={t('form.name.label')}
+                    autoComplete='name'
+                    fullWidth
+                />
 
-                    <FormikTextField
-                        id={'signup-email-input'}
-                        aria-label={t('form.email.ariaLabel')}
-                        name='email'
-                        type='email'
-                        label={t('form.email.label')}
-                        autoComplete='email'
-                        fullWidth
-                    />
+                <FormikTextField
+                    id={'signup-email-input'}
+                    aria-label={t('form.email.ariaLabel')}
+                    name='email'
+                    type='email'
+                    label={t('form.email.label')}
+                    autoComplete='email'
+                    fullWidth
+                />
 
-                    <FormikPasswordField
-                        id={'signup-password-input'}
-                        aria-label={t('signupPage.passwordAriaLabel')}
-                        name='password'
-                        label={t('form.password.label')}
-                        autoComplete='new-password'
-                        fullWidth
-                    />
+                <FormikPasswordField
+                    id={'signup-password-input'}
+                    aria-label={t('signupPage.passwordAriaLabel')}
+                    name='password'
+                    label={t('form.password.label')}
+                    autoComplete='new-password'
+                    fullWidth
+                />
 
-                    <FormikPasswordField
-                        id={'signup-password-confirmation-input'}
-                        aria-label={t('signupPage.passwordConfirmationAriaLabel')}
-                        name='passwordConfirmation'
-                        label={t('signupPage.passwordConfirmationLabel')}
-                        autoComplete='new-password'
-                        fullWidth
-                    />
+                <FormikPasswordField
+                    id={'signup-password-confirmation-input'}
+                    aria-label={t('signupPage.passwordConfirmationAriaLabel')}
+                    name='passwordConfirmation'
+                    label={t('signupPage.passwordConfirmationLabel')}
+                    autoComplete='new-password'
+                    fullWidth
+                />
 
-                    <ButtonWithSpinner
-                        className={classes.submit}
-                        disabled={isSubmitting}
-                        isSpinning={isSubmitting}
-                        fullWidth
-                    >
-                        {t('signupPage.signUp')}
-                    </ButtonWithSpinner>
+                <FormikSubmitButton
+                    className={classes.submit}
+                    fullWidth
+                >
+                    {t('signupPage.signUp')}
+                </FormikSubmitButton>
 
-                    {/*<div>*/}
-                    {/*    <pre>*/}
-                    {/*        {JSON.stringify(values, null, 2)}*/}
-                    {/*    </pre>*/}
-                    {/*    <pre>*/}
-                    {/*        {JSON.stringify(errors, null, 2)}*/}
-                    {/*    </pre>*/}
-                    {/*</div>*/}
-
-                </Form>
-            )}
+            </Form>
         </Formik>
     );
 }

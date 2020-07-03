@@ -9,7 +9,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationLoginArgs, useLoginMutation } from '../../../../graphql/generated-types';
-import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
@@ -74,48 +74,35 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            {({ isSubmitting }) => (
-                <Form className={classNames('login-form', formClassName)}>
+            <Form className={classNames('login-form', formClassName)}>
 
-                    <FormikTextField
-                        id='login-email-input'
-                        aria-label={t('form.email.ariaLabel')}
-                        name='email'
-                        type='email'
-                        label={t('form.email.label')}
-                        autoComplete='email'
-                        fullWidth
-                    />
+                <FormikTextField
+                    id='login-email-input'
+                    aria-label={t('form.email.ariaLabel')}
+                    name='email'
+                    type='email'
+                    label={t('form.email.label')}
+                    autoComplete='email'
+                    fullWidth
+                />
 
-                    <FormikPasswordField
-                        id='login-password-input'
-                        aria-label={t('form.password.ariaLabel')}
-                        name='password'
-                        label={t('form.password.label')}
-                        autoComplete='current-password'
-                        fullWidth
-                    />
+                <FormikPasswordField
+                    id='login-password-input'
+                    aria-label={t('form.password.ariaLabel')}
+                    name='password'
+                    label={t('form.password.label')}
+                    autoComplete='current-password'
+                    fullWidth
+                />
 
-                    <ButtonWithSpinner
-                        className={classes.submit}
-                        disabled={isSubmitting}
-                        isSpinning={isSubmitting}
-                        fullWidth
-                    >
-                        {t('loginPage.logIn')}
-                    </ButtonWithSpinner>
+                <FormikSubmitButton
+                    className={classes.submit}
+                    fullWidth
+                >
+                    {t('loginPage.logIn')}
+                </FormikSubmitButton>
 
-                    {/*<div>*/}
-                    {/*    <pre>*/}
-                    {/*        {JSON.stringify(values, null, 2)}*/}
-                    {/*    </pre>*/}
-                    {/*    <pre>*/}
-                    {/*        {JSON.stringify(errors, null, 2)}*/}
-                    {/*    </pre>*/}
-                    {/*</div>*/}
-
-                </Form>
-            )}
+            </Form>
         </Formik>
     );
 }

@@ -3,12 +3,12 @@ import { Route, Switch } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../__utils__/PageMockContextProvider';
+import { PageContextMocks, PageMockContextProvider } from '../../../../__utils__/PageMockContextProvider';
 
-import { UnauthorizedError } from '../../../code/components/providers/apollo/errors/UnauthorizedError';
-import { ProtectedRoute } from '../../../code/components/common/router/ProtectedRoute';
-import { MeDocument } from '../../../graphql/generated-types';
-import { routes } from '../../../code/config/routes';
+import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
+import { ProtectedRoute } from '../../../../../code/components/common/router/ProtectedRoute';
+import { MeDocument } from '../../../../../graphql/generated-types';
+import { routes } from '../../../../../code/config/routes';
 
 
 describe('ProtectedRoute component', () => {

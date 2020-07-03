@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationResetPasswordArgs, useResetPasswordMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
-import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
@@ -43,7 +43,7 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            {({ isSubmitting, values }) => (
+            {({ values }) => (
                 <Form className='password-reset-form'>
 
                     <input type='hidden' name='token' value={values.token} />
@@ -66,14 +66,12 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
                         fullWidth
                     />
 
-                    <ButtonWithSpinner
+                    <FormikSubmitButton
                         className={classes.submit}
-                        disabled={isSubmitting}
-                        isSpinning={isSubmitting}
                         fullWidth
                     >
                         {t('passwordResetPage.resetPassword')}
-                    </ButtonWithSpinner>
+                    </FormikSubmitButton>
 
                 </Form>
             )}

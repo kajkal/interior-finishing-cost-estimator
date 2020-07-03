@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Form, Formik } from 'formik';
 import { fireEvent, render, RenderResult } from '@testing-library/react';
 
-import { FormikPasswordField } from '../../../code/components/common/form-fields/FormikPasswordField';
+import { FormikPasswordField } from '../../../../../code/components/common/form-fields/FormikPasswordField';
 
 
 describe('FormikPasswordField component', () => {

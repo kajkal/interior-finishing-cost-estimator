@@ -7,7 +7,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationSendPasswordResetInstructionsArgs, useSendPasswordResetInstructionsMutation } from '../../../../graphql/generated-types';
-import { ButtonWithSpinner } from '../../common/progress-indicators/ButtonWithSpinner';
+import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
@@ -35,30 +35,26 @@ export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestForm
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            {({ isSubmitting }) => (
-                <Form className='password-reset-request-form'>
+            <Form className='password-reset-request-form'>
 
-                    <FormikTextField
-                        id='password-reset-request-email-input'
-                        aria-label={t('form.email.ariaLabel')}
-                        name='email'
-                        type='email'
-                        label={t('form.email.label')}
-                        autoComplete='email'
-                        fullWidth
-                    />
+                <FormikTextField
+                    id='password-reset-request-email-input'
+                    aria-label={t('form.email.ariaLabel')}
+                    name='email'
+                    type='email'
+                    label={t('form.email.label')}
+                    autoComplete='email'
+                    fullWidth
+                />
 
-                    <ButtonWithSpinner
-                        className={classes.submit}
-                        disabled={isSubmitting}
-                        isSpinning={isSubmitting}
-                        fullWidth
-                    >
-                        {t('passwordResetPage.sendResetInstructions')}
-                    </ButtonWithSpinner>
+                <FormikSubmitButton
+                    className={classes.submit}
+                    fullWidth
+                >
+                    {t('passwordResetPage.sendResetInstructions')}
+                </FormikSubmitButton>
 
-                </Form>
-            )}
+            </Form>
         </Formik>
     );
 }
