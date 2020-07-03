@@ -64,9 +64,9 @@ export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestForm
 }
 
 function usePasswordResetRequestFormValidationSchema(t: TFunction): Yup.ObjectSchema<PasswordResetRequestFormData> {
-    return React.useMemo(() => Yup.object().shape<PasswordResetRequestFormData>({
+    return React.useMemo(() => Yup.object<PasswordResetRequestFormData>({
         email: createEmailSchema(t),
-    }), [ t ]);
+    }).defined(), [ t ]);
 }
 
 function usePasswordResetRequestFormSubmitHandler(t: TFunction, onSuccess: (email: string) => void): PasswordResetRequestFormSubmitHandler {

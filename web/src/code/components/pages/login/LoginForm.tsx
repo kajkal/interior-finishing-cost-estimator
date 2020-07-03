@@ -41,10 +41,10 @@ export function LoginForm(props: LoginFormProps): React.ReactElement {
     const { push } = useHistory();
     const { state = { from: { pathname: routes.projects() } } } = useLocation<LoginLocationState>();
 
-    const validationSchema = React.useMemo(() => Yup.object().shape<LoginFormData>({
+    const validationSchema = React.useMemo(() => Yup.object<LoginFormData>({
         email: createEmailSchema(t),
         password: createPasswordSchema(t),
-    }), [ t ]);
+    }).defined(), [ t ]);
 
     const handleSubmit = React.useCallback<LoginFormSubmitHandler>(async (values) => {
         try {

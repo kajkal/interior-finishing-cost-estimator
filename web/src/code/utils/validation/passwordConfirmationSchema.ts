@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 export function createPasswordConfirmationSchema(t: TFunction) {
     return Yup.string()
         .test('match', t('form.password.validation.passwordsNotMatch'),
-            function (passwordConfirmation: string) {
+            function (passwordConfirmation: string): passwordConfirmation is string {
                 return passwordConfirmation === this.parent.password;
             });
 }

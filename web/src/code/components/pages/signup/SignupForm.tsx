@@ -39,12 +39,12 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
     const [ registerMutation ] = useRegisterMutation();
     const { push } = useHistory();
 
-    const validationSchema = React.useMemo(() => Yup.object().shape<SignupFormData>({
+    const validationSchema = React.useMemo(() => Yup.object<SignupFormData>({
         name: createNameSchema(t),
         email: createEmailSchema(t),
         password: createPasswordSchema(t),
         passwordConfirmation: createPasswordConfirmationSchema(t),
-    }), [ t ]);
+    }).defined(), [ t ]);
 
     const handleSubmit = React.useCallback<SignupFormSubmitHandler>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
         try {

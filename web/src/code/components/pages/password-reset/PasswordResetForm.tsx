@@ -82,11 +82,11 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
 }
 
 function usePasswordResetFormValidationSchema(t: TFunction): Yup.ObjectSchema<PasswordResetFormData> {
-    return React.useMemo(() => Yup.object().shape<PasswordResetFormData>({
+    return React.useMemo(() => Yup.object<PasswordResetFormData>({
         token: Yup.string().required(),
         password: createPasswordSchema(t),
         passwordConfirmation: createPasswordConfirmationSchema(t),
-    }), [ t ]);
+    }).defined(), [ t ]);
 }
 
 function usePasswordResetFormSubmitHandler(t: TFunction, passwordResetToken: string, locale: string): PasswordResetFormSubmitHandler {
