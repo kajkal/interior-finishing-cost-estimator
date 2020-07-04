@@ -10,7 +10,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AppBar from '@material-ui/core/AppBar';
 
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
-import { layoutConfig } from '../../config/layout';
 
 
 export interface LayoutMobileProps {
@@ -73,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
     },
     toolbar: theme.mixins.toolbar,
     drawerPaper: {
-        width: layoutConfig.drawerWidth,
+        width: theme.sideNavDrawer.width,
     },
     content: {
         flexGrow: 1,

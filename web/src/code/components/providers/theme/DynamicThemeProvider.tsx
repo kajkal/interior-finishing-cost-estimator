@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil/dist';
-import ThemeProvider from '@material-ui/styles/ThemeProvider';
+import { ThemeProvider } from '@material-ui/core/styles';
 
 import { saveThemeTypeAtomState, themeTypeAtom } from '../../atoms/theme-type/themeTypeAtom';
 import { ThemeUtils } from '../../../utils/theme/ThemeUtils';

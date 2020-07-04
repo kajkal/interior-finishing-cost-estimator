@@ -38,6 +38,9 @@ export class ThemeUtils {
                     fontWeight: 'normal',
                 },
             },
+            sideNavDrawer: {
+                width: 240,
+            }
         }));
 
         theme.overrides = {

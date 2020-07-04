@@ -1,6 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil/dist';
 import { fireEvent, render, RenderResult, screen } from '@testing-library/react';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import { LayoutDesktop } from '../../../../code/components/layout/LayoutDesktop';
 
@@ -10,11 +11,13 @@ describe('LayoutDesktop component', () => {
     function renderLayoutWithTestElements(): RenderResult {
         return render(
             <RecoilRoot>
-                <LayoutDesktop
-                    content={<div data-testid='content' />}
-                    sideNav={<div data-testid='sideNav' />}
-                    title={<div data-testid='title' />}
-                />
+                <ThemeProvider theme={createMuiTheme({ sideNavDrawer: { width: 100 } })}>
+                    <LayoutDesktop
+                        content={<div data-testid='content' />}
+                        sideNav={<div data-testid='sideNav' />}
+                        title={<div data-testid='title' />}
+                    />
+                </ThemeProvider>
             </RecoilRoot>,
         );
     }

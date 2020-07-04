@@ -1,6 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil/dist';
 import { fireEvent, render, RenderResult, screen } from '@testing-library/react';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import { LayoutMobile } from '../../../../code/components/layout/LayoutMobile';
 
@@ -10,11 +11,13 @@ describe('LayoutMobile component', () => {
     function renderLayoutWithTestElements(): RenderResult {
         return render(
             <RecoilRoot>
-                <LayoutMobile
-                    content={<div data-testid='content' />}
-                    sideNav={<div data-testid='sideNav' />}
-                    title={<div data-testid='title' />}
-                />
+                <ThemeProvider theme={createMuiTheme({ sideNavDrawer: { width: 100 } })}>
+                    <LayoutMobile
+                        content={<div data-testid='content' />}
+                        sideNav={<div data-testid='sideNav' />}
+                        title={<div data-testid='title' />}
+                    />
+                </ThemeProvider>
             </RecoilRoot>,
         );
     }

@@ -12,7 +12,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
 
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
-import { layoutConfig } from '../../config/layout';
 
 
 export interface LayoutDesktopProps {
@@ -95,8 +94,8 @@ const useStyles = makeStyles((theme) => ({
         }),
     },
     appBarShift: {
-        marginLeft: layoutConfig.drawerWidth,
-        width: `calc(100% - ${layoutConfig.drawerWidth}px)`,
+        marginLeft: theme.sideNavDrawer.width,
+        width: `calc(100% - ${theme.sideNavDrawer.width}px)`,
         transition: theme.transitions.create([ 'width', 'margin' ], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -109,13 +108,13 @@ const useStyles = makeStyles((theme) => ({
         display: 'none',
     },
     drawer: {
-        width: layoutConfig.drawerWidth,
+        width: theme.sideNavDrawer.width,
         flexShrink: 0,
         whiteSpace: 'nowrap',
     },
     drawerOpen: {
         overflowX: 'hidden',
-        width: layoutConfig.drawerWidth,
+        width: theme.sideNavDrawer.width,
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
