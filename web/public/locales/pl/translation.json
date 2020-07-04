@@ -1,6 +1,12 @@
 {
   "common": {
     "appName": "Estymator kosztów wykończenia",
+    "openSideNav": "Otwórz boczną nawigację",
+    "expandSideNav": "Rozwiń boczną nawigację",
+    "collapseSideNav": "Zwiń boczną nawigację",
+    "darkTheme": "Ciemny motyw",
+    "switchToDarkTheme": "Przełącz na ciemny motyw",
+    "switchToLightTheme": "Przełącz na jasny motyw",
     "changeLanguage": "Zmień język"
   },
   "loginPage": {

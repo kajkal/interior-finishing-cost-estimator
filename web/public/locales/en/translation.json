@@ -1,6 +1,12 @@
 {
   "common": {
     "appName": "Interior finishing cost estimator",
+    "openSideNav": "Open side navigation",
+    "expandSideNav": "Expand side navigation",
+    "collapseSideNav": "Collapse side navigation",
+    "darkTheme": "Dark Theme",
+    "switchToDarkTheme": "Switch to dark theme",
+    "switchToLightTheme": "Switch to light theme",
     "changeLanguage": "Change language"
   },
   "loginPage": {

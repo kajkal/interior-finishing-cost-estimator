@@ -1,52 +1,53 @@
 import React from 'react';
-import { Link, Redirect, Route, Switch } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { TmpMe } from './TmpMe';
 import { LogoutPage } from './components/pages/logout/LogoutPage';
 import { LoginPage } from './components/pages/login/LoginPage';
 import { SignupPage } from './components/pages/signup/SignupPage';
 import { routes } from './config/routes';
 import { ProtectedRoute } from './components/common/router/ProtectedRoute';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import MuiLink from '@material-ui/core/Link';
 import { ConfirmEmailAddressPage } from './components/pages/confirm-email-address/ConfirmEmailAddressPage';
-import { LanguageMenu } from './components/common/language-menu/LanguageMenu';
 import { PasswordResetPage } from './components/pages/password-reset/PasswordResetPage';
 import { PasswordResetRequestPage } from './components/pages/password-reset/PasswordResetRequestPage';
+import { Layout } from './components/layout/Layout';
 
 
 export function App(): React.ReactElement {
-    const { t } = useTranslation();
-
     return (
-        <>
-            <Breadcrumbs aria-label='breadcrumb'>
+        <Layout>
+            {/*<Breadcrumbs aria-label='breadcrumb'>*/}
 
-                <MuiLink to={routes.login()} component={Link}>
-                    Log in
-                </MuiLink>
+            {/*    <MuiLink to={routes.login()} component={Link}>*/}
+            {/*        Log in*/}
+            {/*    </MuiLink>*/}
 
-                <MuiLink to={routes.signup()} component={Link}>
-                    Sign up
-                </MuiLink>
+            {/*    <MuiLink to={routes.forgotPassword()} component={Link}>*/}
+            {/*        --Forgot password--*/}
+            {/*    </MuiLink>*/}
 
-                <MuiLink to={routes.projects()} component={Link}>
-                    Projects
-                </MuiLink>
+            {/*    <MuiLink to={'/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWRkNzBhYTkwZTAyMjQwYzQ4MWVhYmMiLCJpYXQiOjE1OTE5OTQ1ODUsImV4cCI6MTU5MjAwMTc4NX0.a_z0oLDGseLxX5KD4tLliYsix05_dMfp1CUwCG5E1VQ'} component={Link}>*/}
+            {/*        --Password reset--*/}
+            {/*    </MuiLink>*/}
 
-                <MuiLink to='/protected' component={Link}>
-                    Protected
-                </MuiLink>
+            {/*    <MuiLink to={routes.signup()} component={Link}>*/}
+            {/*        Sign up*/}
+            {/*    </MuiLink>*/}
 
-                <MuiLink to={routes.logout()} component={Link}>
-                    Logout
-                </MuiLink>
+            {/*    <MuiLink to={routes.projects()} component={Link}>*/}
+            {/*        Projects*/}
+            {/*    </MuiLink>*/}
 
-            </Breadcrumbs>
+            {/*    <MuiLink to='/protected' component={Link}>*/}
+            {/*        Protected*/}
+            {/*    </MuiLink>*/}
 
-            <LanguageMenu />
+            {/*    <MuiLink to={routes.logout()} component={Link}>*/}
+            {/*        Logout*/}
+            {/*    </MuiLink>*/}
 
-            <h1>{t('common.appName')}</h1>
+            {/*</Breadcrumbs>*/}
+
+            {/*<h1>{t('common.appName')}</h1>*/}
 
             <Switch>
 
@@ -89,6 +90,6 @@ export function App(): React.ReactElement {
                 </Route>
 
             </Switch>
-        </>
+        </Layout>
     );
 }
