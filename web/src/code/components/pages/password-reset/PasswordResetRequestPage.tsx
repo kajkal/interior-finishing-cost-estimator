@@ -18,7 +18,7 @@ export function PasswordResetRequestPage(): React.ReactElement {
     const [ recipientEmail, setRecipientEmail ] = React.useState('');
 
     return (
-        <Container component='main' maxWidth='xs'>
+        <Container maxWidth='xs' disableGutters>
             <Typography component='h1' variant='h5' className={classes.header}>
                 {t('passwordResetPage.resetPassword')}
             </Typography>

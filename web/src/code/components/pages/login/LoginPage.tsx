@@ -17,7 +17,7 @@ export function LoginPage(): React.ReactElement {
     const classes = useStyles();
 
     return (
-        <Container component='main' maxWidth='xs'>
+        <Container maxWidth='xs' disableGutters>
 
             <Typography component='h1' variant='h5'>
                 {t('loginPage.logIn')}
