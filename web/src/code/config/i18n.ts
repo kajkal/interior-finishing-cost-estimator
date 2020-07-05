@@ -3,11 +3,12 @@ import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-import { supportedLanguages } from '../../../config/supportedLanguages';
+import { supportedLanguages } from './supportedLanguages';
 
 
 /**
- * Initialize i18n, I18nProvider will display spinner until translations are fetched.
+ * Initialize i18n.
+ * Until translations are fetched React.Suspense is triggered by every component with useTranslation().
  */
 i18n
     .use(Backend)

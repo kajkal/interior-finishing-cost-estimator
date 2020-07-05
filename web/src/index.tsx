@@ -5,29 +5,33 @@ import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline } from '@material-ui/core';
 
 import './styles/index.scss';
+import './code/config/i18n'; // initialize i18n instance
 
 import * as serviceWorker from './serviceWorker';
 import { ApolloContextProvider } from './code/components/providers/apollo/ApolloContextProvider';
-import { I18nContextProvider } from './code/components/providers/i18n/I18nContextProvider';
 import { SnackbarContextProvider } from './code/components/providers/snackbars/SnackbarContextProvider';
 import { DynamicThemeProvider } from './code/components/providers/theme/DynamicThemeProvider';
-import { App } from './code/App';
+import { BackdropSpinner } from './code/components/common/progress-indicators/BackdropSpinner';
+import { Routes } from './code/components/navigation/Routes';
+import { Layout } from './code/components/layout/Layout';
 
 
 ReactDOM.render(
     <RecoilRoot>
-        <ApolloContextProvider>
-            <I18nContextProvider>
-                <BrowserRouter>
+        <BrowserRouter>
+            <React.Suspense fallback={<BackdropSpinner />}>
+                <ApolloContextProvider>
                     <DynamicThemeProvider>
                         <CssBaseline />
                         <SnackbarContextProvider>
-                            <App />
+                            <Layout>
+                                <Routes />
+                            </Layout>
                         </SnackbarContextProvider>
                     </DynamicThemeProvider>
-                </BrowserRouter>
-            </I18nContextProvider>
-        </ApolloContextProvider>
+                </ApolloContextProvider>
+            </React.Suspense>
+        </BrowserRouter>
     </RecoilRoot>
     ,
     document.getElementById('root'),

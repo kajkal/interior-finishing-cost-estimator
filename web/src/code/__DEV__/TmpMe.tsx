@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMeQuery } from '../graphql/generated-types';
+import { useMeQuery } from '../../graphql/generated-types';
 
 
 export function TmpMe(): React.ReactElement | null {
