@@ -1,7 +1,7 @@
-type LocalState {
+type SessionState {
     accessToken: String!
 }
 
 type Query {
-    localState: LocalState!
+    sessionState: SessionState!
 }

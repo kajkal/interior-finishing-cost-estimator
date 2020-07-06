@@ -2,6 +2,7 @@ import gql from 'graphql-tag';
 import * as ApolloReactCommon from '@apollo/react-common';
 import * as ApolloReactHooks from '@apollo/react-hooks';
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -13,11 +14,11 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  localState: LocalState;
   /** Returns data of the currently authenticated user. */
   me: User;
   products: Array<Offer>;
   projects: Array<Project>;
+  sessionState: SessionState;
 };
 
 export type User = {
@@ -108,14 +109,14 @@ export type InitialData = {
   accessToken: Scalars['String'];
 };
 
-export type LocalState = {
-  __typename?: 'LocalState';
+export type SessionState = {
+  __typename?: 'SessionState';
   accessToken: Scalars['String'];
 };
 
-export type ConfirmEmailAddressMutationVariables = {
+export type ConfirmEmailAddressMutationVariables = Exact<{
   token: Scalars['String'];
-};
+}>;
 
 
 export type ConfirmEmailAddressMutation = (
@@ -123,21 +124,10 @@ export type ConfirmEmailAddressMutation = (
   & Pick<Mutation, 'confirmEmailAddress'>
 );
 
-export type LocalStateQueryVariables = {};
-
-
-export type LocalStateQuery = (
-  { __typename?: 'Query' }
-  & { localState: (
-    { __typename?: 'LocalState' }
-    & Pick<LocalState, 'accessToken'>
-  ) }
-);
-
-export type LoginMutationVariables = {
+export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
-};
+}>;
 
 
 export type LoginMutation = (
@@ -162,7 +152,7 @@ export type LoginMutation = (
   ) }
 );
 
-export type LogoutMutationVariables = {};
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = (
@@ -170,7 +160,7 @@ export type LogoutMutation = (
   & Pick<Mutation, 'logout'>
 );
 
-export type MeQueryVariables = {};
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = (
@@ -191,11 +181,11 @@ export type MeQuery = (
   ) }
 );
 
-export type RegisterMutationVariables = {
+export type RegisterMutationVariables = Exact<{
   name: Scalars['String'];
   email: Scalars['String'];
   password: Scalars['String'];
-};
+}>;
 
 
 export type RegisterMutation = (
@@ -220,10 +210,10 @@ export type RegisterMutation = (
   ) }
 );
 
-export type ResetPasswordMutationVariables = {
+export type ResetPasswordMutationVariables = Exact<{
   token: Scalars['String'];
   password: Scalars['String'];
-};
+}>;
 
 
 export type ResetPasswordMutation = (
@@ -231,14 +221,25 @@ export type ResetPasswordMutation = (
   & Pick<Mutation, 'resetPassword'>
 );
 
-export type SendPasswordResetInstructionsMutationVariables = {
+export type SendPasswordResetInstructionsMutationVariables = Exact<{
   email: Scalars['String'];
-};
+}>;
 
 
 export type SendPasswordResetInstructionsMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendPasswordResetInstructions'>
+);
+
+export type SessionStateQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SessionStateQuery = (
+  { __typename?: 'Query' }
+  & { sessionState: (
+    { __typename?: 'SessionState' }
+    & Pick<SessionState, 'accessToken'>
+  ) }
 );
 
 
@@ -271,38 +272,6 @@ export function useConfirmEmailAddressMutation(baseOptions?: ApolloReactHooks.Mu
 export type ConfirmEmailAddressMutationHookResult = ReturnType<typeof useConfirmEmailAddressMutation>;
 export type ConfirmEmailAddressMutationResult = ApolloReactCommon.MutationResult<ConfirmEmailAddressMutation>;
 export type ConfirmEmailAddressMutationOptions = ApolloReactCommon.BaseMutationOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>;
-export const LocalStateDocument = gql`
-    query LocalState {
-  localState @client {
-    accessToken
-  }
-}
-    `;
-
-/**
- * __useLocalStateQuery__
- *
- * To run a query within a React component, call `useLocalStateQuery` and pass it any options that fit your needs.
- * When your component renders, `useLocalStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useLocalStateQuery({
- *   variables: {
- *   },
- * });
- */
-export function useLocalStateQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<LocalStateQuery, LocalStateQueryVariables>) {
-        return ApolloReactHooks.useQuery<LocalStateQuery, LocalStateQueryVariables>(LocalStateDocument, baseOptions);
-      }
-export function useLocalStateLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<LocalStateQuery, LocalStateQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<LocalStateQuery, LocalStateQueryVariables>(LocalStateDocument, baseOptions);
-        }
-export type LocalStateQueryHookResult = ReturnType<typeof useLocalStateQuery>;
-export type LocalStateLazyQueryHookResult = ReturnType<typeof useLocalStateLazyQuery>;
-export type LocalStateQueryResult = ApolloReactCommon.QueryResult<LocalStateQuery, LocalStateQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -523,3 +492,35 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export const SessionStateDocument = gql`
+    query SessionState {
+  sessionState @client {
+    accessToken
+  }
+}
+    `;
+
+/**
+ * __useSessionStateQuery__
+ *
+ * To run a query within a React component, call `useSessionStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSessionStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSessionStateQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSessionStateQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SessionStateQuery, SessionStateQueryVariables>) {
+        return ApolloReactHooks.useQuery<SessionStateQuery, SessionStateQueryVariables>(SessionStateDocument, baseOptions);
+      }
+export function useSessionStateLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SessionStateQuery, SessionStateQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<SessionStateQuery, SessionStateQueryVariables>(SessionStateDocument, baseOptions);
+        }
+export type SessionStateQueryHookResult = ReturnType<typeof useSessionStateQuery>;
+export type SessionStateLazyQueryHookResult = ReturnType<typeof useSessionStateLazyQuery>;
+export type SessionStateQueryResult = ApolloReactCommon.QueryResult<SessionStateQuery, SessionStateQueryVariables>;

@@ -5,7 +5,7 @@ import { ApolloCacheSpiesManager } from '../../../../__utils__/spies-managers/Ap
 import { TokenVerifierSpy } from '../../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
-import { LocalStateDocument, LocalStateQuery } from '../../../../../graphql/generated-types';
+import { SessionStateDocument, SessionStateQuery } from '../../../../../graphql/generated-types';
 import { AuthUtils } from '../../../../../code/components/providers/apollo/auth/AuthUtils';
 
 
@@ -27,11 +27,11 @@ describe('AuthUtils class', () => {
     });
 
     function setApolloCacheLocalStateAccessToken(token: string) {
-        apolloCache.writeQuery<LocalStateQuery>({
-            query: LocalStateDocument,
+        apolloCache.writeQuery<SessionStateQuery>({
+            query: SessionStateDocument,
             data: {
-                localState: {
-                    __typename: 'LocalState',
+                sessionState: {
+                    __typename: 'SessionState',
                     accessToken: token,
                 },
             },
@@ -70,10 +70,10 @@ describe('AuthUtils class', () => {
         function verifyIfTokenWasSavedInCacheAndAddedToAuthHeader(expectedToken: string, operation: Operation) {
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(1);
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledWith({
-                query: LocalStateDocument,
+                query: SessionStateDocument,
                 data: {
-                    localState: {
-                        __typename: 'LocalState',
+                    sessionState: {
+                        __typename: 'SessionState',
                         accessToken: expectedToken,
                     },
                 },

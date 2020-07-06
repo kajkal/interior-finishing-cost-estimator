@@ -12,7 +12,7 @@ import { createPasswordConfirmationSchema } from '../../../utils/validation/pass
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
-import { ApolloCacheManager } from '../../providers/apollo/ApolloCacheManager';
+import { SessionStateManager } from '../../providers/apollo/cache/session/SessionStateManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
@@ -51,7 +51,7 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
             await registerMutation({
                 variables: values,
                 update: (cache, { data }) => {
-                    data && ApolloCacheManager.handleAccessMutationResponse(cache, data.register);
+                    data && SessionStateManager.handleAccessMutationResponse(cache, data.register);
                 },
             });
             successSnackbar('register success!'); // TODO

@@ -1,65 +1,49 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { useApolloClient } from '@apollo/react-hooks';
 
 import { MockApolloClient, MockApolloInMemoryCache } from '../../../../__mocks__/libraries/apollo.boost';
 
-import { LocalStateDocument } from '../../../../../graphql/generated-types';
+import { ApolloContextProvider } from '../../../../../code/components/providers/apollo/ApolloContextProvider';
+import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';
 
 
 describe('ApolloContextProvider component', () => {
 
-    // isolated components:
-    let ApolloContextProvider: React.FunctionComponent;
+    let initApolloClientSpy: jest.SpiedFunction<typeof initApolloClientModule.initApolloClient>;
 
     beforeEach(() => {
         MockApolloClient.setupMocks();
         MockApolloInMemoryCache.setupMocks();
 
-        jest.isolateModules(() => {
-            ApolloContextProvider = require('../../../../../code/components/providers/apollo/ApolloContextProvider').ApolloContextProvider;
-        });
+        // @ts-ignore
+        initApolloClientSpy = jest.spyOn(initApolloClientModule, 'initApolloClient').mockReturnValue(MockApolloClient);
     });
 
-    it('should initialize Apollo client correctly', () => {
-        const { getByText } = render(
+    it('should provide Apollo client', () => {
+        let clientFromContext;
+
+        function SampleApolloClientConsumer() {
+            clientFromContext = useApolloClient();
+            return <div data-testid='SampleApolloClientConsumer' />;
+        }
+
+        render(
             <ApolloContextProvider>
-                <span>sample child component</span>
+                <SampleApolloClientConsumer/>
             </ApolloContextProvider>,
         );
 
-        expect(getByText('sample child component')).toBeInTheDocument();
+        // verify if was called
+        expect(initApolloClientSpy).toHaveBeenCalledTimes(1);
+        expect(initApolloClientSpy).toHaveBeenCalledWith({ sessionState: { accessToken: '' } });
 
-        // verify Apollo client creation
-        expect(MockApolloClient.constructorFn).toHaveBeenCalledTimes(1);
-        expect(MockApolloClient.constructorFn).toHaveBeenCalledWith({
-            uri: 'http://localhost:4000/graphql',
-            credentials: 'include',
-            request: expect.any(Function),
-            cache: MockApolloInMemoryCache,
-        });
+        // verify if renders children
+        expect(screen.getByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
-        // verify cache creation
-        expect(MockApolloInMemoryCache.constructorFn).toHaveBeenCalledTimes(1);
-
-        // verify if cache data was initialized
-        expect(MockApolloInMemoryCache.writeQuery).toHaveBeenCalledTimes(1);
-        expect(MockApolloInMemoryCache.writeQuery).toHaveBeenCalledWith({
-            query: LocalStateDocument,
-            data: {
-                localState: {
-                    __typename: 'LocalState',
-                    accessToken: '',
-                },
-            },
-        });
-
-        // verify if 'on clear store' listener was added
-        expect(MockApolloClient.onClearStore).toHaveBeenCalledTimes(1);
-        expect(MockApolloClient.onClearStore).toHaveBeenCalledWith(expect.any(Function));
-
-        // verify 'on clear store' listener
-        MockApolloClient.simulateClearStore();
-        expect(MockApolloInMemoryCache.writeQuery).toHaveBeenCalledTimes(2); // one extra times
+        // verify if provide Apollo client
+        expect(clientFromContext).toBeDefined();
+        expect(clientFromContext).toBe(MockApolloClient);
     });
 
 });

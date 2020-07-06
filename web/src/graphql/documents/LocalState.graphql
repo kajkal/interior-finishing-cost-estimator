@@ -1,5 +1,0 @@
-query LocalState {
-    localState @client {
-        accessToken
-    }
-}

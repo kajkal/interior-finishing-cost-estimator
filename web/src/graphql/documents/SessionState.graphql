@@ -1,0 +1,5 @@
+query SessionState {
+    sessionState @client {
+        accessToken
+    }
+}

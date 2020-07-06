@@ -9,7 +9,7 @@ import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
-import { LocalStateDocument, MeDocument, MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
+import { SessionStateDocument, MeDocument, MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
 import { SignupPage } from '../../../../code/components/pages/signup/SignupPage';
 import { routes } from '../../../../code/config/routes';
 
@@ -190,10 +190,10 @@ describe('SignupPage component', () => {
 
             // verify if access token was saved in cache
             expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenNthCalledWith(2, {
-                query: LocalStateDocument,
+                query: SessionStateDocument,
                 data: {
-                    localState: {
-                        __typename: 'LocalState',
+                    sessionState: {
+                        __typename: 'SessionState',
                         accessToken: mockResponse.result.data.register.accessToken,
                     },
                 },

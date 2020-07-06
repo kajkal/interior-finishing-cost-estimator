@@ -1,6 +1,6 @@
 import { InMemoryCache, Operation } from 'apollo-boost';
 
-import { ApolloCacheManager } from '../ApolloCacheManager';
+import { SessionStateManager } from '../cache/session/SessionStateManager';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { TokenVerifier } from '../../../../utils/token/TokenVerifier';
 
@@ -33,10 +33,10 @@ export class AuthUtils {
 
         if (AuthUtils.isProtectedOperation(operation.operationName)) {
             const cache: InMemoryCache = operation.getContext().cache;
-            const { accessToken: localAccessToken } = ApolloCacheManager.getLocalState(cache);
+            const { accessToken: localAccessToken } = SessionStateManager.getSessionState(cache);
 
             const accessToken = AuthUtils.verifyAccessToken(localAccessToken) || await AuthUtils.refreshAccessToken();
-            ApolloCacheManager.setLocalState(cache, { accessToken });
+            SessionStateManager.setSessionStateSilent(cache, { accessToken });
 
             operation.setContext({
                 headers: {
