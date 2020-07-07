@@ -4,7 +4,7 @@ import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import userEvent from '@testing-library/user-event';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
@@ -62,7 +62,7 @@ describe('PasswordResetPage component', () => {
         static async fillAndSubmitForm(data: MutationResetPasswordArgs) {
             await extendedUserEvent.type(this.passwordInput, data.password);
             await extendedUserEvent.type(this.passwordConfirmationInput, data.password);
-            fireEvent.click(this.submitButton);
+            userEvent.click(this.submitButton);
         }
     }
 

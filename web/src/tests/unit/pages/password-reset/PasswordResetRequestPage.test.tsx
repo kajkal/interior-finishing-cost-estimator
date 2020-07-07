@@ -1,6 +1,7 @@
 import React from 'react';
 import { createMemoryHistory } from 'history';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
@@ -34,7 +35,7 @@ describe('PasswordResetRequestPage component', () => {
         }
         static async fillAndSubmitForm(data: MutationSendPasswordResetInstructionsArgs) {
             await extendedUserEvent.type(this.emailInput, data.email);
-            fireEvent.click(this.submitButton);
+            userEvent.click(this.submitButton);
         }
     }
 
@@ -42,7 +43,7 @@ describe('PasswordResetRequestPage component', () => {
         const history = createMemoryHistory();
         renderInMockContext({ history });
 
-        fireEvent.click(ViewUnderTest.loginPageLink);
+        userEvent.click(ViewUnderTest.loginPageLink);
 
         expect(history.location.pathname).toBe(routes.login());
     });

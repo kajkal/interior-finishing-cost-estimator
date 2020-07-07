@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockTFunction, mockUseTranslation } from '../../../../__mocks__/libraries/react-i18next';
 import { LanguageMenu } from '../../../../../code/components/navigation/elements/LanguageMenu';
@@ -42,8 +43,8 @@ describe('LanguageMenu component', () => {
         const triggerLanguageMenuButton = screen.getByRole('button', { name: 't:common.changeLanguage' });
         expect(triggerLanguageMenuButton).toHaveTextContent('Deutsch');
 
-        fireEvent.click(triggerLanguageMenuButton);
-        fireEvent.click(screen.getByRole('menuitem', { name: 'Polski' }));
+        userEvent.click(triggerLanguageMenuButton);
+        userEvent.click(screen.getByRole('menuitem', { name: 'Polski' }));
 
         expect(mockChangeLanguage).toHaveBeenCalledTimes(1);
         expect(mockChangeLanguage).toHaveBeenCalledWith('pl');

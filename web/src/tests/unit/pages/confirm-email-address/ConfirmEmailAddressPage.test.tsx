@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { GraphQLError } from 'graphql';
 import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';

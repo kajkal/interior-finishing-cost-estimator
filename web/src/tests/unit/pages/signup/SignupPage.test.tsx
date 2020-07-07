@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { GraphQLError } from 'graphql';
 import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
@@ -7,7 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseSessionState } from '../../../__mocks__/code/mockUseSessionState';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { MockSessionChannel } from '../../../__utils__/mocks/MockSessionChannel';
+import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';

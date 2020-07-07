@@ -1,5 +1,6 @@
-import * as React from 'react';
-import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
+import React from 'react';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { SnackbarContextProvider } from '../../../../../code/components/providers/snackbars/SnackbarContextProvider';
 import { useSnackbar } from '../../../../../code/components/providers/snackbars/useSnackbar';
@@ -19,31 +20,31 @@ describe('SnackbarContextProvider component', () => {
         );
     }
 
-    async function verifyAlert(renderResult: RenderResult, severity: string) {
-        const triggerButton = renderResult.getByRole('button', { name: severity });
-        fireEvent.click(triggerButton);
+    async function verifyAlert(severity: string) {
+        const triggerButton = screen.getByRole('button', { name: severity });
+        userEvent.click(triggerButton);
 
-        const alert = renderResult.getByRole('alert');
+        const alert = screen.getByRole('alert');
         expect(alert).toHaveTextContent(`${severity} message`);
         expect(alert).toHaveClass(`MuiAlert-filled${severity.charAt(0).toUpperCase() + severity.slice(1)}`);
 
-        const alertCloseButton = renderResult.getByRole('button', { name: 'Close' });
-        fireEvent.click(alertCloseButton);
+        const alertCloseButton = screen.getByRole('button', { name: 'Close' });
+        userEvent.click(alertCloseButton);
 
-        await waitFor(() => expect(renderResult.queryByRole('alert')).toBe(null));
+        await waitFor(() => expect(screen.queryByRole('alert')).toBe(null));
     }
 
     it('should display alert on function call', async (done) => {
-        const renderResult = render(
+        render(
             <SnackbarContextProvider>
                 <SampleConsumer />
             </SnackbarContextProvider>,
         );
 
-        await verifyAlert(renderResult, 'info');
-        await verifyAlert(renderResult, 'success');
-        await verifyAlert(renderResult, 'warning');
-        await verifyAlert(renderResult, 'error');
+        await verifyAlert('info');
+        await verifyAlert('success');
+        await verifyAlert('warning');
+        await verifyAlert('error');
         done();
     });
 

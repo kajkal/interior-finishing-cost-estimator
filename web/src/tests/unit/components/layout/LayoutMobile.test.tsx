@@ -1,6 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil/dist';
-import { fireEvent, render, RenderResult, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, RenderResult, screen } from '@testing-library/react';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import { LayoutMobile } from '../../../../code/components/layout/LayoutMobile';
@@ -36,7 +37,7 @@ describe('LayoutMobile component', () => {
         const sideNavDrawer = screen.getByRole('presentation', { hidden: true });
         expect(sideNavDrawer).toHaveStyle({ visibility: 'hidden' });
 
-        fireEvent.click(screen.getByRole('button', { name: 't:common.openSideNav' }));
+        userEvent.click(screen.getByRole('button', { name: 't:common.openSideNav' }));
         expect(sideNavDrawer).not.toHaveStyle({ visibility: 'hidden' });
     });
 

@@ -4,7 +4,7 @@ import { createMemoryHistory, MemoryHistory } from 'history';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { AuthUtilsSpiesManager } from '../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
-import { MockSessionChannel } from '../../../../__utils__/mocks/MockSessionChannel';
+import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
 import { MockApolloClient } from '../../../../__mocks__/libraries/apollo.boost';
 
 import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';

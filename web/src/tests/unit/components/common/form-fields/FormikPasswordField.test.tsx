@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 import { Form, Formik } from 'formik';
-import { fireEvent, render, RenderResult } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, RenderResult } from '@testing-library/react';
 
 import { FormikPasswordField } from '../../../../../code/components/common/form-fields/FormikPasswordField';
 
@@ -33,8 +34,7 @@ describe('FormikPasswordField component', () => {
         expect(passwordInput).toHaveAttribute('type', 'password');
 
         const toggleButton = getByRole('button', { name: 't:form.password.toggleVisibility' });
-        fireEvent.mouseDown(toggleButton);
-        fireEvent.click(toggleButton);
+        userEvent.click(toggleButton);
 
         expect(passwordInput).toHaveAttribute('type', 'text');
     });

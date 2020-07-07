@@ -1,6 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil/dist';
-import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 
 import { ThemeTypeSwitch } from '../../../../../code/components/navigation/elements/ThemeTypeSwitch';
 
@@ -19,7 +20,7 @@ describe('ThemeTypeSwitch component', () => {
         render(<ThemeTypeSwitch isSideNavOpen={true} />, { wrapper: RecoilRoot });
 
         expect(screen.getByRole('button', { name: 't:common.switchToDarkTheme' })).toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button'));
+        userEvent.click(screen.getByRole('button'));
         expect(screen.getByRole('button', { name: 't:common.switchToLightTheme' })).toBeInTheDocument();
     });
 

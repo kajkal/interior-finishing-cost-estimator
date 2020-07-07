@@ -1,6 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil/dist';
-import { fireEvent, render, RenderResult, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, RenderResult, screen } from '@testing-library/react';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import { LayoutDesktop } from '../../../../code/components/layout/LayoutDesktop';
@@ -37,10 +38,10 @@ describe('LayoutDesktop component', () => {
         expect(sideNavDrawer).toBeInTheDocument();
         expect(sideNavDrawer.className).toContain('Close');
 
-        fireEvent.click(screen.getByRole('button', { name: 't:common.expandSideNav' }));
+        userEvent.click(screen.getByRole('button', { name: 't:common.expandSideNav' }));
         expect(sideNavDrawer.className).toContain('Open');
 
-        fireEvent.click(screen.getByRole('button', { name: 't:common.collapseSideNav' }));
+        userEvent.click(screen.getByRole('button', { name: 't:common.collapseSideNav' }));
         expect(sideNavDrawer.className).toContain('Close');
     });
 
