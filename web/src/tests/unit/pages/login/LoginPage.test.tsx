@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import { createMemoryHistory } from 'history';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { ApolloCacheSpiesManager } from '../../../__utils__/spies-managers/ApolloCacheSpiesManager';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { InputValidator } from '../../../__utils__/InputValidator';
@@ -22,11 +22,11 @@ describe('LoginPage component', () => {
 
     class LoginPageTestFixture {
         private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: PageContextMocks) {
+        static renderInMockContext(mocks?: ContextMocks) {
             const renderResult = render(
-                <PageMockContextProvider mocks={mocks}>
+                <MockContextProvider mocks={mocks}>
                     <LoginPage />
-                </PageMockContextProvider>,
+                </MockContextProvider>,
             );
             return new this(renderResult);
         }

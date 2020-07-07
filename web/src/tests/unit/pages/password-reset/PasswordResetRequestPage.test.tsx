@@ -2,7 +2,7 @@ import React from 'react';
 import { createMemoryHistory } from 'history';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
@@ -16,11 +16,11 @@ describe('PasswordResetRequestPage component', () => {
 
     class PasswordResetRequestPageTestFixture {
         private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: PageContextMocks) {
+        static renderInMockContext(mocks?: ContextMocks) {
             const renderResult = render(
-                <PageMockContextProvider mocks={mocks}>
+                <MockContextProvider mocks={mocks}>
                     <PasswordResetRequestPage />
-                </PageMockContextProvider>,
+                </MockContextProvider>,
             );
             return new this(renderResult);
         }

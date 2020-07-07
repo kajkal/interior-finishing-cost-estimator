@@ -5,7 +5,7 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import { MockedResponse } from '@apollo/react-testing';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
 import { MockSnackbarContextData } from '../../../__utils__/mocks/MockSnackbarProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
@@ -34,11 +34,11 @@ describe('ConfirmEmailAddressPage component', () => {
 
     class ConfirmEmailAddressPageTestFixture {
         private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: PageContextMocks) {
+        static renderInMockContext(mocks?: ContextMocks) {
             const renderResult = render(
-                <PageMockContextProvider mocks={mocks}>
+                <MockContextProvider mocks={mocks}>
                     <ConfirmEmailAddressPage />
-                </PageMockContextProvider>,
+                </MockContextProvider>,
             );
             return new this(renderResult);
         }

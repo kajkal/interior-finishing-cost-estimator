@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { ProtectedRoute } from '../../../../../code/components/common/router/ProtectedRoute';
@@ -15,9 +15,9 @@ describe('ProtectedRoute component', () => {
 
     const protectedRoute = '/protected'; // initial location
 
-    function renderProtectedRouteInMockContext(mocks?: PageContextMocks): RenderResult {
+    function renderProtectedRouteInMockContext(mocks?: ContextMocks): RenderResult {
         return render(
-            <PageMockContextProvider mocks={mocks}>
+            <MockContextProvider mocks={mocks}>
                 <Switch>
                     <Route exact path={routes.login()}>
                         login component
@@ -26,7 +26,7 @@ describe('ProtectedRoute component', () => {
                         protected component
                     </ProtectedRoute>
                 </Switch>
-            </PageMockContextProvider>,
+            </MockContextProvider>,
         );
     }
 

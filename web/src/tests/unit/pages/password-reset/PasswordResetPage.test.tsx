@@ -5,7 +5,7 @@ import { createMemoryHistory } from 'history';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 import { changeInputValue } from '../../../__utils__/changeInputValue';
 import { InputValidator } from '../../../__utils__/InputValidator';
@@ -37,13 +37,13 @@ describe('PasswordResetPage component', () => {
 
     class PasswordResetPageTestFixture {
         private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: PageContextMocks) {
+        static renderInMockContext(mocks?: ContextMocks) {
             const renderResult = render(
-                <PageMockContextProvider mocks={mocks}>
+                <MockContextProvider mocks={mocks}>
                     <Route path='/' exact>
                         <PasswordResetPage />
                     </Route>
-                </PageMockContextProvider>,
+                </MockContextProvider>,
             );
             return new this(renderResult);
         }

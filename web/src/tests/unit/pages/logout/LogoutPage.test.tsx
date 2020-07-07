@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createMemoryHistory } from 'history';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 
-import { PageContextMocks, PageMockContextProvider } from '../../../__utils__/PageMockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
 
 import { LogoutPage } from '../../../../code/components/pages/logout/LogoutPage';
@@ -18,11 +18,11 @@ describe('LogoutPage component', () => {
 
     class LogoutPageTestFixture {
         private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: PageContextMocks) {
+        static renderInMockContext(mocks?: ContextMocks) {
             const renderResult = render(
-                <PageMockContextProvider mocks={mocks}>
+                <MockContextProvider mocks={mocks}>
                     <LogoutPage />
-                </PageMockContextProvider>,
+                </MockContextProvider>,
             );
             return new this(renderResult);
         }
