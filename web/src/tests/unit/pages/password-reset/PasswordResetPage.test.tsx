@@ -3,11 +3,12 @@ import { GraphQLError } from 'graphql';
 import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
-import { changeInputValue } from '../../../__utils__/changeInputValue';
+import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
@@ -35,44 +36,43 @@ describe('PasswordResetPage component', () => {
         });
     });
 
-    class PasswordResetPageTestFixture {
-        private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: ContextMocks) {
-            const renderResult = render(
-                <MockContextProvider mocks={mocks}>
-                    <Route path='/' exact>
-                        <PasswordResetPage />
-                    </Route>
-                </MockContextProvider>,
-            );
-            return new this(renderResult);
+    function renderInMockContext(mocks?: ContextMocks) {
+        return render(
+            <MockContextProvider mocks={mocks}>
+                <Route path='/' exact>
+                    <PasswordResetPage />
+                </Route>
+            </MockContextProvider>,
+        );
+    }
+
+    class ViewUnderTest {
+        static get passwordInput() {
+            return screen.getByLabelText('t:passwordResetPage.passwordLabel', { selector: 'input' });
         }
-        get passwordInput() {
-            return this.renderResult.getByLabelText('t:passwordResetPage.passwordLabel', { selector: 'input' }) as HTMLInputElement;
+        static get passwordConfirmationInput() {
+            return screen.getByLabelText('t:passwordResetPage.passwordConfirmationLabel', { selector: 'input' });
         }
-        get passwordConfirmationInput() {
-            return this.renderResult.getByLabelText('t:passwordResetPage.passwordConfirmationLabel', { selector: 'input' }) as HTMLInputElement;
+        static get submitButton() {
+            return screen.getByRole('button', { name: 't:passwordResetPage.resetPassword' });
         }
-        get submitButton() {
-            return this.renderResult.getByRole('button', { name: 't:passwordResetPage.resetPassword' }) as HTMLButtonElement;
+        static get signupPageLink() {
+            return screen.getByText('t:passwordResetPage.signUpLink', { selector: 'a' });
         }
-        get signupPageLink() {
-            return this.renderResult.getByText('t:passwordResetPage.signUpLink', { selector: 'a' }) as HTMLAnchorElement;
-        }
-        async fillAndSubmitForm(data: MutationResetPasswordArgs) {
-            await changeInputValue(this.passwordInput, data.password);
-            await changeInputValue(this.passwordConfirmationInput, data.password);
+        static async fillAndSubmitForm(data: MutationResetPasswordArgs) {
+            await extendedUserEvent.type(this.passwordInput, data.password);
+            await extendedUserEvent.type(this.passwordConfirmationInput, data.password);
             fireEvent.click(this.submitButton);
         }
     }
 
     it('should navigate to new page on \'sign up\' link click', () => {
         const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
-        const { signupPageLink } = PasswordResetPageTestFixture.renderInMockContext({ history });
+        renderInMockContext({ history });
 
-        fireEvent.click(signupPageLink);
+        userEvent.click(ViewUnderTest.signupPageLink);
 
-        expect(history.location.pathname).toMatch(routes.signup());
+        expect(history.location.pathname).toBe(routes.signup());
     });
 
     describe('invalid token search param', () => {
@@ -83,10 +83,10 @@ describe('PasswordResetPage component', () => {
             it(`should redirect to forgot password page and display alert about invalid token for '${path}'`, () => {
                 const history = createMemoryHistory({ initialEntries: [ path ] });
                 const mockSnackbars = { errorSnackbar: jest.fn() };
-                PasswordResetPageTestFixture.renderInMockContext({ history, mockSnackbars });
+                renderInMockContext({ history, mockSnackbars });
 
                 // verify if navigation occurred
-                expect(history.location.pathname).toMatch(routes.forgotPassword());
+                expect(history.location.pathname).toBe(routes.forgotPassword());
 
                 // verify if error alert was displayed
                 expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
@@ -97,10 +97,10 @@ describe('PasswordResetPage component', () => {
         it(`should redirect to forgot password page and display alert about expired token`, () => {
             const history = createMemoryHistory({ initialEntries: [ `/?token=${expiredPasswordResetToken}` ] });
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            PasswordResetPageTestFixture.renderInMockContext({ history, mockSnackbars });
+            renderInMockContext({ history, mockSnackbars });
 
             // verify if navigation occurred
-            expect(history.location.pathname).toMatch(routes.forgotPassword());
+            expect(history.location.pathname).toBe(routes.forgotPassword());
 
             // verify if error alert was displayed
             const expectedErrorMessage = 't:passwordResetPage.expiredPasswordResetToken:{"date":"6/12/2020, 6:35 PM"}';
@@ -177,10 +177,10 @@ describe('PasswordResetPage component', () => {
         describe('validation', () => {
 
             it('should validate password input value', (done) => {
-                const { passwordInput } = PasswordResetPageTestFixture.renderInMockContext({
+                renderInMockContext({
                     history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
                 });
-                InputValidator.basedOn(passwordInput, '#password-reset-password-input-helper-text.Mui-error')
+                InputValidator.basedOn(ViewUnderTest.passwordInput)
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
                     .expectNoError('better password')
@@ -188,12 +188,12 @@ describe('PasswordResetPage component', () => {
             });
 
             it('should validate password confirmation input value', async (done) => {
-                const { passwordInput, passwordConfirmationInput } = PasswordResetPageTestFixture.renderInMockContext({
+                renderInMockContext({
                     history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
                 });
                 const passwordValue = 'first password';
-                await changeInputValue(passwordInput, passwordValue);
-                await InputValidator.basedOn(passwordConfirmationInput, '#password-reset-password-confirmation-input-helper-text.Mui-error')
+                await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
+                await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
                     .expectError('', 't:form.password.validation.passwordsNotMatch')
                     .expectError('not equal', 't:form.password.validation.passwordsNotMatch')
                     .expectNoError(passwordValue);
@@ -206,16 +206,11 @@ describe('PasswordResetPage component', () => {
             const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.success();
             const mockSnackbars = { successSnackbar: jest.fn() };
-            const pageTestFixture = PasswordResetPageTestFixture.renderInMockContext({
-                history,
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toMatch(routes.login()));
+            await waitFor(() => expect(history.location.pathname).toBe(routes.login()));
 
             // verify if success alert was displayed
             expect(mockSnackbars.successSnackbar).toHaveBeenCalledTimes(1);
@@ -227,16 +222,11 @@ describe('PasswordResetPage component', () => {
             const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.invalidPasswordResetToken();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = PasswordResetPageTestFixture.renderInMockContext({
-                history,
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toMatch(routes.forgotPassword()));
+            await waitFor(() => expect(history.location.pathname).toBe(routes.forgotPassword()));
 
             // verify if error alert was displayed
             expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
@@ -248,16 +238,11 @@ describe('PasswordResetPage component', () => {
             const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.expiredPasswordResetToken();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = PasswordResetPageTestFixture.renderInMockContext({
-                history,
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toMatch(routes.forgotPassword()));
+            await waitFor(() => expect(history.location.pathname).toBe(routes.forgotPassword()));
 
             // verify if error alert was displayed
             expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
@@ -268,19 +253,16 @@ describe('PasswordResetPage component', () => {
         it('should display alert about network error', async (done) => {
             const mockResponse = mockResponseGenerator.networkError();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = PasswordResetPageTestFixture.renderInMockContext({
+            renderInMockContext({
                 history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
                 mockResponses: [ mockResponse ],
                 mockSnackbars,
             });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
-            await waitFor(() => {
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
-            });
+            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
             done();
         });
 

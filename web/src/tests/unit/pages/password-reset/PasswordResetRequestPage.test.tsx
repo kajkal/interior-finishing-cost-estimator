@@ -1,9 +1,9 @@
 import React from 'react';
 import { createMemoryHistory } from 'history';
-import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { changeInputValue } from '../../../__utils__/changeInputValue';
+import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
@@ -14,38 +14,37 @@ import { routes } from '../../../../code/config/routes';
 
 describe('PasswordResetRequestPage component', () => {
 
-    class PasswordResetRequestPageTestFixture {
-        private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: ContextMocks) {
-            const renderResult = render(
-                <MockContextProvider mocks={mocks}>
-                    <PasswordResetRequestPage />
-                </MockContextProvider>,
-            );
-            return new this(renderResult);
+    function renderInMockContext(mocks?: ContextMocks) {
+        return render(
+            <MockContextProvider mocks={mocks}>
+                <PasswordResetRequestPage />
+            </MockContextProvider>,
+        );
+    }
+
+    class ViewUnderTest {
+        static get emailInput() {
+            return screen.getByLabelText('t:form.email.label', { selector: 'input' });
         }
-        get emailInput() {
-            return this.renderResult.getByLabelText('t:form.email.label', { selector: 'input' }) as HTMLInputElement;
+        static get submitButton() {
+            return screen.getByRole('button', { name: 't:passwordResetPage.sendResetInstructions' });
         }
-        get submitButton() {
-            return this.renderResult.getByRole('button', { name: 't:passwordResetPage.sendResetInstructions' }) as HTMLButtonElement;
+        static get loginPageLink() {
+            return screen.getByText('t:passwordResetPage.logInLink', { selector: 'a' });
         }
-        get loginPageLink() {
-            return this.renderResult.getByText('t:passwordResetPage.logInLink', { selector: 'a' }) as HTMLAnchorElement;
-        }
-        async fillAndSubmitForm(data: MutationSendPasswordResetInstructionsArgs) {
-            await changeInputValue(this.emailInput, data.email);
+        static async fillAndSubmitForm(data: MutationSendPasswordResetInstructionsArgs) {
+            await extendedUserEvent.type(this.emailInput, data.email);
             fireEvent.click(this.submitButton);
         }
     }
 
     it('should navigate to new page on \'log in\' link click', () => {
         const history = createMemoryHistory();
-        const { loginPageLink } = PasswordResetRequestPageTestFixture.renderInMockContext({ history });
+        renderInMockContext({ history });
 
-        fireEvent.click(loginPageLink);
+        fireEvent.click(ViewUnderTest.loginPageLink);
 
-        expect(history.location.pathname).toMatch(routes.login());
+        expect(history.location.pathname).toBe(routes.login());
     });
 
     describe('send password reset instructions form', () => {
@@ -78,8 +77,8 @@ describe('PasswordResetRequestPage component', () => {
         describe('validation', () => {
 
             it('should validate email input value', (done) => {
-                const { emailInput } = PasswordResetRequestPageTestFixture.renderInMockContext();
-                InputValidator.basedOn(emailInput, '#password-reset-request-email-input-helper-text.Mui-error')
+                renderInMockContext();
+                InputValidator.basedOn(ViewUnderTest.emailInput)
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
                     .expectNoError('validEmail@domain.com')
@@ -90,34 +89,29 @@ describe('PasswordResetRequestPage component', () => {
 
         it('should handle success response and display success message', async (done) => {
             const mockResponse = mockResponseGenerator.success();
-            const pageTestFixture = PasswordResetRequestPageTestFixture.renderInMockContext({ mockResponses: [ mockResponse ] });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
             const successMessage = `t:passwordResetPage.sendResetInstructionsSuccess:{"email":"${mockResponse.request.variables.email}"}`;
 
             // verify if success message is not visible
-            expect(pageTestFixture.renderResult.queryByText(successMessage)).toBeNull();
+            expect(screen.queryByText(successMessage)).toBeNull();
 
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if success message is visible
-            await waitFor(() => expect(pageTestFixture.renderResult.queryByText(successMessage)).toBeInTheDocument());
+            await waitFor(() => expect(screen.queryByText(successMessage)).toBeInTheDocument());
             done();
         });
 
         it('should display notification about network error', async (done) => {
             const mockResponse = mockResponseGenerator.networkError();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = PasswordResetRequestPageTestFixture.renderInMockContext({
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
+            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
 
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
-            await waitFor(() => {
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
-            });
+            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
             done();
         });
 

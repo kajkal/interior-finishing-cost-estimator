@@ -1,73 +1,107 @@
 import * as React from 'react';
 import { GraphQLError } from 'graphql';
+import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 
+import { mockUseSessionState } from '../../../__mocks__/code/mockUseSessionState';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { ApolloCacheSpiesManager } from '../../../__utils__/spies-managers/ApolloCacheSpiesManager';
-import { changeInputValue } from '../../../__utils__/changeInputValue';
+import { MockSessionChannel } from '../../../__utils__/mocks/MockSessionChannel';
+import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
-import { SessionStateDocument, LoginDocument, MeDocument, MutationLoginArgs } from '../../../../graphql/generated-types';
+import { LoginDocument, MutationLoginArgs } from '../../../../graphql/generated-types';
 import { LoginPage } from '../../../../code/components/pages/login/LoginPage';
 import { routes } from '../../../../code/config/routes';
 
 
 describe('LoginPage component', () => {
 
+    const loginPagePath = '/login-page-test-path';
+
     beforeEach(() => {
-        ApolloCacheSpiesManager.setupSpies();
+        MockSessionChannel.setupMocks();
+        mockUseSessionState.mockReset();
+        mockUseSessionState.mockReturnValue({ isUserLoggedIn: false });
     });
 
-    class LoginPageTestFixture {
-        private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: ContextMocks) {
-            const renderResult = render(
-                <MockContextProvider mocks={mocks}>
+    function renderInMockContext(mocks?: ContextMocks) {
+        const history = mocks?.history || createMemoryHistory({ initialEntries: [ loginPagePath ] });
+        return render(
+            <MockContextProvider mocks={{ ...mocks, history }}>
+                <Route path={loginPagePath} exact>
                     <LoginPage />
-                </MockContextProvider>,
-            );
-            return new this(renderResult);
+                </Route>
+            </MockContextProvider>,
+        );
+    }
+
+    class ViewUnderTest {
+        static get emailInput() {
+            return screen.getByLabelText('t:form.email.label', { selector: 'input' });
         }
-        get emailInput() {
-            return this.renderResult.getByLabelText('t:form.email.label', { selector: 'input' }) as HTMLInputElement;
+        static get passwordInput() {
+            return screen.getByLabelText('t:form.password.label', { selector: 'input' });
         }
-        get passwordInput() {
-            return this.renderResult.getByLabelText('t:form.password.label', { selector: 'input' }) as HTMLInputElement;
+        static get submitButton() {
+            return screen.getByRole('button', { name: 't:loginPage.logIn' });
         }
-        get submitButton() {
-            return this.renderResult.getByRole('button', { name: 't:loginPage.logIn' }) as HTMLButtonElement;
+        static get forgotPasswordPageLink() {
+            return screen.getByText('t:loginPage.forgotPasswordLink', { selector: 'a' });
         }
-        get forgotPasswordPageLink() {
-            return this.renderResult.getByText('t:loginPage.forgotPasswordLink', { selector: 'a' }) as HTMLAnchorElement;
+        static get signupPageLink() {
+            return screen.getByText('t:loginPage.signUpLink', { selector: 'a' });
         }
-        get signupPageLink() {
-            return this.renderResult.getByText('t:loginPage.signUpLink', { selector: 'a' }) as HTMLAnchorElement;
-        }
-        async fillAndSubmitForm(data: MutationLoginArgs) {
-            await changeInputValue(this.emailInput, data.email);
-            await changeInputValue(this.passwordInput, data.password);
-            fireEvent.click(this.submitButton);
+        static async fillAndSubmitForm(data: MutationLoginArgs) {
+            await extendedUserEvent.type(this.emailInput, data.email);
+            await extendedUserEvent.type(this.passwordInput, data.password);
+            userEvent.click(this.submitButton);
         }
     }
 
     it('should navigate to new page on \'forgot password\' link click', () => {
-        const history = createMemoryHistory();
-        const { forgotPasswordPageLink } = LoginPageTestFixture.renderInMockContext({ history });
+        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
+        renderInMockContext({ history });
 
-        fireEvent.click(forgotPasswordPageLink);
+        userEvent.click(ViewUnderTest.forgotPasswordPageLink);
 
-        expect(history.location.pathname).toMatch(routes.forgotPassword());
+        expect(history.location.pathname).toBe(routes.forgotPassword());
     });
 
     it('should navigate to new page on \'sign up\' link click', () => {
+        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
+        renderInMockContext({ history });
+
+        userEvent.click(ViewUnderTest.signupPageLink);
+
+        expect(history.location.pathname).toBe(routes.signup());
+    });
+
+    it('should navigate to default page if user is already authenticated', () => {
+        mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
+
+        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
+        renderInMockContext({ history });
+
+        // verify if navigation to default page occurred
+        expect(history.location.pathname).toBe(routes.projects());
+    });
+
+    /**
+     * User try to access protected page, but is not authenticated, so he is redirected to login page.
+     * After successful authentication he is redirected to initially requested protected page.
+     */
+    it('should navigate to initially requested protected page if user is already authenticated', () => {
+        mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
+
         const history = createMemoryHistory();
-        const { signupPageLink } = LoginPageTestFixture.renderInMockContext({ history });
+        history.push(loginPagePath, { from: { pathname: '/protected-page' } }); // simulate redirection done by ProtectedRoute component
+        renderInMockContext({ history });
 
-        fireEvent.click(signupPageLink);
-
-        expect(history.location.pathname).toMatch(routes.signup());
+        // verify if navigation to initially requested protected page occurred
+        expect(history.location.pathname).toBe('/protected-page');
     });
 
     describe('log in form', () => {
@@ -128,8 +162,8 @@ describe('LoginPage component', () => {
         describe('validation', () => {
 
             it('should validate email input value', (done) => {
-                const { emailInput } = LoginPageTestFixture.renderInMockContext();
-                InputValidator.basedOn(emailInput, '#login-email-input-helper-text.Mui-error')
+                renderInMockContext();
+                InputValidator.basedOn(ViewUnderTest.emailInput)
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
                     .expectNoError('validEmail@domain.com')
@@ -137,8 +171,8 @@ describe('LoginPage component', () => {
             });
 
             it('should validate password input value', (done) => {
-                const { passwordInput } = LoginPageTestFixture.renderInMockContext();
-                InputValidator.basedOn(passwordInput, '#login-password-input-helper-text.Mui-error')
+                renderInMockContext();
+                InputValidator.basedOn(ViewUnderTest.passwordInput)
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
                     .expectNoError('better password')
@@ -147,103 +181,44 @@ describe('LoginPage component', () => {
 
         });
 
-        it('should successfully log in and navigate to projects page', async (done) => {
-            const history = createMemoryHistory();
+        it('should successfully log in and trigger session login event', async (done) => {
             const mockResponse = mockResponseGenerator.success();
-            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
-                history,
-                mockResponses: [ mockResponse ],
-            });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toMatch(routes.projects()));
-
-            // verify if apollo cache was updated
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(2);
-
-            // verify if Me query result was saved in cache
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenNthCalledWith(1, {
-                query: MeDocument,
-                data: { me: mockResponse.result.data.login.user },
-            });
-
-            // verify if access token was saved in cache
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenNthCalledWith(2, {
-                query: SessionStateDocument,
-                data: {
-                    sessionState: {
-                        __typename: 'SessionState',
-                        accessToken: mockResponse.result.data.login.accessToken,
-                    },
-                },
-            });
-            done();
-        });
-
-        /**
-         * User try to access protected page, but is not authenticated, so he is redirected to login page.
-         * After successful authentication he is redirected to initially requested protected page.
-         */
-        it('should successfully log in and navigate to initially requested protected page', async (done) => {
-            const history = createMemoryHistory();
-            history.push('/login-page', { from: { pathname: '/protected-page' } }); // simulate redirection done by ProtectedRoute component
-            const mockResponse = mockResponseGenerator.success();
-            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
-                history,
-                mockResponses: [ mockResponse ],
-            });
-
-            // verify current location
-            expect(history.location.pathname).toMatch('/login-page');
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if navigation to initially requested protected page occurred
-            await waitFor(() => expect(history.location.pathname).toMatch('/protected-page'));
+            // verify if session login event was triggered
+            await waitFor(() => expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(1));
+            expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledWith(mockResponse.result.data.login);
             done();
         });
 
         it('should display notification about bad credentials error ', async (done) => {
             const mockResponse = mockResponseGenerator.badCredentials();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
-            await waitFor(() => {
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:loginPage.badCredentials');
-            });
+            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:loginPage.badCredentials');
 
-            // verify if apollo cache was not updated
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(0);
+            // verify if session login event was not triggered
+            expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
             done();
         });
 
         it('should display notification about network error', async (done) => {
             const mockResponse = mockResponseGenerator.networkError();
             const mockSnackbars = { errorSnackbar: jest.fn() };
-            const pageTestFixture = LoginPageTestFixture.renderInMockContext({
-                mockResponses: [ mockResponse ],
-                mockSnackbars,
-            });
-
-            await pageTestFixture.fillAndSubmitForm(mockResponse.request.variables);
+            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
+            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if error alert was displayed
-            await waitFor(() => {
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
-            });
+            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
+            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
 
-            // verify if apollo cache was not updated
-            expect(ApolloCacheSpiesManager.writeQuery).toHaveBeenCalledTimes(0);
+            // verify if session login event was not triggered
+            expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
             done();
         });
 

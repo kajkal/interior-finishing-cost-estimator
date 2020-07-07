@@ -1,33 +1,34 @@
-import { changeInputValue } from './changeInputValue';
+import { extendedUserEvent } from './extendedUserEvent';
 
 
-export interface InputValidatorConfig {
-    inputElement: HTMLInputElement;
-    errorMessageSelector: string;
-}
+/**
+ * Test helper class used to verify input fields validation.
+ */
+export class InputValidator extends Promise<HTMLElement> {
 
-export class InputValidator extends Promise<InputValidatorConfig> {
-
-    static basedOn(inputElement: HTMLInputElement, errorMessageSelector: string): InputValidator {
-        return this.resolve({ inputElement, errorMessageSelector }) as InputValidator;
+    static basedOn(inputElement: HTMLElement): InputValidator {
+        return this.resolve(inputElement) as InputValidator;
     }
 
     expectError(value: string, expectedErrorMessage: string): InputValidator {
-        return this.then(async (config: InputValidatorConfig) => {
-            await changeInputValue(config.inputElement, value);
-            const errorMessageElement = document.querySelector(config.errorMessageSelector);
-            expect(errorMessageElement).not.toBeNull();
-            expect(errorMessageElement).toHaveTextContent(expectedErrorMessage);
-            return config;
+        return this.then(async (inputElement: HTMLElement) => {
+            await extendedUserEvent.type(inputElement, value);
+
+            expect(inputElement).toBeInvalid();
+            expect(inputElement).toHaveDescription(expectedErrorMessage);
+
+            return inputElement;
         }) as InputValidator;
     }
 
     expectNoError(value: string): InputValidator {
-        return this.then(async (config: InputValidatorConfig) => {
-            await changeInputValue(config.inputElement, value);
-            const errorMessageElement = document.querySelector(config.errorMessageSelector);
-            expect(errorMessageElement).toBeNull();
-            return config;
+        return this.then(async (inputElement: HTMLElement) => {
+            await extendedUserEvent.type(inputElement, value);
+
+            expect(inputElement).toBeValid();
+            expect(inputElement).not.toHaveDescription();
+
+            return inputElement;
         }) as InputValidator;
     }
 

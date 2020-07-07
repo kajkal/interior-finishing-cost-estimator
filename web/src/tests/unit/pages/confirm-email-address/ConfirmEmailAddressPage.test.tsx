@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { GraphQLError } from 'graphql';
+import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { MockedResponse } from '@apollo/react-testing';
-import { render, RenderResult, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
@@ -32,16 +33,14 @@ describe('ConfirmEmailAddressPage component', () => {
         });
     });
 
-    class ConfirmEmailAddressPageTestFixture {
-        private constructor(public renderResult: RenderResult) {}
-        static renderInMockContext(mocks?: ContextMocks) {
-            const renderResult = render(
-                <MockContextProvider mocks={mocks}>
+    function renderInMockContext(mocks?: ContextMocks) {
+        return render(
+            <MockContextProvider mocks={mocks}>
+                <Route path='/' exact>
                     <ConfirmEmailAddressPage />
-                </MockContextProvider>,
-            );
-            return new this(renderResult);
-        }
+                </Route>
+            </MockContextProvider>,
+        );
     }
 
     const mockResponseGenerator = {
@@ -97,10 +96,10 @@ describe('ConfirmEmailAddressPage component', () => {
             it(`should redirect to login page and display alert about invalid token for '${path}'`, () => {
                 const history = createMemoryHistory({ initialEntries: [ path ] });
                 const mockSnackbars = { errorSnackbar: jest.fn() };
-                ConfirmEmailAddressPageTestFixture.renderInMockContext({ history, mockSnackbars });
+                renderInMockContext({ history, mockSnackbars });
 
                 // verify if navigation occurred
-                expect(history.location.pathname).toMatch(routes.login());
+                expect(history.location.pathname).toBe(routes.login());
 
                 // verify if mutation was not created
                 expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(0);
@@ -115,20 +114,16 @@ describe('ConfirmEmailAddressPage component', () => {
 
     async function renderAndAwaitMutationResponse(mockResponse: MockedResponse, mockSnackbars: MockSnackbarContextData) {
         const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ] });
-        const { renderResult: { queryByRole } } = ConfirmEmailAddressPageTestFixture.renderInMockContext({
-            history,
-            mockResponses: [ mockResponse ],
-            mockSnackbars,
-        });
+        renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
 
         // verify if progressbar is visible
-        expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
+        expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
 
         // wait for progress bar to disappear
-        await waitFor(() => expect(queryByRole('progressbar', { hidden: true })).toBe(null));
+        await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
 
         // verify if navigation occurred
-        expect(history.location.pathname).toMatch(routes.login());
+        expect(history.location.pathname).toBe(routes.login());
 
         // verify if mutation was created
         expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(1);
@@ -137,7 +132,6 @@ describe('ConfirmEmailAddressPage component', () => {
     it('should display notification about successful email address confirmation', async (done) => {
         const mockResponse = mockResponseGenerator.success();
         const mockSnackbars = { successSnackbar: jest.fn() };
-
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
         // verify if success alert was displayed
@@ -149,7 +143,6 @@ describe('ConfirmEmailAddressPage component', () => {
     it('should display notification about email address already confirmed', async (done) => {
         const mockResponse = mockResponseGenerator.emailAddressAlreadyConfirmed();
         const mockSnackbars = { infoSnackbar: jest.fn() };
-
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
         // verify if info alert was displayed
@@ -161,7 +154,6 @@ describe('ConfirmEmailAddressPage component', () => {
     it('should display notification about invalid email confirmation token', async (done) => {
         const mockResponse = mockResponseGenerator.invalidEmailConfirmationToken();
         const mockSnackbars = { errorSnackbar: jest.fn() };
-
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
         // verify if error alert has been displayed
@@ -173,7 +165,6 @@ describe('ConfirmEmailAddressPage component', () => {
     it('should display notification about network error', async (done) => {
         const mockResponse = mockResponseGenerator.networkError();
         const mockSnackbars = { errorSnackbar: jest.fn() };
-
         await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
 
         // verify if error alert was displayed

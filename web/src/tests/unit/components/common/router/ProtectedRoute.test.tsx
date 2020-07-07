@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { render, RenderResult, waitFor } from '@testing-library/react';
+import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
@@ -15,7 +15,7 @@ describe('ProtectedRoute component', () => {
 
     const protectedRoute = '/protected'; // initial location
 
-    function renderProtectedRouteInMockContext(mocks?: ContextMocks): RenderResult {
+    function renderInMockContext(mocks?: ContextMocks): RenderResult {
         return render(
             <MockContextProvider mocks={mocks}>
                 <Switch>
@@ -59,16 +59,16 @@ describe('ProtectedRoute component', () => {
     it('should render protected component when user is successfully authenticated', async (done) => {
         const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
         const mockResponses = [ mockResponseGenerator.success() ];
-        const { queryByRole, getByText } = renderProtectedRouteInMockContext({ history, mockResponses });
+        renderInMockContext({ history, mockResponses });
 
         // verify if progressbar is visible
-        expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
+        expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
 
         // wait for progress bar to disappear
-        await waitFor(() => expect(queryByRole('progressbar', { hidden: true })).toBe(null));
+        await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
 
         // verify if protected component is in dom
-        expect(getByText('protected component')).toBeInTheDocument();
+        expect(screen.getByText('protected component')).toBeInTheDocument();
         done();
     });
 
@@ -76,17 +76,18 @@ describe('ProtectedRoute component', () => {
         const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
         const mockResponses = [ mockResponseGenerator.unauthorizedError() ];
         const mockSnackbars = { warningSnackbar: jest.fn() };
-        const { queryByRole, getByText } = renderProtectedRouteInMockContext({ history, mockResponses, mockSnackbars });
+        renderInMockContext({ history, mockResponses, mockSnackbars });
 
         // verify if progressbar is visible
-        expect(queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
+        expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
 
         // wait for progress bar to disappear
-        await waitFor(() => expect(queryByRole('progressbar', { hidden: true })).toBe(null));
+        await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
 
         // verify if navigation occurred
-        expect(history.location.pathname).toMatch(routes.login());
-        expect(getByText('login component')).toBeInTheDocument();
+        expect(history.location.pathname).toBe(routes.login());
+        expect(history.location.state).toEqual({ from: expect.objectContaining({ pathname: protectedRoute }) });
+        expect(screen.getByText('login component')).toBeInTheDocument();
 
         // verify if warning alert was displayed
         expect(mockSnackbars.warningSnackbar).toHaveBeenCalledTimes(1);

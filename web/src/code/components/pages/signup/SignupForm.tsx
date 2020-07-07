@@ -1,7 +1,6 @@
 import React from 'react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
-import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
@@ -12,13 +11,12 @@ import { createPasswordConfirmationSchema } from '../../../utils/validation/pass
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
-import { SessionStateManager } from '../../providers/apollo/cache/session/SessionStateManager';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { createNameSchema } from '../../../utils/validation/nameSchema';
-import { routes } from '../../../config/routes';
+import { SessionChannel } from '../../../utils/communication/SessionChannel';
 
 
 export interface SignupFormProps {
@@ -37,7 +35,6 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
 
     const { successSnackbar, errorSnackbar } = useSnackbar();
     const [ registerMutation ] = useRegisterMutation();
-    const { push } = useHistory();
 
     const validationSchema = React.useMemo(() => Yup.object<SignupFormData>({
         name: createNameSchema(t),
@@ -50,12 +47,11 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
         try {
             await registerMutation({
                 variables: values,
-                update: (cache, { data }) => {
-                    data && SessionStateManager.handleAccessMutationResponse(cache, data.register);
+                update: async (cache, { data }) => {
+                    data && await SessionChannel.publishLoginSessionAction(data.register);
                 },
             });
             successSnackbar('register success!'); // TODO
-            push(routes.projects());
         } catch (error) {
             ApolloErrorHandler.process(error)
                 .handleNetworkError(() => errorSnackbar(t('error.networkError')))

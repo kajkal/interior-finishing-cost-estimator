@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,13 +8,19 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
+import { useSessionState } from '../../providers/apollo/cache/session/useSessionState';
 import { routes } from '../../../config/routes';
 import { SignupForm } from './SignupForm';
 
 
 export function SignupPage(): React.ReactElement {
-    const { t } = useTranslation();
     const classes = useStyles();
+    const { t } = useTranslation();
+    const { isUserLoggedIn } = useSessionState();
+
+    if (isUserLoggedIn) {
+        return <Redirect to={routes.projects()} />;
+    }
 
     return (
         <Container maxWidth='xs' disableGutters>

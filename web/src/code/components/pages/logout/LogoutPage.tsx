@@ -1,24 +1,23 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { useLogoutMutation } from '../../../../graphql/generated-types';
 import { useSnackbar } from '../../providers/snackbars/useSnackbar';
-import { routes } from '../../../config/routes';
+import { SessionChannel } from '../../../utils/communication/SessionChannel';
+import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
 
 
 export function LogoutPage(): React.ReactElement | null {
     const { t } = useTranslation();
-    const { successSnackbar, errorSnackbar } = useSnackbar();
-    const [ logoutMutation, { data, client } ] = useLogoutMutation();
+    const { errorSnackbar } = useSnackbar();
+    const [ logoutMutation ] = useLogoutMutation();
 
     React.useEffect(() => {
         void async function logout() {
             try {
-                await logoutMutation();
-                await client?.clearStore();
-                successSnackbar('Logout successfully'); // TODO remove
+                await logoutMutation(); // invalidate refresh token cookie
+                await SessionChannel.publishLogoutSessionAction(); // trigger session logout event
             } catch (error) {
                 ApolloErrorHandler.process(error)
                     .handleNetworkError(() => errorSnackbar(t('error.networkError')))
@@ -27,9 +26,5 @@ export function LogoutPage(): React.ReactElement | null {
         }();
     }, []);
 
-    if (data?.logout) {
-        return <Redirect to={routes.login()} />;
-    }
-
-    return null;
+    return <BackdropSpinner />;
 }
