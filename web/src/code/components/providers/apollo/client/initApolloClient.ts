@@ -2,7 +2,7 @@ import ApolloClient from 'apollo-boost';
 
 import { SessionStateManager } from '../cache/session/SessionStateManager';
 import { ApolloCacheShape } from '../cache/ApolloCacheShape';
-import { AuthUtils } from '../auth/AuthUtils';
+import { AuthUtils } from '../../../../utils/auth/AuthUtils';
 
 
 export function initApolloClient(initialCacheState: ApolloCacheShape): ApolloClient<ApolloCacheShape> {

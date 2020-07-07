@@ -18,8 +18,10 @@ export class MockApolloInMemoryCache {
 
 export class MockApolloClient {
 
+    static cache = MockApolloInMemoryCache;
     static constructorFn: jest.MockInstance<MockApolloClient, [ PresetConfig ]>;
     static writeQuery: jest.MockedFunction<typeof ApolloClient.prototype.writeQuery>;
+    static clearStore: jest.MockedFunction<typeof ApolloClient.prototype.clearStore>;
     static onClearStore: jest.MockedFunction<typeof ApolloClient.prototype.onClearStore>;
 
     static simulateClearStore() {
@@ -27,8 +29,10 @@ export class MockApolloClient {
     }
 
     static setupMocks() {
+        this.cache.setupMocks();
         this.constructorFn = jest.fn().mockImplementation(() => MockApolloClient);
         this.writeQuery = jest.fn();
+        this.clearStore = jest.fn();
         this.onClearStore = jest.fn();
     }
 

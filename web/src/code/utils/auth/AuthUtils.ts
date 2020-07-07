@@ -1,8 +1,8 @@
 import { InMemoryCache, Operation } from 'apollo-boost';
 
-import { SessionStateManager } from '../cache/session/SessionStateManager';
-import { UnauthorizedError } from '../errors/UnauthorizedError';
-import { TokenVerifier } from '../../../../utils/token/TokenVerifier';
+import { SessionStateManager } from '../../components/providers/apollo/cache/session/SessionStateManager';
+import { UnauthorizedError } from '../../components/providers/apollo/errors/UnauthorizedError';
+import { TokenVerifier } from '../token/TokenVerifier';
 
 
 /**
@@ -73,7 +73,7 @@ export class AuthUtils {
      *   - server is not accessible,
      *   - cors problems.
      */
-    private static async refreshAccessToken(): Promise<string> {
+    static async refreshAccessToken(): Promise<string> {
         const response = await fetch(AuthUtils.REFRESH_TOKEN_URL, { method: 'POST', credentials: 'include' });
 
         if (response.ok) {

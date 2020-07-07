@@ -6,7 +6,7 @@ import { TokenVerifierSpy } from '../../../../__utils__/spies-managers/TokenVeri
 
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { SessionStateDocument, SessionStateQuery } from '../../../../../graphql/generated-types';
-import { AuthUtils } from '../../../../../code/components/providers/apollo/auth/AuthUtils';
+import { AuthUtils } from '../../../../../code/utils/auth/AuthUtils';
 
 
 describe('AuthUtils class', () => {
