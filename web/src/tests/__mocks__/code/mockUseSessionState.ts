@@ -1,4 +1,4 @@
-import { ExtendedSessionState } from '../../../code/components/providers/apollo/cache/session/SessionStateManager';
+import { ExtendedSessionState } from '../../../code/components/providers/apollo/cache/session/SessionStateUtils';
 
 
 export const mockUseSessionState: jest.MockedFunction<() => Partial<ExtendedSessionState>> = jest.fn();

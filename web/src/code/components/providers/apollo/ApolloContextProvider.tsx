@@ -4,8 +4,8 @@ import { ApolloProvider } from '@apollo/react-hooks';
 
 import { SessionAction, SessionChannel } from '../../../utils/communication/SessionChannel';
 import { SessionActionType } from '../../../utils/communication/SessionActionType';
-import { SessionStateManager } from './cache/session/SessionStateManager';
 import { MeDocument, MeQuery } from '../../../../graphql/generated-types';
+import { SessionStateUtils } from './cache/session/SessionStateUtils';
 import { initApolloClient } from './client/initApolloClient';
 import { AuthUtils } from '../../../utils/auth/AuthUtils';
 import { routes } from '../../../config/routes';
@@ -51,8 +51,8 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
             switch (action.type) {
 
                 case SessionActionType.LOGIN:
-                    client.cache.writeQuery<MeQuery>({ query: MeDocument, data: { me: action.initialData.user } });
-                    SessionStateManager.setSessionState(client, { accessToken: action.initialData.accessToken });
+                    client.writeQuery<MeQuery>({ query: MeDocument, data: { me: action.initialData.user } });
+                    SessionStateUtils.setSessionState(client, { accessToken: action.initialData.accessToken });
                     break;
 
                 case SessionActionType.LOGOUT:

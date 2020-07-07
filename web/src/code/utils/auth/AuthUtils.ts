@@ -1,6 +1,3 @@
-import { InMemoryCache, Operation } from 'apollo-boost';
-
-import { SessionStateManager } from '../../components/providers/apollo/cache/session/SessionStateManager';
 import { UnauthorizedError } from '../../components/providers/apollo/errors/UnauthorizedError';
 import { TokenVerifier } from '../token/TokenVerifier';
 
@@ -22,41 +19,16 @@ export class AuthUtils {
     private static readonly REFRESH_TOKEN_URL = `${process.env.REACT_APP_SERVER_URL}/refresh_token`;
 
     /**
-     * Prepares GraphQL operation context before sending it as request to the server.
-     * If operation is protected (require authorization) auth header is added.
-     *
-     * @throws will throw an error if cannot acquire valid access token.
-     * Error thrown here could later be found in GraphQL operation result (error.networkError).
-     */
-    static async prepareRequest(operation: Operation): Promise<void> {
-        console.log('%cprepareRequest', 'color: deepskyblue;', operation.operationName);
-
-        if (AuthUtils.isProtectedOperation(operation.operationName)) {
-            const cache: InMemoryCache = operation.getContext().cache;
-            const { accessToken: localAccessToken } = SessionStateManager.getSessionState(cache);
-
-            const accessToken = AuthUtils.verifyAccessToken(localAccessToken) || await AuthUtils.refreshAccessToken();
-            SessionStateManager.setSessionStateSilent(cache, { accessToken });
-
-            operation.setContext({
-                headers: {
-                    authorization: `Bearer ${accessToken}`,
-                },
-            });
-        }
-    }
-
-    /**
      * Determines if given operation is protected (require authorization).
      */
-    private static isProtectedOperation(operationName: string): boolean {
+    static isProtectedOperation(operationName: string): boolean {
         return !AuthUtils.PUBLIC_OPERATIONS.has(operationName);
     }
 
     /**
      * Verifies is given token is valid and not expired.
      */
-    private static verifyAccessToken(tokenToVerify: string | undefined): string | undefined {
+    static verifyAccessToken(tokenToVerify: string | undefined): string | undefined {
         try {
             TokenVerifier.create(tokenToVerify).verifyTokenExpiration();
             return tokenToVerify;

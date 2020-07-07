@@ -146,16 +146,17 @@ describe('ApolloContextProvider component', () => {
 
             MockSessionChannel.simulateSessionEvent(sampleLoginSessionAction);
 
+            // verify if cache was updated for Me query and SessionState
+            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(2);
+
             // verify if Me query result was saved in cache
-            expect(MockApolloClient.cache.writeQuery).toHaveBeenCalledTimes(1);
-            expect(MockApolloClient.cache.writeQuery).toHaveBeenCalledWith({
+            expect(MockApolloClient.writeQuery).toHaveBeenNthCalledWith(1, {
                 query: MeDocument,
                 data: { me: sampleLoginSessionAction.initialData.user },
             });
 
             // verify if access token was saved in cache
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(1);
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledWith({
+            expect(MockApolloClient.writeQuery).toHaveBeenNthCalledWith(2, {
                 query: SessionStateDocument,
                 data: {
                     sessionState: {

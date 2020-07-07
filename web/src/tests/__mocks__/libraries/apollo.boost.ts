@@ -1,39 +1,24 @@
-import { ApolloCache } from 'apollo-cache';
 import ApolloClient, { PresetConfig } from 'apollo-boost';
 
 
-export class MockApolloInMemoryCache {
-
-    static constructorFn: jest.MockInstance<MockApolloInMemoryCache, []>;
-    static writeQuery: jest.MockedFunction<typeof ApolloCache.prototype.writeQuery>;
-    static readQuery: jest.MockedFunction<typeof ApolloCache.prototype.readQuery>;
-
-    static setupMocks() {
-        this.constructorFn = jest.fn().mockImplementation(() => MockApolloInMemoryCache);
-        this.writeQuery = jest.fn();
-        this.readQuery = jest.fn();
-    }
-
-}
-
 export class MockApolloClient {
 
-    static cache = MockApolloInMemoryCache;
-    static constructorFn: jest.MockInstance<MockApolloClient, [ PresetConfig ]>;
-    static writeQuery: jest.MockedFunction<typeof ApolloClient.prototype.writeQuery>;
-    static clearStore: jest.MockedFunction<typeof ApolloClient.prototype.clearStore>;
-    static onClearStore: jest.MockedFunction<typeof ApolloClient.prototype.onClearStore>;
+    static constructorFn: jest.MockInstance<MockApolloClient, [ PresetConfig ]> = jest.fn();
+    static writeQuery: jest.MockedFunction<typeof ApolloClient.prototype.writeQuery> = jest.fn();
+    static readQuery: jest.MockedFunction<typeof ApolloClient.prototype.readQuery> = jest.fn();
+    static clearStore: jest.MockedFunction<typeof ApolloClient.prototype.clearStore> = jest.fn();
+    static onClearStore: jest.MockedFunction<typeof ApolloClient.prototype.onClearStore> = jest.fn();
 
     static simulateClearStore() {
         this.onClearStore.mock.calls[ 0 ][ 0 ]();
     }
 
     static setupMocks() {
-        this.cache.setupMocks();
-        this.constructorFn = jest.fn().mockImplementation(() => MockApolloClient);
-        this.writeQuery = jest.fn();
-        this.clearStore = jest.fn();
-        this.onClearStore = jest.fn();
+        this.constructorFn.mockReset().mockImplementation(() => MockApolloClient);
+        this.writeQuery.mockReset();
+        this.readQuery.mockReset();
+        this.clearStore.mockReset();
+        this.onClearStore.mockReset();
     }
 
 }
@@ -41,5 +26,4 @@ export class MockApolloClient {
 jest.mock('apollo-boost', () => ({
     __esModule: true,
     default: MockApolloClient.constructorFn,
-    InMemoryCache: MockApolloInMemoryCache.constructorFn,
 }));
