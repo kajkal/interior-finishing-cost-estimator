@@ -1,15 +1,18 @@
 import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Backdrop from '@material-ui/core/Backdrop/Backdrop';
+import Backdrop, { BackdropProps } from '@material-ui/core/Backdrop/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
 
-export function BackdropSpinner(): React.ReactElement {
+export interface BackdropSpinnerProps extends BackdropProps {
+}
+
+export function BackdropSpinner(props: BackdropSpinnerProps): React.ReactElement {
     const classes = useStyles();
     return (
-        <Backdrop className={classes.backdrop} open>
-            <CircularProgress color='inherit' />
+        <Backdrop {...props} className={classes.backdrop}>
+            {!props.invisible && <CircularProgress color='inherit' />}
         </Backdrop>
     );
 }
@@ -20,3 +23,7 @@ const useStyles = makeStyles((theme) => ({
         color: '#fff',
     },
 }));
+
+BackdropSpinner.defaultProps = {
+    open: true,
+};

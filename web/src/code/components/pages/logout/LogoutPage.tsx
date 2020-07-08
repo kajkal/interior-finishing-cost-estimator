@@ -26,5 +26,5 @@ export function LogoutPage(): React.ReactElement | null {
         }();
     }, []);
 
-    return <BackdropSpinner />;
+    return <BackdropSpinner invisible />;
 }
