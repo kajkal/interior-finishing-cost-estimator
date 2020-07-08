@@ -1,4 +1,5 @@
 import { BroadcastChannelSpiesManager } from '../../../__utils__/spies-managers/BroadcastChannelSpiesManager';
+import { waitUntil } from '../../../__utils__/waitUntil';
 
 import { SessionActionType } from '../../../../code/utils/communication/SessionActionType';
 import { SessionChannel } from '../../../../code/utils/communication/SessionChannel';
@@ -40,7 +41,7 @@ describe('SessionChannel class', () => {
         await SessionChannel.publishLoginSessionAction(sampleInitialData);
 
         // verify if listener was notified
-        expect(mockListener).toHaveBeenCalledTimes(1);
+        await waitUntil(() => expect(mockListener).toHaveBeenCalledTimes(1));
         expect(mockListener).toHaveBeenCalledWith({
             type: SessionActionType.LOGIN,
             initialData: sampleInitialData,
@@ -57,7 +58,7 @@ describe('SessionChannel class', () => {
         await SessionChannel.publishLogoutSessionAction();
 
         // verify if listener was notified
-        expect(mockListener).toHaveBeenCalledTimes(1);
+        await waitUntil(() => expect(mockListener).toHaveBeenCalledTimes(1));
         expect(mockListener).toHaveBeenCalledWith({
             type: SessionActionType.LOGOUT,
         });
