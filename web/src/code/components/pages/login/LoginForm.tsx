@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
@@ -22,36 +23,12 @@ export interface LoginFormProps {
 }
 
 type LoginFormData = MutationLoginArgs;
-type LoginFormSubmitHandler = FormikConfig<LoginFormData>['onSubmit'];
 
 export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const { errorToast } = useToast();
-    const [ loginMutation ] = useLoginMutation();
-
-    const validationSchema = React.useMemo(() => Yup.object<LoginFormData>({
-        email: createEmailSchema(t),
-        password: createPasswordSchema(t),
-    }).defined(), [ t ]);
-
-    const handleSubmit = React.useCallback<LoginFormSubmitHandler>(async (values) => {
-        try {
-            await loginMutation({
-                variables: values,
-                update: async (cache, { data }) => {
-                    data && await SessionChannel.publishLoginSessionAction(data.login);
-                },
-            });
-        } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleGraphQlErrors({
-                    'BAD_CREDENTIALS': () => errorToast(({ t }) => t('loginPage.badCredentials')),
-                })
-                .finish();
-        }
-    }, []);
+    const validationSchema = useLoginFormValidationSchema(t);
+    const handleSubmit = useLoginFormSubmitHandler();
 
     return (
         <Formik<LoginFormData>
@@ -94,6 +71,45 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
         </Formik>
     );
 }
+
+
+/**
+ * Validation schema
+ */
+function useLoginFormValidationSchema(t: TFunction) {
+    return React.useMemo(() => Yup.object<LoginFormData>({
+        email: createEmailSchema(t),
+        password: createPasswordSchema(t),
+    }).defined(), [ t ]);
+}
+
+
+/**
+ * Submit handler
+ */
+function useLoginFormSubmitHandler() {
+    const { errorToast } = useToast();
+    const [ loginMutation ] = useLoginMutation();
+
+    return React.useCallback<FormikConfig<LoginFormData>['onSubmit']>(async (values) => {
+        try {
+            await loginMutation({
+                variables: values,
+                update: async (cache, { data }) => {
+                    data && await SessionChannel.publishLoginSessionAction(data.login);
+                },
+            });
+        } catch (error) {
+            ApolloErrorHandler.process(error)
+                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
+                .handleGraphQlErrors({
+                    'BAD_CREDENTIALS': () => errorToast(({ t }) => t('loginPage.badCredentials')),
+                })
+                .finish();
+        }
+    }, [ errorToast, loginMutation ]);
+}
+
 
 const useStyles = makeStyles((theme) => ({
     submit: {

@@ -18,5 +18,7 @@ export function useVerifiedToken(tokenToVerify: string | null, ...flags: Verifie
         } catch (error) {
             return [ null, (error instanceof TokenExpiredError) ? error.expiredAt : null ];
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ tokenToVerify, flags.join(',') ]);
 }

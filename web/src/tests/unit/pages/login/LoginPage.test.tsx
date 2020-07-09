@@ -161,27 +161,25 @@ describe('LoginPage component', () => {
 
         describe('validation', () => {
 
-            it('should validate email input value', (done) => {
+            it('should validate email input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.emailInput)
+                await InputValidator.basedOn(ViewUnderTest.emailInput)
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
-                    .expectNoError('validEmail@domain.com')
-                    .finish(done);
+                    .expectNoError('validEmail@domain.com');
             });
 
-            it('should validate password input value', (done) => {
+            it('should validate password input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.passwordInput)
+                await InputValidator.basedOn(ViewUnderTest.passwordInput)
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
-                    .expectNoError('better password')
-                    .finish(done);
+                    .expectNoError('better password');
             });
 
         });
 
-        it('should successfully log in and trigger session login event', async (done) => {
+        it('should successfully log in and trigger session login event', async () => {
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -189,10 +187,9 @@ describe('LoginPage component', () => {
             // verify if session login event was triggered
             await waitFor(() => expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(1));
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledWith(mockResponse.result.data.login);
-            done();
         });
 
-        it('should display notification about bad credentials error ', async (done) => {
+        it('should display notification about bad credentials error ', async () => {
             const mockResponse = mockResponseGenerator.badCredentials();
             renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -204,10 +201,9 @@ describe('LoginPage component', () => {
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-            done();
         });
 
-        it('should display notification about network error', async (done) => {
+        it('should display notification about network error', async () => {
             const mockResponse = mockResponseGenerator.networkError();
             renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -219,7 +215,6 @@ describe('LoginPage component', () => {
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-            done();
         });
 
     });

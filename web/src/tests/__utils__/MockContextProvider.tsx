@@ -4,14 +4,12 @@ import { RecoilRoot, RecoilRootProps } from 'recoil/dist';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { MockedProvider, MockedResponse } from '@apollo/react-testing';
 
-import { MockSnackbarContextData, MockSnackbarProvider } from './mocks/MockSnackbarProvider';
 import { MockToastContextProvider } from './mocks/MockToastContextProvider';
 
 
 export interface ContextMocks {
     history?: MemoryHistory;
     mockResponses?: ReadonlyArray<MockedResponse>;
-    mockSnackbars?: MockSnackbarContextData;
     mockRecoilInitializeState?: RecoilRootProps['initializeState'];
 }
 
@@ -21,15 +19,13 @@ export interface MockContextProviderProps {
 }
 
 export function MockContextProvider(props: MockContextProviderProps): React.ReactElement {
-    const { history = createMemoryHistory(), mockResponses = [], mockSnackbars, mockRecoilInitializeState } = props.mocks || {};
+    const { history = createMemoryHistory(), mockResponses = [], mockRecoilInitializeState } = props.mocks || {};
     return (
         <RecoilRoot initializeState={mockRecoilInitializeState}>
             <MockedProvider mocks={mockResponses}>
                 <Router history={history}>
                     <MockToastContextProvider>
-                        <MockSnackbarProvider mocks={mockSnackbars}>
-                            {props.children}
-                        </MockSnackbarProvider>
+                        {props.children}
                     </MockToastContextProvider>
                 </Router>
             </MockedProvider>

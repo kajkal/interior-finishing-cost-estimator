@@ -145,34 +145,31 @@ describe('SignupPage component', () => {
 
         describe('validation', () => {
 
-            it('should validate name input value', (done) => {
+            it('should validate name input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.nameInput)
+                await InputValidator.basedOn(ViewUnderTest.nameInput)
                     .expectError('', 't:form.name.validation.required')
                     .expectError(':<', 't:form.name.validation.tooShort')
-                    .expectNoError('Valid Name')
-                    .finish(done);
+                    .expectNoError('Valid Name');
             });
 
-            it('should validate email input value', (done) => {
+            it('should validate email input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.emailInput)
+                await InputValidator.basedOn(ViewUnderTest.emailInput)
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
-                    .expectNoError('validEmail@domain.com')
-                    .finish(done);
+                    .expectNoError('validEmail@domain.com');
             });
 
-            it('should validate password input value', (done) => {
+            it('should validate password input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.passwordInput)
+                await InputValidator.basedOn(ViewUnderTest.passwordInput)
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
-                    .expectNoError('better password')
-                    .finish(done);
+                    .expectNoError('better password');
             });
 
-            it('should validate password confirmation input value', async (done) => {
+            it('should validate password confirmation input value', async () => {
                 renderInMockContext();
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
@@ -180,12 +177,11 @@ describe('SignupPage component', () => {
                     .expectError('', 't:form.password.validation.passwordsNotMatch')
                     .expectError('not equal', 't:form.password.validation.passwordsNotMatch')
                     .expectNoError(passwordValue);
-                done();
             });
 
         });
 
-        it('should successfully sign up and trigger session login event', async (done) => {
+        it('should successfully sign up and trigger session login event', async () => {
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -193,10 +189,15 @@ describe('SignupPage component', () => {
             // verify if session login event was triggered
             await waitFor(() => expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(1));
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledWith(mockResponse.result.data.register);
-            done();
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('success');
+            expect(toast).toHaveTextContent('t:signupPage.signupSuccessTitle');
+            expect(screen.getByTestId('MockTrans')).toHaveAttribute('data-i18n', 'signupPage.signupSuccessDescription');
         });
 
-        it('should display information about not available email', async (done) => {
+        it('should display information about not available email', async () => {
             const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
             const mockResponse = mockResponseGenerator.emailNotAvailable();
             renderInMockContext({ history, mockResponses: [ mockResponse ] });
@@ -208,23 +209,21 @@ describe('SignupPage component', () => {
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-            done();
         });
 
-        it('should display notification about network error', async (done) => {
+        it('should display notification about network error', async () => {
             const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
             const mockResponse = mockResponseGenerator.networkError();
-            const mockSnackbars = { errorSnackbar: jest.fn() };
-            renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
+            renderInMockContext({ history, mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
-            // verify if error alert was displayed
-            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
-            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:error.networkError');
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-            done();
         });
 
     });

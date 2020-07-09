@@ -11,7 +11,7 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
-import { useSnackbar } from '../../providers/snackbars/useSnackbar';
+import { useToast } from '../../providers/toast/useToast';
 
 
 export interface PasswordResetRequestFormProps {
@@ -19,13 +19,12 @@ export interface PasswordResetRequestFormProps {
 }
 
 type PasswordResetRequestFormData = MutationSendPasswordResetInstructionsArgs;
-type PasswordResetRequestFormSubmitHandler = FormikConfig<PasswordResetRequestFormData>['onSubmit'];
 
 export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestFormProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const validationSchema = usePasswordResetRequestFormValidationSchema(t);
-    const handleSubmit = usePasswordResetRequestFormSubmitHandler(t, onSuccess);
+    const handleSubmit = usePasswordResetRequestFormSubmitHandler(onSuccess);
 
     return (
         <Formik<PasswordResetRequestFormData>
@@ -59,28 +58,36 @@ export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestForm
     );
 }
 
-function usePasswordResetRequestFormValidationSchema(t: TFunction): Yup.ObjectSchema<PasswordResetRequestFormData> {
+
+/**
+ * Validation schema
+ */
+function usePasswordResetRequestFormValidationSchema(t: TFunction) {
     return React.useMemo(() => Yup.object<PasswordResetRequestFormData>({
         email: createEmailSchema(t),
     }).defined(), [ t ]);
 }
 
-function usePasswordResetRequestFormSubmitHandler(t: TFunction, onSuccess: (email: string) => void): PasswordResetRequestFormSubmitHandler {
+
+/**
+ * Submit handler
+ */
+function usePasswordResetRequestFormSubmitHandler(onSuccess: (email: string) => void) {
+    const { errorToast } = useToast();
     const [ sendPasswordResetInstructionsMutation ] = useSendPasswordResetInstructionsMutation();
-    const { errorSnackbar } = useSnackbar();
-    return React.useCallback(async (values) => {
+
+    return React.useCallback<FormikConfig<PasswordResetRequestFormData>['onSubmit']>(async (values) => {
         try {
-            await sendPasswordResetInstructionsMutation({
-                variables: values,
-            });
+            await sendPasswordResetInstructionsMutation({ variables: values });
             onSuccess(values.email);
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
                 .finish();
         }
-    }, [ t, errorSnackbar, sendPasswordResetInstructionsMutation, onSuccess ]);
+    }, [ errorToast, onSuccess, sendPasswordResetInstructionsMutation ]);
 }
+
 
 const useStyles = makeStyles((theme) => ({
     submit: {

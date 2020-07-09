@@ -8,7 +8,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
-import { MockSnackbarContextData } from '../../../__utils__/mocks/MockSnackbarProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';
@@ -93,10 +92,9 @@ describe('ConfirmEmailAddressPage component', () => {
         const invalidPaths = [ '/', '/?notToken=value', '/?token=invalid_token' ];
 
         invalidPaths.forEach((path: string) => {
-            it(`should redirect to login page and display alert about invalid token for '${path}'`, () => {
+            it(`should redirect to login page and display alert about invalid token for '${path}'`, async () => {
                 const history = createMemoryHistory({ initialEntries: [ path ] });
-                const mockSnackbars = { errorSnackbar: jest.fn() };
-                renderInMockContext({ history, mockSnackbars });
+                renderInMockContext({ history });
 
                 // verify if navigation occurred
                 expect(history.location.pathname).toBe(routes.login());
@@ -104,17 +102,18 @@ describe('ConfirmEmailAddressPage component', () => {
                 // verify if mutation was not created
                 expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(0);
 
-                // verify if error alert has been displayed
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-                expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.invalidEmailConfirmationToken');
+                // verify if toast is visible
+                const toast = await screen.findByTestId('MockToast');
+                expect(toast).toHaveClass('error');
+                expect(toast).toHaveTextContent('t:emailConfirmationPage.invalidEmailConfirmationToken');
             });
         });
 
     });
 
-    async function renderAndAwaitMutationResponse(mockResponse: MockedResponse, mockSnackbars: MockSnackbarContextData) {
+    async function renderAndAwaitMutationResponse(mockResponse: MockedResponse) {
         const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ] });
-        renderInMockContext({ history, mockResponses: [ mockResponse ], mockSnackbars });
+        renderInMockContext({ history, mockResponses: [ mockResponse ] });
 
         // verify if progressbar is visible
         expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
@@ -129,48 +128,44 @@ describe('ConfirmEmailAddressPage component', () => {
         expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(1);
     }
 
-    it('should display notification about successful email address confirmation', async (done) => {
+    it('should display notification about successful email address confirmation', async () => {
         const mockResponse = mockResponseGenerator.success();
-        const mockSnackbars = { successSnackbar: jest.fn() };
-        await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
+        await renderAndAwaitMutationResponse(mockResponse);
 
-        // verify if success alert was displayed
-        expect(mockSnackbars.successSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.successSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.emailConfirmedSuccessfully');
-        done();
+        // verify if toast is visible
+        const toast = await screen.findByTestId('MockToast');
+        expect(toast).toHaveClass('success');
+        expect(toast).toHaveTextContent('t:emailConfirmationPage.emailConfirmedSuccessfully');
     });
 
-    it('should display notification about email address already confirmed', async (done) => {
+    it('should display notification about email address already confirmed', async () => {
         const mockResponse = mockResponseGenerator.emailAddressAlreadyConfirmed();
-        const mockSnackbars = { infoSnackbar: jest.fn() };
-        await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
+        await renderAndAwaitMutationResponse(mockResponse);
 
-        // verify if info alert was displayed
-        expect(mockSnackbars.infoSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.infoSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.emailAlreadyConfirmed');
-        done();
+        // verify if toast is visible
+        const toast = await screen.findByTestId('MockToast');
+        expect(toast).toHaveClass('info');
+        expect(toast).toHaveTextContent('t:emailConfirmationPage.emailAlreadyConfirmed');
     });
 
-    it('should display notification about invalid email confirmation token', async (done) => {
+    it('should display notification about invalid email confirmation token', async () => {
         const mockResponse = mockResponseGenerator.invalidEmailConfirmationToken();
-        const mockSnackbars = { errorSnackbar: jest.fn() };
-        await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
+        await renderAndAwaitMutationResponse(mockResponse);
 
-        // verify if error alert has been displayed
-        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:emailConfirmationPage.invalidEmailConfirmationToken');
-        done();
+        // verify if toast is visible
+        const toast = await screen.findByTestId('MockToast');
+        expect(toast).toHaveClass('error');
+        expect(toast).toHaveTextContent('t:emailConfirmationPage.invalidEmailConfirmationToken');
     });
 
-    it('should display notification about network error', async (done) => {
+    it('should display notification about network error', async () => {
         const mockResponse = mockResponseGenerator.networkError();
-        const mockSnackbars = { errorSnackbar: jest.fn() };
-        await renderAndAwaitMutationResponse(mockResponse, mockSnackbars);
+        await renderAndAwaitMutationResponse(mockResponse);
 
-        // verify if error alert was displayed
-        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
-        done();
+        // verify if toast is visible
+        const toast = await screen.findByTestId('MockToast');
+        expect(toast).toHaveClass('error');
+        expect(toast).toHaveTextContent('t:error.networkError');
     });
 
 });

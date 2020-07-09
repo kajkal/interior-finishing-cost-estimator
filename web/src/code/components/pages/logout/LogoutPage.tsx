@@ -22,7 +22,7 @@ export function LogoutPage(): React.ReactElement | null {
                     .finish();
             }
         }();
-    }, []);
+    }, [ errorToast, logoutMutation ]);
 
     return <BackdropSpinner invisible />;
 }

@@ -11,7 +11,7 @@ import Grid from '@material-ui/core/Grid';
 
 import { useVerifiedToken } from '../../../utils/hooks/useVerifiedToken';
 import { useSearchParams } from '../../../utils/hooks/useSearchParams';
-import { useSnackbar } from '../../providers/snackbars/useSnackbar';
+import { useToast } from '../../providers/toast/useToast';
 import { PasswordResetForm } from './PasswordResetForm';
 import { routes } from '../../../config/routes';
 
@@ -19,18 +19,18 @@ import { routes } from '../../../config/routes';
 export function PasswordResetPage(): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
-    const { errorSnackbar } = useSnackbar();
+    const { errorToast } = useToast();
     const { token } = useSearchParams('token');
     const [ verifiedPasswordResetToken, expiredAt ] = useVerifiedToken(token, 'checkExpiration');
 
     React.useEffect(() => {
         if (expiredAt) {
             const formattedExpirationDate = DateTime.fromJSDate(expiredAt).setLocale(i18n.language).toLocaleString(DateTime.DATETIME_SHORT);
-            errorSnackbar(t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
+            errorToast(({ t }) => t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
         } else if (!verifiedPasswordResetToken) {
-            errorSnackbar(t('passwordResetPage.invalidPasswordResetToken'));
+            errorToast(({ t }) => t('passwordResetPage.invalidPasswordResetToken'));
         }
-    }, [ expiredAt, i18n.language ]);
+    }, [ expiredAt, verifiedPasswordResetToken, i18n.language, errorToast ]);
 
     if (!verifiedPasswordResetToken) {
         return <Redirect to={routes.forgotPassword()} />;

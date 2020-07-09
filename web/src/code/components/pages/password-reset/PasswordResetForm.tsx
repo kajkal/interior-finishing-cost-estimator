@@ -14,7 +14,7 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
-import { useSnackbar } from '../../providers/snackbars/useSnackbar';
+import { useToast } from '../../providers/toast/useToast';
 import { routes } from '../../../config/routes';
 
 
@@ -25,13 +25,12 @@ export interface PasswordResetFormProps {
 interface PasswordResetFormData extends MutationResetPasswordArgs {
     passwordConfirmation: string;
 }
-type PasswordResetFormSubmitHandler = FormikConfig<PasswordResetFormData>['onSubmit'];
 
 export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
     const validationSchema = usePasswordResetFormValidationSchema(t);
-    const handleSubmit = usePasswordResetFormSubmitHandler(t, passwordResetToken, i18n.language);
+    const handleSubmit = usePasswordResetFormSubmitHandler(i18n.language);
 
     return (
         <Formik<PasswordResetFormData>
@@ -79,7 +78,11 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
     );
 }
 
-function usePasswordResetFormValidationSchema(t: TFunction): Yup.ObjectSchema<PasswordResetFormData> {
+
+/**
+ * Validation schema
+ */
+function usePasswordResetFormValidationSchema(t: TFunction) {
     return React.useMemo(() => Yup.object<PasswordResetFormData>({
         token: Yup.string().required(),
         password: createPasswordSchema(t),
@@ -87,34 +90,40 @@ function usePasswordResetFormValidationSchema(t: TFunction): Yup.ObjectSchema<Pa
     }).defined(), [ t ]);
 }
 
-function usePasswordResetFormSubmitHandler(t: TFunction, passwordResetToken: string, locale: string): PasswordResetFormSubmitHandler {
-    const [ resetPasswordMutation ] = useResetPasswordMutation();
-    const { successSnackbar, errorSnackbar } = useSnackbar();
+
+/**
+ * Submit handler
+ */
+function usePasswordResetFormSubmitHandler(locale: string) {
     const { replace } = useHistory();
-    return React.useCallback(async ({ passwordConfirmation: _, ...values }) => {
+    const { successToast, errorToast } = useToast();
+    const [ resetPasswordMutation ] = useResetPasswordMutation();
+
+    return React.useCallback<FormikConfig<PasswordResetFormData>['onSubmit']>(async ({ passwordConfirmation: _, ...values }) => {
         try {
             await resetPasswordMutation({ variables: values });
-            successSnackbar(t('passwordResetPage.passwordResetSuccess'));
+            successToast(({ t }) => t('passwordResetPage.passwordResetSuccess'));
             replace(routes.login());
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
                 .handleGraphQlErrors({
                     'EXPIRED_PASSWORD_RESET_TOKEN': ({ extensions }) => {
                         const { expiredAt = new Date().toISOString() } = extensions || {};
                         const formattedExpirationDate = DateTime.fromISO(expiredAt).setLocale(locale).toLocaleString(DateTime.DATETIME_SHORT);
-                        errorSnackbar(t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
+                        errorToast(({ t }) => t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
                         replace(routes.forgotPassword());
                     },
                     'INVALID_PASSWORD_RESET_TOKEN': () => {
-                        errorSnackbar(t('passwordResetPage.invalidPasswordResetToken'));
+                        errorToast(({ t }) => t('passwordResetPage.invalidPasswordResetToken'));
                         replace(routes.forgotPassword());
                     },
                 })
                 .finish();
         }
-    }, [ t, errorSnackbar, resetPasswordMutation, passwordResetToken ]);
+    }, [ locale, replace, successToast, errorToast, resetPasswordMutation ]);
 }
+
 
 const useStyles = makeStyles((theme) => ({
     submit: {

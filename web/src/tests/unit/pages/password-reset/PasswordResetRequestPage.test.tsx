@@ -1,7 +1,7 @@
 import React from 'react';
 import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
@@ -77,43 +77,39 @@ describe('PasswordResetRequestPage component', () => {
 
         describe('validation', () => {
 
-            it('should validate email input value', (done) => {
+            it('should validate email input value', async () => {
                 renderInMockContext();
-                InputValidator.basedOn(ViewUnderTest.emailInput)
+                await InputValidator.basedOn(ViewUnderTest.emailInput)
                     .expectError('', 't:form.email.validation.required')
                     .expectError('invalid-email-address', 't:form.email.validation.invalid')
-                    .expectNoError('validEmail@domain.com')
-                    .finish(done);
+                    .expectNoError('validEmail@domain.com');
             });
 
         });
 
-        it('should handle success response and display success message', async (done) => {
+        it('should handle success response and display success message', async () => {
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ] });
-            const successMessage = `t:passwordResetPage.sendResetInstructionsSuccess:{"email":"${mockResponse.request.variables.email}"}`;
 
             // verify if success message is not visible
-            expect(screen.queryByText(successMessage)).toBeNull();
+            expect(screen.queryByTestId('MockTrans')).toBeNull();
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if success message is visible
-            await waitFor(() => expect(screen.queryByText(successMessage)).toBeInTheDocument());
-            done();
+            expect(await screen.findByTestId('MockTrans')).toHaveAttribute('data-i18n', 'passwordResetPage.sendResetInstructionsSuccess');
         });
 
-        it('should display notification about network error', async (done) => {
+        it('should display notification about network error', async () => {
             const mockResponse = mockResponseGenerator.networkError();
-            const mockSnackbars = { errorSnackbar: jest.fn() };
-            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
-            // verify if error alert was displayed
-            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
-            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
-            done();
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:error.networkError');
         });
 
     });

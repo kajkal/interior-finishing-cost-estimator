@@ -41,16 +41,15 @@ describe('LogoutPage component', () => {
         }),
     };
 
-    it('should logout on mount and trigger session logout event', async (done) => {
+    it('should logout on mount and trigger session logout event', async () => {
         const mockResponse = mockResponseGenerator.success();
         renderInMockContext({ mockResponses: [ mockResponse ] });
 
         // verify if session logout event was triggered
         await waitFor(() => expect(MockSessionChannel.publishLogoutSessionAction).toHaveBeenCalledTimes(1));
-        done();
     });
 
-    it('should display notification about network error', async (done) => {
+    it('should display notification about network error', async () => {
         const mockResponse = mockResponseGenerator.networkError();
         renderInMockContext({ mockResponses: [ mockResponse ] });
 
@@ -61,7 +60,6 @@ describe('LogoutPage component', () => {
 
         // verify if session logout event was not triggered
         expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-        done();
     });
 
 });

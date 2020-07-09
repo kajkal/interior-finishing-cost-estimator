@@ -1,7 +1,8 @@
 import React from 'react';
 import * as Yup from 'yup';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,11 +13,14 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
-import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { createNameSchema } from '../../../utils/validation/nameSchema';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
+import { useToast } from '../../providers/toast/useToast';
+import { ToastContentProps } from '../../providers/toast/context/ToastContext';
+import { AlertTitle } from '@material-ui/lab';
+import Link from '@material-ui/core/Link';
 
 
 export interface SignupFormProps {
@@ -26,41 +30,12 @@ export interface SignupFormProps {
 interface SignupFormData extends MutationRegisterArgs {
     passwordConfirmation: string;
 }
-type SignupFormSubmitHandler = FormikConfig<SignupFormData>['onSubmit'];
 
-export function SignupForm(props: SignupFormProps): React.ReactElement {
-    const { t } = useTranslation();
-    const { formClassName } = props;
+export function SignupForm({ formClassName }: SignupFormProps): React.ReactElement {
     const classes = useStyles();
-
-    const { successSnackbar, errorSnackbar } = useSnackbar();
-    const [ registerMutation ] = useRegisterMutation();
-
-    const validationSchema = React.useMemo(() => Yup.object<SignupFormData>({
-        name: createNameSchema(t),
-        email: createEmailSchema(t),
-        password: createPasswordSchema(t),
-        passwordConfirmation: createPasswordConfirmationSchema(t),
-    }).defined(), [ t ]);
-
-    const handleSubmit = React.useCallback<SignupFormSubmitHandler>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
-        try {
-            await registerMutation({
-                variables: values,
-                update: async (cache, { data }) => {
-                    data && await SessionChannel.publishLoginSessionAction(data.register);
-                },
-            });
-            successSnackbar('register success!'); // TODO
-        } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
-                .handleGraphQlErrors({
-                    'EMAIL_NOT_AVAILABLE': () => setFieldError('email', t('form.email.validation.notAvailable')),
-                })
-                .finish();
-        }
-    }, []);
+    const { t } = useTranslation();
+    const validationSchema = useSignupFormValidationSchema(t);
+    const handleSubmit = useSignupFormSubmitHandler(t);
 
     return (
         <Formik<SignupFormData>
@@ -124,6 +99,56 @@ export function SignupForm(props: SignupFormProps): React.ReactElement {
         </Formik>
     );
 }
+
+
+/**
+ * Validation schema
+ */
+function useSignupFormValidationSchema(t: TFunction) {
+    return React.useMemo(() => Yup.object<SignupFormData>({
+        name: createNameSchema(t),
+        email: createEmailSchema(t),
+        password: createPasswordSchema(t),
+        passwordConfirmation: createPasswordConfirmationSchema(t),
+    }).defined(), [ t ]);
+}
+
+
+/**
+ * Submit handler
+ */
+function useSignupFormSubmitHandler(t: TFunction) {
+    const { successToast, errorToast } = useToast();
+    const [ registerMutation ] = useRegisterMutation();
+
+    return React.useCallback<FormikConfig<SignupFormData>['onSubmit']>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
+        try {
+            await registerMutation({
+                variables: values,
+                update: async (cache, { data }) => {
+                    data && await SessionChannel.publishLoginSessionAction(data.register);
+                },
+            });
+            const SignupSuccessToast: React.ComponentType<ToastContentProps> = ({ t }) => (
+                <>
+                    <AlertTitle>{t('signupPage.signupSuccessTitle')}</AlertTitle>
+                    <Trans i18nKey='signupPage.signupSuccessDescription'>
+                        {' '}<Link component='span'>{{ email: values.email }}</Link>{' '}
+                    </Trans>
+                </>
+            );
+            successToast(SignupSuccessToast, { disableAutoHide: true });
+        } catch (error) {
+            ApolloErrorHandler.process(error)
+                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
+                .handleGraphQlErrors({
+                    'EMAIL_NOT_AVAILABLE': () => setFieldError('email', t('form.email.validation.notAvailable')),
+                })
+                .finish();
+        }
+    }, [ t, successToast, errorToast, registerMutation ]);
+}
+
 
 const useStyles = makeStyles((theme) => ({
     submit: {

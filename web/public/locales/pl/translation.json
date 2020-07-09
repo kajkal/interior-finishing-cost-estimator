@@ -21,7 +21,9 @@
     "logInLink": "Wróć do logowania",
     "passwordAriaLabel": "Stwórz bezpieczne hasło",
     "passwordConfirmationLabel": "Potwierdź hasło",
-    "passwordConfirmationAriaLabel": "Potwierdź swoje hasło"
+    "passwordConfirmationAriaLabel": "Potwierdź swoje hasło",
+    "signupSuccessTitle": "Twoje konto zostało utworzone",
+    "signupSuccessDescription": "Na adres <1>{{email}}</1> został wysłany email z instrukcją jak aktywować konto."
   },
   "emailConfirmationPage": {
     "emailConfirmedSuccessfully": "Twój adres email został potwierdzony",
@@ -33,7 +35,7 @@
     "signUpLink": "Poddaj się, stwórz nowe konto",
     "sendResetInstructionsDescription": "Email z instrukcją resetowania hasła zostanie wysłany na podany niżej adres email:",
     "sendResetInstructions": "Wyślij instrukcję resetowania hasła",
-    "sendResetInstructionsSuccess": "Jeżeli konto zarejestrowane na {{email}} istnieje i posiada potwierdzony adres email, otrzymasz wiadomość email z odnośnikiem umożliwiającym zresetowanie Twojego hasła.",
+    "sendResetInstructionsSuccess": "Jeżeli konto zarejestrowane na <1>{{email}}</1> istnieje i posiada potwierdzony adres email, otrzymasz wiadomość email z odnośnikiem umożliwiającym zresetowanie Twojego hasła.",
     "resetPassword": "Resetowanie hasła",
     "expiredPasswordResetToken": "Ten link wygasł {{date}}",
     "invalidPasswordResetToken": "Nieprawidłowy token resetowania hasła",

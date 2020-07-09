@@ -21,7 +21,9 @@
     "logInLink": "Log in instead",
     "passwordAriaLabel": "Create a secure password",
     "passwordConfirmationLabel": "Confirm password",
-    "passwordConfirmationAriaLabel": "Confirm your password"
+    "passwordConfirmationAriaLabel": "Confirm your password",
+    "signupSuccessTitle": "Your account has been successfully created",
+    "signupSuccessDescription": "An email has been sent to <1>{{email}}</1>. In that message you will find instructions on how to activate your account."
   },
   "emailConfirmationPage": {
     "emailConfirmedSuccessfully": "Your email address has been confirmed",
@@ -33,7 +35,7 @@
     "signUpLink": "Give up, create new account",
     "sendResetInstructionsDescription": "An email with password reset instructions will be send to this email address:",
     "sendResetInstructions": "Send reset instructions",
-    "sendResetInstructionsSuccess": "If an account for {{email}} exists and has a confirmed email address, you will receive an email with a link to reset your password.",
+    "sendResetInstructionsSuccess": "If an account for <1>{{email}}</1> exists and has a confirmed email address, you will receive an email with a link to reset your password.",
     "resetPassword": "Reset password",
     "expiredPasswordResetToken": "This link has expired at {{date}}",
     "invalidPasswordResetToken": "Incorrect password reset token",

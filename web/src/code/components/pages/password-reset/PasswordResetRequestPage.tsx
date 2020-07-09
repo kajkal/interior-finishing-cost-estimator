@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -26,7 +26,9 @@ export function PasswordResetRequestPage(): React.ReactElement {
                 (recipientEmail)
                     ? (
                         <Typography variant='subtitle1' className={classes.subtitle}>
-                            {t('passwordResetPage.sendResetInstructionsSuccess', { email: recipientEmail })}
+                            <Trans i18nKey='passwordResetPage.sendResetInstructionsSuccess'>
+                                {' '}<MuiLink component='span'>{{ email: recipientEmail }}</MuiLink>{' '}
+                            </Trans>
                         </Typography>
                     )
                     : (

@@ -14,7 +14,7 @@ export function ProtectedRoute({ children, ...rest }: RouteProps): React.ReactEl
 
     React.useEffect(() => {
         error && warningToast(({ t }) => t('error.authorizationRequired'));
-    }, [ error ]);
+    }, [ error, warningToast ]);
 
     return (
         <Route

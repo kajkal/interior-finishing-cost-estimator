@@ -18,7 +18,7 @@ export function useSideNavController(): SideNavController {
 
     const handleSideNavToggle = React.useCallback(() => {
         setSideNavOpen(isOpen => !isOpen);
-    }, []);
+    }, [ setSideNavOpen ]);
 
     return { isSideNavOpen, onSideNavToggle: handleSideNavToggle };
 }

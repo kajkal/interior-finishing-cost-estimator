@@ -1,3 +1,6 @@
+import React from 'react';
+
+
 export function mockTFunction(key: string, options?: object) {
     // 't:' prefix is added to translation key as proof of calling transaction function
     return (options)
@@ -12,6 +15,11 @@ export const mockUseTranslation = jest.fn().mockReturnValue({
     },
 });
 
+export const MockTrans = jest.fn().mockImplementation(({ i18nKey }) => (
+    <div data-testid='MockTrans' data-i18n={i18nKey} />
+));
+
 jest.mock('react-i18next', () => ({
     useTranslation: mockUseTranslation,
+    Trans: MockTrans,
 }));
