@@ -8,9 +8,21 @@ import { muteConsole } from '../../../../__utils__/muteConsole';
 import { ToastContextProvider } from '../../../../../code/components/providers/toast/ToastContextProvider';
 import { ShowToast } from '../../../../../code/components/providers/toast/context/ToastContext';
 import { useToast } from '../../../../../code/components/providers/toast/useToast';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { RecoilRoot } from 'recoil/dist';
 
 
 describe('ToastContextProvider component', () => {
+
+    const wrapper: React.ComponentType = ({ children }) => (
+        <RecoilRoot>
+            <ThemeProvider theme={createMuiTheme({ sideNavDrawer: { width: 100 } })}>
+                <ToastContextProvider>
+                    {children}
+                </ToastContextProvider>
+            </ThemeProvider>
+        </RecoilRoot>
+    );
 
     function SampleConsumer() {
         const { infoToast, successToast, warningToast, errorToast } = useToast();
@@ -57,7 +69,7 @@ describe('ToastContextProvider component', () => {
             expect(screen.queryByRole('alert')).toBe(null);
         }
 
-        render(<ToastContextProvider><SampleConsumer /></ToastContextProvider>);
+        render(<SampleConsumer />, { wrapper });
 
         verifyIfToastIsAutomaticallyClosedAfterTimeout('info');
         verifyIfToastIsAutomaticallyClosedAfterTimeout('success');
@@ -82,7 +94,7 @@ describe('ToastContextProvider component', () => {
             await waitFor(() => expect(screen.queryByRole('alert')).toBe(null));
         }
 
-        render(<ToastContextProvider><SampleConsumer /></ToastContextProvider>);
+        render(<SampleConsumer />, { wrapper });
 
         await verifyIfToastIsClosedOnCloseButtonClick('info');
         await verifyIfToastIsClosedOnCloseButtonClick('success');

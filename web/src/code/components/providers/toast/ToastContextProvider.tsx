@@ -1,12 +1,15 @@
 import React from 'react';
+import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
+import { makeStyles } from '@material-ui/core/styles';
 import { TransitionProps } from '@material-ui/core/transitions';
 import Snackbar, { SnackbarCloseReason } from '@material-ui/core/Snackbar/Snackbar';
 import Alert, { Color } from '@material-ui/lab/Alert';
 import Slide from '@material-ui/core/Slide';
 
 import { ToastContentProps, ToastContext, ToastContextData } from './context/ToastContext';
+import { useSideNavController } from '../../atoms/side-nav/useSideNavController';
 
 
 export interface ToastContextProviderProps {
@@ -22,7 +25,9 @@ export interface ToastProviderState {
 }
 
 export function ToastContextProvider({ children }: ToastContextProviderProps): React.ReactElement {
+    const classes = useStyles();
     const { t } = useTranslation();
+    const { isSideNavOpen } = useSideNavController();
     const [ { Toast, ...state }, setState ] = React.useState<ToastProviderState>({
         open: false,
         toastKey: -1,
@@ -80,6 +85,9 @@ export function ToastContextProvider({ children }: ToastContextProviderProps): R
         <ToastContext.Provider value={contextValue}>
             {children}
             <Snackbar
+                className={clsx(classes.snackbar, {
+                    [ classes.snackbarShift ]: isSideNavOpen,
+                })}
                 key={state.toastKey}
                 open={state.open}
                 onClose={handleToastClose}
@@ -87,10 +95,14 @@ export function ToastContextProvider({ children }: ToastContextProviderProps): R
                 TransitionComponent={SlideTransition}
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'center',
+                    horizontal: 'left',
                 }}
             >
                 <Alert
+                    className={classes.alert}
+                    classes={{
+                        action: classes.alertAction,
+                    }}
                     onClose={handleToastClose}
                     severity={state.severity}
                     elevation={6}
@@ -107,3 +119,34 @@ export function ToastContextProvider({ children }: ToastContextProviderProps): R
 function SlideTransition(props: TransitionProps) {
     return <Slide {...props} direction='up' />;
 }
+
+const useStyles = makeStyles((theme) => ({
+    snackbar: {
+        [ theme.breakpoints.up('sm') ]: {
+            marginRight: 24,
+            maxWidth: 600,
+            left: theme.spacing(9) + 25,
+            transition: theme.transitions.create([ 'left' ], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+        },
+    },
+    snackbarShift: {
+        [ theme.breakpoints.up('sm') ]: {
+            left: theme.sideNavDrawer.width + 25,
+            transition: theme.transitions.create([ 'left' ], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
+    },
+    alert: {
+        [ theme.breakpoints.down('sm') ]: {
+            width: '100%',
+        },
+    },
+    alertAction: {
+        alignItems: 'flex-start',
+    },
+}));

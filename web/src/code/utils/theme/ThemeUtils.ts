@@ -39,7 +39,7 @@ export class ThemeUtils {
                 },
             },
             sideNavDrawer: {
-                width: 240,
+                width: 250,
             }
         }));
 

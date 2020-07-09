@@ -55,6 +55,7 @@ export function LanguageMenu({ isSideNavOpen }: LanguageMenuProps): React.ReactE
             </ConditionalTooltip>
             <Menu
                 id='language-menu'
+                className={classes.menu}
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
@@ -79,6 +80,10 @@ export function LanguageMenu({ isSideNavOpen }: LanguageMenuProps): React.ReactE
 }
 
 const useStyles = makeStyles((theme) => ({
+    menu: {
+        // necessary for menu to be on top of snackbar/toast
+        zIndex: `${theme.zIndex.snackbar + 1}!important` as unknown as number,
+    },
     listItemSecondary: {
         opacity: 0,
         transition: theme.transitions.create('opacity', {
