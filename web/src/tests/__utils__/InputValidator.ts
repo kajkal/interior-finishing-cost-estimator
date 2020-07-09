@@ -32,22 +32,4 @@ export class InputValidator extends Promise<HTMLElement> {
         }) as InputValidator;
     }
 
-    /**
-     * Validation could be finalized by either:
-     * @example calling finish with jest done callback:
-     * it('should ...', (done) => {
-     *     InputValidator.for(...)
-     *         .expectError(...)
-     *         .finish(done);
-     * });
-     * @example or by awaiting:
-     * it('should ...', async (done) => {
-     *     await InputValidator.for(...)
-     *         .expectError.(...);
-     * });
-     */
-    async finish(doneCallback: jest.DoneCallback) {
-        return this.then(() => doneCallback());
-    }
-
 }

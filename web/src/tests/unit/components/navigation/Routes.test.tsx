@@ -33,7 +33,7 @@ jest.mock('../../../../code/components/pages/logout/LogoutPage', () => ({
 
 describe('Routes component', () => {
 
-    it('should switch between available routes based on active location', async (done) => {
+    it('should switch between available routes based on active location', () => {
         const history = createMemoryHistory();
 
         render(
@@ -59,7 +59,6 @@ describe('Routes component', () => {
 
         history.push(routes.logout());
         expect(screen.getByTestId('MockLogoutPage')).toBeInTheDocument();
-        done();
     });
 
     it('should render not found page when given location not match to any defined route', () => {

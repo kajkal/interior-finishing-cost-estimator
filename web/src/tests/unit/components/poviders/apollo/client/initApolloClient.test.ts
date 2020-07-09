@@ -68,7 +68,7 @@ describe('initApolloClient function', () => {
             } as unknown as Operation;
         }
 
-        it('should add auth header only for protected operations', async (done) => {
+        it('should add auth header only for protected operations', async () => {
             MockApolloClient.readQuery.mockReturnValue({ sessionState: { accessToken: 'ACCESS_TOKEN_FROM_CACHE' } });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(false);
 
@@ -84,10 +84,9 @@ describe('initApolloClient function', () => {
 
             // verify if operation context was not updated
             expect(operation.setContext).toHaveBeenCalledTimes(0);
-            done();
         });
 
-        it('should use valid access token from memory', async (done) => {
+        it('should use valid access token from memory', async () => {
             MockApolloClient.readQuery.mockReturnValue({
                 sessionState: { accessToken: 'ACCESS_TOKEN_FROM_CACHE' },
             });
@@ -109,10 +108,9 @@ describe('initApolloClient function', () => {
             expect(operation.setContext).toHaveBeenCalledWith({
                 headers: { authorization: 'Bearer ACCESS_TOKEN_FROM_CACHE' },
             });
-            done();
         });
 
-        it('should refresh token when access token from memory is invalid', async (done) => {
+        it('should refresh token when access token from memory is invalid', async () => {
             MockApolloClient.readQuery.mockReturnValue({ sessionState: { accessToken: 'INVALID_ACCESS_TOKEN_FROM_CACHE' } });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(true);
             AuthUtilsSpiesManager.verifyAccessToken.mockReturnValue(undefined);
@@ -139,7 +137,6 @@ describe('initApolloClient function', () => {
             expect(operation.setContext).toHaveBeenCalledWith({
                 headers: { authorization: 'Bearer REFRESHED_ACCESS_TOKEN' },
             });
-            done();
         });
 
         it('should throw en error when the refresh operation returns an error', async (done) => {

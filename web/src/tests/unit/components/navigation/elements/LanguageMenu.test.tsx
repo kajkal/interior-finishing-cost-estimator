@@ -37,7 +37,7 @@ describe('LanguageMenu component', () => {
         expect(screen.getByRole('button')).toHaveAttribute('title', '');
     });
 
-    it('should display available options and change language on option select', async (done) => {
+    it('should display available options and change language on option select', async () => {
         render(<LanguageMenu isSideNavOpen={true} />);
 
         const triggerLanguageMenuButton = screen.getByRole('button', { name: 't:common.changeLanguage' });
@@ -50,7 +50,6 @@ describe('LanguageMenu component', () => {
         expect(mockChangeLanguage).toHaveBeenCalledWith('pl');
 
         await waitFor(() => expect(screen.queryByRole('menu')).toBe(null));
-        done();
     });
 
 });

@@ -98,7 +98,7 @@ describe('index file', () => {
             };
         }
 
-        it('should display spinner until i18n initialization is complete and then should use correct translations', async (done) => {
+        it('should display spinner until i18n initialization is complete and then should use correct translations', async () => {
             jest.mock('../../code/config/supportedLanguages', () => ({
                 supportedLanguages: [
                     { code: 'en', name: 'English' },
@@ -145,13 +145,12 @@ describe('index file', () => {
 
             // verify if child component is visible and if it's translation is correct
             expect(screen.queryByTestId('child-component')).toHaveTextContent('Translated text');
-            done();
         });
 
         /**
          * Maps each value from translation files to '-' and then compares translation file structures.
          */
-        it(`should support: ${supportedLanguages.map(l => l.code).join(', ')} languages`, async (done) => {
+        it(`should support: ${supportedLanguages.map(l => l.code).join(', ')} languages`, async () => {
             const rootDirectory = './public/locales';
             const localeDirectories = await fs.promises.readdir(rootDirectory);
             const locales = await Promise.all(localeDirectories.map(async (locale) => {
@@ -177,7 +176,6 @@ describe('index file', () => {
             locales.forEach(({ translation }) => {
                 expect(translation).toEqual(locales[ 0 ].translation);
             });
-            done();
         });
 
     });

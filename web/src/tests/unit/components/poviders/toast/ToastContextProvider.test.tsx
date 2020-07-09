@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { Color } from '@material-ui/lab/Alert/Alert';
 
+import { muteConsole } from '../../../../__utils__/muteConsole';
+
 import { ToastContextProvider } from '../../../../../code/components/providers/toast/ToastContextProvider';
 import { ShowToast } from '../../../../../code/components/providers/toast/context/ToastContext';
 import { useToast } from '../../../../../code/components/providers/toast/useToast';
@@ -63,7 +65,7 @@ describe('ToastContextProvider component', () => {
         verifyIfToastIsAutomaticallyClosedAfterTimeout('error');
     });
 
-    it('should display success toast and then close it on close button click', async (done) => {
+    it('should display success toast and then close it on close button click', async () => {
         async function verifyIfToastIsClosedOnCloseButtonClick(severity: Color) {
             // verify if toast is not visible
             expect(screen.queryByRole('alert')).toBe(null);
@@ -86,7 +88,6 @@ describe('ToastContextProvider component', () => {
         await verifyIfToastIsClosedOnCloseButtonClick('success');
         await verifyIfToastIsClosedOnCloseButtonClick('warning');
         await verifyIfToastIsClosedOnCloseButtonClick('error');
-        done();
     });
 
     it('should throw error when ToastContext is used without ToastContextProvider', () => {
@@ -114,24 +115,17 @@ describe('ToastContextProvider component', () => {
             }
         }
 
-        const consoleErrorSpy = jest.spyOn(console, 'error')
-            .mockImplementation((message?: any, ...optionalParams: any[]) => {
-                if (typeof message === 'string') {
-                    if (message.startsWith('Error: Uncaught [') || message.startsWith('The above error occurred')) {
-                        // mute noisy ErrorBoundary errors
-                        return;
-                    }
-                }
-                console.warn(message, ...optionalParams);
-            });
+        // mute noisy ErrorBoundary errors
+        const consoleErrorMock = muteConsole('error', (message) => (
+            message.startsWith('Error: Uncaught [') || message.startsWith('The above error occurred')
+        ));
 
         verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('info');
         verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('success');
         verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('warning');
         verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('error');
 
-        expect(consoleErrorSpy).toHaveBeenCalledTimes(8);
-        consoleErrorSpy.mockRestore();
+        expect(consoleErrorMock).toHaveBeenCalledTimes(8);
     });
 
 });

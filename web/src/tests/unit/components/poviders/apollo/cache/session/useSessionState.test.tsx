@@ -39,7 +39,7 @@ describe('useSessionState hook', () => {
         },
     };
 
-    it('should return default session state when cache is empty', async (done) => {
+    it('should return default session state when cache is empty', async () => {
         const cache = new InMemoryCache();
         const { result, waitForNextUpdate } = renderHook(() => useSessionState(), {
             wrapper: createWrapper(cache),
@@ -52,10 +52,9 @@ describe('useSessionState hook', () => {
             accessToken: '',
             isUserLoggedIn: false,
         });
-        done();
     });
 
-    it('should return not authenticated session state from cache', async (done) => {
+    it('should return not authenticated session state from cache', async () => {
         const cache = new InMemoryCache();
         cache.writeQuery(mockCacheRecords.notAuthenticated);
         const { result, waitForNextUpdate } = renderHook(() => useSessionState(), {
@@ -69,10 +68,9 @@ describe('useSessionState hook', () => {
             accessToken: '',
             isUserLoggedIn: false,
         });
-        done();
     });
 
-    it('should return full session state from cache', async (done) => {
+    it('should return full session state from cache', async () => {
         const cache = new InMemoryCache();
         cache.writeQuery(mockCacheRecords.authenticated);
         const { result, waitForNextUpdate } = renderHook(() => useSessionState(), {
@@ -86,7 +84,6 @@ describe('useSessionState hook', () => {
             accessToken: 'tokenValueFromCache',
             isUserLoggedIn: true,
         });
-        done();
     });
 
 });

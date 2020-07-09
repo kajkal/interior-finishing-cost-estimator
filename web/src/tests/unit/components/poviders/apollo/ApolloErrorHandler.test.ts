@@ -1,10 +1,25 @@
 import { ApolloError } from 'apollo-boost';
 import { GraphQLError } from 'graphql';
+
+import { muteConsole } from '../../../../__utils__/muteConsole';
+
 import { ApolloErrorHandler } from '../../../../../code/components/providers/apollo/errors/ApolloErrorHandler';
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 
 
 describe('ApolloErrorHandler class ', () => {
+
+    const consoleLogMock = muteConsole('log', (message) => (
+        message.startsWith('unexpected argument validation error')
+    ));
+    const consoleErrorMock = muteConsole('error', (message) => (
+        message.startsWith('unhandled error')
+    ));
+
+    beforeEach(() => {
+        consoleLogMock.mockClear();
+        consoleErrorMock.mockClear();
+    });
 
     describe('GraphQL error', () => {
 
@@ -26,6 +41,8 @@ describe('ApolloErrorHandler class ', () => {
             // then
             expect(handled).toBe(false);
             expect(mockHandler).toHaveBeenCalledTimes(0);
+            expect(consoleErrorMock).toHaveBeenCalledTimes(1);
+            expect(consoleErrorMock).toHaveBeenCalledWith(expect.any(String), error);
         });
 
         it('should call handler when error is matched to handler', () => {
@@ -70,11 +87,12 @@ describe('ApolloErrorHandler class ', () => {
             // then
             expect(handled).toBe(false);
             expect(mockHandler).toHaveBeenCalledTimes(0);
+            expect(consoleErrorMock).toHaveBeenCalledTimes(1);
+            expect(consoleErrorMock).toHaveBeenCalledWith(expect.any(String), error);
         });
 
         it('should log details of unhandled validation error', () => {
             // given
-            jest.spyOn(console, 'log');
             const error = new ApolloError({
                 graphQLErrors: [ {
                     message: 'Argument Validation Error',
@@ -90,12 +108,13 @@ describe('ApolloErrorHandler class ', () => {
 
             // then
             expect(handled).toBe(false);
-            expect(console.log).toHaveBeenCalledTimes(1);
-            expect(console.log).toHaveBeenCalledWith('unexpected argument validation error', {
+            expect(consoleLogMock).toHaveBeenCalledTimes(1);
+            expect(consoleLogMock).toHaveBeenCalledWith(expect.any(String), {
                 message: 'Argument Validation Error',
                 extensions: { code: 'INTERNAL_SERVER_ERROR' },
             });
-            jest.spyOn(console, 'log').mockRestore();
+            expect(consoleErrorMock).toHaveBeenCalledTimes(1);
+            expect(consoleErrorMock).toHaveBeenCalledWith(expect.any(String), error);
         });
 
     });
@@ -121,6 +140,8 @@ describe('ApolloErrorHandler class ', () => {
             expect(handled).toBe(false);
             expect(mockNetworkErrorHandler).toHaveBeenCalledTimes(0);
             expect(mockUnauthorizedErrorHandler).toHaveBeenCalledTimes(0);
+            expect(consoleErrorMock).toHaveBeenCalledTimes(1);
+            expect(consoleErrorMock).toHaveBeenCalledWith(expect.any(String), error);
         });
 
         it('should call unauthorizedErrorHandler when network error is instanceof UnauthorizedError', () => {
@@ -182,6 +203,8 @@ describe('ApolloErrorHandler class ', () => {
             // then
             expect(handled).toBe(false);
             expect(mockHandler).toHaveBeenCalledTimes(0);
+            expect(consoleErrorMock).toHaveBeenCalledTimes(1);
+            expect(consoleErrorMock).toHaveBeenCalledWith(expect.any(String), error);
         });
 
     });

@@ -60,7 +60,7 @@ describe('ApolloContextProvider component', () => {
         );
     }
 
-    it('should trigger React.Suspense until accessToken value is determined then should initialize Apollo context', async (done) => {
+    it('should trigger React.Suspense until accessToken value is determined then should initialize Apollo context', async () => {
         const { resolveValue } = deferRefreshAccessTokenPromise();
         renderInMockContext();
 
@@ -71,10 +71,9 @@ describe('ApolloContextProvider component', () => {
 
         // verify if provider' children are visible
         expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
-        done();
     });
 
-    it('should initialize ApolloClient with default cache', async (done) => {
+    it('should initialize ApolloClient with default cache', async () => {
         const { throwError } = deferRefreshAccessTokenPromise();
         renderInMockContext();
 
@@ -88,10 +87,9 @@ describe('ApolloContextProvider component', () => {
         expect(initApolloClientSpy).toHaveBeenCalledWith({
             sessionState: { accessToken: '' },
         });
-        done();
     });
 
-    it('should initialize ApolloClient with cache based on existing session state', async (done) => {
+    it('should initialize ApolloClient with cache based on existing session state', async () => {
         const { resolveValue } = deferRefreshAccessTokenPromise();
         renderInMockContext();
 
@@ -105,12 +103,11 @@ describe('ApolloContextProvider component', () => {
         expect(initApolloClientSpy).toHaveBeenCalledWith({
             sessionState: { accessToken: 'accessTokenTestValue' },
         });
-        done();
     });
 
     describe('session state synchronization', () => {
 
-        it('should add session event listener on mount and remove session event listener on unmount', async (done) => {
+        it('should add session event listener on mount and remove session event listener on unmount', async () => {
             AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('');
             const { unmount } = renderInMockContext();
 
@@ -125,10 +122,9 @@ describe('ApolloContextProvider component', () => {
 
             // verify if session event listener was removed
             expect(MockSessionChannel.removeSessionEventListener).toHaveBeenCalledTimes(1);
-            done();
         });
 
-        it('should handle login session event correctly', async (done) => {
+        it('should handle login session event correctly', async () => {
             const sampleLoginSessionAction: LoginSessionAction = {
                 type: SessionActionType.LOGIN,
                 initialData: {
@@ -165,10 +161,9 @@ describe('ApolloContextProvider component', () => {
                     },
                 },
             });
-            done();
         });
 
-        it('should handle logout session event correctly', async (done) => {
+        it('should handle logout session event correctly', async () => {
             const sampleLogoutSessionAction: LogoutSessionAction = {
                 type: SessionActionType.LOGOUT,
             };
@@ -187,7 +182,6 @@ describe('ApolloContextProvider component', () => {
 
             // verify if navigation to login page occurred
             await waitFor(() => expect(history.location.pathname).toBe(routes.login()));
-            done();
         });
 
     });

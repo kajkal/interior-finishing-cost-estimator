@@ -53,7 +53,7 @@ describe('AuthUtils class', () => {
             fetchSpy.mockRestore();
         });
 
-        it('should return access token fetched from server', async (done) => {
+        it('should return access token fetched from server', async () => {
             fetchSpy.mockResolvedValue({
                 ok: true,
                 json: () => Promise.resolve({ accessToken: 'REFRESHED_ACCESS_TOKEN' }),
@@ -61,7 +61,6 @@ describe('AuthUtils class', () => {
 
             const accessToken = await AuthUtils.refreshAccessToken();
             expect(accessToken).toBe('REFRESHED_ACCESS_TOKEN');
-            done();
         });
 
         it('should throw error in case of server error', async (done) => {

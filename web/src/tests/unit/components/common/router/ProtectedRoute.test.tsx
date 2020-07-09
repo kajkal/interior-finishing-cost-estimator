@@ -56,7 +56,7 @@ describe('ProtectedRoute component', () => {
         }),
     };
 
-    it('should render protected component when user is successfully authenticated', async (done) => {
+    it('should render protected component when user is successfully authenticated', async () => {
         const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
         const mockResponses = [ mockResponseGenerator.success() ];
         renderInMockContext({ history, mockResponses });
@@ -69,10 +69,9 @@ describe('ProtectedRoute component', () => {
 
         // verify if protected component is in dom
         expect(screen.getByText('protected component')).toBeInTheDocument();
-        done();
     });
 
-    it('should navigate to login page and display warning notification when user is not authenticated', async (done) => {
+    it('should navigate to login page and display warning notification when user is not authenticated', async () => {
         const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
         const mockResponses = [ mockResponseGenerator.unauthorizedError() ];
         renderInMockContext({ history, mockResponses });
@@ -92,7 +91,6 @@ describe('ProtectedRoute component', () => {
         const toast = await screen.findByTestId('MockToast');
         expect(toast).toHaveClass('warning');
         expect(toast).toHaveTextContent('t:error.authorizationRequired');
-        done();
     });
 
 });

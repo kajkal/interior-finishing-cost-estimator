@@ -12,7 +12,7 @@ describe('SessionChannel class', () => {
         BroadcastChannelSpiesManager.setupSpies();
     });
 
-    it('should add and later remove session event lister', async (done) => {
+    it('should add and later remove session event lister', async () => {
         const mockListener = jest.fn();
 
         SessionChannel.addSessionEventListener(mockListener);
@@ -26,10 +26,9 @@ describe('SessionChannel class', () => {
 
         expect(BroadcastChannelSpiesManager.removeEventListener).toHaveBeenCalledTimes(1);
         expect(BroadcastChannelSpiesManager.removeEventListener).toHaveBeenCalledWith('message', mockListener);
-        done();
     });
 
-    it('should notify listeners about login event', async (done) => {
+    it('should notify listeners about login event', async () => {
         const mockListener = jest.fn();
         const sampleInitialData: LoginMutation['login'] = {
             __typename: 'InitialData',
@@ -48,10 +47,9 @@ describe('SessionChannel class', () => {
         });
 
         SessionChannel.removeSessionEventListener(mockListener);
-        done();
     });
 
-    it('should notify listeners about logout event', async (done) => {
+    it('should notify listeners about logout event', async () => {
         const mockListener = jest.fn();
 
         SessionChannel.addSessionEventListener(mockListener);
@@ -64,7 +62,6 @@ describe('SessionChannel class', () => {
         });
 
         SessionChannel.removeSessionEventListener(mockListener);
-        done();
     });
 
 });
