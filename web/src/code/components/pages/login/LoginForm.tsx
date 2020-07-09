@@ -11,10 +11,10 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
-import { useSnackbar } from '../../providers/snackbars/useSnackbar';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
+import { useToast } from '../../providers/toast/useToast';
 
 
 export interface LoginFormProps {
@@ -25,10 +25,9 @@ type LoginFormData = MutationLoginArgs;
 type LoginFormSubmitHandler = FormikConfig<LoginFormData>['onSubmit'];
 
 export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement {
-    const { t } = useTranslation();
     const classes = useStyles();
-
-    const { errorSnackbar } = useSnackbar();
+    const { t } = useTranslation();
+    const { errorToast } = useToast();
     const [ loginMutation ] = useLoginMutation();
 
     const validationSchema = React.useMemo(() => Yup.object<LoginFormData>({
@@ -46,9 +45,9 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
             });
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorSnackbar(t('error.networkError')))
+                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
                 .handleGraphQlErrors({
-                    'BAD_CREDENTIALS': () => errorSnackbar(t('loginPage.badCredentials')),
+                    'BAD_CREDENTIALS': () => errorToast(({ t }) => t('loginPage.badCredentials')),
                 })
                 .finish();
         }

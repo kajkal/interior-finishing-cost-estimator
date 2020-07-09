@@ -75,8 +75,7 @@ describe('ProtectedRoute component', () => {
     it('should navigate to login page and display warning notification when user is not authenticated', async (done) => {
         const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
         const mockResponses = [ mockResponseGenerator.unauthorizedError() ];
-        const mockSnackbars = { warningSnackbar: jest.fn() };
-        renderInMockContext({ history, mockResponses, mockSnackbars });
+        renderInMockContext({ history, mockResponses });
 
         // verify if progressbar is visible
         expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
@@ -89,9 +88,10 @@ describe('ProtectedRoute component', () => {
         expect(history.location.state).toEqual({ from: expect.objectContaining({ pathname: protectedRoute }) });
         expect(screen.getByText('login component')).toBeInTheDocument();
 
-        // verify if warning alert was displayed
-        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledTimes(1);
-        expect(mockSnackbars.warningSnackbar).toHaveBeenCalledWith('t:error.authorizationRequired');
+        // verify if toast is visible
+        const toast = await screen.findByTestId('MockToast');
+        expect(toast).toHaveClass('warning');
+        expect(toast).toHaveTextContent('t:error.authorizationRequired');
         done();
     });
 

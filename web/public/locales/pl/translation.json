@@ -1,6 +1,7 @@
 {
   "common": {
     "appName": "Estymator kosztów wykończenia",
+    "closeToast": "Zamknij wiadomość",
     "openSideNav": "Otwórz boczną nawigację",
     "expandSideNav": "Rozwiń boczną nawigację",
     "collapseSideNav": "Zwiń boczną nawigację",

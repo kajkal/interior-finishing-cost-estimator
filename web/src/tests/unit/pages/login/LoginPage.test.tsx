@@ -194,13 +194,13 @@ describe('LoginPage component', () => {
 
         it('should display notification about bad credentials error ', async (done) => {
             const mockResponse = mockResponseGenerator.badCredentials();
-            const mockSnackbars = { errorSnackbar: jest.fn() };
-            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
-            // verify if error alert was displayed
-            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
-            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:loginPage.badCredentials');
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:loginPage.badCredentials');
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
@@ -209,13 +209,13 @@ describe('LoginPage component', () => {
 
         it('should display notification about network error', async (done) => {
             const mockResponse = mockResponseGenerator.networkError();
-            const mockSnackbars = { errorSnackbar: jest.fn() };
-            renderInMockContext({ mockResponses: [ mockResponse ], mockSnackbars });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
-            // verify if error alert was displayed
-            await waitFor(() => expect(mockSnackbars.errorSnackbar).toHaveBeenCalledTimes(1));
-            expect(mockSnackbars.errorSnackbar).toHaveBeenCalledWith('t:error.networkError');
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:error.networkError');
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);

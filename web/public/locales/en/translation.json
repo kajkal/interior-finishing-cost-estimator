@@ -1,6 +1,7 @@
 {
   "common": {
     "appName": "Interior finishing cost estimator",
+    "closeToast": "Close",
     "openSideNav": "Open side navigation",
     "expandSideNav": "Expand side navigation",
     "collapseSideNav": "Collapse side navigation",

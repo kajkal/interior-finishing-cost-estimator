@@ -15,7 +15,10 @@ import { supportedLanguages } from '../../code/config/supportedLanguages';
 jest.unmock('react-i18next');
 
 jest.mock('../../code/components/providers/apollo/ApolloContextProvider', () => ({
-    ApolloContextProvider: (props: any) => <>{props.children}</>,
+    ApolloContextProvider: (props: any) => <div data-testid='MockApolloContextProvider'>{props.children}</div>,
+}));
+jest.mock('../../code/components/providers/toast/ToastContextProvider', () => ({
+    ToastContextProvider: (props: any) => <div data-testid='MockToastContextProvider'>{props.children}</div>,
 }));
 jest.mock('../../code/components/navigation/Routes', () => ({
     Routes: () => <div data-testid='MockRoutes' />,
@@ -47,6 +50,10 @@ describe('index file', () => {
             jest.isolateModules(() => {
                 require('../../index');
             });
+
+            // verify if Apollo and Toast context providers are present
+            expect(screen.getByTestId('MockApolloContextProvider')).toBeInTheDocument();
+            expect(screen.getByTestId('MockToastContextProvider')).toBeInTheDocument();
 
             // verify if Layout and Routes are present in DOM
             expect(screen.getByTestId('MockLayout')).toBeInTheDocument();

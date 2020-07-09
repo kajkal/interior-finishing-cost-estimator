@@ -5,6 +5,7 @@ import { createMemoryHistory, MemoryHistory } from 'history';
 import { MockedProvider, MockedResponse } from '@apollo/react-testing';
 
 import { MockSnackbarContextData, MockSnackbarProvider } from './mocks/MockSnackbarProvider';
+import { MockToastContextProvider } from './mocks/MockToastContextProvider';
 
 
 export interface ContextMocks {
@@ -25,9 +26,11 @@ export function MockContextProvider(props: MockContextProviderProps): React.Reac
         <RecoilRoot initializeState={mockRecoilInitializeState}>
             <MockedProvider mocks={mockResponses}>
                 <Router history={history}>
-                    <MockSnackbarProvider mocks={mockSnackbars}>
-                        {props.children}
-                    </MockSnackbarProvider>
+                    <MockToastContextProvider>
+                        <MockSnackbarProvider mocks={mockSnackbars}>
+                            {props.children}
+                        </MockSnackbarProvider>
+                    </MockToastContextProvider>
                 </Router>
             </MockedProvider>
         </RecoilRoot>
