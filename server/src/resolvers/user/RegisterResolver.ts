@@ -39,9 +39,13 @@ export class RegisterResolver {
             throw new UserInputError('EMAIL_NOT_AVAILABLE');
         }
 
-        const encodedPassword = await hash(data.password);
+        // this two promises could be trigger simultaneously
+        const [ slug, encodedPassword ] = await Promise.all([
+            this.userRepository.generateUniqueSlug(data.name),
+            hash(data.password),
+        ]);
 
-        const user = this.userRepository.create({ ...data, password: encodedPassword });
+        const user = this.userRepository.create({ ...data, slug, password: encodedPassword });
         await this.userRepository.persistAndFlush(user);
 
         this.emailService.sendConfirmEmailAddressEmail(user); // no need to await

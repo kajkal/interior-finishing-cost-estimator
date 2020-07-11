@@ -4,7 +4,9 @@ import { UserRepository } from '../../../../src/repositories/UserRepository';
 export class UserRepositorySpy {
 
     static isEmailTaken: jest.SpiedFunction<typeof UserRepository.prototype.isEmailTaken>;
-    static find: jest.SpiedFunction<typeof UserRepository.prototype.find>;
+    static generateUniqueSlug: jest.SpiedFunction<typeof UserRepository.prototype.generateUniqueSlug>;
+
+    static count: jest.SpiedFunction<typeof UserRepository.prototype.count>;
     static findOne: jest.SpiedFunction<typeof UserRepository.prototype.findOne>;
     static findOneOrFail: jest.SpiedFunction<typeof UserRepository.prototype.findOneOrFail>;
     static create: jest.SpiedFunction<typeof UserRepository.prototype.create>;
@@ -13,7 +15,8 @@ export class UserRepositorySpy {
     static setupSpies() {
         this.restoreSpies();
         this.isEmailTaken = jest.spyOn(UserRepository.prototype, 'isEmailTaken');
-        this.find = jest.spyOn(UserRepository.prototype, 'find');
+        this.generateUniqueSlug = jest.spyOn(UserRepository.prototype, 'generateUniqueSlug');
+        this.count = jest.spyOn(UserRepository.prototype, 'count');
         this.findOne = jest.spyOn(UserRepository.prototype, 'findOne');
         this.findOneOrFail = jest.spyOn(UserRepository.prototype, 'findOneOrFail');
         this.create = jest.spyOn(UserRepository.prototype, 'create');
@@ -22,7 +25,8 @@ export class UserRepositorySpy {
 
     private static restoreSpies() {
         this.isEmailTaken?.mockRestore();
-        this.find?.mockRestore();
+        this.generateUniqueSlug?.mockRestore();
+        this.count?.mockRestore();
         this.findOne?.mockRestore();
         this.findOneOrFail?.mockRestore();
         this.create?.mockRestore();

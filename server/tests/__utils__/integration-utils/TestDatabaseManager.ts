@@ -43,8 +43,10 @@ export class TestDatabaseManager {
      * User
      */
     async populateWithUser(partialUserData?: Partial<Omit<User, 'products' | 'projects' | 'offers'>>): Promise<User & { unencryptedPassword: string }> {
+        const name = generator.name();
         const userData = {
-            name: generator.name(),
+            name,
+            slug: name.toLowerCase().replace(' ', '-'), // simple slug generator
             email: generator.email(),
             password: generator.string({ length: 8 }),
             isEmailAddressConfirmed: false,

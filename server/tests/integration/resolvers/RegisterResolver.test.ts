@@ -44,13 +44,14 @@ describe('RegisterResolver', () => {
                 accessToken
                 user {
                   name
+                  slug
                   email
                 }
               }
             }
         `;
 
-        it('should create new user and return initial data if form data are valid', async (done) => {
+        it('should create new user and return initial data if form data are valid', async () => {
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
                 email: generator.email(),
@@ -60,10 +61,6 @@ describe('RegisterResolver', () => {
                 query: registerMutation,
                 variables: registerFormData,
             });
-
-            // verify if email was check for availability
-            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
 
             // verify if new user object was created and saved in db
             expect(UserRepositorySpy.create).toHaveBeenCalledTimes(1);
@@ -98,15 +95,15 @@ describe('RegisterResolver', () => {
                         accessToken: expect.any(String),
                         user: {
                             name: registerFormData.name,
+                            slug: registerFormData.name.toLowerCase().replace(' ', '-'),
                             email: registerFormData.email,
                         },
                     },
                 },
             });
-            done();
         });
 
-        it('should return error if user with given email address already exists', async (done) => {
+        it('should return error if user with given email address already exists', async () => {
             const existingUser = await testUtils.db.populateWithUser();
             const registerFormData: RegisterFormData = {
                 name: generator.name(),
@@ -118,11 +115,8 @@ describe('RegisterResolver', () => {
                 variables: registerFormData,
             });
 
-            // verify if email was check for availability
-            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.isEmailTaken).toHaveBeenCalledWith(registerFormData.email);
-
             // verify if functions reserved for creating new user were not called
+            expect(UserRepositorySpy.generateUniqueSlug).toHaveBeenCalledTimes(0);
             expect(UserRepositorySpy.create).toHaveBeenCalledTimes(0);
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(0);
             expect(EmailServiceSpy.sendConfirmEmailAddressEmail).toHaveBeenCalledTimes(0);
@@ -142,7 +136,6 @@ describe('RegisterResolver', () => {
                     }),
                 ],
             });
-            done();
         });
 
     });
@@ -159,7 +152,7 @@ describe('RegisterResolver', () => {
             return Container.get(EmailAddressConfirmationService).generateEmailAddressConfirmationToken(userData);
         }
 
-        it('should mark user email as confirmed if token is valid', async (done) => {
+        it('should mark user email as confirmed if token is valid', async () => {
             const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: false });
             const emailAddressConfirmationData: EmailAddressConfirmationData = {
                 token: createSampleEmailAddressConfirmationToken(user),
@@ -191,10 +184,9 @@ describe('RegisterResolver', () => {
                     confirmEmailAddress: true,
                 },
             });
-            done();
         });
 
-        it('should return error is email address is already confirmed', async (done) => {
+        it('should return error is email address is already confirmed', async () => {
             const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: true });
             const emailAddressConfirmationData: EmailAddressConfirmationData = {
                 token: createSampleEmailAddressConfirmationToken(user),
@@ -229,10 +221,9 @@ describe('RegisterResolver', () => {
                     }),
                 ],
             });
-            done();
         });
 
-        it('should return error if token is invalid', async (done) => {
+        it('should return error if token is invalid', async () => {
             const emailAddressConfirmationData: EmailAddressConfirmationData = {
                 token: sign({ id: 'sample id' }, 'WRONG_PRIVATE_KEY'),
             };
@@ -260,7 +251,6 @@ describe('RegisterResolver', () => {
                     }),
                 ],
             });
-            done();
         });
 
     });

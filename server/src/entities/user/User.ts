@@ -15,6 +15,10 @@ export class User extends BaseEntity {
     @Property()
     name!: string;
 
+    @Field({ description: 'Unique user slug. Used in URLs' })
+    @Property({ unique: true })
+    slug!: string;
+
     @Field()
     @Property({ unique: true })
     email!: string;
