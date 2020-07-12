@@ -1,6 +1,8 @@
 import gql from 'graphql-tag';
 import * as ApolloReactCommon from '@apollo/client';
 import * as ApolloReactHooks from '@apollo/client';
+
+
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -24,8 +26,11 @@ export type Query = {
 export type User = {
   __typename?: 'User';
   name: Scalars['String'];
+  /** Unique user slug. Used in URLs */
+  slug: Scalars['String'];
   email: Scalars['String'];
   products: Array<Product>;
+  productCount: Scalars['Int'];
   projects: Array<Project>;
   offers: Array<Offer>;
 };
@@ -40,6 +45,8 @@ export type Project = {
   __typename?: 'Project';
   id: Scalars['ID'];
   name: Scalars['String'];
+  /** Unique project slug. Used in URLs */
+  slug: Scalars['String'];
 };
 
 export type Offer = {
@@ -82,6 +89,23 @@ export type MutationSendPasswordResetInstructionsArgs = {
 export type MutationResetPasswordArgs = {
   token: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationCreateProjectArgs = {
+  id?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+};
+
+
+export type MutationUpdateProjectArgs = {
+  id?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+};
+
+
+export type MutationDeleteProjectArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -137,13 +161,13 @@ export type LoginMutation = (
     & Pick<InitialData, 'accessToken'>
     & { user: (
       { __typename?: 'User' }
-      & Pick<User, 'name' | 'email'>
+      & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
       & { products: Array<(
         { __typename?: 'Product' }
         & Pick<Product, 'name'>
       )>, projects: Array<(
         { __typename?: 'Project' }
-        & Pick<Project, 'name'>
+        & Pick<Project, 'id' | 'name' | 'slug'>
       )>, offers: Array<(
         { __typename?: 'Offer' }
         & Pick<Offer, 'name'>
@@ -167,13 +191,13 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me: (
     { __typename?: 'User' }
-    & Pick<User, 'name' | 'email'>
+    & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
     & { products: Array<(
       { __typename?: 'Product' }
       & Pick<Product, 'name'>
     )>, projects: Array<(
       { __typename?: 'Project' }
-      & Pick<Project, 'name'>
+      & Pick<Project, 'id' | 'name' | 'slug'>
     )>, offers: Array<(
       { __typename?: 'Offer' }
       & Pick<Offer, 'name'>
@@ -195,13 +219,13 @@ export type RegisterMutation = (
     & Pick<InitialData, 'accessToken'>
     & { user: (
       { __typename?: 'User' }
-      & Pick<User, 'name' | 'email'>
+      & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
       & { products: Array<(
         { __typename?: 'Product' }
         & Pick<Product, 'name'>
       )>, projects: Array<(
         { __typename?: 'Project' }
-        & Pick<Project, 'name'>
+        & Pick<Project, 'id' | 'name' | 'slug'>
       )>, offers: Array<(
         { __typename?: 'Offer' }
         & Pick<Offer, 'name'>
@@ -278,12 +302,16 @@ export const LoginDocument = gql`
     accessToken
     user {
       name
+      slug
       email
       products {
         name
       }
+      productCount
       projects {
+        id
         name
+        slug
       }
       offers {
         name
@@ -349,12 +377,16 @@ export const MeDocument = gql`
     query Me {
   me {
     name
+    slug
     email
     products {
       name
     }
+    productCount
     projects {
+      id
       name
+      slug
     }
     offers {
       name
@@ -393,12 +425,16 @@ export const RegisterDocument = gql`
     accessToken
     user {
       name
+      slug
       email
       products {
         name
       }
+      productCount
       projects {
+        id
         name
+        slug
       }
       offers {
         name

@@ -119,14 +119,7 @@ describe('LoginPage component', () => {
                     data: {
                         login: {
                             accessToken: 'ACCESS_TOKEN_TEST_VALUE',
-                            user: {
-                                name: '',
-                                email: '',
-                                products: [],
-                                projects: [],
-                                offers: [],
-                                '__typename': 'User',
-                            },
+                            user: { userData: '...' },
                             '__typename': 'InitialData',
                         },
                     },

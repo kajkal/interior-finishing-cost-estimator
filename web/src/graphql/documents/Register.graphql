@@ -3,12 +3,16 @@ mutation Register($name: String!, $email: String!, $password: String!) {
         accessToken
         user {
             name
+            slug
             email
             products {
                 name
             }
+            productCount
             projects {
+                id
                 name
+                slug
             }
             offers {
                 name
