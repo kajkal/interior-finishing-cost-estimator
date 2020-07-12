@@ -1,9 +1,9 @@
-import { MockLogger } from '../../__mocks__/utils/logger';
+import { MockLogger } from '../../../__mocks__/utils/logger';
 
-import { useIntegrationTestsUtils } from '../../__utils__/integration-utils/useIntegrationTestsUtils';
-import { UserRepositorySpy } from '../../__utils__/spies/repositories/UserRepositorySpy';
-import { AccessTokenManagerSpy } from '../../__utils__/spies/services/auth/AccessTokenManagerSpy';
-import { createAccessToken } from '../../__utils__/integration-utils/authUtils';
+import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { createAccessToken } from '../../../__utils__/integration-utils/authUtils';
 
 
 describe('UserResolver', () => {
@@ -44,14 +44,14 @@ describe('UserResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const product1 = await testUtils.db.populateWithProduct(user.id);
             const product2 = await testUtils.db.populateWithProduct(user.id);
-            const [ authHeader, validToken ] = createAccessToken(user);
+            const { authHeader, tokenValue } = createAccessToken(user);
             const response = await testUtils.postGraphQL({
                 query: meQuery,
             }).set('Authorization', authHeader);
 
             // verify if access token was verified
             expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
-            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(validToken);
+            expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(tokenValue);
 
             // verify if the database was queried
             expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);

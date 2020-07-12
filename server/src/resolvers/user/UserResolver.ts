@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { Authorized, Ctx, FieldResolver, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { Authorized, Ctx, FieldResolver, Query, Resolver, Root, UseMiddleware, Int } from 'type-graphql';
 
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { UserRepository } from '../../repositories/UserRepository';
@@ -22,6 +22,13 @@ export class UserResolver {
     async products(@Root() user: User) {
         console.log('loading products for user', user.email);
         return await user.products.loadItems();
+    }
+
+    @FieldResolver(() => Int)
+    async productCount(@Root() user: User) {
+        console.log('loading productCount for user', user.email);
+        await user.products.init();
+        return user.products.count();
     }
 
     @FieldResolver(() => [ Project ])

@@ -1,20 +1,20 @@
 import { Container } from 'typedi';
 import { sign } from 'jsonwebtoken';
 
-import { MockLogger } from '../../__mocks__/utils/logger';
+import { MockLogger } from '../../../__mocks__/utils/logger';
 
-import { useIntegrationTestsUtils } from '../../__utils__/integration-utils/useIntegrationTestsUtils';
-import { UserRepositorySpy } from '../../__utils__/spies/repositories/UserRepositorySpy';
-import { EmailServiceSpy } from '../../__utils__/spies/services/email/EmailServiceSpy';
-import { AccessTokenManagerSpy } from '../../__utils__/spies/services/auth/AccessTokenManagerSpy';
-import { RefreshTokenManagerSpy } from '../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
-import { EmailAddressConfirmationTokenManagerSpy } from '../../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationTokenManagerSpy';
-import { generator } from '../../__utils__/generator';
+import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
+import { EmailServiceSpy } from '../../../__utils__/spies/services/email/EmailServiceSpy';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+import { EmailAddressConfirmationTokenManagerSpy } from '../../../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationTokenManagerSpy';
+import { generator } from '../../../__utils__/generator';
 
-import { EmailAddressConfirmationService } from '../../../src/services/email-address-confirmation/EmailAddressConfirmationService';
-import { EmailAddressConfirmationData } from '../../../src/resolvers/user/input/EmailAddressConfirmationData';
-import { RegisterFormData } from '../../../src/resolvers/user/input/RegisterFormData';
-import { User } from '../../../src/entities/user/User';
+import { EmailAddressConfirmationService } from '../../../../src/services/email-address-confirmation/EmailAddressConfirmationService';
+import { EmailAddressConfirmationData } from '../../../../src/resolvers/user/input/EmailAddressConfirmationData';
+import { RegisterFormData } from '../../../../src/resolvers/user/input/RegisterFormData';
+import { User } from '../../../../src/entities/user/User';
 
 
 describe('RegisterResolver', () => {
@@ -95,7 +95,7 @@ describe('RegisterResolver', () => {
                         accessToken: expect.any(String),
                         user: {
                             name: registerFormData.name,
-                            slug: registerFormData.name.toLowerCase().replace(' ', '-'),
+                            slug: registerFormData.name.toLowerCase().replace(/\s/g, '-'),
                             email: registerFormData.email,
                         },
                     },

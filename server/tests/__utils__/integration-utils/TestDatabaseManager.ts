@@ -4,6 +4,7 @@ import { MikroORM, wrap } from 'mikro-orm';
 
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 import { Product } from '../../../src/entities/product/Product';
+import { Project } from '../../../src/entities/project/Project';
 import { User } from '../../../src/entities/user/User';
 import { generator } from '../generator';
 
@@ -76,6 +77,26 @@ export class TestDatabaseManager {
         await this.orm.em.persistAndFlush(product);
 
         return product;
+    }
+
+
+    /**
+     * Project
+     */
+    async populateWithProject(userId: string, partialProjectData?: Partial<Omit<Project, 'user'>>): Promise<Project> {
+        const name = generator.sentence({ words: 5 }).replace(/\./g, '');
+        const projectData = {
+            user: userId,
+            name,
+            slug: name.toLowerCase().replace(' ', '-'), // simple slug generator
+            ...partialProjectData,
+        };
+
+        const project = new Project();
+        wrap(project).assign(projectData, { em: this.orm.em });
+        await this.orm.em.persistAndFlush(project);
+
+        return project;
     }
 
 }

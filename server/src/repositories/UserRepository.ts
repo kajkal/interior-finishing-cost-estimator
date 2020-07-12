@@ -1,6 +1,6 @@
-import slugify from 'slugify';
 import { EntityRepository, Repository } from 'mikro-orm';
 
+import { generateSlugBase, generateUniqueSlug } from '../utils/generateUniqueSlug';
 import { User } from '../entities/user/User';
 
 
@@ -13,11 +13,14 @@ export class UserRepository extends EntityRepository<User> {
     }
 
     async generateUniqueSlug(name: string): Promise<string> {
-        const slugBase = slugify(name, { lower: true, strict: true });
-        const slugCount = await this.count({ slug: new RegExp(`^${slugBase}-?\\d*$`) });
-        return (slugCount)
-            ? `${slugBase}-${slugCount}`
-            : slugBase;
+        const slugBase = generateSlugBase(name);
+        const usersSlugs = await this.find({
+            slug: new RegExp(`^${slugBase}(-\\d+)?$`),
+        }, {
+            fields: [ 'slug' ],
+        });
+        const takenSlugs = usersSlugs.map(it => it.slug);
+        return generateUniqueSlug(slugBase, takenSlugs);
     }
 
 }

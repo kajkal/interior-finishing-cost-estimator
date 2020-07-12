@@ -1,12 +1,12 @@
-import { MockLogger } from '../../__mocks__/utils/logger';
+import { MockLogger } from '../../../__mocks__/utils/logger';
 
-import { useIntegrationTestsUtils } from '../../__utils__/integration-utils/useIntegrationTestsUtils';
-import { UserRepositorySpy } from '../../__utils__/spies/repositories/UserRepositorySpy';
-import { AuthServiceSpy } from '../../__utils__/spies/services/auth/AuthServiceSpy';
-import { AccessTokenManagerSpy } from '../../__utils__/spies/services/auth/AccessTokenManagerSpy';
-import { RefreshTokenManagerSpy } from '../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
+import { AuthServiceSpy } from '../../../__utils__/spies/services/auth/AuthServiceSpy';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
 
-import { LoginFormData } from '../../../src/resolvers/user/input/LoginFormData';
+import { LoginFormData } from '../../../../src/resolvers/user/input/LoginFormData';
 
 
 describe('LoginResolver', () => {

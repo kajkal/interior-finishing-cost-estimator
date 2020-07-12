@@ -46,30 +46,30 @@ describe('UserRepository class', () => {
 
     describe('generateUniqueSlug method', () => {
 
-        it('should generate slug when there is no similar slug in db', async () => {
-            // given
-            UserRepositorySpy.count.mockResolvedValueOnce(0);
+        const slugsFromDb = [
+            'karol-lesniak',
+            'karol-lesniak-1',
+            'sample',
+        ];
 
-            // when
-            const result = await repositoryUnderTest.generateUniqueSlug('Karol Leśniak');
-
-            // then
-            expect(result).toBe('karol-lesniak');
-            expect(UserRepositorySpy.count).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.count).toHaveBeenCalledWith({ slug: expect.any(RegExp) });
+        beforeEach(() => {
+            UserRepositorySpy.find.mockImplementation(({ slug: slugRegExp }: any): any => slugsFromDb
+                .filter(slug => slugRegExp.test(slug))
+                .map(slug => ({ slug })),
+            );
         });
 
-        it('should generate slug when there already are some similar slugs in db', async () => {
-            // given
-            UserRepositorySpy.count.mockResolvedValueOnce(2);
+        it('should generate slug when there are no similar slugs in db', async () => {
+            const result = await repositoryUnderTest.generateUniqueSlug('Leśniak Karol');
+            expect(result).toBe('lesniak-karol');
+        });
 
-            // when
-            const result = await repositoryUnderTest.generateUniqueSlug('Karol Leśniak');
+        it('should generate unique slug when there are similar slugs in db', async () => {
+            const result1 = await repositoryUnderTest.generateUniqueSlug('Karol Leśniak');
+            expect(result1).toBe('karol-lesniak-2');
 
-            // then
-            expect(result).toBe('karol-lesniak-2');
-            expect(UserRepositorySpy.count).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.count).toHaveBeenCalledWith({ slug: expect.any(RegExp) });
+            const result2 = await repositoryUnderTest.generateUniqueSlug('Sample');
+            expect(result2).toBe('sample-1');
         });
 
     });

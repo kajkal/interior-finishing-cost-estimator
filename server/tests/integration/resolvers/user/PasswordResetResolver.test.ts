@@ -1,17 +1,17 @@
 import { Container } from 'typedi';
 import { sign } from 'jsonwebtoken';
 
-import { MockLogger } from '../../__mocks__/utils/logger';
+import { MockLogger } from '../../../__mocks__/utils/logger';
 
-import { useIntegrationTestsUtils } from '../../__utils__/integration-utils/useIntegrationTestsUtils';
-import { UserRepositorySpy } from '../../__utils__/spies/repositories/UserRepositorySpy';
-import { EmailServiceSpy } from '../../__utils__/spies/services/email/EmailServiceSpy';
-import { PasswordResetTokenManagerSpy } from '../../__utils__/spies/services/password-reset/PasswordResetTokenManagerSpy';
-import { generator } from '../../__utils__/generator';
+import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
+import { EmailServiceSpy } from '../../../__utils__/spies/services/email/EmailServiceSpy';
+import { PasswordResetTokenManagerSpy } from '../../../__utils__/spies/services/password-reset/PasswordResetTokenManagerSpy';
+import { generator } from '../../../__utils__/generator';
 
-import { PasswordResetService } from '../../../src/services/password-reset/PasswordResetService';
-import { PasswordResetFormData } from '../../../src/resolvers/user/input/PasswordResetFormData';
-import { User } from '../../../src/entities/user/User';
+import { PasswordResetService } from '../../../../src/services/password-reset/PasswordResetService';
+import { PasswordResetFormData } from '../../../../src/resolvers/user/input/PasswordResetFormData';
+import { User } from '../../../../src/entities/user/User';
 
 
 describe('PasswordResetResolver', () => {

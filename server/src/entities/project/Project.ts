@@ -19,4 +19,8 @@ export class Project extends BaseEntity {
     @Property()
     name!: string;
 
+    @Field({ description: 'Unique project slug. Used in URLs' })
+    @Property({ unique: true })
+    slug!: string;
+
 }

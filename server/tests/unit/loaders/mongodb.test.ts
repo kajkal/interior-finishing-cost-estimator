@@ -27,7 +27,7 @@ describe('mongodb loader', () => {
         MockOrm.em.getRepository.mockRestore();
     });
 
-    it('should connect to database', async () => {
+    it('should connect to database', async (done) => {
         expect.assertions(6);
 
         // given/when
@@ -50,9 +50,10 @@ describe('mongodb loader', () => {
         expect(MockOrm.em.getRepository).toHaveBeenCalledTimes(4);
         expect(MockLogger.info).toHaveBeenCalledTimes(1);
         expect(MockLogger.info).toHaveBeenCalledWith(expect.stringMatching(/Successfully connected/));
+        done();
     });
 
-    it('should log error and exit when cannot connect to database', async () => {
+    it('should log error and exit when cannot connect to database', async (done) => {
         expect.assertions(3);
 
         // given
@@ -68,6 +69,7 @@ describe('mongodb loader', () => {
         expect(MockLogger.error).toHaveBeenCalledTimes(1);
         expect(MockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Cannot connect/), expect.any(Error));
         expect(process.exit).toHaveBeenCalledTimes(1);
+        done();
     });
 
 });
