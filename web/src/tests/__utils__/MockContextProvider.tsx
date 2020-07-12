@@ -2,7 +2,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { RecoilRoot, RecoilRootProps } from 'recoil/dist';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import { MockedProvider, MockedResponse } from '@apollo/react-testing';
+import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 
 import { MockToastContextProvider } from './mocks/MockToastContextProvider';
 

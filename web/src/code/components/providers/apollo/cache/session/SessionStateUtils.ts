@@ -1,4 +1,4 @@
-import ApolloClient from 'apollo-boost';
+import {ApolloClient} from '@apollo/client';
 
 import { SessionState, SessionStateDocument, SessionStateQuery } from '../../../../../../graphql/generated-types';
 import { ApolloCacheShape } from '../ApolloCacheShape';
@@ -15,16 +15,13 @@ export class SessionStateUtils {
         accessToken: '',
     };
 
-    static setDefaultSessionState(client: ApolloClient<ApolloCacheShape>) {
-        this.setSessionState(client, SessionStateUtils.DEFAULT_SESSION_SATE);
-    }
-
-    static setSessionState(client: ApolloClient<ApolloCacheShape>, newState: SessionState) {
+    static setSessionState(client: ApolloClient<ApolloCacheShape>, newState: SessionState | undefined) {
         client.writeQuery<SessionStateQuery>({
             query: SessionStateDocument,
             data: {
                 sessionState: {
                     __typename: 'SessionState',
+                    ...SessionStateUtils.DEFAULT_SESSION_SATE,
                     ...newState,
                 },
             },

@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-boost';
+import { ApolloError } from '@apollo/client';
 import { GraphQLError } from 'graphql';
 
 import { muteConsole } from '../../../../__utils__/muteConsole';

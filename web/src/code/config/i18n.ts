@@ -24,7 +24,7 @@ i18n
         },
         // fallbackLng: 'en', // fallback language is always loaded, regardless of selected language
         fallbackLng: false, // only selected language is loaded
-        debug: true,
+        // debug: true,
         interpolation: {
             escapeValue: false,
         },

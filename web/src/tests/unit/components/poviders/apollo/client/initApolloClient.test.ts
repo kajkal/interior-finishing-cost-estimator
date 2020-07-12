@@ -1,7 +1,8 @@
-import { Operation } from 'apollo-boost';
+import * as apolloClientModule from '@apollo/client';
+import * as linkContextModule from '@apollo/link-context';
 
-import { MockApolloClient } from '../../../../../__mocks__/libraries/apollo.boost';
 import { AuthUtilsSpiesManager } from '../../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
+import { ApolloClientSpy } from '../../../../../__utils__/spies-managers/ApolloClientSpy';
 
 import { UnauthorizedError } from '../../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { initApolloClient } from '../../../../../../code/components/providers/apollo/client/initApolloClient';
@@ -10,25 +11,40 @@ import { SessionStateDocument } from '../../../../../../graphql/generated-types'
 
 describe('initApolloClient function', () => {
 
+    let setContextSpy: jest.SpiedFunction<typeof linkContextModule.setContext>;
+    let createHttpLinkSpy: jest.SpiedFunction<typeof apolloClientModule.createHttpLink>;
+
     beforeEach(() => {
-        MockApolloClient.setupMocks();
+        ApolloClientSpy.setupSpies();
+        setContextSpy = jest.spyOn(linkContextModule, 'setContext');
+        createHttpLinkSpy = jest.spyOn(apolloClientModule, 'createHttpLink');
+    });
+
+    afterEach(() => {
+        setContextSpy.mockRestore();
+        createHttpLinkSpy.mockRestore();
     });
 
     it('should create ApolloClient with given initial cache state', () => {
-        initApolloClient({ sessionState: { accessToken: 'initialAccessTokenValue' } });
+        const client = initApolloClient({ sessionState: { accessToken: 'initialAccessTokenValue' } });
 
-        // verify Apollo client creation
-        expect(MockApolloClient.constructorFn).toHaveBeenCalledTimes(1);
-        expect(MockApolloClient.constructorFn).toHaveBeenCalledWith({
+        // verify produced client
+        expect(client).toBeInstanceOf(apolloClientModule.ApolloClient);
+
+        // verify HttpLink
+        expect(createHttpLinkSpy).toHaveBeenCalledTimes(1);
+        expect(createHttpLinkSpy).toHaveBeenCalledWith({
             uri: 'http://localhost:4000/graphql',
             credentials: 'include',
-            resolvers: {},
-            request: expect.any(Function),
         });
 
+        // verify AuthLink
+        expect(setContextSpy).toHaveBeenCalledTimes(1);
+        expect(setContextSpy).toHaveBeenCalledWith(expect.any(Function));
+
         // verify if cache session data was initialized
-        expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(1);
-        expect(MockApolloClient.writeQuery).toHaveBeenCalledWith({
+        expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(1);
+        expect(ApolloClientSpy.writeQuery).toHaveBeenCalledWith({
             query: SessionStateDocument,
             data: {
                 sessionState: {
@@ -38,14 +54,11 @@ describe('initApolloClient function', () => {
             },
         });
 
-        // verify if 'on clear store' listener was added
-        expect(MockApolloClient.onClearStore).toHaveBeenCalledTimes(1);
-        expect(MockApolloClient.onClearStore).toHaveBeenCalledWith(expect.any(Function));
-
         // verify 'on clear store' listener
-        MockApolloClient.simulateClearStore();
-        expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(2); // one extra time
+        ApolloClientSpy.simulateClearStore();
+        expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(2); // one extra time
     });
+
 
     describe('prepare GraphQL request', () => {
 
@@ -53,76 +66,75 @@ describe('initApolloClient function', () => {
             AuthUtilsSpiesManager.setupSpiesAndMockImplementations();
         });
 
-        function getPrepareRequestFunction() {
+        function getPrepareOperationContextFunction() {
             initApolloClient({ sessionState: null! });
-            const prepareRequestFn = MockApolloClient.constructorFn.mock.calls[ 0 ][ 0 ].request!;
-            expect(prepareRequestFn).toBeInstanceOf(Function);
-            MockApolloClient.writeQuery.mockReset(); // write of initial cache data
-            return prepareRequestFn;
+            const prepareOperationContextFn = setContextSpy.mock.calls[ 0 ][ 0 ];
+            expect(prepareOperationContextFn).toBeInstanceOf(Function);
+            ApolloClientSpy.writeQuery.mockReset(); // write of initial cache data
+            return prepareOperationContextFn;
         }
 
         function createSampleOperation() {
             return {
                 operationName: 'SampleOperation',
                 setContext: jest.fn(),
-            } as unknown as Operation;
+            } as unknown as apolloClientModule.Operation;
         }
 
         it('should add auth header only for protected operations', async () => {
-            MockApolloClient.readQuery.mockReturnValue({ sessionState: { accessToken: 'ACCESS_TOKEN_FROM_CACHE' } });
+            ApolloClientSpy.readQuery.mockReturnValue({ sessionState: { accessToken: 'ACCESS_TOKEN_FROM_CACHE' } });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(false);
 
-            const prepareRequest = getPrepareRequestFunction();
+            const prepareOperationContext = getPrepareOperationContextFunction();
             const operation = createSampleOperation();
-            await prepareRequest(operation);
+            const context = await prepareOperationContext(operation, {});
 
             // verify if access token from cache was not verified
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(0);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(0);
 
             // verify if cache was not updated
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(0);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(0);
 
             // verify if operation context was not updated
-            expect(operation.setContext).toHaveBeenCalledTimes(0);
+            expect(context).toEqual({});
         });
 
         it('should use valid access token from memory', async () => {
-            MockApolloClient.readQuery.mockReturnValue({
+            ApolloClientSpy.readQuery.mockReturnValue({
                 sessionState: { accessToken: 'ACCESS_TOKEN_FROM_CACHE' },
             });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(true);
             AuthUtilsSpiesManager.verifyAccessToken.mockImplementation((token) => token);
 
-            const prepareRequest = getPrepareRequestFunction();
+            const prepareOperationContext = getPrepareOperationContextFunction();
             const operation = createSampleOperation();
-            await prepareRequest(operation);
+            const context = await prepareOperationContext(operation, {});
 
             // verify if access token was not refreshed
             expect(AuthUtilsSpiesManager.refreshAccessToken).toHaveBeenCalledTimes(0);
 
             // verify if cache was not updated unnecessarily
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(0);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(0);
 
             // verify if operation context was updated
-            expect(operation.setContext).toHaveBeenCalledTimes(1);
-            expect(operation.setContext).toHaveBeenCalledWith({
+            expect(context).toEqual({
                 headers: { authorization: 'Bearer ACCESS_TOKEN_FROM_CACHE' },
             });
         });
 
         it('should refresh token when access token from memory is invalid', async () => {
-            MockApolloClient.readQuery.mockReturnValue({ sessionState: { accessToken: 'INVALID_ACCESS_TOKEN_FROM_CACHE' } });
+            ApolloClientSpy.readQuery.mockReturnValue({ sessionState: { accessToken: 'INVALID_ACCESS_TOKEN_FROM_CACHE' } });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(true);
             AuthUtilsSpiesManager.verifyAccessToken.mockReturnValue(undefined);
             AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('REFRESHED_ACCESS_TOKEN');
 
-            const prepareRequest = getPrepareRequestFunction();
+            const prepareOperationContext = getPrepareOperationContextFunction();
             const operation = createSampleOperation();
-            await prepareRequest(operation);
+            const context = await prepareOperationContext(operation, {});
 
             // verify if cache was updated
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(1);
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledWith({
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(1);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledWith({
                 query: SessionStateDocument,
                 data: {
                     sessionState: {
@@ -133,33 +145,30 @@ describe('initApolloClient function', () => {
             });
 
             // verify if operation context was updated
-            expect(operation.setContext).toHaveBeenCalledTimes(1);
-            expect(operation.setContext).toHaveBeenCalledWith({
+            expect(context).toEqual({
                 headers: { authorization: 'Bearer REFRESHED_ACCESS_TOKEN' },
             });
         });
 
         it('should throw en error when the refresh operation returns an error', async (done) => {
-            MockApolloClient.readQuery.mockReturnValue({ sessionState: { accessToken: 'INVALID_ACCESS_TOKEN_FROM_CACHE' } });
+            ApolloClientSpy.readQuery.mockReturnValue({ sessionState: { accessToken: 'INVALID_ACCESS_TOKEN_FROM_CACHE' } });
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(true);
             AuthUtilsSpiesManager.verifyAccessToken.mockReturnValue(undefined);
             AuthUtilsSpiesManager.refreshAccessToken.mockImplementation(() => {
                 throw new UnauthorizedError('cannot refresh token');
             });
 
-            const prepareRequest = getPrepareRequestFunction();
+            const prepareOperationContext = getPrepareOperationContextFunction();
             const operation = createSampleOperation();
 
             try {
-                await prepareRequest(operation);
+                await prepareOperationContext(operation, {});
             } catch (error) {
+                expect(error).toBeInstanceOf(UnauthorizedError);
                 expect(error).toHaveProperty('message', 'cannot refresh token');
 
                 // verify if cache was not updated
-                expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(0);
-
-                // verify if operation context was not updated
-                expect(operation.setContext).toHaveBeenCalledTimes(0);
+                expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(0);
                 done();
             }
         });

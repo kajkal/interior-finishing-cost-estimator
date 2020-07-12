@@ -3,11 +3,10 @@ import { GraphQLError } from 'graphql';
 import { Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { JsonWebTokenError } from 'jsonwebtoken';
-import { MockedResponse } from '@apollo/react-testing';
+import { MockedResponse } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { ApolloClientSpiesManager } from '../../../__utils__/spies-managers/ApolloClientSpiesManager';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';
@@ -20,7 +19,6 @@ describe('ConfirmEmailAddressPage component', () => {
     const validEmailAddressConfirmationToken = 'VALID_TOKEN';
 
     beforeEach(() => {
-        ApolloClientSpiesManager.setupSpies();
         TokenVerifierSpy.setupSpiesAndMockImplementations();
         TokenVerifierSpy.create.mockImplementation((tokenToVerify?: string | null) => {
             switch (tokenToVerify) {
@@ -99,9 +97,6 @@ describe('ConfirmEmailAddressPage component', () => {
                 // verify if navigation occurred
                 expect(history.location.pathname).toBe(routes.login());
 
-                // verify if mutation was not created
-                expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(0);
-
                 // verify if toast is visible
                 const toast = await screen.findByTestId('MockToast');
                 expect(toast).toHaveClass('error');
@@ -123,9 +118,6 @@ describe('ConfirmEmailAddressPage component', () => {
 
         // verify if navigation occurred
         expect(history.location.pathname).toBe(routes.login());
-
-        // verify if mutation was created
-        expect(ApolloClientSpiesManager.mutate).toHaveBeenCalledTimes(1);
     }
 
     it('should display notification about successful email address confirmation', async () => {

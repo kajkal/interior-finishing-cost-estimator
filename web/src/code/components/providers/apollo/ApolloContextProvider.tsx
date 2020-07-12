@@ -1,10 +1,11 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from '@apollo/client';
 
 import { SessionAction, SessionChannel } from '../../../utils/communication/SessionChannel';
+import { MeDocument, MeQuery, useMeLazyQuery } from '../../../../graphql/generated-types';
 import { SessionActionType } from '../../../utils/communication/SessionActionType';
-import { MeDocument, MeQuery } from '../../../../graphql/generated-types';
+import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
 import { SessionStateUtils } from './cache/session/SessionStateUtils';
 import { initApolloClient } from './client/initApolloClient';
 import { AuthUtils } from '../../../utils/auth/AuthUtils';
@@ -39,6 +40,7 @@ const accessTokenResource = function createAccessTokenResource() {
 export function ApolloContextProvider({ children }: ApolloContextProviderProps): React.ReactElement {
     const accessToken = accessTokenResource.read(); // triggers React.Suspense
     const [ client ] = React.useState(() => initApolloClient({ sessionState: { accessToken } }));
+    const [ meQuery, result ] = useMeLazyQuery({ client });
     const { push } = useHistory();
 
     React.useEffect(() => {
@@ -69,6 +71,13 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
         };
     }, [ client, push ]);
 
+    React.useEffect(() => {
+        accessToken && meQuery();
+    }, [ accessToken ]);
+
+    if (accessToken && (!result.data && !result.error)) {
+        return <BackdropSpinner />;
+    }
     return (
         <ApolloProvider client={client}>
             {children}

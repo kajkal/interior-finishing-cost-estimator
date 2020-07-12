@@ -1,8 +1,7 @@
 import React from 'react';
-import { InMemoryCache } from 'apollo-boost';
-import { Cache } from 'apollo-cache/src/types/index';
+import { Cache, InMemoryCache } from '@apollo/client';
+import { MockedProvider } from '@apollo/client/testing';
 import { renderHook } from '@testing-library/react-hooks';
-import { MockedProvider } from '@apollo/react-testing';
 
 import { SessionStateDocument, SessionStateQuery } from '../../../../../../../graphql/generated-types';
 import { useSessionState } from '../../../../../../../code/components/providers/apollo/cache/session/useSessionState';

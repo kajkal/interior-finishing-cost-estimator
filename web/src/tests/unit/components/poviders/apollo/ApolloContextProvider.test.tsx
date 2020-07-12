@@ -4,13 +4,13 @@ import { createMemoryHistory, MemoryHistory } from 'history';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { AuthUtilsSpiesManager } from '../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
+import { ApolloClientSpy } from '../../../../__utils__/spies-managers/ApolloClientSpy';
 import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
-import { MockApolloClient } from '../../../../__mocks__/libraries/apollo.boost';
 
 import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { LoginSessionAction, LogoutSessionAction } from '../../../../../code/utils/communication/SessionChannel';
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
-import { LoginMutation, MeDocument, SessionStateDocument } from '../../../../../graphql/generated-types';
+import * as generatedTypesModule from '../../../../../graphql/generated-types';
 import { SessionActionType } from '../../../../../code/utils/communication/SessionActionType';
 import { routes } from '../../../../../code/config/routes';
 
@@ -21,14 +21,16 @@ describe('ApolloContextProvider component', () => {
     let ApolloContextProvider: React.FunctionComponent;
 
     let initApolloClientSpy: jest.SpiedFunction<typeof initApolloClientModule.initApolloClient>;
+    let useMeLazyQuerySpy: jest.SpiedFunction<typeof generatedTypesModule.useMeLazyQuery>;
 
     beforeEach(() => {
-        MockApolloClient.setupMocks();
+        ApolloClientSpy.setupSpies();
         AuthUtilsSpiesManager.setupSpiesAndMockImplementations();
         MockSessionChannel.setupMocks();
 
         // @ts-ignore
-        initApolloClientSpy = jest.spyOn(initApolloClientModule, 'initApolloClient').mockReturnValue(MockApolloClient);
+        initApolloClientSpy = jest.spyOn(initApolloClientModule, 'initApolloClient');
+        useMeLazyQuerySpy = jest.spyOn(generatedTypesModule, 'useMeLazyQuery');
         initApolloClientSpy.mockClear();
     });
 
@@ -46,7 +48,7 @@ describe('ApolloContextProvider component', () => {
 
     function renderInMockContext(history: MemoryHistory = createMemoryHistory()) {
         jest.isolateModules(() => {
-            ApolloContextProvider = require('../../../../../code/components/providers/apollo/ApolloContextProvider').ApolloContextProvider;
+            ({ ApolloContextProvider } = require('../../../../../code/components/providers/apollo/ApolloContextProvider'));
         });
 
         return render(
@@ -74,6 +76,9 @@ describe('ApolloContextProvider component', () => {
     });
 
     it('should initialize ApolloClient with default cache', async () => {
+        const mockMeQuery = jest.fn();
+        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: { me: {} } } as any ]);
+
         const { throwError } = deferRefreshAccessTokenPromise();
         renderInMockContext();
 
@@ -81,6 +86,9 @@ describe('ApolloContextProvider component', () => {
 
         // verify if provider' children are visible
         expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
+
+        // verify if MeQuery was not triggered
+        expect(mockMeQuery).toHaveBeenCalledTimes(0);
 
         // verify if ApolloClient was initialized with correct initial cache state
         expect(initApolloClientSpy).toHaveBeenCalledTimes(1);
@@ -90,6 +98,9 @@ describe('ApolloContextProvider component', () => {
     });
 
     it('should initialize ApolloClient with cache based on existing session state', async () => {
+        const mockMeQuery = jest.fn();
+        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: { me: {} } } as any ]);
+
         const { resolveValue } = deferRefreshAccessTokenPromise();
         renderInMockContext();
 
@@ -98,11 +109,30 @@ describe('ApolloContextProvider component', () => {
         // verify if provider' children are visible
         expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
+        // verify if MeQuery was triggered
+        expect(mockMeQuery).toHaveBeenCalledTimes(1);
+
         // verify if ApolloClient was initialized with correct initial cache state
         expect(initApolloClientSpy).toHaveBeenCalledTimes(1);
         expect(initApolloClientSpy).toHaveBeenCalledWith({
             sessionState: { accessToken: 'accessTokenTestValue' },
         });
+    });
+
+    it('should display spinner when user session exists and user data are fetching', async () => {
+        const mockMeQuery = jest.fn();
+        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: undefined, error: undefined } as any ]);
+
+        const { resolveValue } = deferRefreshAccessTokenPromise();
+        renderInMockContext();
+
+        resolveValue('accessTokenTestValue');
+
+        // wait for me query trigger
+        await waitFor(() => expect(mockMeQuery).toHaveBeenCalledTimes(1));
+
+        // verify if spinner is visible
+        expect(screen.getByRole('progressbar', { hidden: true })).toBeInTheDocument();
     });
 
     describe('session state synchronization', () => {
@@ -129,7 +159,7 @@ describe('ApolloContextProvider component', () => {
                 type: SessionActionType.LOGIN,
                 initialData: {
                     __typename: 'InitialData',
-                    user: {} as LoginMutation['login']['user'],
+                    user: {} as generatedTypesModule.LoginMutation['login']['user'],
                     accessToken: 'accessTokenTestValue',
                 },
             };
@@ -140,20 +170,21 @@ describe('ApolloContextProvider component', () => {
             // verify if provider' children are visible
             expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
+            ApolloClientSpy.writeQuery.mockClear();
             MockSessionChannel.simulateSessionEvent(sampleLoginSessionAction);
 
             // verify if cache was updated for Me query and SessionState
-            expect(MockApolloClient.writeQuery).toHaveBeenCalledTimes(2);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(2);
 
             // verify if Me query result was saved in cache
-            expect(MockApolloClient.writeQuery).toHaveBeenNthCalledWith(1, {
-                query: MeDocument,
+            expect(ApolloClientSpy.writeQuery).toHaveBeenNthCalledWith(1, {
+                query: generatedTypesModule.MeDocument,
                 data: { me: sampleLoginSessionAction.initialData.user },
             });
 
             // verify if access token was saved in cache
-            expect(MockApolloClient.writeQuery).toHaveBeenNthCalledWith(2, {
-                query: SessionStateDocument,
+            expect(ApolloClientSpy.writeQuery).toHaveBeenNthCalledWith(2, {
+                query: generatedTypesModule.SessionStateDocument,
                 data: {
                     sessionState: {
                         __typename: 'SessionState',
@@ -178,7 +209,7 @@ describe('ApolloContextProvider component', () => {
             MockSessionChannel.simulateSessionEvent(sampleLogoutSessionAction);
 
             // verify if apollo cache was cleared
-            expect(MockApolloClient.clearStore).toHaveBeenCalledTimes(1);
+            expect(ApolloClientSpy.clearStore).toHaveBeenCalledTimes(1);
 
             // verify if navigation to login page occurred
             await waitFor(() => expect(history.location.pathname).toBe(routes.login()));

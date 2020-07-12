@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { ApolloError } from 'apollo-boost';
+import { ApolloError } from '@apollo/client';
 
 import { UnauthorizedError } from './UnauthorizedError';
 

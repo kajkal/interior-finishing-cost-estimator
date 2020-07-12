@@ -21,8 +21,8 @@ export class AuthUtils {
     /**
      * Determines if given operation is protected (require authorization).
      */
-    static isProtectedOperation(operationName: string): boolean {
-        return !AuthUtils.PUBLIC_OPERATIONS.has(operationName);
+    static isProtectedOperation(operationName?: string): boolean {
+        return !AuthUtils.PUBLIC_OPERATIONS.has(operationName!);
     }
 
     /**
