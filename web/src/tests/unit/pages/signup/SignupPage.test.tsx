@@ -4,9 +4,9 @@ import { Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { mockUseSessionState } from '../../../__mocks__/code/mockUseSessionState';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
+import { mockUseUserData } from '../../../__mocks__/code/mockUseUserData';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
@@ -22,8 +22,7 @@ describe('SignupPage component', () => {
 
     beforeEach(() => {
         MockSessionChannel.setupMocks();
-        mockUseSessionState.mockReset();
-        mockUseSessionState.mockReturnValue({ isUserLoggedIn: false });
+        mockUseUserData.mockReturnValue({ userData: undefined, isLoggedIn: false });
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -73,9 +72,9 @@ describe('SignupPage component', () => {
     });
 
     it('should navigate to default page if user is already authenticated', () => {
-        mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
+        mockUseUserData.mockReturnValue({ userData: { slug: 'sample-user' }, isLoggedIn: true });
         renderInMockContext();
-        expect(screen.getByTestId('location')).toHaveTextContent(nav.inquiries());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.user('sample-user').profile());
     });
 
     describe('sign up form', () => {

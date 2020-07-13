@@ -3,7 +3,7 @@ import { InitialEntry, State, To } from 'history';
 import { NavigateFunction, useNavigate } from 'react-router';
 import { act, render, screen } from '@testing-library/react';
 
-import { mockUseMeQuery } from '../../../__mocks__/code/mockUseMeQuery';
+import { mockUseUserData } from '../../../__mocks__/code/mockUseUserData';
 import { MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { mockComponent } from '../../../__utils__/mockComponent';
 
@@ -52,7 +52,7 @@ describe('Navigator component', () => {
     describe('with not logged in user', () => {
 
         beforeEach(() => {
-            mockUseMeQuery.mockReturnValue({ data: undefined });
+            mockUseUserData.mockReturnValue({ userData: undefined, isLoggedIn: false });
         });
 
         it('should allow user to visit publicly available pages', () => {
@@ -104,35 +104,33 @@ describe('Navigator component', () => {
 
     describe('with logged in user', () => {
 
-        const authorizedUserSlug = 'karol-lesniak';
-
         beforeEach(() => {
-            mockUseMeQuery.mockReturnValue({ data: { me: { slug: authorizedUserSlug } } });
+            mockUseUserData.mockReturnValue({ userData: { slug: 'sample-user' }, isLoggedIn: true });
         });
 
         it('should allow user to visit protected pages when user is logged in', () => {
             const { navigate } = renderInMockContext([ nav.logout() ]);
             expect(screen.getByTestId('mock-LogoutPage')).toBeInTheDocument();
 
-            navigate(nav.user(authorizedUserSlug).profile());
+            navigate(nav.user('sample-user').profile());
             expect(screen.getByTestId('mock-AuthorizedUserProfilePage')).toBeInTheDocument();
 
-            navigate(nav.user(authorizedUserSlug).account());
+            navigate(nav.user('sample-user').account());
             expect(screen.getByTestId('mock-AccountPage')).toBeInTheDocument();
 
-            navigate(nav.user(authorizedUserSlug).products());
+            navigate(nav.user('sample-user').products());
             expect(screen.getByTestId('mock-ProductsPage')).toBeInTheDocument();
 
-            navigate(nav.user(authorizedUserSlug).projects('sample-project'));
+            navigate(nav.user('sample-user').projects('sample-project'));
             expect(screen.getByTestId('mock-ProjectPage')).toBeInTheDocument();
 
-            navigate('/karol-lesniak/invalid-path');
+            navigate('/sample-user/invalid-path');
             expect(screen.getByTestId('mock-PageNotFound')).toBeInTheDocument();
         });
 
         it('should display page not found for invalid paths', () => {
             const { navigate } = renderInMockContext([ nav.logout() ]);
-            navigate('/karol-lesniak/invalid-path');
+            navigate('/sample-user/invalid-path');
             expect(screen.getByTestId('mock-PageNotFound')).toBeInTheDocument();
         });
 

@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
-import { useSessionState } from '../../providers/apollo/cache/session/useSessionState';
+import { useUserData } from '../../../utils/hooks/useUserData';
 import { LoginForm } from './LoginForm';
 import { nav } from '../../../config/nav';
 
@@ -30,11 +30,12 @@ function useRequestedLocation(): PartialPath | undefined {
 export function LoginPage(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const { isUserLoggedIn } = useSessionState();
+    const { userData } = useUserData();
     const requestedLocation = useRequestedLocation();
 
-    if (isUserLoggedIn) {
-        return <Navigate to={requestedLocation || nav.inquiries()} />;
+    // redirect when user is already logged in
+    if (userData) {
+        return <Navigate to={requestedLocation || nav.user(userData.slug).profile()} />;
     }
 
     return (

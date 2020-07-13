@@ -16,15 +16,13 @@ import { PageNotFound } from '../pages/not-found/PageNotFound';
 import { UserProfilePage } from '../pages/profile/UserProfilePage';
 
 import { ProtectedRoute } from '../common/router/ProtectedRoute';
-import { useMeQuery } from '../../../graphql/generated-types';
+import { useUserData } from '../../utils/hooks/useUserData';
 import { useToast } from '../providers/toast/useToast';
 import { nav, navMap } from '../../config/nav';
 
 
 export function Navigator(): React.ReactElement {
-    const { data } = useMeQuery({ fetchPolicy: 'cache-only' });
-    const authorizedUserSlug = data?.me.slug;
-    const isUserLoggedIn = Boolean(authorizedUserSlug);
+    const { userData, isLoggedIn } = useUserData();
 
     return (
         <div>
@@ -34,14 +32,14 @@ export function Navigator(): React.ReactElement {
 
                 <Route path={navMap.login} element={<LoginPage />} />
                 <Route path={navMap.signup} element={<SignupPage />} />
-                <ProtectedRoute path={navMap.logout} element={<LogoutPage />} isUserLoggedIn={isUserLoggedIn} silent />
+                <ProtectedRoute path={navMap.logout} element={<LogoutPage />} isUserLoggedIn={isLoggedIn} silent />
 
                 <Route path={navMap.confirmEmailAddress} element={<ConfirmEmailAddressPage />} />
                 <Route path={navMap.forgotPassword} element={<PasswordResetRequestPage />} />
                 <Route path={navMap.passwordReset} element={<PasswordResetPage />} />
                 <Route path={navMap.inquiries} element={<InquiriesPage />} />
 
-                <ProtectedRoute path={authorizedUserSlug} element={<Outlet />} isUserLoggedIn={isUserLoggedIn}>
+                <ProtectedRoute path={userData?.slug} element={<Outlet />} isUserLoggedIn={isLoggedIn}>
                     <Route path={navMap.user.profile} element={<AuthorizedUserProfilePage />} />
                     <Route path={navMap.user.account} element={<AccountPage />} />
                     <Route path={navMap.user.products} element={<ProductsPage />} />

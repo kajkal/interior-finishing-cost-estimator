@@ -1,12 +1,8 @@
-import {ApolloClient} from '@apollo/client';
+import { ApolloClient } from '@apollo/client';
 
 import { SessionState, SessionStateDocument, SessionStateQuery } from '../../../../../../graphql/generated-types';
 import { ApolloCacheShape } from '../ApolloCacheShape';
 
-
-export interface ExtendedSessionState extends SessionState {
-    isUserLoggedIn: boolean;
-}
 
 export class SessionStateUtils {
 
@@ -31,13 +27,6 @@ export class SessionStateUtils {
     static getSessionState(client: ApolloClient<ApolloCacheShape>): SessionState {
         const { sessionState } = client.readQuery<SessionStateQuery>({ query: SessionStateDocument })!;
         return sessionState;
-    }
-
-    static extendSessionState(sessionState: SessionState): ExtendedSessionState {
-        return {
-            ...sessionState,
-            isUserLoggedIn: Boolean(sessionState.accessToken),
-        };
     }
 
 }
