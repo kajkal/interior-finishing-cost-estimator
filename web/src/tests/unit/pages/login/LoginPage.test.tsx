@@ -1,7 +1,6 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
-import { Route } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
@@ -14,7 +13,7 @@ import { generator } from '../../../__utils__/generator';
 
 import { LoginDocument, MutationLoginArgs } from '../../../../graphql/generated-types';
 import { LoginPage } from '../../../../code/components/pages/login/LoginPage';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('LoginPage component', () => {
@@ -28,12 +27,14 @@ describe('LoginPage component', () => {
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
-        const history = mocks?.history || createMemoryHistory({ initialEntries: [ loginPagePath ] });
+        const initialEntries = mocks?.initialEntries || [ loginPagePath ];
         return render(
-            <MockContextProvider mocks={{ ...mocks, history }}>
-                <Route path={loginPagePath} exact>
-                    <LoginPage />
-                </Route>
+            <MockContextProvider mocks={{ ...mocks, initialEntries }}>
+                <Routes>
+                    <Route path={loginPagePath}>
+                        <LoginPage />
+                    </Route>
+                </Routes>
             </MockContextProvider>,
         );
     }
@@ -62,31 +63,21 @@ describe('LoginPage component', () => {
     }
 
     it('should navigate to new page on \'forgot password\' link click', () => {
-        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
-        renderInMockContext({ history });
-
+        renderInMockContext();
         userEvent.click(ViewUnderTest.forgotPasswordPageLink);
-
-        expect(history.location.pathname).toBe(routes.forgotPassword());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.forgotPassword());
     });
 
     it('should navigate to new page on \'sign up\' link click', () => {
-        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
-        renderInMockContext({ history });
-
+        renderInMockContext();
         userEvent.click(ViewUnderTest.signupPageLink);
-
-        expect(history.location.pathname).toBe(routes.signup());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.signup());
     });
 
     it('should navigate to default page if user is already authenticated', () => {
         mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
-
-        const history = createMemoryHistory({ initialEntries: [ loginPagePath ] });
-        renderInMockContext({ history });
-
-        // verify if navigation to default page occurred
-        expect(history.location.pathname).toBe(routes.projects());
+        renderInMockContext();
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.inquiries());
     });
 
     /**
@@ -95,13 +86,13 @@ describe('LoginPage component', () => {
      */
     it('should navigate to initially requested protected page if user is already authenticated', () => {
         mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
-
-        const history = createMemoryHistory();
-        history.push(loginPagePath, { from: { pathname: '/protected-page' } }); // simulate redirection done by ProtectedRoute component
-        renderInMockContext({ history });
-
-        // verify if navigation to initially requested protected page occurred
-        expect(history.location.pathname).toBe('/protected-page');
+        renderInMockContext({
+            initialEntries: [ {
+                pathname: loginPagePath,
+                state: { from: { pathname: '/protected-page' } }, // simulate redirection done by ProtectedRoute component
+            } ],
+        });
+        expect(screen.getByTestId('location')).toHaveTextContent('/protected-page');
     });
 
     describe('log in form', () => {

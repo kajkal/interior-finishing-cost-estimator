@@ -1,7 +1,6 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
-import { Route } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
@@ -14,7 +13,7 @@ import { generator } from '../../../__utils__/generator';
 
 import { MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
 import { SignupPage } from '../../../../code/components/pages/signup/SignupPage';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('SignupPage component', () => {
@@ -28,12 +27,13 @@ describe('SignupPage component', () => {
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
-        const history = mocks?.history || createMemoryHistory({ initialEntries: [ signupPagePath ] });
         return render(
-            <MockContextProvider mocks={{ ...mocks, history }}>
-                <Route path={signupPagePath} exact>
-                    <SignupPage />
-                </Route>
+            <MockContextProvider mocks={{ ...mocks, initialEntries: [ signupPagePath ] }}>
+                <Routes>
+                    <Route path={signupPagePath}>
+                        <SignupPage />
+                    </Route>
+                </Routes>
             </MockContextProvider>,
         );
     }
@@ -67,22 +67,15 @@ describe('SignupPage component', () => {
     }
 
     it('should navigate to new page on \'log in\' link click', () => {
-        const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
-        renderInMockContext({ history });
-
+        renderInMockContext();
         userEvent.click(ViewUnderTest.loginPageLink);
-
-        expect(history.location.pathname).toBe(routes.login());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.login());
     });
 
     it('should navigate to default page if user is already authenticated', () => {
         mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
-
-        const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
-        renderInMockContext({ history });
-
-        // verify if navigation to default page occurred
-        expect(history.location.pathname).toBe(routes.projects());
+        renderInMockContext();
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.inquiries());
     });
 
     describe('sign up form', () => {
@@ -191,9 +184,8 @@ describe('SignupPage component', () => {
         });
 
         it('should display information about not available email', async () => {
-            const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
             const mockResponse = mockResponseGenerator.emailNotAvailable();
-            renderInMockContext({ history, mockResponses: [ mockResponse ] });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if email field is mark as invalid and error message is displayed
@@ -205,9 +197,8 @@ describe('SignupPage component', () => {
         });
 
         it('should display notification about network error', async () => {
-            const history = createMemoryHistory({ initialEntries: [ signupPagePath ] });
             const mockResponse = mockResponseGenerator.networkError();
-            renderInMockContext({ history, mockResponses: [ mockResponse ] });
+            renderInMockContext({ mockResponses: [ mockResponse ] });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if toast is visible

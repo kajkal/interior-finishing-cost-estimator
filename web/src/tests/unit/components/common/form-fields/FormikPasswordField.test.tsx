@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Formik } from 'formik';
 import userEvent from '@testing-library/user-event';
-import { render, RenderResult } from '@testing-library/react';
+import { render, RenderResult, screen } from '@testing-library/react';
 
 import { FormikPasswordField } from '../../../../../code/components/common/form-fields/FormikPasswordField';
 
@@ -28,12 +28,12 @@ describe('FormikPasswordField component', () => {
     }
 
     it('should toggle input type on visibility button click', () => {
-        const { getByRole, getByLabelText } = renderInFormikContext();
+        renderInFormikContext();
 
-        const passwordInput = getByLabelText('Password', { selector: 'input' });
+        const passwordInput = screen.getByLabelText('Password', { selector: 'input' });
         expect(passwordInput).toHaveAttribute('type', 'password');
 
-        const toggleButton = getByRole('button', { name: 't:form.password.toggleVisibility' });
+        const toggleButton = screen.getByRole('button', { name: 't:form.password.toggleVisibility' });
         userEvent.click(toggleButton);
 
         expect(passwordInput).toHaveAttribute('type', 'text');

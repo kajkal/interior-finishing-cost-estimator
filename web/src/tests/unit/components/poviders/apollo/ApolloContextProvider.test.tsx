@@ -1,18 +1,15 @@
 import React from 'react';
-import { Router } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import { render, screen, waitFor } from '@testing-library/react';
 
+import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
 import { AuthUtilsSpiesManager } from '../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
 import { ApolloClientSpy } from '../../../../__utils__/spies-managers/ApolloClientSpy';
-import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
 
 import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { LoginSessionAction, LogoutSessionAction } from '../../../../../code/utils/communication/SessionChannel';
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
-import * as generatedTypesModule from '../../../../../graphql/generated-types';
 import { SessionActionType } from '../../../../../code/utils/communication/SessionActionType';
-import { routes } from '../../../../../code/config/routes';
+import * as generatedTypesModule from '../../../../../graphql/generated-types';
 
 
 describe('ApolloContextProvider component', () => {
@@ -46,19 +43,17 @@ describe('ApolloContextProvider component', () => {
         return { resolveValue, throwError };
     }
 
-    function renderInMockContext(history: MemoryHistory = createMemoryHistory()) {
+    function renderInMockContext() {
         jest.isolateModules(() => {
             ({ ApolloContextProvider } = require('../../../../../code/components/providers/apollo/ApolloContextProvider'));
         });
 
         return render(
-            <Router history={history}>
-                <React.Suspense fallback={<div data-testid='MockSpinner' />}>
-                    <ApolloContextProvider>
-                        <div data-testid='SampleApolloClientConsumer' />
-                    </ApolloContextProvider>
-                </React.Suspense>
-            </Router>,
+            <React.Suspense fallback={<div data-testid='MockSpinner' />}>
+                <ApolloContextProvider>
+                    <div data-testid='SampleApolloClientConsumer' />
+                </ApolloContextProvider>
+            </React.Suspense>,
         );
     }
 
@@ -199,9 +194,8 @@ describe('ApolloContextProvider component', () => {
                 type: SessionActionType.LOGOUT,
             };
 
-            const history = createMemoryHistory();
             AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('');
-            renderInMockContext(history);
+            renderInMockContext();
 
             // verify if provider' children are visible
             expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
@@ -210,9 +204,6 @@ describe('ApolloContextProvider component', () => {
 
             // verify if apollo cache was cleared
             expect(ApolloClientSpy.clearStore).toHaveBeenCalledTimes(1);
-
-            // verify if navigation to login page occurred
-            await waitFor(() => expect(history.location.pathname).toBe(routes.login()));
         });
 
     });

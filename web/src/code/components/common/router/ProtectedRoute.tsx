@@ -1,33 +1,41 @@
 import React from 'react';
-import { RouteProps } from 'react-router';
-import { Redirect, Route } from 'react-router-dom';
+import { RouteProps, useLocation } from 'react-router';
+import { Navigate, Route } from 'react-router-dom';
 
-import { BackdropSpinner } from '../progress-indicators/BackdropSpinner';
-import { useMeQuery } from '../../../../graphql/generated-types';
 import { useToast } from '../../providers/toast/useToast';
-import { routes } from '../../../config/routes';
+import { nav } from '../../../config/nav';
 
 
-export function ProtectedRoute({ children, ...rest }: RouteProps): React.ReactElement {
+export interface ProtectedRouteProps extends RouteProps {
+    isUserLoggedIn: boolean;
+    /**
+     * Silent navigation, with replace, without warning toast
+     */
+    silent?: boolean;
+}
+
+export function ProtectedRoute({ isUserLoggedIn, silent, element, ...rest }: ProtectedRouteProps): React.ReactElement {
     const { warningToast } = useToast();
-    const { error, loading } = useMeQuery();
+    const location = useLocation();
 
     React.useEffect(() => {
-        error && warningToast(({ t }) => t('error.authorizationRequired'));
-    }, [ error, warningToast ]);
+        if (!isUserLoggedIn && !silent) {
+            warningToast(({ t }) => t('error.authorizationRequired'));
+        }
+    }, [ warningToast, isUserLoggedIn, silent ]);
 
     return (
         <Route
             {...rest}
-            render={({ location }) => {
-                if (loading) {
-                    return <BackdropSpinner />;
-                }
-                if (error) {
-                    return <Redirect to={{ pathname: routes.login(), state: { from: location } }} />;
-                }
-                return children;
-            }}
+            element={
+                (isUserLoggedIn)
+                    ? element
+                    : <Navigate
+                        to={nav.login()}
+                        state={silent ? undefined : { from: location }}
+                        replace={silent}
+                    />
+            }
         />
     );
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
-import { Route } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { Route, Routes } from 'react-router-dom';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { MockedResponse } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -11,7 +10,7 @@ import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifie
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';
 import { ConfirmEmailAddressDocument } from '../../../../graphql/generated-types';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('ConfirmEmailAddressPage component', () => {
@@ -33,9 +32,11 @@ describe('ConfirmEmailAddressPage component', () => {
     function renderInMockContext(mocks?: ContextMocks) {
         return render(
             <MockContextProvider mocks={mocks}>
-                <Route path='/' exact>
-                    <ConfirmEmailAddressPage />
-                </Route>
+                <Routes>
+                    <Route path='/'>
+                        <ConfirmEmailAddressPage />
+                    </Route>
+                </Routes>
             </MockContextProvider>,
         );
     }
@@ -91,11 +92,10 @@ describe('ConfirmEmailAddressPage component', () => {
 
         invalidPaths.forEach((path: string) => {
             it(`should redirect to login page and display alert about invalid token for '${path}'`, async () => {
-                const history = createMemoryHistory({ initialEntries: [ path ] });
-                renderInMockContext({ history });
+                renderInMockContext({ initialEntries: [ path ] });
 
                 // verify if navigation occurred
-                expect(history.location.pathname).toBe(routes.login());
+                expect(screen.getByTestId('location')).toHaveTextContent(nav.login());
 
                 // verify if toast is visible
                 const toast = await screen.findByTestId('MockToast');
@@ -107,8 +107,10 @@ describe('ConfirmEmailAddressPage component', () => {
     });
 
     async function renderAndAwaitMutationResponse(mockResponse: MockedResponse) {
-        const history = createMemoryHistory({ initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ] });
-        renderInMockContext({ history, mockResponses: [ mockResponse ] });
+        renderInMockContext({
+            mockResponses: [ mockResponse ],
+            initialEntries: [ `/?token=${mockResponse.request.variables!.token}` ],
+        });
 
         // verify if progressbar is visible
         expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
@@ -117,7 +119,7 @@ describe('ConfirmEmailAddressPage component', () => {
         await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
 
         // verify if navigation occurred
-        expect(history.location.pathname).toBe(routes.login());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.login());
     }
 
     it('should display notification about successful email address confirmation', async () => {

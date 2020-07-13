@@ -2,7 +2,6 @@ import React from 'react';
 import * as Yup from 'yup';
 import { DateTime } from 'luxon';
 import { TFunction } from 'i18next';
-import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
@@ -15,7 +14,8 @@ import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHan
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { useToast } from '../../providers/toast/useToast';
-import { routes } from '../../../config/routes';
+import { useNavigate } from 'react-router';
+import { nav } from '../../../config/nav';
 
 
 export interface PasswordResetFormProps {
@@ -95,7 +95,7 @@ function usePasswordResetFormValidationSchema(t: TFunction) {
  * Submit handler
  */
 function usePasswordResetFormSubmitHandler(locale: string) {
-    const { replace } = useHistory();
+    const navigate = useNavigate();
     const { successToast, errorToast } = useToast();
     const [ resetPasswordMutation ] = useResetPasswordMutation();
 
@@ -103,7 +103,7 @@ function usePasswordResetFormSubmitHandler(locale: string) {
         try {
             await resetPasswordMutation({ variables: values });
             successToast(({ t }) => t('passwordResetPage.passwordResetSuccess'));
-            replace(routes.login());
+            navigate(nav.login(), { replace: true });
         } catch (error) {
             ApolloErrorHandler.process(error)
                 .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
@@ -112,16 +112,16 @@ function usePasswordResetFormSubmitHandler(locale: string) {
                         const { expiredAt = new Date().toISOString() } = extensions || {};
                         const formattedExpirationDate = DateTime.fromISO(expiredAt).setLocale(locale).toLocaleString(DateTime.DATETIME_SHORT);
                         errorToast(({ t }) => t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
-                        replace(routes.forgotPassword());
+                        navigate(nav.forgotPassword(), { replace: true });
                     },
                     'INVALID_PASSWORD_RESET_TOKEN': () => {
                         errorToast(({ t }) => t('passwordResetPage.invalidPasswordResetToken'));
-                        replace(routes.forgotPassword());
+                        navigate(nav.forgotPassword(), { replace: true });
                     },
                 })
                 .finish();
         }
-    }, [ locale, replace, successToast, errorToast, resetPasswordMutation ]);
+    }, [ locale, navigate, successToast, errorToast, resetPasswordMutation ]);
 }
 
 

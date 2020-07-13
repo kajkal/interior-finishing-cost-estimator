@@ -1,7 +1,7 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import MuiLink from '@material-ui/core/Link';
@@ -13,7 +13,7 @@ import { useVerifiedToken } from '../../../utils/hooks/useVerifiedToken';
 import { useSearchParams } from '../../../utils/hooks/useSearchParams';
 import { useToast } from '../../providers/toast/useToast';
 import { PasswordResetForm } from './PasswordResetForm';
-import { routes } from '../../../config/routes';
+import { nav } from '../../../config/nav';
 
 
 export function PasswordResetPage(): React.ReactElement {
@@ -33,7 +33,7 @@ export function PasswordResetPage(): React.ReactElement {
     }, [ expiredAt, verifiedPasswordResetToken, i18n.language, errorToast ]);
 
     if (!verifiedPasswordResetToken) {
-        return <Redirect to={routes.forgotPassword()} />;
+        return <Navigate to={nav.forgotPassword()} />;
     }
 
     return (
@@ -46,7 +46,7 @@ export function PasswordResetPage(): React.ReactElement {
 
             <Grid container direction='row-reverse'>
                 <Grid item>
-                    <MuiLink to={routes.signup()} variant='body2' component={Link}>
+                    <MuiLink to={nav.signup()} variant='body2' component={Link}>
                         {t('passwordResetPage.signUpLink')}
                     </MuiLink>
                 </Grid>

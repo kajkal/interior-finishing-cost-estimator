@@ -1,16 +1,16 @@
 import React from 'react';
-import { Router } from 'react-router-dom';
+import { InitialEntry } from 'history';
 import { RecoilRoot, RecoilRootProps } from 'recoil/dist';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 
 import { MockToastContextProvider } from './mocks/MockToastContextProvider';
+import { MockRouter } from './context-providers/MockRouter';
 
 
 export interface ContextMocks {
-    history?: MemoryHistory;
+    recoilInitializeState?: RecoilRootProps['initializeState'];
     mockResponses?: ReadonlyArray<MockedResponse>;
-    mockRecoilInitializeState?: RecoilRootProps['initializeState'];
+    initialEntries?: InitialEntry[];
 }
 
 export interface MockContextProviderProps {
@@ -18,16 +18,15 @@ export interface MockContextProviderProps {
     mocks?: ContextMocks;
 }
 
-export function MockContextProvider(props: MockContextProviderProps): React.ReactElement {
-    const { history = createMemoryHistory(), mockResponses = [], mockRecoilInitializeState } = props.mocks || {};
+export function MockContextProvider({ children, mocks }: MockContextProviderProps): React.ReactElement {
     return (
-        <RecoilRoot initializeState={mockRecoilInitializeState}>
-            <MockedProvider mocks={mockResponses}>
-                <Router history={history}>
+        <RecoilRoot initializeState={mocks?.recoilInitializeState}>
+            <MockedProvider mocks={mocks?.mockResponses || []}>
+                <MockRouter initialEntries={mocks?.initialEntries}>
                     <MockToastContextProvider>
-                        {props.children}
+                        {children}
                     </MockToastContextProvider>
-                </Router>
+                </MockRouter>
             </MockedProvider>
         </RecoilRoot>
     );

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 
 import { SessionAction, SessionChannel } from '../../../utils/communication/SessionChannel';
@@ -9,7 +8,6 @@ import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinne
 import { SessionStateUtils } from './cache/session/SessionStateUtils';
 import { initApolloClient } from './client/initApolloClient';
 import { AuthUtils } from '../../../utils/auth/AuthUtils';
-import { routes } from '../../../config/routes';
 
 
 export interface ApolloContextProviderProps {
@@ -41,7 +39,6 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
     const accessToken = accessTokenResource.read(); // triggers React.Suspense
     const [ client ] = React.useState(() => initApolloClient({ sessionState: { accessToken } }));
     const [ meQuery, result ] = useMeLazyQuery({ client });
-    const { push } = useHistory();
 
     React.useEffect(() => {
 
@@ -59,7 +56,6 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
 
                 case SessionActionType.LOGOUT:
                     await client.clearStore();
-                    push(routes.login());
                     break;
 
             }
@@ -69,7 +65,7 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
         return () => {
             SessionChannel.removeSessionEventListener(sessionStateSynchronizer);
         };
-    }, [ client, push ]);
+    }, [ client ]);
 
     React.useEffect(() => {
         accessToken && meQuery();

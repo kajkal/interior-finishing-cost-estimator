@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { useConfirmEmailAddressMutation } from '../../../../graphql/generated-types';
@@ -7,7 +7,7 @@ import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinne
 import { useVerifiedToken } from '../../../utils/hooks/useVerifiedToken';
 import { useSearchParams } from '../../../utils/hooks/useSearchParams';
 import { useToast } from '../../providers/toast/useToast';
-import { routes } from '../../../config/routes';
+import { nav } from '../../../config/nav';
 
 
 export function ConfirmEmailAddressPage(): React.ReactElement {
@@ -43,5 +43,5 @@ export function ConfirmEmailAddressPage(): React.ReactElement {
         return <BackdropSpinner />;
     }
 
-    return <Redirect to={routes.login()} />;
+    return <Navigate to={nav.login()} />;
 }

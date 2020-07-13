@@ -12,7 +12,7 @@ import { ApolloContextProvider } from './code/components/providers/apollo/Apollo
 import { ToastContextProvider } from './code/components/providers/toast/ToastContextProvider';
 import { DynamicThemeProvider } from './code/components/providers/theme/DynamicThemeProvider';
 import { BackdropSpinner } from './code/components/common/progress-indicators/BackdropSpinner';
-import { Routes } from './code/components/navigation/Routes';
+import { Navigator } from './code/components/navigation/Navigator';
 import { Layout } from './code/components/layout/Layout';
 
 
@@ -25,7 +25,7 @@ ReactDOM.render(
                         <CssBaseline />
                         <ToastContextProvider>
                             <Layout>
-                                <Routes />
+                                <Navigator />
                             </Layout>
                         </ToastContextProvider>
                     </DynamicThemeProvider>

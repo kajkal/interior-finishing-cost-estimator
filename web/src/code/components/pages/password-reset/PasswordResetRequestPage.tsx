@@ -9,7 +9,7 @@ import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
 import { PasswordResetRequestForm } from './PasswordResetRequestForm';
-import { routes } from '../../../config/routes';
+import { nav } from '../../../config/nav';
 
 
 export function PasswordResetRequestPage(): React.ReactElement {
@@ -43,7 +43,7 @@ export function PasswordResetRequestPage(): React.ReactElement {
             }
             <Grid container direction='row-reverse'>
                 <Grid item>
-                    <MuiLink to={routes.login()} variant='body2' component={Link}>
+                    <MuiLink to={nav.login()} variant='body2' component={Link}>
                         {t('passwordResetPage.logInLink')}
                     </MuiLink>
                 </Grid>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
@@ -10,7 +9,7 @@ import { generator } from '../../../__utils__/generator';
 
 import { MutationSendPasswordResetInstructionsArgs, SendPasswordResetInstructionsDocument } from '../../../../graphql/generated-types';
 import { PasswordResetRequestPage } from '../../../../code/components/pages/password-reset/PasswordResetRequestPage';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('PasswordResetRequestPage component', () => {
@@ -40,12 +39,9 @@ describe('PasswordResetRequestPage component', () => {
     }
 
     it('should navigate to new page on \'log in\' link click', () => {
-        const history = createMemoryHistory();
-        renderInMockContext({ history });
-
+        renderInMockContext();
         userEvent.click(ViewUnderTest.loginPageLink);
-
-        expect(history.location.pathname).toBe(routes.login());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.login());
     });
 
     describe('send password reset instructions form', () => {

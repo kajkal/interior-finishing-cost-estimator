@@ -1,96 +1,75 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
-import { render, RenderResult, screen, waitFor } from '@testing-library/react';
+import { Location } from 'history';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { render, RenderResult, screen } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { ProtectedRoute } from '../../../../../code/components/common/router/ProtectedRoute';
-import { MeDocument } from '../../../../../graphql/generated-types';
-import { routes } from '../../../../../code/config/routes';
 
 
 describe('ProtectedRoute component', () => {
 
-    const protectedRoute = '/protected'; // initial location
-
-    function renderInMockContext(mocks?: ContextMocks): RenderResult {
+    function renderInMockContext(isUserLoggedIn: boolean, LoginPageComponent: React.ComponentType, silent?: boolean): RenderResult {
         return render(
-            <MockContextProvider mocks={mocks}>
-                <Switch>
-                    <Route exact path={routes.login()}>
-                        login component
+            <MockContextProvider mocks={{ initialEntries: [ '/protected' ] }}>
+                <Routes>
+                    <Route path='/login'>
+                        <LoginPageComponent />
                     </Route>
-                    <ProtectedRoute exact path={protectedRoute}>
-                        protected component
+                    <ProtectedRoute path='/protected' isUserLoggedIn={isUserLoggedIn} silent={silent}>
+                        <div data-testid='ProtectedPage' />
                     </ProtectedRoute>
-                </Switch>
+                </Routes>
             </MockContextProvider>,
         );
     }
 
-    const mockResponseGenerator = {
-        success: () => ({
-            request: {
-                query: MeDocument,
-            },
-            result: {
-                data: {
-                    me: {
-                        name: '',
-                        email: '',
-                        products: [],
-                        projects: [],
-                        offers: [],
-                        '__typename': 'User',
-                    },
-                },
-            },
-        }),
-        unauthorizedError: () => ({
-            request: {
-                query: MeDocument,
-            },
-            error: new UnauthorizedError('INVALID_REFRESH_TOKEN'),
-        }),
-    };
+    it('should render protected page when user is logged in', () => {
+        renderInMockContext(true, () => <div data-testid='LoginPage' />);
 
-    it('should render protected component when user is successfully authenticated', async () => {
-        const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
-        const mockResponses = [ mockResponseGenerator.success() ];
-        renderInMockContext({ history, mockResponses });
-
-        // verify if progressbar is visible
-        expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
-
-        // wait for progress bar to disappear
-        await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
-
-        // verify if protected component is in dom
-        expect(screen.getByText('protected component')).toBeInTheDocument();
+        // verify if protected component is visible
+        expect(screen.getByTestId('ProtectedPage')).toBeInTheDocument();
     });
 
-    it('should navigate to login page and display warning notification when user is not authenticated', async () => {
-        const history = createMemoryHistory({ initialEntries: [ protectedRoute ] });
-        const mockResponses = [ mockResponseGenerator.unauthorizedError() ];
-        renderInMockContext({ history, mockResponses });
+    it('should navigate to login page and display warning notification when user is not logged in', () => {
+        let location!: Location<any>;
+        const LoginPageComponent: React.ComponentType = () => {
+            location = useLocation();
+            return <div data-testid='LoginPage' />;
+        };
+        renderInMockContext(false, LoginPageComponent);
 
-        // verify if progressbar is visible
-        expect(screen.queryByRole('progressbar', { hidden: true })).toBeInTheDocument();
+        // verify if login page is visible
+        expect(screen.getByTestId('LoginPage')).toBeInTheDocument();
 
-        // wait for progress bar to disappear
-        await waitFor(() => expect(screen.queryByRole('progressbar', { hidden: true })).toBe(null));
-
-        // verify if navigation occurred
-        expect(history.location.pathname).toBe(routes.login());
-        expect(history.location.state).toEqual({ from: expect.objectContaining({ pathname: protectedRoute }) });
-        expect(screen.getByText('login component')).toBeInTheDocument();
+        // verify if location state contains information about protected page path
+        expect(location).toBeDefined();
+        expect(location.state).toEqual({ from: expect.objectContaining({ pathname: '/protected' }) });
 
         // verify if toast is visible
-        const toast = await screen.findByTestId('MockToast');
+        const toast = screen.getByTestId('MockToast');
         expect(toast).toHaveClass('warning');
         expect(toast).toHaveTextContent('t:error.authorizationRequired');
+    });
+
+    it('should silently navigate to login page and not display warning notification when silent prop is present', () => {
+        let location!: Location<any>;
+        const LoginPageComponent: React.ComponentType = () => {
+            location = useLocation();
+            return <div data-testid='LoginPage' />;
+        };
+        renderInMockContext(false, LoginPageComponent, true);
+
+        // verify if login page is visible
+        expect(screen.getByTestId('LoginPage')).toBeInTheDocument();
+
+        // verify if location state is not defined
+        expect(location).toBeDefined();
+        expect(location.state).toBe(null);
+
+        // verify if toast is not visible
+        expect(screen.queryByTestId('MockToast')).toBeNull();
     });
 
 });

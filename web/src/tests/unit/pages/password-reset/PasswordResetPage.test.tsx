@@ -1,7 +1,6 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
-import { Route } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { Route, Routes } from 'react-router-dom';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -14,7 +13,7 @@ import { generator } from '../../../__utils__/generator';
 
 import { MutationResetPasswordArgs, ResetPasswordDocument } from '../../../../graphql/generated-types';
 import { PasswordResetPage } from '../../../../code/components/pages/password-reset/PasswordResetPage';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('PasswordResetPage component', () => {
@@ -39,9 +38,11 @@ describe('PasswordResetPage component', () => {
     function renderInMockContext(mocks?: ContextMocks) {
         return render(
             <MockContextProvider mocks={mocks}>
-                <Route path='/' exact>
-                    <PasswordResetPage />
-                </Route>
+                <Routes>
+                    <Route path='/'>
+                        <PasswordResetPage />
+                    </Route>
+                </Routes>
             </MockContextProvider>,
         );
     }
@@ -67,12 +68,9 @@ describe('PasswordResetPage component', () => {
     }
 
     it('should navigate to new page on \'sign up\' link click', () => {
-        const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
-        renderInMockContext({ history });
-
+        renderInMockContext({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
         userEvent.click(ViewUnderTest.signupPageLink);
-
-        expect(history.location.pathname).toBe(routes.signup());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.signup());
     });
 
     describe('invalid token search param', () => {
@@ -81,11 +79,10 @@ describe('PasswordResetPage component', () => {
 
         invalidPaths.forEach((path: string) => {
             it(`should redirect to forgot password page and display alert about invalid token for '${path}'`, async () => {
-                const history = createMemoryHistory({ initialEntries: [ path ] });
-                renderInMockContext({ history });
+                renderInMockContext({ initialEntries: [ path ] });
 
                 // verify if navigation occurred
-                expect(history.location.pathname).toBe(routes.forgotPassword());
+                expect(screen.getByTestId('location')).toHaveTextContent(nav.forgotPassword());
 
                 // verify if toast is visible
                 const toast = await screen.findByTestId('MockToast');
@@ -95,11 +92,10 @@ describe('PasswordResetPage component', () => {
         });
 
         it(`should redirect to forgot password page and display alert about expired token`, async () => {
-            const history = createMemoryHistory({ initialEntries: [ `/?token=${expiredPasswordResetToken}` ] });
-            renderInMockContext({ history });
+            renderInMockContext({ initialEntries: [ `/?token=${expiredPasswordResetToken}` ] });
 
             // verify if navigation occurred
-            expect(history.location.pathname).toBe(routes.forgotPassword());
+            expect(screen.getByTestId('location')).toHaveTextContent(nav.forgotPassword());
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
@@ -176,9 +172,7 @@ describe('PasswordResetPage component', () => {
         describe('validation', () => {
 
             it('should validate password input value', async () => {
-                renderInMockContext({
-                    history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
-                });
+                renderInMockContext({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
                 await InputValidator.basedOn(ViewUnderTest.passwordInput)
                     .expectError('', 't:form.password.validation.required')
                     .expectError('bad', 't:form.password.validation.tooShort')
@@ -186,9 +180,7 @@ describe('PasswordResetPage component', () => {
             });
 
             it('should validate password confirmation input value', async () => {
-                renderInMockContext({
-                    history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
-                });
+                renderInMockContext({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
                 await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
@@ -200,13 +192,15 @@ describe('PasswordResetPage component', () => {
         });
 
         it('should successfully reset password and navigate to login page', async () => {
-            const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.success();
-            renderInMockContext({ history, mockResponses: [ mockResponse ] });
+            renderInMockContext({
+                mockResponses: [ mockResponse ],
+                initialEntries: [ `/?token=${validPasswordResetToken}` ],
+            });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toBe(routes.login()));
+            await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(nav.login()));
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
@@ -215,13 +209,15 @@ describe('PasswordResetPage component', () => {
         });
 
         it('should display alert about invalid token and navigate to forgot password page', async () => {
-            const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.invalidPasswordResetToken();
-            renderInMockContext({ history, mockResponses: [ mockResponse ] });
+            renderInMockContext({
+                mockResponses: [ mockResponse ],
+                initialEntries: [ `/?token=${validPasswordResetToken}` ],
+            });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toBe(routes.forgotPassword()));
+            await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(nav.forgotPassword()));
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
@@ -230,13 +226,15 @@ describe('PasswordResetPage component', () => {
         });
 
         it('should display alert about expired token and navigate to forgot password page', async () => {
-            const history = createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
             const mockResponse = mockResponseGenerator.expiredPasswordResetToken();
-            renderInMockContext({ history, mockResponses: [ mockResponse ] });
+            renderInMockContext({
+                mockResponses: [ mockResponse ],
+                initialEntries: [ `/?token=${validPasswordResetToken}` ],
+            });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if navigation occurred
-            await waitFor(() => expect(history.location.pathname).toBe(routes.forgotPassword()));
+            await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(nav.forgotPassword()));
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
@@ -247,7 +245,7 @@ describe('PasswordResetPage component', () => {
         it('should display alert about network error', async () => {
             const mockResponse = mockResponseGenerator.networkError();
             renderInMockContext({
-                history: createMemoryHistory({ initialEntries: [ `/?token=${validPasswordResetToken}` ] }),
+                initialEntries: [ `/?token=${validPasswordResetToken}` ],
                 mockResponses: [ mockResponse ],
             });
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);

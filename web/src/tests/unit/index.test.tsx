@@ -8,28 +8,29 @@ import { render, screen, waitFor } from '@testing-library/react';
 import i18n, { BackendModule, i18n as I18n, ReadCallback } from 'i18next';
 
 import { MockServiceWorker } from '../__mocks__/other/serviceWorker';
+import { mockComponent } from '../__utils__/mockComponent';
+
 import { supportedLanguages } from '../../code/config/supportedLanguages';
 
 
 // unmock globally mocked library
 jest.unmock('react-i18next');
 
+// mock file with side effect
 jest.mock('../../code/components/providers/apollo/ApolloContextProvider', () => ({
-    ApolloContextProvider: (props: any) => <div data-testid='MockApolloContextProvider'>{props.children}</div>,
-}));
-jest.mock('../../code/components/providers/toast/ToastContextProvider', () => ({
-    ToastContextProvider: (props: any) => <div data-testid='MockToastContextProvider'>{props.children}</div>,
-}));
-jest.mock('../../code/components/navigation/Routes', () => ({
-    Routes: () => <div data-testid='MockRoutes' />,
-}));
-jest.mock('../../code/components/layout/Layout', () => ({
-    Layout: (props: any) => <div data-testid='MockLayout'>{props.children}</div>,
+    ApolloContextProvider: () => null, // will be mocked by 'mockComponent' function
 }));
 
 describe('index file', () => {
 
     let rootElement: HTMLDivElement;
+
+    beforeAll(() => {
+        mockComponent('../../code/components/providers/apollo/ApolloContextProvider');
+        mockComponent('../../code/components/providers/toast/ToastContextProvider');
+        mockComponent('../../code/components/navigation/Navigator');
+        mockComponent('../../code/components/layout/Layout');
+    });
 
     beforeEach(() => {
         rootElement = document.createElement('div');
@@ -52,12 +53,12 @@ describe('index file', () => {
             });
 
             // verify if Apollo and Toast context providers are present
-            expect(screen.getByTestId('MockApolloContextProvider')).toBeInTheDocument();
-            expect(screen.getByTestId('MockToastContextProvider')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-ApolloContextProvider')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-ToastContextProvider')).toBeInTheDocument();
 
-            // verify if Layout and Routes are present in DOM
-            expect(screen.getByTestId('MockLayout')).toBeInTheDocument();
-            expect(screen.getByTestId('MockRoutes')).toBeInTheDocument();
+            // verify if Layout and Navigator are present in DOM
+            expect(screen.getByTestId('mock-Layout')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-Navigator')).toBeInTheDocument();
 
             // verify if service worker was unregistered
             expect(MockServiceWorker.unregister).toHaveBeenCalledTimes(1);
@@ -119,13 +120,13 @@ describe('index file', () => {
             setupI18nContext(fakeBackend);
 
             render(
-                <React.Suspense fallback={<div data-testid='MockSpinner' />}>
+                <React.Suspense fallback={<div data-testid='mock-Spinner' />}>
                     <SampleChildComponent />
                 </React.Suspense>,
             );
 
             // verify if loader/spinner/progressbar is visible
-            expect(screen.getByTestId('MockSpinner')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-Spinner')).toBeInTheDocument();
 
             // verify if i18n was initialized on component file import
             expect(i18n.use).toHaveBeenCalledTimes(3);

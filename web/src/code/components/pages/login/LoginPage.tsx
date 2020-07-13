@@ -1,7 +1,7 @@
 import React from 'react';
+import { Location, PartialPath } from 'history';
 import { useTranslation } from 'react-i18next';
-import { LocationDescriptorObject } from 'history';
-import { Link, Redirect, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -10,21 +10,21 @@ import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
 import { useSessionState } from '../../providers/apollo/cache/session/useSessionState';
-import { routes } from '../../../config/routes';
 import { LoginForm } from './LoginForm';
+import { nav } from '../../../config/nav';
 
 
 interface LoginPageLocationState {
-    from: LocationDescriptorObject;
+    from: PartialPath;
 }
 
 /**
  * Returns location from requested protected site, or default one.
  * @see ProtectedRoute
  */
-function useRequestedLocation(): LocationDescriptorObject {
-    const { state } = useLocation<LoginPageLocationState | null>();
-    return state?.from || { pathname: routes.projects() };
+function useRequestedLocation(): PartialPath | undefined {
+    const { state } = useLocation() as Location<LoginPageLocationState>;
+    return state?.from || undefined;
 }
 
 export function LoginPage(): React.ReactElement {
@@ -34,7 +34,7 @@ export function LoginPage(): React.ReactElement {
     const requestedLocation = useRequestedLocation();
 
     if (isUserLoggedIn) {
-        return <Redirect to={requestedLocation} />;
+        return <Navigate to={requestedLocation || nav.inquiries()} />;
     }
 
     return (
@@ -48,12 +48,12 @@ export function LoginPage(): React.ReactElement {
 
             <Grid container>
                 <Grid item xs>
-                    <MuiLink to={routes.forgotPassword()} variant='body2' component={Link}>
+                    <MuiLink to={nav.forgotPassword()} variant='body2' component={Link}>
                         {t('loginPage.forgotPasswordLink')}
                     </MuiLink>
                 </Grid>
                 <Grid item>
-                    <MuiLink to={routes.signup()} variant='body2' component={Link}>
+                    <MuiLink to={nav.signup()} variant='body2' component={Link}>
                         {t('loginPage.signUpLink')}
                     </MuiLink>
                 </Grid>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,8 +9,8 @@ import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
 import { useSessionState } from '../../providers/apollo/cache/session/useSessionState';
-import { routes } from '../../../config/routes';
 import { SignupForm } from './SignupForm';
+import { nav } from '../../../config/nav';
 
 
 export function SignupPage(): React.ReactElement {
@@ -19,7 +19,7 @@ export function SignupPage(): React.ReactElement {
     const { isUserLoggedIn } = useSessionState();
 
     if (isUserLoggedIn) {
-        return <Redirect to={routes.projects()} />;
+        return <Navigate to={nav.inquiries()} />;
     }
 
     return (
@@ -33,7 +33,7 @@ export function SignupPage(): React.ReactElement {
 
             <Grid container direction='row-reverse'>
                 <Grid item>
-                    <MuiLink to={routes.login()} variant='body2' component={Link}>
+                    <MuiLink to={nav.login()} variant='body2' component={Link}>
                         {t('signupPage.logInLink')}
                     </MuiLink>
                 </Grid>

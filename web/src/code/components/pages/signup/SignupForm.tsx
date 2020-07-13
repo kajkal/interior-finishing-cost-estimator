@@ -6,6 +6,8 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { AlertTitle } from '@material-ui/lab';
+import Link from '@material-ui/core/Link';
 
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
@@ -17,10 +19,8 @@ import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { createNameSchema } from '../../../utils/validation/nameSchema';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
-import { useToast } from '../../providers/toast/useToast';
 import { ToastContentProps } from '../../providers/toast/context/ToastContext';
-import { AlertTitle } from '@material-ui/lab';
-import Link from '@material-ui/core/Link';
+import { useToast } from '../../providers/toast/useToast';
 
 
 export interface SignupFormProps {

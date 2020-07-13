@@ -8,7 +8,14 @@
     "darkTheme": "Ciemny motyw",
     "switchToDarkTheme": "Przełącz na ciemny motyw",
     "switchToLightTheme": "Przełącz na jasny motyw",
-    "changeLanguage": "Zmień język"
+    "changeLanguage": "Zmień język",
+    "projects": "Projekty",
+    "projectsExpand": "Rozwiń listę projektów",
+    "projectsCollapse": "Zwiń listę projektów",
+    "products": "Produkty",
+    "productsAriaLabel": "Zobacz swoje produkty",
+    "inquiries": "Zapytania",
+    "inquiriesAriaLabel": "Zobacz zapytania"
   },
   "loginPage": {
     "logIn": "Zaloguj się",
@@ -44,6 +51,9 @@
     "passwordConfirmationLabel": "Potwierdź nowe hasło",
     "passwordConfirmationAriaLabel": "Potwierdź swoje nowe hasło",
     "passwordResetSuccess": "Twoje hasło zostało zresetowane!"
+  },
+  "notFoundPage": {
+    "pageNotFound": "Nie znaleziono strony"
   },
   "form": {
     "password": {
