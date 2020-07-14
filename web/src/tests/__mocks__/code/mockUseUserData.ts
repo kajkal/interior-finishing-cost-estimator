@@ -1,7 +1,11 @@
 import { UseUserDataHookResult } from '../../../code/utils/hooks/useUserData';
 
 
-export const mockUseUserData: jest.MockedFunction<() => Partial<UseUserDataHookResult>> = jest.fn();
+export type DeepPartial<T> = {
+    [P in keyof T]?: DeepPartial<T[P]>;
+};
+
+export const mockUseUserData: jest.MockedFunction<() => DeepPartial<UseUserDataHookResult>> = jest.fn();
 
 jest.mock('../../../code/utils/hooks/useUserData', () => ({
     useUserData: mockUseUserData,

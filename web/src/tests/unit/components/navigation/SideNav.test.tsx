@@ -1,27 +1,24 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
 
 import { mockUseSideNavController } from '../../../__mocks__/code/mockUseSideNavController';
-import { mockUseSessionState } from '../../../__mocks__/code/mockUseSessionState';
+import { mockUseUserData } from '../../../__mocks__/code/mockUseUserData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { mockComponent } from '../../../__utils__/mockComponent';
 
 import { SideNav } from '../../../../code/components/navigation/SideNav';
-import { routes } from '../../../../code/config/routes';
+import { nav } from '../../../../code/config/nav';
 
-
-jest.mock('../../../../code/components/navigation/elements/ThemeTypeSwitch', () => ({
-    ThemeTypeSwitch: () => <div data-testid='MockThemeTypeSwitch' />,
-}));
-jest.mock('../../../../code/components/navigation/elements/LanguageMenu', () => ({
-    LanguageMenu: () => <div data-testid='MockLanguageMenu' />,
-}));
 
 describe('SideNav component', () => {
 
+    beforeAll(() => {
+        mockComponent('../../code/components/navigation/public/ThemeTypeSwitch');
+        mockComponent('../../code/components/navigation/public/LanguageMenu');
+    });
+
     beforeEach(() => {
-        mockUseSideNavController.mockReset();
-        mockUseSessionState.mockReset();
+        mockUseSideNavController.mockReturnValue({ isSideNavOpen: false });
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -32,46 +29,71 @@ describe('SideNav component', () => {
         );
     }
 
-    it('should render publicly available navigation', () => {
-        mockUseSideNavController.mockReturnValue({ isSideNavOpen: true });
-        mockUseSessionState.mockReturnValue({ isUserLoggedIn: false });
+    describe('with not logged in user', () => {
 
-        renderInMockContext({
-            history: createMemoryHistory({ initialEntries: [ routes.login() ] }),
+        beforeEach(() => {
+            mockUseUserData.mockReturnValue({ userData: undefined });
         });
 
-        // verify active 'Log in' button
-        const logInLink = screen.getByRole('button', { name: 'Log in' });
-        expect(logInLink).toHaveAttribute('href', routes.login());
-        expect(logInLink).toHaveAttribute('aria-current', 'page');
-        expect(logInLink).toHaveAttribute('title', ''); // no tooltip
+        it('should render publicly available links', () => {
+            renderInMockContext();
 
-        // TODO: other links
+            const linkToInquiries = screen.getByRole('button', { name: 't:common.inquiriesAriaLabel' });
+            const linkToLogin = screen.getByRole('button', { name: 't:loginPage.logIn' });
+            const linkToSignup = screen.getByRole('button', { name: 't:signupPage.signUp' });
 
-        // verify common app settings buttons
-        expect(screen.getByTestId('MockThemeTypeSwitch')).toBeInTheDocument();
-        expect(screen.getByTestId('MockLanguageMenu')).toBeInTheDocument();
+            // verify public navigation links
+            expect(linkToInquiries).toBeVisible();
+            expect(linkToInquiries).toHaveAttribute('href', nav.inquiries());
+            expect(linkToLogin).toBeVisible();
+            expect(linkToLogin).toHaveAttribute('href', nav.login());
+            expect(linkToSignup).toBeVisible();
+            expect(linkToSignup).toHaveAttribute('href', nav.signup());
+        });
+
+        it('should render common app settings buttons', () => {
+            renderInMockContext();
+            expect(screen.getByTestId('mock-ThemeTypeSwitch')).toBeVisible();
+            expect(screen.getByTestId('mock-LanguageMenu')).toBeVisible();
+        });
+
     });
 
-    it('should render navigation available only for authenticated users', () => {
-        mockUseSideNavController.mockReturnValue({ isSideNavOpen: false }); // tooltips should be active
-        mockUseSessionState.mockReturnValue({ isUserLoggedIn: true });
+    describe('with logged in user', () => {
 
-        renderInMockContext({
-            history: createMemoryHistory({ initialEntries: [ routes.projects() ] }),
+        beforeEach(() => {
+            mockUseUserData.mockReturnValue({
+                userData: {
+                    name: 'Sample Name',
+                    slug: 'sample-user',
+                    projects: [],
+                },
+            });
         });
 
-        // verify active 'Projects' button
-        const projectsLink = screen.getByRole('button', { name: 'Projects' });
-        expect(projectsLink).toHaveAttribute('href', routes.projects());
-        expect(projectsLink).toHaveAttribute('aria-current', 'page');
-        expect(projectsLink).toHaveAttribute('title', 'Projects'); // with tooltip
+        it('should render links reserved only for authorized users', () => {
+            renderInMockContext();
 
-        // TODO: other links
+            const accountCollapsibleListToggle = screen.getByRole('button', { name: /^t:common.account(Expand|Collapse)$/ });
+            const projectCollapsibleListToggle = screen.getByRole('button', { name: /^t:common.projects(Expand|Collapse)$/ });
+            const linkToUserProducts = screen.getByRole('button', { name: 't:common.productsAriaLabel' });
+            const linkToInquiries = screen.getByRole('button', { name: 't:common.inquiriesAriaLabel' });
 
-        // verify common app settings buttons
-        expect(screen.getByTestId('MockThemeTypeSwitch')).toBeInTheDocument();
-        expect(screen.getByTestId('MockLanguageMenu')).toBeInTheDocument();
+            // verify public navigation links
+            expect(accountCollapsibleListToggle).toBeVisible();
+            expect(projectCollapsibleListToggle).toBeVisible();
+            expect(linkToUserProducts).toBeVisible();
+            expect(linkToUserProducts).toHaveAttribute('href', nav.user('sample-user').products());
+            expect(linkToInquiries).toBeVisible();
+            expect(linkToInquiries).toHaveAttribute('href', nav.inquiries());
+        });
+
+        it('should render common app settings buttons', () => {
+            renderInMockContext();
+            expect(screen.getByTestId('mock-ThemeTypeSwitch')).toBeVisible();
+            expect(screen.getByTestId('mock-LanguageMenu')).toBeVisible();
+        });
+
     });
 
 });

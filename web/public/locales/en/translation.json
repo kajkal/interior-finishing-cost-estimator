@@ -9,11 +9,21 @@
     "switchToDarkTheme": "Switch to dark theme",
     "switchToLightTheme": "Switch to light theme",
     "changeLanguage": "Change language",
+
+    "accountExpand": "Expand account options",
+    "accountCollapse": "Collapse account options",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+
     "projects": "Projects",
     "projectsExpand": "Expand project list",
     "projectsCollapse": "Collapse project list",
+    "projectAriaLabel": "View project {{name}}",
+
     "products": "Products",
     "productsAriaLabel": "View your products",
+
     "inquiries": "Inquiries",
     "inquiriesAriaLabel": "View inquiries"
   },

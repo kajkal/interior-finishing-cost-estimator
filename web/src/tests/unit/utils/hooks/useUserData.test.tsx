@@ -4,7 +4,7 @@ import { MockedProvider } from '@apollo/client/testing';
 import { renderHook } from '@testing-library/react-hooks';
 
 import { MeDocument, MeQuery } from '../../../../graphql/generated-types';
-import { useUserData } from '../../../../code/utils/hooks/useUserData';
+import { useUserData, UseUserDataHookResult } from '../../../../code/utils/hooks/useUserData';
 
 
 describe('useUserData hook', () => {
@@ -27,7 +27,7 @@ describe('useUserData hook', () => {
             data: {
                 me: {
                     __typename: 'User',
-                    name: '',
+                    name: 'Sample Name',
                     slug: 'sample-slug',
                     email: '',
                     products: [],
@@ -42,7 +42,7 @@ describe('useUserData hook', () => {
     it('should return empty user data object from cache', async () => {
         const cache = new InMemoryCache();
         cache.writeQuery(mockCacheRecords.notAuthenticated);
-        const { result, waitForNextUpdate } = renderHook(() => useUserData(), {
+        const { result, waitForNextUpdate } = renderHook<never, UseUserDataHookResult>(() => useUserData(), {
             wrapper: createWrapper(cache),
         });
 
@@ -57,7 +57,7 @@ describe('useUserData hook', () => {
     it('should return mapped user data from cache', async () => {
         const cache = new InMemoryCache();
         cache.writeQuery(mockCacheRecords.authenticated);
-        const { result, waitForNextUpdate } = renderHook(() => useUserData(), {
+        const { result, waitForNextUpdate } = renderHook<never, UseUserDataHookResult>(() => useUserData(), {
             wrapper: createWrapper(cache),
         });
 
@@ -65,7 +65,9 @@ describe('useUserData hook', () => {
 
         expect(result.current).toEqual({
             userData: {
+                name: 'Sample Name',
                 slug: 'sample-slug',
+                projects: [],
             },
             isLoggedIn: true,
         });

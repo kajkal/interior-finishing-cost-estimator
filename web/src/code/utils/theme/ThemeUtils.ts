@@ -39,8 +39,8 @@ export class ThemeUtils {
                 },
             },
             sideNavDrawer: {
-                width: 250,
-            }
+                width: 255,
+            },
         }));
 
         theme.overrides = {
@@ -50,6 +50,23 @@ export class ThemeUtils {
                     color: theme.palette.text.primary,
                     borderBottom: '1px solid '.concat(theme.palette.divider),
                     boxShadow: 'none',
+                },
+            },
+            MuiListItemIcon: {
+                root: {
+                    minWidth: 'unset',
+                    marginRight: theme.spacing(1.5),
+                },
+            },
+            MuiListItemText: {
+                inset: {
+                    paddingLeft: theme.spacing(4.5),
+                },
+            },
+            MuiListItemAvatar: {
+                root: {
+                    minWidth: 'unset',
+                    marginRight: theme.spacing(1.5),
                 },
             },
         };

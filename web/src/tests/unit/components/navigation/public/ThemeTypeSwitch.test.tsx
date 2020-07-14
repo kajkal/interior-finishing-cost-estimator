@@ -3,7 +3,7 @@ import { RecoilRoot } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
-import { ThemeTypeSwitch } from '../../../../../code/components/navigation/elements/ThemeTypeSwitch';
+import { ThemeTypeSwitch } from '../../../../../code/components/navigation/public/ThemeTypeSwitch';
 
 
 describe('ThemeTypeSwitch component', () => {

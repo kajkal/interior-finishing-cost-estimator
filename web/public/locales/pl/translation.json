@@ -9,11 +9,21 @@
     "switchToDarkTheme": "Przełącz na ciemny motyw",
     "switchToLightTheme": "Przełącz na jasny motyw",
     "changeLanguage": "Zmień język",
+
+    "accountExpand": "Rozwiń opcje mojego konta",
+    "accountCollapse": "Zwiń opcje mojego konta",
+    "profile": "Profil",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj",
+
     "projects": "Projekty",
     "projectsExpand": "Rozwiń listę projektów",
     "projectsCollapse": "Zwiń listę projektów",
+    "projectAriaLabel": "Zobacz projekt {{name}}",
+
     "products": "Produkty",
     "productsAriaLabel": "Zobacz swoje produkty",
+
     "inquiries": "Zapytania",
     "inquiriesAriaLabel": "Zobacz zapytania"
   },

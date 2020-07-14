@@ -69,7 +69,7 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
 
     React.useEffect(() => {
         accessToken && meQuery();
-    }, [ accessToken ]);
+    }, [ accessToken, meQuery ]);
 
     if (accessToken && (!result.data && !result.error)) {
         return <BackdropSpinner />;

@@ -22,7 +22,7 @@ describe('SignupPage component', () => {
 
     beforeEach(() => {
         MockSessionChannel.setupMocks();
-        mockUseUserData.mockReturnValue({ userData: undefined, isLoggedIn: false });
+        mockUseUserData.mockReturnValue({ userData: undefined });
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -72,7 +72,7 @@ describe('SignupPage component', () => {
     });
 
     it('should navigate to default page if user is already authenticated', () => {
-        mockUseUserData.mockReturnValue({ userData: { slug: 'sample-user' }, isLoggedIn: true });
+        mockUseUserData.mockReturnValue({ userData: { slug: 'sample-user' } });
         renderInMockContext();
         expect(screen.getByTestId('location')).toHaveTextContent(nav.user('sample-user').profile());
     });

@@ -1,69 +1,87 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
-import ListItem from '@material-ui/core/ListItem';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import Divider from '@material-ui/core/Divider';
-import LockIcon from '@material-ui/icons/Lock';
 import List from '@material-ui/core/List';
 
-import { useSessionState } from '../providers/apollo/cache/session/useSessionState';
-import { ConditionalTooltip } from '../common/data-display/ConditionalTooltip';
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
-import { ListItemNavLink } from './elements/ListItemNavLink';
-import { ThemeTypeSwitch } from './elements/ThemeTypeSwitch';
-import { LanguageMenu } from './elements/LanguageMenu';
-import { routes } from '../../config/routes';
+import { ProjectsCollapsibleList } from './protected/ProjectsCollapsibleList';
+import { AccountCollapsibleList } from './protected/AccountCollapsibleList';
+import { SimpleNavigationItem } from './basic/SimpleNavigationItem';
+import { useUserData } from '../../utils/hooks/useUserData';
+import { ThemeTypeSwitch } from './public/ThemeTypeSwitch';
+import { LanguageMenu } from './public/LanguageMenu';
+import { nav } from '../../config/nav';
 
-
-const guestLinks = [
-    { to: routes.login(), name: 'Log in' },
-    { to: routes.signup(), name: 'Sign up' },
-    { to: routes.forgotPassword(), name: 'Forgot password' },
-    { to: '/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWRkNzBhYTkwZTAyMjQwYzQ4MWVhYmMiLCJpYXQiOjE1OTE5OTQ1ODUsImV4cCI6MTU5MjAwMTc4NX0.a_z0oLDGseLxX5KD4tLliYsix05_dMfp1CUwCG5E1VQ', name: 'Password reset' },
-];
-
-const userLinks = [
-    { to: routes.projects(), name: 'Projects' },
-    { to: '/protected', name: 'Protected' },
-    { to: routes.logout(), name: 'Logout' },
-];
 
 export function SideNav(): React.ReactElement {
     const classes = useStyles();
-    const { isSideNavOpen } = useSideNavController();
-    const { isUserLoggedIn } = useSessionState();
+    const { t } = useTranslation();
+    const { userData } = useUserData();
+    const { isSideNavOpen, onSideNavToggle } = useSideNavController();
 
     return (
         <>
             <Divider />
-            <List>
-                <ListItem>
-                    <ListItemIcon>
-                        {
-                            (isUserLoggedIn)
-                                ? <LockOpenIcon style={{ color: 'green' }} />
-                                : <LockIcon style={{ color: 'red' }} />
-                        }
-                    </ListItemIcon>
-                    <ListItemText primary={(isUserLoggedIn) ? 'YES' : 'NO'} />
-                </ListItem>
-                {
-                    (isUserLoggedIn ? userLinks : guestLinks).map((link, index) => (
-                        <ConditionalTooltip key={index} condition={!isSideNavOpen} title={link.name}>
-                            <ListItemNavLink to={link.to} aria-label={link.name}>
-                                <ListItemIcon>
-                                    <ArrowForwardIosIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={link.name} />
-                            </ListItemNavLink>
-                        </ConditionalTooltip>
-                    ))
-                }
-            </List>
+            {
+                (userData)
+                    ? (
+                        <List>
+                            <AccountCollapsibleList
+                                isSideNavOpen={isSideNavOpen}
+                                onSideNavToggle={onSideNavToggle}
+                                userData={userData}
+                            />
+                            <ProjectsCollapsibleList
+                                isSideNavOpen={isSideNavOpen}
+                                onSideNavToggle={onSideNavToggle}
+                                userData={userData}
+                            />
+                            <SimpleNavigationItem
+                                to={nav.user(userData.slug).products()}
+                                label={t('common.products')}
+                                ariaLabel={t('common.productsAriaLabel')}
+                                Icon={BookmarksIcon}
+                                isSideNavOpen={isSideNavOpen}
+                            />
+                            <SimpleNavigationItem
+                                to={nav.inquiries()}
+                                label={t('common.inquiries')}
+                                ariaLabel={t('common.inquiriesAriaLabel')}
+                                Icon={LocalOfferIcon}
+                                isSideNavOpen={isSideNavOpen}
+                            />
+                        </List>
+                    )
+                    : (
+                        <List>
+                            <SimpleNavigationItem
+                                to={nav.inquiries()}
+                                label={t('common.inquiries')}
+                                ariaLabel={t('common.inquiriesAriaLabel')}
+                                Icon={LocalOfferIcon}
+                                isSideNavOpen={isSideNavOpen}
+                            />
+                            <SimpleNavigationItem
+                                to={nav.login()}
+                                label={t('loginPage.logIn')}
+                                Icon={LockOpenIcon}
+                                isSideNavOpen={isSideNavOpen}
+                            />
+                            <SimpleNavigationItem
+                                to={nav.signup()}
+                                label={t('signupPage.signUp')}
+                                Icon={PersonAddIcon}
+                                isSideNavOpen={isSideNavOpen}
+                            />
+                        </List>
+                    )
+            }
 
             <Divider className={classes.divider} />
             <List>

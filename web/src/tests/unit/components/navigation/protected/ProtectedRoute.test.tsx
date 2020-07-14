@@ -5,7 +5,7 @@ import { render, RenderResult, screen } from '@testing-library/react';
 
 import { MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
-import { ProtectedRoute } from '../../../../../code/components/common/router/ProtectedRoute';
+import { ProtectedRoute } from '../../../../../code/components/navigation/protected/ProtectedRoute';
 
 
 describe('ProtectedRoute component', () => {

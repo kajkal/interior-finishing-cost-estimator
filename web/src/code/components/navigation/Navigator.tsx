@@ -15,7 +15,7 @@ import { ProjectPage } from '../pages/project/ProjectPage';
 import { PageNotFound } from '../pages/not-found/PageNotFound';
 import { UserProfilePage } from '../pages/profile/UserProfilePage';
 
-import { ProtectedRoute } from '../common/router/ProtectedRoute';
+import { ProtectedRoute } from './protected/ProtectedRoute';
 import { useUserData } from '../../utils/hooks/useUserData';
 import { useToast } from '../providers/toast/useToast';
 import { nav, navMap } from '../../config/nav';

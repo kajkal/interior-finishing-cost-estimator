@@ -2,7 +2,7 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 
-import { ListItemNavLink } from '../../../../../code/components/navigation/elements/ListItemNavLink';
+import { ListItemNavLink } from '../../../../../code/components/navigation/basic/ListItemNavLink';
 
 
 describe('ListItemNavLink component', () => {

@@ -22,12 +22,12 @@ export const navMap = {
     login: '/login',
     signup: '/signup',
     logout: '/logout',
-    confirmEmailAddress: '/confirm-email-address',
-    forgotPassword: '/forgot-password',
-    passwordReset: '/reset-password',
+    confirmEmailAddress: '/signup/confirm-email-address',
+    forgotPassword: '/login/forgot-password',
+    passwordReset: '/login/reset-password',
     inquiries: '/inquiries',
-    user: {
-        profile: '',
+    user: { // '/<userSlug>'
+        profile: '/',
         account: '/account',
         products: '/products',
         projects: '/projects',

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockTFunction, mockUseTranslation } from '../../../../__mocks__/libraries/react-i18next';
-import { LanguageMenu } from '../../../../../code/components/navigation/elements/LanguageMenu';
+import { LanguageMenu } from '../../../../../code/components/navigation/public/LanguageMenu';
 
 
 jest.mock('../../../../../code/config/supportedLanguages', () => ({

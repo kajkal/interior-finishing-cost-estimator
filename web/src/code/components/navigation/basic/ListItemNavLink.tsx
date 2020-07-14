@@ -7,11 +7,10 @@ import ListItem from '@material-ui/core/ListItem';
 
 export interface ListItemNavLinkProps extends Omit<NavLinkProps, 'activeClassName' | 'activeStyle'> {
     children: React.ReactNode;
-    isSideNavExpanded?: boolean;
 }
 
 export const ListItemNavLink = React.forwardRef(
-    function ListItemNavLink({ children, isSideNavExpanded, to, ...rest }: ListItemNavLinkProps, ref): React.ReactElement {
+    function ListItemNavLink({ children, to, ...rest }: ListItemNavLinkProps, ref): React.ReactElement {
         const classes = useStyles();
 
         const Link = React.useMemo(() => (
@@ -28,9 +27,9 @@ export const ListItemNavLink = React.forwardRef(
     },
 );
 
-
 const useStyles = makeStyles((theme) => ({
     activeRouterLink: {
         backgroundColor: theme.palette.action.selected,
+        // color: theme.palette.secondary.main
     },
 }));
