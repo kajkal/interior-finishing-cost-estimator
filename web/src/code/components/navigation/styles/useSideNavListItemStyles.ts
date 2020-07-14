@@ -11,6 +11,12 @@ export const useSideNavListItemStyles = makeStyles((theme) => ({
             }),
         },
     },
+    listItemTextInner: {
+        [ theme.breakpoints.up('sm') ]: {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+        },
+    },
     listItemTextShow: {
         [ theme.breakpoints.up('sm') ]: {
             marginLeft: 0,

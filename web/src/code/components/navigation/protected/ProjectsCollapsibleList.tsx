@@ -67,12 +67,16 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userDa
                                 to={nav.user(userData.slug).projects(slug)}
                                 className={listItemStyles.nested}
                                 aria-label={t('common.projectAriaLabel', { name })}
+                                end
                             >
                                 <ListItemText
                                     primary={name}
                                     className={clsx(listItemStyles.listItemText, {
                                         [ listItemStyles.listItemTextShow ]: isSideNavOpen,
                                     })}
+                                    classes={{
+                                        primary: listItemStyles.listItemTextInner,
+                                    }}
                                 />
                             </ListItemNavLink>
                         ))
