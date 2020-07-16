@@ -15,6 +15,7 @@ import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
 import { useCollapsibleList } from '../basic/useCollapsibleList';
 import { UserData } from '../../../utils/hooks/useUserData';
 import { ListItemNavLink } from '../basic/ListItemNavLink';
+import { ExpandIcon } from '../../common/icons/ExpandIcon';
 import { nav } from '../../../config/nav';
 
 
@@ -27,15 +28,15 @@ export interface ProjectsCollapsibleListProps {
 export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userData }: ProjectsCollapsibleListProps): React.ReactElement {
     const listItemStyles = useSideNavListItemStyles();
     const { t } = useTranslation();
-    const { open, onClick, ExpandIcon } = useCollapsibleList(true, isSideNavOpen, onSideNavToggle);
+    const { expanded, onListTrigger } = useCollapsibleList(true, isSideNavOpen, onSideNavToggle);
 
     return (
         <>
             <ConditionalTooltip condition={!isSideNavOpen} title={t('common.projectsExpand')!}>
                 <ListItem
                     button
-                    onClick={onClick}
-                    aria-label={(open) ? t('common.projectsCollapse') : t('common.projectsExpand')}
+                    onClick={onListTrigger}
+                    aria-label={(expanded) ? t('common.projectsCollapse') : t('common.projectsExpand')}
                 >
 
                     <ListItemIcon>
@@ -50,6 +51,7 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userDa
                     />
 
                     <ExpandIcon
+                        expanded={expanded}
                         className={clsx(listItemStyles.listItem, {
                             [ listItemStyles.listItemShow ]: isSideNavOpen,
                         })}
@@ -58,7 +60,7 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userDa
                 </ListItem>
             </ConditionalTooltip>
 
-            <Collapse in={open} timeout='auto'>
+            <Collapse in={expanded} timeout='auto'>
                 <List component='div' disablePadding dense>
                     {
                         userData.projects.map(({ id, slug, name }) => (

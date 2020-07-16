@@ -1,23 +1,24 @@
 import React from 'react';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import { useTheme } from '@material-ui/core/styles';
+import { useMediaQuery } from '@material-ui/core';
 
 
 export function useCollapsibleList(initialState: boolean, isSideNavOpen: boolean, onSideNavToggle: () => void) {
-    const [ open, setOpen ] = React.useState(initialState);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [ expanded, setExpanded ] = React.useState(initialState);
 
     const handleClick = () => {
         if (!isSideNavOpen) {
             onSideNavToggle();
-            setOpen(true);
+            setExpanded(true);
         } else {
-            setOpen(!open);
+            setExpanded(!expanded);
         }
     };
 
     return {
-        open: open && isSideNavOpen,
-        onClick: handleClick,
-        ExpandIcon: open ? ExpandLess : ExpandMore,
+        expanded: (isMobile) ? expanded : (expanded && isSideNavOpen),
+        onListTrigger: handleClick,
     };
 }

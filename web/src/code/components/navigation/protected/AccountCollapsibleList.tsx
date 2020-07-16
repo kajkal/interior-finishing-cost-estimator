@@ -16,6 +16,7 @@ import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
 import { useCollapsibleList } from '../basic/useCollapsibleList';
 import { UserData } from '../../../utils/hooks/useUserData';
 import { ListItemNavLink } from '../basic/ListItemNavLink';
+import { ExpandIcon } from '../../common/icons/ExpandIcon';
 import { nav } from '../../../config/nav';
 
 
@@ -29,7 +30,7 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userDat
     const classes = useStyles();
     const listItemStyles = useSideNavListItemStyles();
     const { t } = useTranslation();
-    const { open, onClick, ExpandIcon } = useCollapsibleList(false, isSideNavOpen, onSideNavToggle);
+    const { expanded, onListTrigger } = useCollapsibleList(false, isSideNavOpen, onSideNavToggle);
     const accountOptions = React.useMemo(() => [
         { to: nav.user(userData.slug).profile(), label: t('common.profile') },
         { to: nav.user(userData.slug).account(), label: t('common.settings') },
@@ -41,12 +42,12 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userDat
             <ConditionalTooltip condition={!isSideNavOpen} title={t('common.accountExpand')!}>
                 <ListItem
                     button
-                    onClick={onClick}
-                    aria-label={(open) ? t('common.accountCollapse') : t('common.accountExpand')}
+                    onClick={onListTrigger}
+                    aria-label={(expanded) ? t('common.accountCollapse') : t('common.accountExpand')}
                 >
 
                     <ListItemAvatar>
-                        <Avatar alt={userData.name} /*src='/dev_avatar.jpg'*/ className={classes.avatar} />
+                        <Avatar variant='rounded' alt={userData.name} /*src='/dev_avatar.jpg'*/ className={classes.avatar} />
                     </ListItemAvatar>
 
                     <ListItemText
@@ -57,6 +58,7 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userDat
                     />
 
                     <ExpandIcon
+                        expanded={expanded}
                         className={clsx(listItemStyles.listItem, {
                             [ listItemStyles.listItemShow ]: isSideNavOpen,
                         })}
@@ -65,7 +67,7 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userDat
                 </ListItem>
             </ConditionalTooltip>
 
-            <Collapse in={open} timeout='auto'>
+            <Collapse in={expanded} timeout='auto'>
                 <List component='div' disablePadding dense>
                     {
                         accountOptions.map(({ to, label }) => (
