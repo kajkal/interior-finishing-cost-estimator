@@ -52,6 +52,36 @@ export class ThemeUtils {
                     boxShadow: 'none',
                 },
             },
+            MuiFilledInput: {
+                root: {
+                    borderWidth: 1,
+                    borderStyle: 'solid',
+                    borderColor: theme.palette.text.disabled,
+                    borderRadius: theme.shape.borderRadius,
+                    backgroundColor: theme.palette.background.paper,
+                    transition: theme.transitions.create([ 'border-color' ]),
+                    '&:hover': {
+                        borderColor: theme.palette.text.primary,
+                        backgroundColor: theme.palette.background.paper,
+                    },
+                    '&$focused': {
+                        borderColor: theme.palette.primary.main,
+                        backgroundColor: theme.palette.background.paper,
+                    },
+                },
+                input: {
+                    '&:-webkit-autofill': {
+                        borderRadius: 'inherit',
+                    },
+                },
+            },
+            MuiFormLabel: {
+                root: {
+                    '&$error': {
+                        color: theme.palette.text.secondary,
+                    },
+                },
+            },
             MuiListItemIcon: {
                 root: {
                     minWidth: 'unset',
