@@ -101,7 +101,6 @@ export const config = {
     },
 
     gc: {
-        credentialsFile: resolve(process.env.GC_CREDENTIALS_FILE!),
     },
 
 } as const;

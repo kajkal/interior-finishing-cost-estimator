@@ -149,7 +149,6 @@ describe('config object', () => {
                 }),
             },
             gc: expect.objectContaining({
-                credentialsFile: expect.stringMatching(/^.*server.*GC_CREDENTIALS_FILE_TEST_VALUE$/),
             }),
         });
         expect(MockDotenv.config).toHaveBeenCalledTimes(1);

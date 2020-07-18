@@ -25,9 +25,7 @@ class TransportStreamManager {
 
     private static createProductionTransports(): TransportStream | TransportStream[] {
         return [
-            new LoggingWinston({
-                keyFilename: config.gc.credentialsFile,
-            }),
+            new LoggingWinston(),
         ];
     }
 
