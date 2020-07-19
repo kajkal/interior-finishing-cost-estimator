@@ -1,8 +1,3 @@
-const MockLoggingWinston = jest.fn();
-jest.mock('@google-cloud/logging-winston', () => ({
-    LoggingWinston: MockLoggingWinston,
-}));
-
 describe('logger objects', () => {
 
     let originalProcessEnv: NodeJS.ProcessEnv;
@@ -17,10 +12,7 @@ describe('logger objects', () => {
 
     afterEach(() => {
         jest.resetModules();
-
         MockCreateLogger.mockClear();
-        MockLoggingWinston.mockClear();
-
         process.env = originalProcessEnv;
     });
 
@@ -53,9 +45,7 @@ describe('logger objects', () => {
         expect(logger).toBe('LOGGER');
         expect(MockCreateLogger).toHaveBeenCalledTimes(1);
         expect(MockCreateLogger).toHaveBeenCalledWith(expect.objectContaining({
-            transports: [
-                expect.any(MockLoggingWinston),
-            ],
+            transports: [ { mock: true, class: 'LoggingWinston' } ],
         }));
     });
 

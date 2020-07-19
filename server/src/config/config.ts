@@ -100,7 +100,8 @@ export const config = {
         },
     },
 
-    gc: {
+    gcp: {
+        storageBucketName: process.env.GOOGLE_STORAGE_BUCKET_NAME!,
     },
 
 } as const;
