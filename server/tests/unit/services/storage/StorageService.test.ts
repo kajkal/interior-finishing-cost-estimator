@@ -1,8 +1,6 @@
 import { ReadStream } from 'fs';
 import { Readable, Writable } from 'stream';
-import { Storage } from '@google-cloud/storage';
-
-import { MockLogger } from '../../../__mocks__/utils/logger';
+import { CreateWriteStreamOptions, Storage } from '@google-cloud/storage';
 
 import { ResourceUpload, StorageService } from '../../../../src/services/storage/StorageService';
 
@@ -12,7 +10,6 @@ describe('StorageService class', () => {
     let mockBucket = jest.fn();
 
     beforeEach(() => {
-        MockLogger.setupMocks();
         (Storage as unknown as jest.Mock).mockClear().mockReturnValue({
             bucket: mockBucket.mockClear(),
         });
@@ -27,18 +24,32 @@ describe('StorageService class', () => {
         beforeEach(() => {
             uploadedDataChunks = [];
             mockBucket.mockReturnValue({
-                file: mockFile.mockClear().mockReturnValue({
-                    createWriteStream: mockCreateWriteStream.mockClear().mockReturnValue(new Writable({
-                        write(chunk, encoding, callback) {
-                            uploadedDataChunks.push(chunk.toString());
-                            if (chunk.toString() === 'error') {
-                                callback(new Error('Ups... Error!'));
-                            } else {
-                                callback();
-                            }
-                        },
-                    })),
-                }),
+                file: mockFile.mockClear(),
+            });
+            mockFile.mockImplementation((filePath: string) => {
+                const fileData = {
+                    name: filePath,
+                    bucket: {
+                        id: 'sampleBucketId',
+                        storage: { apiEndpoint: 'https://sample.api.com' },
+                    },
+                    metadata: {},
+                    getSignedUrl: () => [ 'sampleSignedUrl' ],
+                    createWriteStream: mockCreateWriteStream.mockClear().mockImplementation((options: CreateWriteStreamOptions) => {
+                        fileData.metadata = options.metadata;
+                        return new Writable({
+                            write(chunk, encoding, callback) {
+                                uploadedDataChunks.push(chunk.toString());
+                                if (chunk.toString() === 'error') {
+                                    callback(new Error('Ups... Error!'));
+                                } else {
+                                    callback();
+                                }
+                            },
+                        });
+                    }),
+                };
+                return fileData;
             });
         });
 
@@ -65,13 +76,13 @@ describe('StorageService class', () => {
             yield 'chunk_2';
         }
 
-        it('should resolve promise when file is uploaded successfully', async () => {
+        it('should return uploaded resource data when file is uploaded successfully', async () => {
             const resource = createSampleResource(sampleDataGenerator(), {
                 filename: 'sampleFilename.txt',
                 userId: 'sampleUserId',
                 directory: 'sampleDirectory',
             });
-            await new StorageService().uploadResource(resource);
+            const resourceData = await new StorageService().uploadResource(resource);
 
             // verify if good storage bucket name was used
             expect(mockBucket).toHaveBeenCalledTimes(1);
@@ -92,9 +103,15 @@ describe('StorageService class', () => {
 
             // verify uploaded data
             expect(uploadedDataChunks).toEqual([ 'chunk_1', 'chunk_2' ]);
+
+            // verify result
+            expect(resourceData).toEqual({
+                name: 'sampleFilename.txt',
+                url: 'sampleSignedUrl',
+            });
         });
 
-        it('should reject promise when file is not uploaded successfully', async (done) => {
+        it('should throw error when file is not uploaded successfully', async (done) => {
             const resource = createSampleResource(sampleDataWithErrorGenerator(), {
                 filename: 'sampleFilename.txt',
                 userId: 'sampleUserId',
@@ -114,37 +131,56 @@ describe('StorageService class', () => {
 
         it('should mark file as public when directory is \'public\'', async () => {
             const resource = createSampleResource(sampleDataGenerator(), { directory: 'public' });
-            await new StorageService().uploadResource(resource);
+            const resourceData = await new StorageService().uploadResource(resource);
 
             // verify upload options
             expect(mockCreateWriteStream).toHaveBeenCalledTimes(1);
             expect(mockCreateWriteStream).toHaveBeenCalledWith(expect.objectContaining({
                 public: true,
             }));
+
+            // verify result
+            expect(resourceData).toEqual({
+                name: 'sampleFilename.txt',
+                url: 'https://sample.api.com/sampleBucketId/sampleUserId/public/sampleFilename.txt',
+            });
         });
 
         it('should mark file as private when directory is not \'public\'', async () => {
             const resource = createSampleResource(sampleDataGenerator(), { directory: 'sampleDirectory' });
-            await new StorageService().uploadResource(resource);
+            const resourceData = await new StorageService().uploadResource(resource);
 
             // verify upload options
             expect(mockCreateWriteStream).toHaveBeenCalledTimes(1);
             expect(mockCreateWriteStream).toHaveBeenCalledWith(expect.objectContaining({
                 public: false,
             }));
+
+            // verify result
+            expect(resourceData).toEqual({
+                url: 'sampleSignedUrl',
+                name: 'sampleFilename.txt',
+            });
         });
 
-        it('should add resource description as file metadata when description is defined', async () => {
+        it('should add resource description as file metadata when file description is defined', async () => {
             const resource = createSampleResource(sampleDataGenerator(), {
                 metadata: { description: 'sampleDescription' },
             });
-            await new StorageService().uploadResource(resource);
+            const resourceData = await new StorageService().uploadResource(resource);
 
             // verify upload options
             expect(mockCreateWriteStream).toHaveBeenCalledTimes(1);
             expect(mockCreateWriteStream).toHaveBeenCalledWith(expect.objectContaining({
                 metadata: { metadata: { description: 'sampleDescription' } },
             }));
+
+            // verify result
+            expect(resourceData).toEqual({
+                url: 'sampleSignedUrl',
+                name: 'sampleFilename.txt',
+                description: 'sampleDescription',
+            });
         });
 
     });
@@ -187,6 +223,7 @@ describe('StorageService class', () => {
             // verify result
             expect(resources).toEqual([ {
                 url: 'https://sample.api.com/sampleBucketId/sampleUserId/public/avatar.png',
+                name: 'avatar.png',
                 description: 'sampleDescription',
             } ]);
         });
@@ -195,6 +232,7 @@ describe('StorageService class', () => {
             const mockGetSignedUrl = jest.fn().mockResolvedValue([ 'sampleSignedUrl' ]);
             mockGetFiles.mockReturnValue([ [
                 {
+                    name: 'sampleUserId/protected/sampleFile.pdf',
                     getSignedUrl: mockGetSignedUrl,
                     metadata: {},
                 },
@@ -218,22 +256,57 @@ describe('StorageService class', () => {
             // verify result
             expect(resources).toEqual([ {
                 url: 'sampleSignedUrl',
+                name: 'sampleFile.pdf',
                 description: undefined,
             } ]);
         });
 
-        it('should log error and return empty array when error is thrown', async () => {
+        it('should throw error when cannot get resources data', async (done) => {
             mockGetFiles.mockImplementation(() => {
                 throw new Error('Ups... Error!');
             });
-            const resources = await new StorageService().getResources('sampleUserId', 'protected');
 
-            // verify if error was logged
-            expect(MockLogger.error).toHaveBeenCalledTimes(1);
-            expect(MockLogger.error).toHaveBeenCalledWith('Cannot get files from sampleUserId/protected/', expect.any(Error));
+            try {
+                await new StorageService().getResources('sampleUserId', 'protected');
+            } catch (error) {
+                expect(error).toHaveProperty('message', 'Ups... Error!');
+                done();
+            }
+        });
 
-            // verify result
-            expect(resources).toEqual([]);
+    });
+
+    describe('deleteResources method', () => {
+
+        let mockDeleteFiles = jest.fn();
+
+        beforeEach(() => {
+            mockBucket.mockReturnValue({
+                deleteFiles: mockDeleteFiles.mockClear(),
+            });
+        });
+
+        it('should delete files', async () => {
+            await new StorageService().deleteResources('sampleUserId', 'public', 'avatar');
+
+            // verify search prefix
+            expect(mockDeleteFiles).toHaveBeenCalledTimes(1);
+            expect(mockDeleteFiles).toHaveBeenCalledWith({
+                prefix: 'sampleUserId/public/avatar',
+            });
+        });
+
+        it('should throw error when cannot delete resources data', async (done) => {
+            mockDeleteFiles.mockImplementation(() => {
+                throw new Error('Ups... Error!');
+            });
+
+            try {
+                await new StorageService().deleteResources('sampleUserId', 'public', 'avatar');
+            } catch (error) {
+                expect(error).toHaveProperty('message', 'Ups... Error!');
+                done();
+            }
         });
 
     });

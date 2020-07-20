@@ -1,11 +1,19 @@
+import { FileUpload } from 'graphql-upload';
+import { Response } from 'supertest';
+
 import { MockLogger } from '../../../__mocks__/utils/logger';
 
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
 import { ProjectRepositorySpy } from '../../../__utils__/spies/repositories/ProjectRepositorySpy';
+import { StorageServiceSpy } from '../../../__utils__/spies/services/storage/StorageServiceSpy';
 import { createAccessToken } from '../../../__utils__/integration-utils/authUtils';
 import { generator } from '../../../__utils__/generator';
 
-import { ProjectFormData } from '../../../../src/resolvers/project/input/ProjectFormData';
+import { ProjectCreateFormData } from '../../../../src/resolvers/project/input/ProjectCreateFormData';
+import { ProjectUpdateFormData } from '../../../../src/resolvers/project/input/ProjectUpdateFormData';
+import { ProjectDeleteFormData } from '../../../../src/resolvers/project/input/ProjectDeleteFormData';
+import { ResourceCreateFormData } from '../../../../src/resolvers/project/input/ResourceCreateFormData';
+import { ResourceDeleteFormData } from '../../../../src/resolvers/project/input/ResourceDeleteFormData';
 
 
 describe('ProjectResolver', () => {
@@ -17,9 +25,60 @@ describe('ProjectResolver', () => {
 
         // repositories
         ProjectRepositorySpy.setupSpies();
+
+        // services
+        StorageServiceSpy.setupSpiesAndMockImplementations();
     });
 
-    describe('create project resolver ', () => {
+    function expectUserIsNotProjectOwnerError(response: Response) {
+        // verify if access was logged
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+        // verify mutation response
+        expect(response.body).toEqual({
+            data: null,
+            errors: [
+                expect.objectContaining({
+                    message: 'RESOURCE_OWNER_ROLE_REQUIRED',
+                }),
+            ],
+        });
+    }
+
+    function expectProjectNotFoundError(response: Response) {
+        // verify if access was logged
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+        // verify mutation response
+        expect(response.body).toEqual({
+            data: null,
+            errors: [
+                expect.objectContaining({
+                    message: 'PROJECT_NOT_FOUND',
+                }),
+            ],
+        });
+    }
+
+    function expectNotAuthorizedError(response: Response) {
+        // verify if access was logged
+        expect(MockLogger.warn).toHaveBeenCalledTimes(1);
+        expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
+
+        // verify mutation response
+        expect(response.body).toEqual({
+            data: null,
+            errors: [
+                expect.objectContaining({
+                    message: 'INVALID_ACCESS_TOKEN',
+                }),
+            ],
+        });
+    }
+
+    describe('create project mutation ', () => {
 
         const createProjectMutation = `
             mutation CreateProject($name: String!) {
@@ -33,12 +92,12 @@ describe('ProjectResolver', () => {
 
         it('should create project for logged user', async () => {
             const user = await testUtils.db.populateWithUser();
-            const projectFormData: ProjectFormData = {
+            const projectCreateFormData: ProjectCreateFormData = {
                 name: generator.sentence({ words: 5 }).replace(/\./g, ''),
             };
             const response = await testUtils.postGraphQL({
                 query: createProjectMutation,
-                variables: projectFormData,
+                variables: projectCreateFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
 
             // verify if new project object was created and saved in db
@@ -54,35 +113,22 @@ describe('ProjectResolver', () => {
                 data: {
                     createProject: {
                         id: expect.any(String),
-                        name: projectFormData.name,
-                        slug: projectFormData.name.toLowerCase().replace(/\s/g, '-'),
+                        name: projectCreateFormData.name,
+                        slug: projectCreateFormData.name.toLowerCase().replace(/\s/g, '-'),
                     },
                 },
             });
         });
 
         it('should return error when user is not authenticated', async () => {
-            const projectFormData: ProjectFormData = {
+            const projectCreateFormData: ProjectCreateFormData = {
                 name: generator.sentence({ words: 5 }).replace(/\./g, ''),
             };
             const response = await testUtils.postGraphQL({
                 query: createProjectMutation,
-                variables: projectFormData,
+                variables: projectCreateFormData,
             });
-
-            // verify if access error was logged
-            expect(MockLogger.warn).toHaveBeenCalledTimes(1);
-            expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
-
-            // verify query response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'INVALID_ACCESS_TOKEN',
-                    }),
-                ],
-            });
+            expectNotAuthorizedError(response);
         });
 
     });
@@ -90,8 +136,8 @@ describe('ProjectResolver', () => {
     describe('update project mutation', () => {
 
         const updateProjectMutation = `
-            mutation UpdateProject($id: String, $name: String!) {
-              updateProject(id: $id, name: $name) {
+            mutation UpdateProject($projectId: String!, $name: String!) {
+              updateProject(projectId: $projectId, name: $name) {
                 id
                 name
                 slug
@@ -103,67 +149,40 @@ describe('ProjectResolver', () => {
             const projectOwner = await testUtils.db.populateWithUser();
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
+            const projectUpdateFormData: ProjectUpdateFormData = {
+                projectId: projectToUpdate.id,
+                name: 'sample name',
+            };
             const response = await testUtils.postGraphQL({
                 query: updateProjectMutation,
-                variables: { id: projectToUpdate.id, name: 'sample name' },
+                variables: projectUpdateFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify mutation response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'RESOURCE_OWNER_ROLE_REQUIRED',
-                    }),
-                ],
-            });
+            expectUserIsNotProjectOwnerError(response);
         });
 
         it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
+            const projectUpdateFormData: ProjectUpdateFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                name: 'sample name',
+            };
             const response = await testUtils.postGraphQL({
                 query: updateProjectMutation,
-                variables: { id: '5f0b4777903f9e20fc1e8a9c', name: 'sample name' },
+                variables: projectUpdateFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify mutation response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'PROJECT_NOT_FOUND',
-                    }),
-                ],
-            });
+            expectProjectNotFoundError(response);
         });
 
         it('should return error when user is not authenticated', async () => {
+            const projectUpdateFormData: ProjectUpdateFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                name: 'sample name',
+            };
             const response = await testUtils.postGraphQL({
                 query: updateProjectMutation,
-                variables: { id: '5f0b4777903f9e20fc1e8a9c', name: 'sample name' },
+                variables: projectUpdateFormData,
             });
-
-            // verify if access was logged
-            expect(MockLogger.warn).toHaveBeenCalledTimes(1);
-            expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
-
-            // verify mutation response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'INVALID_ACCESS_TOKEN',
-                    }),
-                ],
-            });
+            expectNotAuthorizedError(response);
         });
 
     });
@@ -171,17 +190,20 @@ describe('ProjectResolver', () => {
     describe('delete project mutation', () => {
 
         const deleteProjectMutation = `
-            mutation DeleteProject($id: String!) {
-              deleteProject(id: $id)
+            mutation DeleteProject($projectId: String!) {
+              deleteProject(projectId: $projectId)
             }
         `;
 
-        it('should return true when user is project owner and project exists', async () => {
+        it('should return true when user is a project owner', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToDelete = await testUtils.db.populateWithProject(user.id);
+            const projectDeleteFormData: ProjectDeleteFormData = {
+                projectId: projectToDelete.id,
+            };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
-                variables: { id: projectToDelete.id },
+                variables: projectDeleteFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
 
             // verify if access was logged
@@ -196,71 +218,226 @@ describe('ProjectResolver', () => {
             });
         });
 
-        it('should return false when user is not a project owner', async () => {
+        it('should return error when user is not a project owner', async () => {
             const projectOwner = await testUtils.db.populateWithUser();
             const user = await testUtils.db.populateWithUser();
             const projectToDelete = await testUtils.db.populateWithProject(projectOwner.id);
+            const projectDeleteFormData: ProjectDeleteFormData = {
+                projectId: projectToDelete.id,
+            };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
-                variables: { id: projectToDelete.id },
+                variables: projectDeleteFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify mutation response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'RESOURCE_OWNER_ROLE_REQUIRED',
-                    }),
-                ],
-            });
+            expectUserIsNotProjectOwnerError(response);
         });
 
-        it('should return false when project is not found', async () => {
+        it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
+            const projectDeleteFormData: ProjectDeleteFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+            };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
-                variables: { id: '5f0b4777903f9e20fc1e8a9c' },
+                variables: projectDeleteFormData,
             }).set('Authorization', createAccessToken(user).authHeader);
-
-            // verify if access was logged
-            expect(MockLogger.info).toHaveBeenCalledTimes(1);
-            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
-
-            // verify mutation response
-            expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'PROJECT_NOT_FOUND',
-                    }),
-                ],
-            });
+            expectProjectNotFoundError(response);
         });
 
         it('should return error when user is not authenticated', async () => {
+            const projectDeleteFormData: ProjectDeleteFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+            };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
-                variables: { id: '5f0b4777903f9e20fc1e8a9c' },
+                variables: projectDeleteFormData,
             });
+            expectNotAuthorizedError(response);
+        });
+
+    });
+
+    describe('upload project file mutation', () => {
+
+        const uploadProjectFileMutation = `
+            mutation UploadProjectFile($projectId: String!, $file: Upload!, $description: String) {
+              uploadProjectFile(projectId: $projectId, file: $file, description: $description) {
+                url
+                name
+                description
+              }
+            }
+        `;
+
+        beforeEach(() => {
+            StorageServiceSpy.uploadResource.mockImplementation((resource) => Promise.resolve({
+                url: `url:${resource.userId}/${resource.directory}/${resource.filename}`,
+                name: resource.filename,
+                description: resource.metadata?.description,
+            }));
+        });
+
+        function createFile(filename: string): FileUpload {
+            return {
+                filename: filename,
+            } as unknown as FileUpload;
+        }
+
+        it('should return uploaded file data when user is a project owner', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(user.id);
+            const resourceCreateFormData: ResourceCreateFormData = {
+                projectId: projectToUpdate.id,
+                file: createFile('sampleFile.pdf'),
+                description: 'sample file description',
+            };
+            const response = await testUtils.postGraphQL({
+                query: uploadProjectFileMutation,
+                variables: resourceCreateFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+
+            // verify if resource was uploaded
+            expect(StorageServiceSpy.uploadResource).toHaveBeenCalledTimes(1);
 
             // verify if access was logged
-            expect(MockLogger.warn).toHaveBeenCalledTimes(1);
-            expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
 
             // verify mutation response
             expect(response.body).toEqual({
-                data: null,
-                errors: [
-                    expect.objectContaining({
-                        message: 'INVALID_ACCESS_TOKEN',
-                    }),
-                ],
+                data: {
+                    uploadProjectFile: {
+                        url: `url:${user.id}/${projectToUpdate.id}/sampleFile.pdf`,
+                        name: 'sampleFile.pdf',
+                        description: 'sample file description',
+                    },
+                },
             });
+        });
+
+        it('should return error when user is not a project owner', async () => {
+            const projectOwner = await testUtils.db.populateWithUser();
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
+            const resourceCreateFormData: ResourceCreateFormData = {
+                projectId: projectToUpdate.id,
+                file: createFile('sampleFile.pdf'),
+                description: 'sample file description',
+            };
+            const response = await testUtils.postGraphQL({
+                query: uploadProjectFileMutation,
+                variables: resourceCreateFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+            expectUserIsNotProjectOwnerError(response);
+        });
+
+        it('should return error when project is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const resourceCreateFormData: ResourceCreateFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                file: createFile('sampleFile.pdf'),
+                description: 'sample file description',
+            };
+            const response = await testUtils.postGraphQL({
+                query: uploadProjectFileMutation,
+                variables: resourceCreateFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+            expectProjectNotFoundError(response);
+        });
+
+        it('should return error when user is not authenticated', async () => {
+            const resourceCreateFormData: ResourceCreateFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                file: createFile('sampleFile.pdf'),
+                description: 'sample file description',
+            };
+            const response = await testUtils.postGraphQL({
+                query: uploadProjectFileMutation,
+                variables: resourceCreateFormData,
+            });
+            expectNotAuthorizedError(response);
+        });
+
+    });
+
+    describe('delete project file mutation', () => {
+
+        const deleteProjectFileMutation = `
+            mutation UploadProjectFile($projectId: String!, $resourceName: String!) {
+              deleteProjectFile(projectId: $projectId, resourceName: $resourceName)
+            }
+        `;
+
+        beforeEach(() => {
+            StorageServiceSpy.deleteResources.mockImplementation(() => Promise.resolve());
+        });
+
+        it('should return true when user is a project owner', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(user.id);
+            const resourceDeleteFormData: ResourceDeleteFormData = {
+                projectId: projectToUpdate.id,
+                resourceName: 'sampleFile.pdf',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProjectFileMutation,
+                variables: resourceDeleteFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+
+            // verify if resource was deleted
+            expect(StorageServiceSpy.deleteResources).toHaveBeenCalledTimes(1);
+            expect(StorageServiceSpy.deleteResources).toHaveBeenCalledWith(user.id, projectToUpdate.id, 'sampleFile.pdf');
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    deleteProjectFile: true,
+                },
+            });
+        });
+
+        it('should return error when user is not a project owner', async () => {
+            const projectOwner = await testUtils.db.populateWithUser();
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
+            const resourceDeleteFormData: ResourceDeleteFormData = {
+                projectId: projectToUpdate.id,
+                resourceName: 'sampleFile.pdf',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProjectFileMutation,
+                variables: resourceDeleteFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+            expectUserIsNotProjectOwnerError(response);
+        });
+
+        it('should return error when project is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const resourceDeleteFormData: ResourceDeleteFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                resourceName: 'sampleFile.pdf',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProjectFileMutation,
+                variables: resourceDeleteFormData,
+            }).set('Authorization', createAccessToken(user).authHeader);
+            expectProjectNotFoundError(response);
+        });
+
+        it('should return error when user is not authenticated', async () => {
+            const resourceDeleteFormData: ResourceDeleteFormData = {
+                projectId: '5f0b4777903f9e20fc1e8a9c',
+                resourceName: 'sampleFile.pdf',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProjectFileMutation,
+                variables: resourceDeleteFormData,
+            });
+            expectNotAuthorizedError(response);
         });
 
     });

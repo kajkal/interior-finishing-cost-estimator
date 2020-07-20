@@ -17,13 +17,13 @@ describe('ElementId class', () => {
     describe('id field', () => {
 
         it('should accept valid id', () => {
-            idTestValue.valid.forEach(({ data, expectedErrors }) => {
+            idTestValue('id').valid.forEach(({ data, expectedErrors }) => {
                 expectValidationErrors(createElementIdObject(data), expectedErrors);
             });
         });
 
         it('should reject invalid id', () => {
-            idTestValue.invalid.forEach(({ data, expectedErrors }) => {
+            idTestValue('id').invalid.forEach(({ data, expectedErrors }) => {
                 expectValidationErrors(createElementIdObject(data), expectedErrors);
             });
         });

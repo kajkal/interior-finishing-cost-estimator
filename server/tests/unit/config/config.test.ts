@@ -87,8 +87,8 @@ describe('config object', () => {
                         },
                     }),
                 },
-                gc: expect.objectContaining({
-                    credentialsFile: expect.any(String),
+                gcp: expect.objectContaining({
+                    storageBucketName: expect.any(String),
                 }),
             });
             expect(MockDotenv.config).toHaveBeenCalledTimes(1);
@@ -148,7 +148,8 @@ describe('config object', () => {
                     },
                 }),
             },
-            gc: expect.objectContaining({
+            gcp: expect.objectContaining({
+                storageBucketName: 'GOOGLE_STORAGE_BUCKET_NAME_TEST_VALUE',
             }),
         });
         expect(MockDotenv.config).toHaveBeenCalledTimes(1);

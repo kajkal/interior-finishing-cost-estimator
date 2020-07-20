@@ -1,17 +1,16 @@
 import { Service } from 'typedi';
 import { FileUpload } from 'graphql-upload';
-import { Storage } from '@google-cloud/storage';
+import { File, Storage } from '@google-cloud/storage';
 
 import { ResourceData } from '../../resolvers/common/output/ResourceData';
 import { config } from '../../config/config';
-import { logger } from '../../utils/logger';
 
 
 export interface ResourceUpload extends FileUpload {
     userId: string;
-    directory: 'public' | string;
+    directory: string; // 'public' is a special directory where all files are publicly available
     metadata?: {
-        description: string;
+        description: string | undefined;
     };
 }
 
@@ -32,51 +31,66 @@ export class StorageService {
         return this.storage.bucket(config.gcp.storageBucketName);
     }
 
-    async uploadResource(resource: ResourceUpload) {
+    async uploadResource(resource: ResourceUpload): Promise<ResourceData> {
+        const isPublic = resource.directory === 'public';
         const filePath = `${resource.userId}/${resource.directory}/${resource.filename}`;
-        return new Promise<void>((resolve, reject) => (
+        const file = this.bucket.file(filePath);
+
+        await new Promise<void>((resolve, reject) => (
             resource.createReadStream()
                 .pipe(
-                    this.bucket.file(filePath).createWriteStream({
+                    file.createWriteStream({
                         resumable: false,
                         gzip: true,
-                        public: (resource.directory === 'public'),
+                        public: isPublic,
                         metadata: { metadata: resource.metadata },
                     }),
                 )
                 .on('error', reject)
                 .on('finish', resolve)
         ));
+
+        return (isPublic)
+            ? StorageService.getPublicResourceData(file)
+            : await StorageService.getProtectedResourceData(file);
     }
 
-    async getResources(userId: string, directory: 'public' | string, prefix?: string): Promise<ResourceData[]> {
-        try {
-            const [ files ] = await this.bucket.getFiles({
-                prefix: `${userId}/${directory}/${prefix || ''}`,
-            });
+    async getResources(userId: string, directory: string, prefix?: string): Promise<ResourceData[]> {
+        const [ files ] = await this.bucket.getFiles({
+            prefix: `${userId}/${directory}/${prefix || ''}`,
+        });
+        return (directory === 'public')
+            ? files.map(StorageService.getPublicResourceData)
+            : await Promise.all(files.map(StorageService.getProtectedResourceData));
+    }
 
-            if (directory === 'public') {
-                return files.map((file) => ({
-                    url: `${file.bucket.storage.apiEndpoint}/${file.bucket.id}/${file.name}`,
-                    ...file.metadata.metadata,
-                }));
-            }
+    async deleteResources(userId: string, directory: string, prefix?: string): Promise<void> {
+        return await this.bucket.deleteFiles({
+            prefix: `${userId}/${directory}/${prefix || ''}`,
+        });
+    }
 
-            return await Promise.all(files.map(async (file) => {
-                const [ url ] = await file.getSignedUrl({
-                    version: 'v4',
-                    action: 'read',
-                    expires: Date.now() + 1000 * 60 * 60, // one hour
-                });
-                return {
-                    url,
-                    ...file.metadata.metadata,
-                };
-            }));
-        } catch (error) {
-            logger.error(`Cannot get files from ${userId}/${directory}/`, error);
-            return [];
-        }
+
+    private static getPublicResourceData(file: File): ResourceData {
+        const url = `${file.bucket.storage.apiEndpoint}/${file.bucket.id}/${file.name}`;
+        return StorageService.createResourceData(file, url);
+    }
+
+    private static async getProtectedResourceData(file: File): Promise<ResourceData> {
+        const [ url ] = await file.getSignedUrl({
+            version: 'v4',
+            action: 'read',
+            expires: Date.now() + 1000 * 60 * 60, // one hour
+        });
+        return StorageService.createResourceData(file, url);
+    }
+
+    private static createResourceData(file: File, url: string): ResourceData {
+        return {
+            url,
+            name: file.name.split('/').slice(-1)[ 0 ],
+            ...file.metadata.metadata,
+        };
     }
 
 }

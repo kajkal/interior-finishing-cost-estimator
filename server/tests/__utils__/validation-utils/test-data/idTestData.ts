@@ -1,37 +1,36 @@
-import { ValidationTestData } from '../ValidationTestData';
-
-
-export const idTestValue: Record<'valid' | 'invalid', ValidationTestData<{ id: string }>[]> = {
-    valid: [
-        {
-            data: {
-                id: '5f09e24646904045d48e5598',
+export function idTestValue(idFieldName: 'id' | 'projectId') {
+    return {
+        valid: [
+            {
+                data: {
+                    [ idFieldName ]: '5f09e24646904045d48e5598',
+                },
+                expectedErrors: [],
             },
-            expectedErrors: [],
-        },
-        {
-            data: {
-                id: '5f09e24646904045d48e5598',
+            {
+                data: {
+                    [ idFieldName ]: '5f09e24646904045d48e5598',
+                },
+                expectedErrors: [],
             },
-            expectedErrors: [],
-        },
-    ],
-    invalid: [
-        {
-            data: {
-                id: '',
+        ],
+        invalid: [
+            {
+                data: {
+                    [ idFieldName ]: '',
+                },
+                expectedErrors: [ {
+                    isMongoId: `${idFieldName} must be a mongodb id`,
+                } ],
             },
-            expectedErrors: [ {
-                isMongoId: 'id must be a mongodb id',
-            } ],
-        },
-        {
-            data: {
-                id: 'invalid-id',
+            {
+                data: {
+                    [ idFieldName ]: 'invalid-id',
+                },
+                expectedErrors: [ {
+                    isMongoId: `${idFieldName} must be a mongodb id`,
+                } ],
             },
-            expectedErrors: [ {
-                isMongoId: 'id must be a mongodb id',
-            } ],
-        },
-    ],
-};
+        ],
+    };
+}

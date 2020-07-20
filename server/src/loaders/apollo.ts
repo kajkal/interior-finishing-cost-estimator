@@ -29,5 +29,9 @@ export async function createApolloServer(): Promise<ApolloServer> {
             container: Container,
         }),
         context: (expressContext) => expressContext,
+        uploads: {
+            maxFiles: 1,
+            maxFileSize: 1e+8, // 100mb
+        },
     });
 }

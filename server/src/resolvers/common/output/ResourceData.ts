@@ -7,6 +7,9 @@ export class ResourceData {
     @Field()
     url!: string;
 
+    @Field()
+    name!: string;
+
     @Field({ nullable: true })
     description?: string;
 

@@ -25,6 +25,10 @@ describe('apollo loader', () => {
         expect(MockApolloServerConstructor).toHaveBeenCalledWith({
             schema: expect.any(Object),
             context: expect.any(Function),
+            uploads: {
+                maxFiles: 1,
+                maxFileSize: 1e+8,
+            },
         });
 
         // test apollo server context generator:

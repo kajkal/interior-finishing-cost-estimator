@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { Authorized, Ctx, FieldResolver, Query, Resolver, Root, UseMiddleware, Int } from 'type-graphql';
+import { Authorized, Ctx, FieldResolver, Int, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { UserRepository } from '../../repositories/UserRepository';
