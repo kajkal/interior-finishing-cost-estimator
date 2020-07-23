@@ -94,6 +94,14 @@
         "tooShort": "Name is too short",
         "tooLong": "Name is too long"
       }
+    },
+    "dropzone": {
+      "validation": {
+        "unknownError": "Error with processing file {{filename}}",
+        "invalidType": "Wrong file type, please select again",
+        "tooLarge": "File {{filename}} size exceed the allowed limit of {{maxSizeInMb}} MB",
+        "toManyFiles": "Too many files selected"
+      }
     }
   },
   "error": {

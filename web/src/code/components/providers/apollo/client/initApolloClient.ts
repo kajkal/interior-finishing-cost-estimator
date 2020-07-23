@@ -1,4 +1,5 @@
-import { ApolloClient, createHttpLink, from, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloLink, from, InMemoryCache } from '@apollo/client';
+import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/link-context';
 
 
@@ -39,10 +40,10 @@ export function initApolloClient(initialCacheState: ApolloCacheShape): ApolloCli
                 return {};
             }),
 
-            createHttpLink({
+            createUploadLink({
                 uri: `${process.env.REACT_APP_SERVER_URL}/graphql`,
                 credentials: 'include',
-            }),
+            }) as unknown as ApolloLink,
 
         ]),
         cache: new InMemoryCache(),

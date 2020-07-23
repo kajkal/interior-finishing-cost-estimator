@@ -1,5 +1,6 @@
 import * as apolloClientModule from '@apollo/client';
 import * as linkContextModule from '@apollo/link-context';
+import { createUploadLink } from 'apollo-upload-client';
 
 import { AuthUtilsSpiesManager } from '../../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
 import { ApolloClientSpy } from '../../../../../__utils__/spies-managers/ApolloClientSpy';
@@ -12,17 +13,17 @@ import { SessionStateDocument } from '../../../../../../graphql/generated-types'
 describe('initApolloClient function', () => {
 
     let setContextSpy: jest.SpiedFunction<typeof linkContextModule.setContext>;
-    let createHttpLinkSpy: jest.SpiedFunction<typeof apolloClientModule.createHttpLink>;
+    let createUploadLinkSpy: jest.SpiedFunction<typeof createUploadLink>;
 
     beforeEach(() => {
         ApolloClientSpy.setupSpies();
         setContextSpy = jest.spyOn(linkContextModule, 'setContext');
-        createHttpLinkSpy = jest.spyOn(apolloClientModule, 'createHttpLink');
+        createUploadLinkSpy = jest.spyOn(require('apollo-upload-client'), 'createUploadLink') as typeof createUploadLinkSpy;
     });
 
     afterEach(() => {
         setContextSpy.mockRestore();
-        createHttpLinkSpy.mockRestore();
+        createUploadLinkSpy.mockRestore();
     });
 
     it('should create ApolloClient with given initial cache state', () => {
@@ -31,9 +32,9 @@ describe('initApolloClient function', () => {
         // verify produced client
         expect(client).toBeInstanceOf(apolloClientModule.ApolloClient);
 
-        // verify HttpLink
-        expect(createHttpLinkSpy).toHaveBeenCalledTimes(1);
-        expect(createHttpLinkSpy).toHaveBeenCalledWith({
+        // verify HttpLink/UploadLink
+        expect(createUploadLinkSpy).toHaveBeenCalledTimes(1);
+        expect(createUploadLinkSpy).toHaveBeenCalledWith({
             uri: 'http://localhost:4000/graphql',
             credentials: 'include',
         });

@@ -17,7 +17,7 @@ export function FormikSubmitButton({ children, disabled, ...rest }: FormikSubmit
         <Button
             {...rest}
             disabled={disabled || isSubmitting}
-            type='submit'
+            type={rest.type || 'submit'}
             variant='contained'
             color='primary'
         >

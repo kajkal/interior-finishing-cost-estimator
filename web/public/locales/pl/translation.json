@@ -94,6 +94,14 @@
         "tooShort": "Wprowadzona nazwa jest za krótka",
         "tooLong": "Wprowadzona nazwa jest za długa"
       }
+    },
+    "dropzone": {
+      "validation": {
+        "unknownError": "Błąd podczas przetwarzania pliku {{filename}}",
+        "invalidType": "Niepoprawny format pliku",
+        "tooLarge": "Rozmiar pliku {{filename}} przekracza dopuszczalny limit {{maxSizeInMb}} MB",
+        "toManyFiles": "Wybrano zbyt wiele plików"
+      }
     }
   },
   "error": {
