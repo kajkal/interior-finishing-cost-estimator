@@ -1,20 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TextFieldProps } from '@material-ui/core/TextField/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment/InputAdornment';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Visibility from '@material-ui/icons/Visibility';
 
-import { FormikTextField } from './FormikTextField';
+import { FormikTextField, FormikTextFieldProps } from './FormikTextField';
 
 
 function preventDefault(event: React.MouseEvent) {
     event.preventDefault();
 }
 
-export function FormikPasswordField(props: TextFieldProps): React.ReactElement {
+export function FormikPasswordField(props: FormikTextFieldProps): React.ReactElement {
     const { t } = useTranslation();
     const [ showPassword, setShowPassword ] = React.useState(false);
 

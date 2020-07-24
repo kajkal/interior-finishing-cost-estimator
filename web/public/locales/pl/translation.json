@@ -66,6 +66,9 @@
     "pageNotFound": "Nie znaleziono strony"
   },
   "form": {
+    "common": {
+      "optional": "Opcjonalne"
+    },
     "password": {
       "label": "Hasło",
       "ariaLabel": "Wprowadź swoje hasło",

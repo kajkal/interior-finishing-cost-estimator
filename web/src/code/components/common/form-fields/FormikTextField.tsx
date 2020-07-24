@@ -1,11 +1,15 @@
 import React from 'react';
 import { Field } from 'formik';
 import { FieldProps } from 'formik/dist/Field';
+import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
+import { LabelWithOptionalIndicator } from './LabelWithOptionalIndicator';
 
-import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 
+export interface FormikTextFieldProps extends Omit<FilledTextFieldProps, 'variant'> {
+    optional?: boolean;
+}
 
-export function FormikTextField({ name, InputProps, ...rest }: TextFieldProps): React.ReactElement {
+export function FormikTextField({ name, label, optional, InputProps, ...rest }: FormikTextFieldProps): React.ReactElement {
     return (
         <Field name={name}>
             {({ field, form, meta }: FieldProps<string>) => {
@@ -15,6 +19,7 @@ export function FormikTextField({ name, InputProps, ...rest }: TextFieldProps): 
                         {...rest}
                         {...field}
 
+                        label={optional ? <LabelWithOptionalIndicator label={label} /> : label}
                         disabled={rest.disabled || form.isSubmitting}
                         error={Boolean(errorMessage)}
                         helperText={errorMessage || rest.helperText}

@@ -66,6 +66,9 @@
     "pageNotFound": "Page not found"
   },
   "form": {
+    "common": {
+      "optional": "Optional"
+    },
     "password": {
       "label": "Password",
       "ariaLabel": "Enter your password",
