@@ -11,11 +11,12 @@ export interface FormikDropzoneAreaProps {
     label: string;
     accept?: string;
     multiple?: boolean; // default to false
+    autoFocus?: boolean;
 }
 
 const maxSizeInB = 1e+8; // 100mb
 
-export function FormikDropzoneArea({ name, label, accept, multiple = false }: FormikDropzoneAreaProps): React.ReactElement {
+export function FormikDropzoneArea({ name, label, accept, multiple = false, autoFocus }: FormikDropzoneAreaProps): React.ReactElement {
     const { t } = useTranslation();
     const { isSubmitting } = useFormikContext();
     const [ { value }, meta, { setValue, setTouched, setError } ] = useField<File | File[] | null>(name);
@@ -66,6 +67,7 @@ export function FormikDropzoneArea({ name, label, accept, multiple = false }: Fo
             onFileDialogCancel={handleTouched}
             onTouched={handleTouched}
             onDelete={handleDelete}
+            autoFocus={autoFocus}
         />
     );
 }

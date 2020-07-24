@@ -11,14 +11,19 @@ import { FormikDropzoneArea } from '../../../../../code/components/common/form-f
 
 describe('FormikDropzoneArea component', () => {
 
-    function renderInFormikContext(onSubmit: jest.Mock): RenderResult {
+    interface Options {
+        autoFocus?: boolean;
+        onSubmit?: jest.Mock;
+    }
+
+    function renderInFormikContext(config: Options = {}): RenderResult {
         return render(
             <Formik
                 initialValues={{ file: null }}
                 validationSchema={Yup.object({
                     file: Yup.mixed().required('File not selected error'),
                 })}
-                onSubmit={onSubmit}
+                onSubmit={config.onSubmit || jest.fn()}
             >
                 {() => (
                     <Form>
@@ -26,6 +31,7 @@ describe('FormikDropzoneArea component', () => {
                             name='file'
                             label='Drag and drop some files here, or click to select files'
                             accept='image/*'
+                            autoFocus={config.autoFocus}
                         />
                         <button type='submit'>
                             {'Upload file'}
@@ -52,7 +58,7 @@ describe('FormikDropzoneArea component', () => {
 
     it('should handle valid file successfully', async () => {
         const handleSubmit = jest.fn();
-        renderInFormikContext(handleSubmit);
+        renderInFormikContext({onSubmit: handleSubmit});
 
         // verify if initially no errors are visible
         expect(ViewUnderTest.dropzone).toHaveDescription('');
@@ -68,7 +74,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should render accepted file name and delete button', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // upload file
         const file = createSampleFile({ filename: 'me.png', type: 'image/png' });
@@ -84,7 +90,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should reject file with invalid type and display error', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // upload file
         const file = createSampleFile({ filename: 'hello.txt', type: 'text/plain' });
@@ -96,7 +102,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should reject too large file and display error', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // upload file
         const file = createSampleFile({ filename: 'me.png', type: 'image/png', size: 1e+8 + 1 });
@@ -108,7 +114,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should reject multiple files and display error', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // upload file
         const files = [
@@ -123,7 +129,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should reject invalid file and display error', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // upload file
         const file = createSampleFile({ filename: 'invalid', type: 'image/png', size: -5 });
@@ -135,7 +141,7 @@ describe('FormikDropzoneArea component', () => {
     });
 
     it('should display error on touch when no files are selected', async () => {
-        renderInFormikContext(jest.fn());
+        renderInFormikContext();
 
         // focus dropzone
         userEvent.tab();
@@ -148,6 +154,19 @@ describe('FormikDropzoneArea component', () => {
         // verify if error is visible
         await waitFor(() => expect(ViewUnderTest.dropzone).toBeInvalid());
         expect(ViewUnderTest.dropzone).toHaveDescription('File not selected error');
+    });
+
+    it('should focus dropzone on render when {autoFocus} prop is set to true', () => {
+        const { unmount } = renderInFormikContext({ autoFocus: false });
+
+        // verify body is focused
+        expect(document.body).toHaveFocus();
+
+        unmount();
+        renderInFormikContext({ autoFocus: true });
+
+        // verify if dropzone is focused
+        expect(ViewUnderTest.dropzone).toHaveFocus();
     });
 
 });

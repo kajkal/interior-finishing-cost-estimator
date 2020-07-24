@@ -18,13 +18,20 @@ export interface DropzoneAreaProps extends DropzoneOptions {
     files: File[];
     onDelete: (file: File) => void;
     onTouched: () => void;
+    autoFocus?: boolean;
 }
 
-export function DropzoneArea({ name, label, error, files, onDelete, onTouched, ...dropzoneOptions }: DropzoneAreaProps): React.ReactElement {
+export function DropzoneArea({ name, label, error, files, onDelete, onTouched, autoFocus, ...dropzoneOptions }: DropzoneAreaProps): React.ReactElement {
     const classes = useStyles();
-    const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, isFileDialogActive } = useDropzone(dropzoneOptions);
+    const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, isFileDialogActive, rootRef } = useDropzone(dropzoneOptions);
     const labelId = 'dropzone-label';
     const helperTextId = error ? 'dropzone-helper-text' : undefined;
+
+    React.useEffect(() => {
+        if (autoFocus && rootRef.current) {
+            rootRef.current!.focus();
+        }
+    }, [ rootRef, autoFocus ]);
 
     return (
         <FormControl fullWidth margin='normal'>
@@ -118,7 +125,7 @@ const useStyles = makeStyles((theme) => ({
     },
     dropzoneArea: {
         minHeight: 168,
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: theme.shape.borderRadius - 1, // -1 fixes undesirable border corner effect
         backgroundColor: theme.palette.background.paper,
     },
     dragActive: {},
