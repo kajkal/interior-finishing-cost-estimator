@@ -59,9 +59,12 @@ export class StorageService {
         const [ files ] = await this.bucket.getFiles({
             prefix: `${userId}/${directory}/${prefix || ''}`,
         });
+        const sortedFilesByModificationDate = files.sort((a, b) => (
+            (a.metadata.updated).localeCompare(b.metadata.updated)
+        ));
         return (directory === 'public')
-            ? files.map(StorageService.getPublicResourceData)
-            : await Promise.all(files.map(StorageService.getProtectedResourceData));
+            ? sortedFilesByModificationDate.map(StorageService.getPublicResourceData)
+            : await Promise.all(sortedFilesByModificationDate.map(StorageService.getProtectedResourceData));
     }
 
     async deleteResources(userId: string, directory: string, prefix?: string): Promise<void> {

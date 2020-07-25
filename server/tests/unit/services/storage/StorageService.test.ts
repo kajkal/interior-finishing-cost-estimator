@@ -7,7 +7,7 @@ import { ResourceUpload, StorageService } from '../../../../src/services/storage
 
 describe('StorageService class', () => {
 
-    let mockBucket = jest.fn();
+    const mockBucket = jest.fn();
 
     beforeEach(() => {
         (Storage as unknown as jest.Mock).mockClear().mockReturnValue({
@@ -17,8 +17,8 @@ describe('StorageService class', () => {
 
     describe('uploadResource method', () => {
 
-        let mockFile = jest.fn();
-        let mockCreateWriteStream = jest.fn();
+        const mockFile = jest.fn();
+        const mockCreateWriteStream = jest.fn();
         let uploadedDataChunks: string[] = [];
 
         beforeEach(() => {
@@ -187,7 +187,7 @@ describe('StorageService class', () => {
 
     describe('getResources method', () => {
 
-        let mockGetFiles = jest.fn();
+        const mockGetFiles = jest.fn();
 
         beforeEach(() => {
             mockBucket.mockReturnValue({
@@ -232,9 +232,18 @@ describe('StorageService class', () => {
             const mockGetSignedUrl = jest.fn().mockResolvedValue([ 'sampleSignedUrl' ]);
             mockGetFiles.mockReturnValue([ [
                 {
-                    name: 'sampleUserId/protected/sampleFile.pdf',
+                    name: 'sampleUserId/protected/sampleFile2.pdf',
                     getSignedUrl: mockGetSignedUrl,
-                    metadata: {},
+                    metadata: {
+                        updated: '2020-07-23T16:08:06.019Z',
+                    },
+                },
+                {
+                    name: 'sampleUserId/protected/sampleFile1.pdf',
+                    getSignedUrl: mockGetSignedUrl,
+                    metadata: {
+                        updated: '2020-07-23T16:07:06.019Z',
+                    },
                 },
             ] ]);
             const resources = await new StorageService().getResources('sampleUserId', 'protected');
@@ -246,7 +255,7 @@ describe('StorageService class', () => {
             });
 
             // verify signed url options
-            expect(mockGetSignedUrl).toHaveBeenCalledTimes(1);
+            expect(mockGetSignedUrl).toHaveBeenCalledTimes(2);
             expect(mockGetSignedUrl).toHaveBeenCalledWith({
                 version: 'v4',
                 action: 'read',
@@ -254,11 +263,18 @@ describe('StorageService class', () => {
             });
 
             // verify result
-            expect(resources).toEqual([ {
-                url: 'sampleSignedUrl',
-                name: 'sampleFile.pdf',
-                description: undefined,
-            } ]);
+            expect(resources).toEqual([
+                {
+                    url: 'sampleSignedUrl',
+                    name: 'sampleFile1.pdf',
+                    description: undefined,
+                },
+                {
+                    url: 'sampleSignedUrl',
+                    name: 'sampleFile2.pdf',
+                    description: undefined,
+                },
+            ]);
         });
 
         it('should throw error when cannot get resources data', async (done) => {
@@ -278,7 +294,7 @@ describe('StorageService class', () => {
 
     describe('deleteResources method', () => {
 
-        let mockDeleteFiles = jest.fn();
+        const mockDeleteFiles = jest.fn();
 
         beforeEach(() => {
             mockBucket.mockReturnValue({
