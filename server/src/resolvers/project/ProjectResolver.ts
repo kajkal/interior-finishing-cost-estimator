@@ -92,8 +92,8 @@ export class ProjectResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => ResourceData)
-    async uploadProjectFile(@Args() { projectId, ...data }: ResourceCreateFormData, @Ctx() context: AuthorizedContext): Promise<ResourceData> {
-        const projectToUpdate = await this.projectRepository.findOne({ id: projectId });
+    async uploadProjectFile(@Args() { projectSlug, ...data }: ResourceCreateFormData, @Ctx() context: AuthorizedContext): Promise<ResourceData> {
+        const projectToUpdate = await this.projectRepository.findOne({ slug: projectSlug });
 
         if (projectToUpdate) {
             if (projectToUpdate.user.id === context.jwtPayload.sub) {
@@ -101,7 +101,7 @@ export class ProjectResolver {
                 return await this.storageService.uploadResource({
                     ...file,
                     userId: context.jwtPayload.sub,
-                    directory: projectId,
+                    directory: projectToUpdate.id,
                     metadata: {
                         description: data.description,
                     },
@@ -117,12 +117,12 @@ export class ProjectResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
-    async deleteProjectFile(@Args() { projectId, resourceName }: ResourceDeleteFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const projectToUpdate = await this.projectRepository.findOne({ id: projectId });
+    async deleteProjectFile(@Args() { projectSlug, resourceName }: ResourceDeleteFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
+        const projectToUpdate = await this.projectRepository.findOne({ slug: projectSlug });
 
         if (projectToUpdate) {
             if (projectToUpdate.user.id === context.jwtPayload.sub) {
-                await this.storageService.deleteResources(context.jwtPayload.sub, projectId, resourceName);
+                await this.storageService.deleteResources(context.jwtPayload.sub, projectToUpdate.id, resourceName);
                 return true;
             }
 

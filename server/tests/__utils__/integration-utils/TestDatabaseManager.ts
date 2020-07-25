@@ -2,6 +2,7 @@ import { Db } from 'mongodb';
 import { hash } from 'argon2';
 import { MikroORM, wrap } from 'mikro-orm';
 
+import { generateSlugBase } from '../../../src/utils/generateUniqueSlug';
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 import { Product } from '../../../src/entities/product/Product';
 import { Project } from '../../../src/entities/project/Project';
@@ -47,7 +48,7 @@ export class TestDatabaseManager {
         const name = generator.name();
         const userData = {
             name,
-            slug: name.toLowerCase().replace(' ', '-'), // simple slug generator
+            slug: generateSlugBase(name),
             email: generator.email(),
             password: generator.string({ length: 8 }),
             isEmailAddressConfirmed: false,
@@ -88,7 +89,7 @@ export class TestDatabaseManager {
         const projectData = {
             user: userId,
             name,
-            slug: name.toLowerCase().replace(' ', '-'), // simple slug generator
+            slug: generateSlugBase(name),
             ...partialProjectData,
         };
 

@@ -1,13 +1,14 @@
 import { ArgsType, Field } from 'type-graphql';
-import { IsMongoId } from 'class-validator';
+
 import { ResourceFormData } from '../../common/input/ResourceFormData';
+import { IsSlug } from '../../../decorators/IsSlug';
 
 
 @ArgsType()
 export class ResourceCreateFormData extends ResourceFormData {
 
     @Field()
-    @IsMongoId()
-    projectId!: string;
+    @IsSlug()
+    projectSlug!: string;
 
 }

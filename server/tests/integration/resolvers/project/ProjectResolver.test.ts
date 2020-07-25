@@ -260,8 +260,8 @@ describe('ProjectResolver', () => {
     describe('upload project file mutation', () => {
 
         const uploadProjectFileMutation = `
-            mutation UploadProjectFile($projectId: String!, $file: Upload!, $description: String) {
-              uploadProjectFile(projectId: $projectId, file: $file, description: $description) {
+            mutation UploadProjectFile($projectSlug: String!, $file: Upload!, $description: String) {
+              uploadProjectFile(projectSlug: $projectSlug, file: $file, description: $description) {
                 url
                 name
                 description
@@ -287,7 +287,7 @@ describe('ProjectResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id);
             const resourceCreateFormData: ResourceCreateFormData = {
-                projectId: projectToUpdate.id,
+                projectSlug: projectToUpdate.slug,
                 file: createFile('sampleFile.pdf'),
                 description: 'sample file description',
             };
@@ -320,7 +320,7 @@ describe('ProjectResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
             const resourceCreateFormData: ResourceCreateFormData = {
-                projectId: projectToUpdate.id,
+                projectSlug: projectToUpdate.slug,
                 file: createFile('sampleFile.pdf'),
                 description: 'sample file description',
             };
@@ -334,7 +334,7 @@ describe('ProjectResolver', () => {
         it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
             const resourceCreateFormData: ResourceCreateFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
+                projectSlug: 'not-exiting-project',
                 file: createFile('sampleFile.pdf'),
                 description: 'sample file description',
             };
@@ -347,7 +347,7 @@ describe('ProjectResolver', () => {
 
         it('should return error when user is not authenticated', async () => {
             const resourceCreateFormData: ResourceCreateFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
+                projectSlug: 'some-project',
                 file: createFile('sampleFile.pdf'),
                 description: 'sample file description',
             };
@@ -363,8 +363,8 @@ describe('ProjectResolver', () => {
     describe('delete project file mutation', () => {
 
         const deleteProjectFileMutation = `
-            mutation UploadProjectFile($projectId: String!, $resourceName: String!) {
-              deleteProjectFile(projectId: $projectId, resourceName: $resourceName)
+            mutation DeleteProjectFile($projectSlug: String!, $resourceName: String!) {
+              deleteProjectFile(projectSlug: $projectSlug, resourceName: $resourceName)
             }
         `;
 
@@ -376,7 +376,7 @@ describe('ProjectResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id);
             const resourceDeleteFormData: ResourceDeleteFormData = {
-                projectId: projectToUpdate.id,
+                projectSlug: projectToUpdate.slug,
                 resourceName: 'sampleFile.pdf',
             };
             const response = await testUtils.postGraphQL({
@@ -405,7 +405,7 @@ describe('ProjectResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
             const resourceDeleteFormData: ResourceDeleteFormData = {
-                projectId: projectToUpdate.id,
+                projectSlug: projectToUpdate.slug,
                 resourceName: 'sampleFile.pdf',
             };
             const response = await testUtils.postGraphQL({
@@ -418,7 +418,7 @@ describe('ProjectResolver', () => {
         it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
             const resourceDeleteFormData: ResourceDeleteFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
+                projectSlug: 'not-exiting-project',
                 resourceName: 'sampleFile.pdf',
             };
             const response = await testUtils.postGraphQL({
@@ -430,7 +430,7 @@ describe('ProjectResolver', () => {
 
         it('should return error when user is not authenticated', async () => {
             const resourceDeleteFormData: ResourceDeleteFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
+                projectSlug: 'some-project',
                 resourceName: 'sampleFile.pdf',
             };
             const response = await testUtils.postGraphQL({

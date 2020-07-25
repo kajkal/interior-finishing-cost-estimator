@@ -34,6 +34,15 @@ describe('ResourceFormData class', () => {
 
     describe('description filed', () => {
 
+        it('should be optional', () => {
+            [
+                { data: { description: undefined }, expectedErrors: [] },
+                { data: { description: null! }, expectedErrors: [] },
+            ].forEach(({ data, expectedErrors }) => {
+                expectValidationErrors(createResourceFormDataObject(data), expectedErrors);
+            });
+        });
+
         it('should accept valid description', () => {
             [
                 { data: { description: 'valid description' }, expectedErrors: [] },
