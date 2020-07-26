@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import BookmarksIcon from '@material-ui/icons/Bookmarks';
+import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 
@@ -35,18 +35,18 @@ export function SideNav(): React.ReactElement {
                             <AccountCollapsibleList
                                 isSideNavOpen={isSideNavOpen}
                                 onSideNavToggle={onSideNavToggle}
-                                userData={userData}
+                                userName={userData.name}
                             />
                             <ProjectsCollapsibleList
                                 isSideNavOpen={isSideNavOpen}
                                 onSideNavToggle={onSideNavToggle}
-                                userData={userData}
+                                projects={userData.projects}
                             />
                             <SimpleNavigationItem
-                                to={nav.user(userData.slug).products()}
+                                to={nav.products()}
                                 label={t('common.products')}
                                 ariaLabel={t('common.productsAriaLabel')}
-                                Icon={BookmarksIcon}
+                                Icon={ShoppingBasketIcon}
                                 isSideNavOpen={isSideNavOpen}
                             />
                             <SimpleNavigationItem

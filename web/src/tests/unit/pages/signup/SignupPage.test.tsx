@@ -5,12 +5,12 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
-import { mockUseUserData } from '../../../__mocks__/code/mockUseUserData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
+import { accessTokenVar } from '../../../../code/components/providers/apollo/client/accessTokenVar';
 import { MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
 import { SignupPage } from '../../../../code/components/pages/signup/SignupPage';
 import { nav } from '../../../../code/config/nav';
@@ -22,7 +22,7 @@ describe('SignupPage component', () => {
 
     beforeEach(() => {
         MockSessionChannel.setupMocks();
-        mockUseUserData.mockReturnValue({ userData: undefined });
+        accessTokenVar(null);
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -72,9 +72,9 @@ describe('SignupPage component', () => {
     });
 
     it('should navigate to default page if user is already authenticated', () => {
-        mockUseUserData.mockReturnValue({ userData: { slug: 'sample-user' } });
+        accessTokenVar('LOGGED_USER_TOKEN');
         renderInMockContext();
-        expect(screen.getByTestId('location')).toHaveTextContent(nav.user('sample-user').profile());
+        expect(screen.getByTestId('location')).toHaveTextContent(nav.profile());
     });
 
     describe('sign up form', () => {

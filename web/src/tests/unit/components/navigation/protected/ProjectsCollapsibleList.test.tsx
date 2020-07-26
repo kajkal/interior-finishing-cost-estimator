@@ -5,21 +5,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MockRouter } from '../../../../__utils__/context-providers/MockRouter';
 
 import { ProjectsCollapsibleList } from '../../../../../code/components/navigation/protected/ProjectsCollapsibleList';
-import { UserData } from '../../../../../code/utils/hooks/useUserData';
 import { nav } from '../../../../../code/config/nav';
 
 
 describe('ProjectsCollapsibleList component', () => {
 
     const mockHandleSideNavToggle = jest.fn();
-    const userData = {
-        name: 'Sample Name',
-        slug: 'sample-name',
-        projects: [
-            { id: '1', name: 'Sample project', slug: 'sample-project' },
-            { id: '2', name: 'Project sample', slug: 'project-sample' },
-        ],
-    } as UserData;
+    const projects = [
+        { id: '1', name: 'Sample project', slug: 'sample-project' },
+        { id: '2', name: 'Project sample', slug: 'project-sample' },
+    ];
 
     beforeEach(() => {
         mockHandleSideNavToggle.mockReset();
@@ -29,7 +24,7 @@ describe('ProjectsCollapsibleList component', () => {
         const { rerender } = render(<ProjectsCollapsibleList
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            projects={projects}
         />, { wrapper: MockRouter });
 
         // simulate 'isSideNavOpen' prop change on 'onSideNavToggle' prop call
@@ -37,7 +32,7 @@ describe('ProjectsCollapsibleList component', () => {
             rerender(<ProjectsCollapsibleList
                 isSideNavOpen={true}
                 onSideNavToggle={mockHandleSideNavToggle}
-                userData={userData}
+                projects={projects}
             />);
         });
 
@@ -59,7 +54,7 @@ describe('ProjectsCollapsibleList component', () => {
         const { rerender } = render(<ProjectsCollapsibleList
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            projects={projects}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.projects(Expand|Collapse)$/ });
@@ -68,7 +63,7 @@ describe('ProjectsCollapsibleList component', () => {
         rerender(<ProjectsCollapsibleList
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            projects={projects}
         />);
         expect(collapsibleListTrigger).toHaveAttribute('title', '');
     });
@@ -77,7 +72,7 @@ describe('ProjectsCollapsibleList component', () => {
         render(<ProjectsCollapsibleList
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            projects={projects}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.projects(Expand|Collapse)$/ });
@@ -85,8 +80,8 @@ describe('ProjectsCollapsibleList component', () => {
         const linkToProject2 = screen.getByRole('button', { name: 't:common.projectAriaLabel:{"name":"Project sample"}' });
 
         // verify links
-        expect(linkToProject1).toHaveAttribute('href', nav.user('sample-name').projects('sample-project'));
-        expect(linkToProject2).toHaveAttribute('href', nav.user('sample-name').projects('project-sample'));
+        expect(linkToProject1).toHaveAttribute('href', nav.project('sample-project'));
+        expect(linkToProject2).toHaveAttribute('href', nav.project('project-sample'));
 
         // verify if list is initially closed
         expect(screen.queryByRole('button', { name: 't:common.projectsCollapse' })).toBeInTheDocument();

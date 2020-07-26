@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
-import { useUserData } from '../../../utils/hooks/useUserData';
+import { accessTokenVar } from '../../providers/apollo/client/accessTokenVar';
 import { SignupForm } from './SignupForm';
 import { nav } from '../../../config/nav';
 
@@ -16,11 +16,10 @@ import { nav } from '../../../config/nav';
 export function SignupPage(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const { userData } = useUserData();
+    const isUserLoggedIn = Boolean(accessTokenVar());
 
-    // redirect when user is already logged in
-    if (userData) {
-        return <Navigate to={nav.user(userData.slug).profile()} />;
+    if (isUserLoggedIn) {
+        return <Navigate to={nav.profile()} />;
     }
 
     return (

@@ -14,7 +14,6 @@ import Divider from '@material-ui/core/Divider';
 import { ConditionalTooltip } from '../../common/data-display/ConditionalTooltip';
 import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
 import { useCollapsibleList } from '../basic/useCollapsibleList';
-import { UserData } from '../../../utils/hooks/useUserData';
 import { ListItemNavLink } from '../basic/ListItemNavLink';
 import { ExpandIcon } from '../../common/icons/ExpandIcon';
 import { nav } from '../../../config/nav';
@@ -23,19 +22,19 @@ import { nav } from '../../../config/nav';
 export interface AccountCollapsibleListProps {
     isSideNavOpen: boolean;
     onSideNavToggle: () => void;
-    userData: UserData;
+    userName: string;
 }
 
-export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userData }: AccountCollapsibleListProps): React.ReactElement {
+export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userName }: AccountCollapsibleListProps): React.ReactElement {
     const classes = useStyles();
     const listItemStyles = useSideNavListItemStyles();
     const { t } = useTranslation();
     const { expanded, onListTrigger } = useCollapsibleList(false, isSideNavOpen, onSideNavToggle);
     const accountOptions = React.useMemo(() => [
-        { to: nav.user(userData.slug).profile(), label: t('common.profile') },
-        { to: nav.user(userData.slug).account(), label: t('common.settings') },
+        { to: nav.profile(), label: t('common.profile') },
+        { to: nav.settings(), label: t('common.settings') },
         { to: nav.logout(), label: t('common.logout') },
-    ], [ userData.slug, t ]);
+    ], [ t ]);
 
     return (
         <>
@@ -47,11 +46,11 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userDat
                 >
 
                     <ListItemAvatar>
-                        <Avatar variant='rounded' alt={userData.name} /*src='/dev_avatar.jpg'*/ className={classes.avatar} />
+                        <Avatar variant='rounded' alt={userName} /*src='/dev_avatar.jpg'*/ className={classes.avatar} />
                     </ListItemAvatar>
 
                     <ListItemText
-                        primary={userData.name}
+                        primary={userName}
                         className={clsx(listItemStyles.listItemText, {
                             [ listItemStyles.listItemTextShow ]: isSideNavOpen,
                         })}

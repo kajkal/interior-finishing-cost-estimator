@@ -2,19 +2,20 @@ import React from 'react';
 import { RouteProps, useLocation } from 'react-router';
 import { Navigate, Route } from 'react-router-dom';
 
+import { accessTokenVar } from '../../providers/apollo/client/accessTokenVar';
 import { useToast } from '../../providers/toast/useToast';
 import { nav } from '../../../config/nav';
 
 
 export interface ProtectedRouteProps extends RouteProps {
-    isUserLoggedIn: boolean;
     /**
      * Silent navigation, with replace, without warning toast
      */
     silent?: boolean;
 }
 
-export function ProtectedRoute({ isUserLoggedIn, silent, element, ...rest }: ProtectedRouteProps): React.ReactElement {
+export function ProtectedRoute({ silent, element, ...rest }: ProtectedRouteProps): React.ReactElement {
+    const isUserLoggedIn = Boolean(accessTokenVar());
     const { warningToast } = useToast();
     const location = useLocation();
 
@@ -22,7 +23,7 @@ export function ProtectedRoute({ isUserLoggedIn, silent, element, ...rest }: Pro
         if (!isUserLoggedIn && !silent) {
             warningToast(({ t }) => t('error.authorizationRequired'));
         }
-    }, [ warningToast, isUserLoggedIn, silent ]);
+    }, [ isUserLoggedIn, silent, warningToast ]);
 
     return (
         <Route

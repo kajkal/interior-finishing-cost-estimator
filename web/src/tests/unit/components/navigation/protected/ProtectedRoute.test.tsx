@@ -1,23 +1,24 @@
 import React from 'react';
 import { Location } from 'history';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { render, RenderResult, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
 import { ProtectedRoute } from '../../../../../code/components/navigation/protected/ProtectedRoute';
+import { accessTokenVar } from '../../../../../code/components/providers/apollo/client/accessTokenVar';
 
 
 describe('ProtectedRoute component', () => {
 
-    function renderInMockContext(isUserLoggedIn: boolean, LoginPageComponent: React.ComponentType, silent?: boolean): RenderResult {
+    function renderInMockContext(LoginPageComponent: React.ComponentType, silent?: boolean) {
         return render(
             <MockContextProvider mocks={{ initialEntries: [ '/protected' ] }}>
                 <Routes>
                     <Route path='/login'>
                         <LoginPageComponent />
                     </Route>
-                    <ProtectedRoute path='/protected' isUserLoggedIn={isUserLoggedIn} silent={silent}>
+                    <ProtectedRoute path='/protected' silent={silent}>
                         <div data-testid='ProtectedPage' />
                     </ProtectedRoute>
                 </Routes>
@@ -26,19 +27,20 @@ describe('ProtectedRoute component', () => {
     }
 
     it('should render protected page when user is logged in', () => {
-        renderInMockContext(true, () => <div data-testid='LoginPage' />);
+        accessTokenVar('LOGGED_USER_TOKEN');
+        renderInMockContext(() => <div data-testid='LoginPage' />);
 
         // verify if protected component is visible
         expect(screen.getByTestId('ProtectedPage')).toBeInTheDocument();
     });
 
     it('should navigate to login page and display warning notification when user is not logged in', () => {
+        accessTokenVar(null);
         let location!: Location<any>;
-        const LoginPageComponent: React.ComponentType = () => {
+        renderInMockContext(() => {
             location = useLocation();
             return <div data-testid='LoginPage' />;
-        };
-        renderInMockContext(false, LoginPageComponent);
+        });
 
         // verify if login page is visible
         expect(screen.getByTestId('LoginPage')).toBeInTheDocument();
@@ -54,12 +56,12 @@ describe('ProtectedRoute component', () => {
     });
 
     it('should silently navigate to login page and not display warning notification when silent prop is present', () => {
+        accessTokenVar(null);
         let location!: Location<any>;
-        const LoginPageComponent: React.ComponentType = () => {
+        renderInMockContext(() => {
             location = useLocation();
             return <div data-testid='LoginPage' />;
-        };
-        renderInMockContext(false, LoginPageComponent, true);
+        }, true);
 
         // verify if login page is visible
         expect(screen.getByTestId('LoginPage')).toBeInTheDocument();

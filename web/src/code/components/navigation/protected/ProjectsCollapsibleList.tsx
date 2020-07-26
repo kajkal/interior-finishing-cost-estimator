@@ -13,7 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import { ConditionalTooltip } from '../../common/data-display/ConditionalTooltip';
 import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
 import { useCollapsibleList } from '../basic/useCollapsibleList';
-import { UserData } from '../../../utils/hooks/useUserData';
+import { Project } from '../../../../graphql/generated-types';
 import { ListItemNavLink } from '../basic/ListItemNavLink';
 import { ExpandIcon } from '../../common/icons/ExpandIcon';
 import { nav } from '../../../config/nav';
@@ -22,10 +22,10 @@ import { nav } from '../../../config/nav';
 export interface ProjectsCollapsibleListProps {
     isSideNavOpen: boolean;
     onSideNavToggle: () => void;
-    userData: UserData;
+    projects: Pick<Project, 'id' | 'slug' | 'name'>[];
 }
 
-export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userData }: ProjectsCollapsibleListProps): React.ReactElement {
+export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, projects }: ProjectsCollapsibleListProps): React.ReactElement {
     const listItemStyles = useSideNavListItemStyles();
     const { t } = useTranslation();
     const { expanded, onListTrigger } = useCollapsibleList(true, isSideNavOpen, onSideNavToggle);
@@ -63,10 +63,10 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, userDa
             <Collapse in={expanded} timeout='auto'>
                 <List component='div' disablePadding dense>
                     {
-                        userData.projects.map(({ id, slug, name }) => (
+                        projects.map(({ id, slug, name }) => (
                             <ListItemNavLink
                                 key={id}
-                                to={nav.user(userData.slug).projects(slug)}
+                                to={nav.project(slug)}
                                 className={listItemStyles.nested}
                                 aria-label={t('common.projectAriaLabel', { name })}
                                 end

@@ -83,7 +83,7 @@ describe('SideNav component', () => {
             expect(accountCollapsibleListToggle).toBeVisible();
             expect(projectCollapsibleListToggle).toBeVisible();
             expect(linkToUserProducts).toBeVisible();
-            expect(linkToUserProducts).toHaveAttribute('href', nav.user('sample-user').products());
+            expect(linkToUserProducts).toHaveAttribute('href', nav.products());
             expect(linkToInquiries).toBeVisible();
             expect(linkToInquiries).toHaveAttribute('href', nav.inquiries());
         });

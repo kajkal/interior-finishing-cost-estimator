@@ -5,17 +5,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MockRouter } from '../../../../__utils__/context-providers/MockRouter';
 
 import { AccountCollapsibleList } from '../../../../../code/components/navigation/protected/AccountCollapsibleList';
-import { UserData } from '../../../../../code/utils/hooks/useUserData';
 import { nav } from '../../../../../code/config/nav';
 
 
 describe('AccountCollapsibleList component', () => {
 
     const mockHandleSideNavToggle = jest.fn();
-    const userData = {
-        name: 'Sample Name',
-        slug: 'sample-name',
-    } as UserData;
 
     beforeEach(() => {
         mockHandleSideNavToggle.mockReset();
@@ -25,7 +20,7 @@ describe('AccountCollapsibleList component', () => {
         const { rerender } = render(<AccountCollapsibleList
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            userName={'Sample Name'}
         />, { wrapper: MockRouter });
 
         // simulate 'isSideNavOpen' prop change on 'onSideNavToggle' prop call
@@ -33,7 +28,7 @@ describe('AccountCollapsibleList component', () => {
             rerender(<AccountCollapsibleList
                 isSideNavOpen={true}
                 onSideNavToggle={mockHandleSideNavToggle}
-                userData={userData}
+                userName={'Sample Name'}
             />);
         });
 
@@ -55,7 +50,7 @@ describe('AccountCollapsibleList component', () => {
         const { rerender } = render(<AccountCollapsibleList
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            userName={'Sample Name'}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.account(Expand|Collapse)$/ });
@@ -64,7 +59,7 @@ describe('AccountCollapsibleList component', () => {
         rerender(<AccountCollapsibleList
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            userName={'Sample Name'}
         />);
         expect(collapsibleListTrigger).toHaveAttribute('title', '');
     });
@@ -73,7 +68,7 @@ describe('AccountCollapsibleList component', () => {
         render(<AccountCollapsibleList
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
-            userData={userData}
+            userName={'Sample Name'}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.account(Expand|Collapse)$/ });
@@ -82,8 +77,8 @@ describe('AccountCollapsibleList component', () => {
         const linkToLogout = screen.getByRole('button', { name: 't:common.logout' });
 
         // verify links
-        expect(linkToProfile).toHaveAttribute('href', nav.user('sample-name').profile());
-        expect(linkToSettings).toHaveAttribute('href', nav.user('sample-name').account());
+        expect(linkToProfile).toHaveAttribute('href', nav.profile());
+        expect(linkToSettings).toHaveAttribute('href', nav.settings());
         expect(linkToLogout).toHaveAttribute('href', nav.logout());
 
         // verify if list is initially closed
