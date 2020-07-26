@@ -9,11 +9,11 @@ import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 
+import { useCurrentUserCachedData } from '../../utils/hooks/useCurrentUserCachedData';
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
 import { ProjectsCollapsibleList } from './protected/ProjectsCollapsibleList';
 import { AccountCollapsibleList } from './protected/AccountCollapsibleList';
 import { SimpleNavigationItem } from './basic/SimpleNavigationItem';
-import { useUserData } from '../../utils/hooks/useUserData';
 import { ThemeTypeSwitch } from './public/ThemeTypeSwitch';
 import { LanguageMenu } from './public/LanguageMenu';
 import { nav } from '../../config/nav';
@@ -22,7 +22,7 @@ import { nav } from '../../config/nav';
 export function SideNav(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const { userData } = useUserData();
+    const userData = useCurrentUserCachedData();
     const { isSideNavOpen, onSideNavToggle } = useSideNavController();
 
     return (

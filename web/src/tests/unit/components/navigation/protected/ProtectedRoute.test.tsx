@@ -3,10 +3,10 @@ import { Location } from 'history';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 
+import { mockUseCurrentUserCachedData } from '../../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
 import { ProtectedRoute } from '../../../../../code/components/navigation/protected/ProtectedRoute';
-import { accessTokenVar } from '../../../../../code/components/providers/apollo/client/accessTokenVar';
 
 
 describe('ProtectedRoute component', () => {
@@ -27,7 +27,7 @@ describe('ProtectedRoute component', () => {
     }
 
     it('should render protected page when user is logged in', () => {
-        accessTokenVar('LOGGED_USER_TOKEN');
+        mockUseCurrentUserCachedData.mockReturnValue({});
         renderInMockContext(() => <div data-testid='LoginPage' />);
 
         // verify if protected component is visible
@@ -35,7 +35,7 @@ describe('ProtectedRoute component', () => {
     });
 
     it('should navigate to login page and display warning notification when user is not logged in', () => {
-        accessTokenVar(null);
+        mockUseCurrentUserCachedData.mockReturnValue(undefined);
         let location!: Location<any>;
         renderInMockContext(() => {
             location = useLocation();
@@ -56,7 +56,7 @@ describe('ProtectedRoute component', () => {
     });
 
     it('should silently navigate to login page and not display warning notification when silent prop is present', () => {
-        accessTokenVar(null);
+        mockUseCurrentUserCachedData.mockReturnValue(undefined);
         let location!: Location<any>;
         renderInMockContext(() => {
             location = useLocation();

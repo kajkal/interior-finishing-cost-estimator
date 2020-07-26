@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
-import { accessTokenVar } from '../../providers/apollo/client/accessTokenVar';
+import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { LoginForm } from './LoginForm';
 import { nav } from '../../../config/nav';
 
@@ -31,7 +31,7 @@ export function LoginPage(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const requestedLocation = useRequestedLocation();
-    const isUserLoggedIn = Boolean(accessTokenVar());
+    const isUserLoggedIn = Boolean(useCurrentUserCachedData());
 
     if (isUserLoggedIn) {
         return <Navigate to={requestedLocation || nav.profile()} />;

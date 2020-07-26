@@ -2,7 +2,7 @@ import React from 'react';
 import { RouteProps, useLocation } from 'react-router';
 import { Navigate, Route } from 'react-router-dom';
 
-import { accessTokenVar } from '../../providers/apollo/client/accessTokenVar';
+import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { useToast } from '../../providers/toast/useToast';
 import { nav } from '../../../config/nav';
 
@@ -15,7 +15,7 @@ export interface ProtectedRouteProps extends RouteProps {
 }
 
 export function ProtectedRoute({ silent, element, ...rest }: ProtectedRouteProps): React.ReactElement {
-    const isUserLoggedIn = Boolean(accessTokenVar());
+    const isUserLoggedIn = Boolean(useCurrentUserCachedData());
     const { warningToast } = useToast();
     const location = useLocation();
 

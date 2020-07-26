@@ -9,6 +9,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import MenuIcon from '@material-ui/icons/Menu';
 import AppBar from '@material-ui/core/AppBar';
 
+import { PageLinearProgress } from '../common/progress-indicators/PageLinearProgress';
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
 
 
@@ -40,6 +41,7 @@ export function LayoutMobile({ content, sideNav, title }: LayoutMobileProps): Re
                         {title}
                     </Typography>
                 </Toolbar>
+                <PageLinearProgress />
             </AppBar>
             <SwipeableDrawer
                 open={isSideNavOpen}
@@ -76,6 +78,6 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        padding: theme.spacing(2),
     },
 }));

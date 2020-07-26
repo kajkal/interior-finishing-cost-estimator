@@ -5,12 +5,12 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
+import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
-import { accessTokenVar } from '../../../../code/components/providers/apollo/client/accessTokenVar';
 import { LoginDocument, MutationLoginArgs } from '../../../../graphql/generated-types';
 import { LoginPage } from '../../../../code/components/pages/login/LoginPage';
 import { nav } from '../../../../code/config/nav';
@@ -22,7 +22,7 @@ describe('LoginPage component', () => {
 
     beforeEach(() => {
         MockSessionChannel.setupMocks();
-        accessTokenVar(null);
+        mockUseCurrentUserCachedData.mockReturnValue(undefined);
     });
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -74,7 +74,7 @@ describe('LoginPage component', () => {
     });
 
     it('should navigate to default page if user is already authenticated', () => {
-        accessTokenVar('LOGGED_USER_TOKEN');
+        mockUseCurrentUserCachedData.mockReturnValue({});
         renderInMockContext();
         expect(screen.getByTestId('location')).toHaveTextContent(nav.profile());
     });
@@ -84,7 +84,7 @@ describe('LoginPage component', () => {
      * After successful authentication he is redirected to initially requested protected page.
      */
     it('should navigate to initially requested protected page if user is already authenticated', () => {
-        accessTokenVar('LOGGED_USER_TOKEN');
+        mockUseCurrentUserCachedData.mockReturnValue({});
         renderInMockContext({
             initialEntries: [ {
                 pathname: loginPagePath,

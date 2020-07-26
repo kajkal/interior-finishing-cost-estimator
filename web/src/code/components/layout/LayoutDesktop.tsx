@@ -11,6 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
 
+import { PageLinearProgress } from '../common/progress-indicators/PageLinearProgress';
 import { useSideNavController } from '../atoms/side-nav/useSideNavController';
 
 
@@ -49,6 +50,7 @@ export function LayoutDesktop({ content, sideNav, title }: LayoutDesktopProps): 
                         {title}
                     </Typography>
                 </Toolbar>
+                <PageLinearProgress />
             </AppBar>
             <Drawer
                 variant='permanent'

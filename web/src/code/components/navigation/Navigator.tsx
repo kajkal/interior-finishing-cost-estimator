@@ -9,7 +9,7 @@ import { PasswordResetRequestPage } from '../pages/password-reset/PasswordResetR
 import { PasswordResetPage } from '../pages/password-reset/PasswordResetPage';
 import { InquiriesPage } from '../pages/inquiries/InquiriesPage';
 import { AuthorizedUserProfilePage } from '../pages/profile/AuthorizedUserProfilePage';
-import { AccountPage } from '../pages/account/AccountPage';
+import { SettingsPage } from '../pages/settings/SettingsPage';
 import { ProductsPage } from '../pages/products/ProductsPage';
 import { ProjectPage } from '../pages/project/ProjectPage';
 import { PageNotFound } from '../pages/not-found/PageNotFound';

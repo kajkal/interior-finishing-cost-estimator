@@ -3,12 +3,12 @@ import { InitialEntry, State, To } from 'history';
 import { NavigateFunction, useNavigate } from 'react-router';
 import { act, render, screen } from '@testing-library/react';
 
+import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { mockComponent } from '../../../__utils__/mockComponent';
 
 import { Navigator } from '../../../../code/components/navigation/Navigator';
 import { nav } from '../../../../code/config/nav';
-import { accessTokenVar } from '../../../../code/components/providers/apollo/client/accessTokenVar';
 
 
 describe('Navigator component', () => {
@@ -52,7 +52,7 @@ describe('Navigator component', () => {
     describe('with not logged in user', () => {
 
         beforeEach(() => {
-            accessTokenVar(null);
+            mockUseCurrentUserCachedData.mockReturnValue(undefined);
         });
 
         it('should allow user to visit publicly available pages', () => {
@@ -113,7 +113,7 @@ describe('Navigator component', () => {
     describe('with logged in user', () => {
 
         beforeEach(() => {
-            accessTokenVar('LOGGED_USER_TOKEN');
+            mockUseCurrentUserCachedData.mockReturnValue({});
         });
 
         it('should allow user to visit protected pages when user is logged in', () => {

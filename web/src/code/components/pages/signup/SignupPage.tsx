@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
-import { accessTokenVar } from '../../providers/apollo/client/accessTokenVar';
+import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { SignupForm } from './SignupForm';
 import { nav } from '../../../config/nav';
 
@@ -16,7 +16,7 @@ import { nav } from '../../../config/nav';
 export function SignupPage(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const isUserLoggedIn = Boolean(accessTokenVar());
+    const isUserLoggedIn = Boolean(useCurrentUserCachedData());
 
     if (isUserLoggedIn) {
         return <Navigate to={nav.profile()} />;

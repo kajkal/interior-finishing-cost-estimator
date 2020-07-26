@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
+import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { mockUseSideNavController } from '../../../__mocks__/code/mockUseSideNavController';
-import { mockUseUserData } from '../../../__mocks__/code/mockUseUserData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { mockComponent } from '../../../__utils__/mockComponent';
 
@@ -32,7 +32,7 @@ describe('SideNav component', () => {
     describe('with not logged in user', () => {
 
         beforeEach(() => {
-            mockUseUserData.mockReturnValue({ userData: undefined });
+            mockUseCurrentUserCachedData.mockReturnValue(undefined);
         });
 
         it('should render publicly available links', () => {
@@ -62,12 +62,10 @@ describe('SideNav component', () => {
     describe('with logged in user', () => {
 
         beforeEach(() => {
-            mockUseUserData.mockReturnValue({
-                userData: {
-                    name: 'Sample Name',
-                    slug: 'sample-user',
-                    projects: [],
-                },
+            mockUseCurrentUserCachedData.mockReturnValue({
+                name: 'Sample Name',
+                slug: 'sample-user',
+                projects: [],
             });
         });
 
