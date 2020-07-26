@@ -2,13 +2,11 @@ import { ApolloClient, ApolloLink, from, InMemoryCache } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/link-context';
 
-
-import { SessionStateUtils } from '../cache/session/SessionStateUtils';
-import { ApolloCacheShape } from '../cache/ApolloCacheShape';
 import { AuthUtils } from '../../../../utils/auth/AuthUtils';
+import { accessTokenVar } from './accessTokenVar';
 
 
-export function initApolloClient(initialCacheState: ApolloCacheShape): ApolloClient<ApolloCacheShape> {
+export function initApolloClient(): ApolloClient<unknown> {
     const client = new ApolloClient({
         link: from([
 
@@ -23,12 +21,8 @@ export function initApolloClient(initialCacheState: ApolloCacheShape): ApolloCli
                 console.log('%cprepareOperation', 'color: deepskyblue;', operation.operationName);
 
                 if (AuthUtils.isProtectedOperation(operation.operationName)) {
-                    const { accessToken } = SessionStateUtils.getSessionState(client);
-                    const validAccessToken = AuthUtils.verifyAccessToken(accessToken) || await AuthUtils.refreshAccessToken();
-
-                    if (accessToken !== validAccessToken) {
-                        SessionStateUtils.setSessionState(client, { accessToken: validAccessToken });
-                    }
+                    const validAccessToken = AuthUtils.verifyAccessToken(accessTokenVar()) || await AuthUtils.refreshAccessToken();
+                    accessTokenVar(validAccessToken);
 
                     return {
                         headers: {
@@ -50,10 +44,8 @@ export function initApolloClient(initialCacheState: ApolloCacheShape): ApolloCli
 
     });
 
-    SessionStateUtils.setSessionState(client, initialCacheState.sessionState);
-
     client.onClearStore(async () => {
-        SessionStateUtils.setSessionState(client, SessionStateUtils.DEFAULT_SESSION_SATE);
+        accessTokenVar(null);
     });
 
     return client;

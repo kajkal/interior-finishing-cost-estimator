@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { NetworkStatus } from '@apollo/client';
+import { render, screen } from '@testing-library/react';
 
 import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
 import { AuthUtilsSpiesManager } from '../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
@@ -8,8 +9,9 @@ import { ApolloClientSpy } from '../../../../__utils__/spies-managers/ApolloClie
 import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { LoginSessionAction, LogoutSessionAction } from '../../../../../code/utils/communication/SessionChannel';
 import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
+import { accessTokenVar } from '../../../../../code/components/providers/apollo/client/accessTokenVar';
 import { SessionActionType } from '../../../../../code/utils/communication/SessionActionType';
-import * as generatedTypesModule from '../../../../../graphql/generated-types';
+import {LoginMutation, MeDocument } from '../../../../../graphql/generated-types';
 
 
 describe('ApolloContextProvider component', () => {
@@ -18,7 +20,6 @@ describe('ApolloContextProvider component', () => {
     let ApolloContextProvider: React.FunctionComponent;
 
     let initApolloClientSpy: jest.SpiedFunction<typeof initApolloClientModule.initApolloClient>;
-    let useMeLazyQuerySpy: jest.SpiedFunction<typeof generatedTypesModule.useMeLazyQuery>;
 
     beforeEach(() => {
         ApolloClientSpy.setupSpies();
@@ -27,8 +28,9 @@ describe('ApolloContextProvider component', () => {
 
         // @ts-ignore
         initApolloClientSpy = jest.spyOn(initApolloClientModule, 'initApolloClient');
-        useMeLazyQuerySpy = jest.spyOn(generatedTypesModule, 'useMeLazyQuery');
         initApolloClientSpy.mockClear();
+
+        accessTokenVar(null);
     });
 
     function deferRefreshAccessTokenPromise() {
@@ -57,77 +59,71 @@ describe('ApolloContextProvider component', () => {
         );
     }
 
-    it('should trigger React.Suspense until accessToken value is determined then should initialize Apollo context', async () => {
-        const { resolveValue } = deferRefreshAccessTokenPromise();
-        renderInMockContext();
+    describe('should trigger React.Suspense until initial app state is determined', () => {
 
-        // verify if loader/spinner/progressbar is visible
-        expect(screen.getByTestId('MockSpinner')).toBeInTheDocument();
+        it('when user is already logged in and MeQuery returned data', async () => {
+            ApolloClientSpy.query.mockResolvedValue({ loading: false, networkStatus: NetworkStatus.ready });
+            const { resolveValue } = deferRefreshAccessTokenPromise();
+            renderInMockContext();
 
-        resolveValue('');
+            // verify if loader/spinner/progressbar is visible
+            expect(screen.getByTestId('MockSpinner')).toBeInTheDocument();
 
-        // verify if provider' children are visible
-        expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
-    });
+            resolveValue('REFRESHED_ACCESS_TOKEN');
 
-    it('should initialize ApolloClient with default cache', async () => {
-        const mockMeQuery = jest.fn();
-        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: { me: {} } } as any ]);
+            // verify if provider' children are visible
+            expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
-        const { throwError } = deferRefreshAccessTokenPromise();
-        renderInMockContext();
+            // verify if MeQuery was triggered
+            expect(ApolloClientSpy.query).toHaveBeenCalledTimes(1);
+            expect(ApolloClientSpy.query).toHaveBeenCalledWith({ query: MeDocument });
 
-        throwError(new UnauthorizedError('NO_EXISTING_SESSION'));
-
-        // verify if provider' children are visible
-        expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
-
-        // verify if MeQuery was not triggered
-        expect(mockMeQuery).toHaveBeenCalledTimes(0);
-
-        // verify if ApolloClient was initialized with correct initial cache state
-        expect(initApolloClientSpy).toHaveBeenCalledTimes(1);
-        expect(initApolloClientSpy).toHaveBeenCalledWith({
-            sessionState: { accessToken: '' },
+            // verify accessToken cache value
+            expect(accessTokenVar()).toBe('REFRESHED_ACCESS_TOKEN');
         });
-    });
 
-    it('should initialize ApolloClient with cache based on existing session state', async () => {
-        const mockMeQuery = jest.fn();
-        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: { me: {} } } as any ]);
+        it('when user is already logged in and MeQuery returned error', async () => {
+            ApolloClientSpy.query.mockImplementation(() => {
+                throw new Error('sth broke');
+            });
+            const { resolveValue } = deferRefreshAccessTokenPromise();
+            renderInMockContext();
 
-        const { resolveValue } = deferRefreshAccessTokenPromise();
-        renderInMockContext();
+            // verify if loader/spinner/progressbar is visible
+            expect(screen.getByTestId('MockSpinner')).toBeInTheDocument();
 
-        resolveValue('accessTokenTestValue');
+            resolveValue('REFRESHED_ACCESS_TOKEN');
 
-        // verify if provider' children are visible
-        expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
+            // verify if provider' children are visible
+            expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
-        // verify if MeQuery was triggered
-        expect(mockMeQuery).toHaveBeenCalledTimes(1);
+            // verify if MeQuery was triggered
+            expect(ApolloClientSpy.query).toHaveBeenCalledTimes(1);
+            expect(ApolloClientSpy.query).toHaveBeenCalledWith({ query: MeDocument });
 
-        // verify if ApolloClient was initialized with correct initial cache state
-        expect(initApolloClientSpy).toHaveBeenCalledTimes(1);
-        expect(initApolloClientSpy).toHaveBeenCalledWith({
-            sessionState: { accessToken: 'accessTokenTestValue' },
+            // verify accessToken cache value
+            expect(accessTokenVar()).toBe(null);
         });
-    });
 
-    it('should display spinner when user session exists and user data are fetching', async () => {
-        const mockMeQuery = jest.fn();
-        useMeLazyQuerySpy.mockReturnValue([ mockMeQuery, { data: undefined, error: undefined } as any ]);
+        it('when user is not already logged in', async () => {
+            const { throwError } = deferRefreshAccessTokenPromise();
+            renderInMockContext();
 
-        const { resolveValue } = deferRefreshAccessTokenPromise();
-        renderInMockContext();
+            // verify if loader/spinner/progressbar is visible
+            expect(screen.getByTestId('MockSpinner')).toBeInTheDocument();
 
-        resolveValue('accessTokenTestValue');
+            throwError(new UnauthorizedError('NO_EXISTING_SESSION'));
 
-        // wait for me query trigger
-        await waitFor(() => expect(mockMeQuery).toHaveBeenCalledTimes(1));
+            // verify if provider' children are visible
+            expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
-        // verify if spinner is visible
-        expect(screen.getByRole('progressbar', { hidden: true })).toBeInTheDocument();
+            // verify if MeQuery was not triggered
+            expect(ApolloClientSpy.query).toHaveBeenCalledTimes(0);
+
+            // verify accessToken cache value
+            expect(accessTokenVar()).toBe(null);
+        });
+
     });
 
     describe('session state synchronization', () => {
@@ -150,52 +146,47 @@ describe('ApolloContextProvider component', () => {
         });
 
         it('should handle login session event correctly', async () => {
+            const { throwError } = deferRefreshAccessTokenPromise();
             const sampleLoginSessionAction: LoginSessionAction = {
                 type: SessionActionType.LOGIN,
                 initialData: {
                     __typename: 'InitialData',
-                    user: {} as generatedTypesModule.LoginMutation['login']['user'],
-                    accessToken: 'accessTokenTestValue',
+                    user: {} as LoginMutation['login']['user'],
+                    accessToken: 'ACCESS_TOKEN_FROM_LOGIN_EVENT',
                 },
             };
 
-            AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('');
             renderInMockContext();
+            throwError(new UnauthorizedError('NO_EXISTING_SESSION'));
 
             // verify if provider' children are visible
             expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
 
-            ApolloClientSpy.writeQuery.mockClear();
+            // verify initial accessToken cache value
+            expect(accessTokenVar()).toBe(null);
+
             MockSessionChannel.simulateSessionEvent(sampleLoginSessionAction);
 
-            // verify if cache was updated for Me query and SessionState
-            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(2);
-
             // verify if Me query result was saved in cache
-            expect(ApolloClientSpy.writeQuery).toHaveBeenNthCalledWith(1, {
-                query: generatedTypesModule.MeDocument,
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledTimes(1);
+            expect(ApolloClientSpy.writeQuery).toHaveBeenCalledWith({
+                query: MeDocument,
                 data: { me: sampleLoginSessionAction.initialData.user },
             });
 
             // verify if access token was saved in cache
-            expect(ApolloClientSpy.writeQuery).toHaveBeenNthCalledWith(2, {
-                query: generatedTypesModule.SessionStateDocument,
-                data: {
-                    sessionState: {
-                        __typename: 'SessionState',
-                        accessToken: sampleLoginSessionAction.initialData.accessToken,
-                    },
-                },
-            });
+            expect(accessTokenVar()).toBe('ACCESS_TOKEN_FROM_LOGIN_EVENT');
         });
 
         it('should handle logout session event correctly', async () => {
+            ApolloClientSpy.query.mockResolvedValue({ loading: false, networkStatus: NetworkStatus.ready });
+            const { resolveValue } = deferRefreshAccessTokenPromise();
             const sampleLogoutSessionAction: LogoutSessionAction = {
                 type: SessionActionType.LOGOUT,
             };
 
-            AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('');
             renderInMockContext();
+            resolveValue('REFRESHED_ACCESS_TOKEN');
 
             // verify if provider' children are visible
             expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();

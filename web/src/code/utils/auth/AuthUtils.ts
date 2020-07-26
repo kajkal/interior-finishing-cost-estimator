@@ -28,12 +28,12 @@ export class AuthUtils {
     /**
      * Verifies is given token is valid and not expired.
      */
-    static verifyAccessToken(tokenToVerify: string | undefined): string | undefined {
+    static verifyAccessToken(tokenToVerify: string | null): string | null {
         try {
             TokenVerifier.create(tokenToVerify).verifyTokenExpiration();
             return tokenToVerify;
         } catch (error) {
-            return undefined;
+            return null;
         }
     }
 

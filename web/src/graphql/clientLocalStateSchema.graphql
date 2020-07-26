@@ -1,7 +1,0 @@
-type SessionState {
-    accessToken: String!
-}
-
-type Query {
-    sessionState: SessionState!
-}

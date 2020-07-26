@@ -31,11 +31,11 @@ describe('AuthUtils class', () => {
             expect(AuthUtils.verifyAccessToken('sample-token')).toBe('sample-token');
         });
 
-        it('should return undefined if token is invalid', () => {
+        it('should return null if token is invalid', () => {
             TokenVerifierSpy.verifyTokenExpiration.mockImplementation(() => {
                 throw new TokenExpiredError('TOKEN_EXPIRED', new Date());
             });
-            expect(AuthUtils.verifyAccessToken('sample-token')).toBe(undefined);
+            expect(AuthUtils.verifyAccessToken('sample-token')).toBe(null);
         });
 
     });

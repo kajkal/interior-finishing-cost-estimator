@@ -3,6 +3,7 @@ import { ApolloClient } from '@apollo/client';
 
 export class ApolloClientSpy {
 
+    static query: jest.SpiedFunction<typeof ApolloClient.prototype.query>;
     static writeQuery: jest.SpiedFunction<typeof ApolloClient.prototype.writeQuery>;
     static readQuery: jest.SpiedFunction<typeof ApolloClient.prototype.readQuery>;
     static clearStore: jest.SpiedFunction<typeof ApolloClient.prototype.clearStore>;
@@ -14,6 +15,7 @@ export class ApolloClientSpy {
 
     static setupSpies() {
         this.restoreSpies();
+        this.query = jest.spyOn(ApolloClient.prototype, 'query');
         this.writeQuery = jest.spyOn(ApolloClient.prototype, 'writeQuery');
         this.readQuery = jest.spyOn(ApolloClient.prototype, 'readQuery');
         this.clearStore = jest.spyOn(ApolloClient.prototype, 'clearStore');
@@ -21,6 +23,7 @@ export class ApolloClientSpy {
     }
 
     private static restoreSpies() {
+        this.query?.mockRestore();
         this.writeQuery?.mockRestore();
         this.readQuery?.mockRestore();
         this.clearStore?.mockRestore();
