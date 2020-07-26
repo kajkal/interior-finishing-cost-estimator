@@ -49,8 +49,8 @@ export function LayoutDesktop({ content, sideNav, title }: LayoutDesktopProps): 
                     <Typography variant='h6' noWrap>
                         {title}
                     </Typography>
+                    <PageLinearProgress />
                 </Toolbar>
-                <PageLinearProgress />
             </AppBar>
             <Drawer
                 variant='permanent'

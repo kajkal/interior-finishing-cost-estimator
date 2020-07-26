@@ -20,7 +20,7 @@ export function PageLinearProgress(): React.ReactElement {
 
     return (
         <MuiLinearProgress
-            className={clsx({
+            className={clsx(classes.root, {
                 [ classes.hidden ]: !isPageLoading,
             })}
             color={(type === ThemeType.light) ? 'primary' : 'secondary'}
@@ -30,6 +30,12 @@ export function PageLinearProgress(): React.ReactElement {
 
 
 const useStyles = makeStyles({
+    root: {
+        position: 'absolute',
+        top: '100%',
+        right: 0,
+        left: 0,
+    },
     hidden: {
         visibility: 'hidden',
     },

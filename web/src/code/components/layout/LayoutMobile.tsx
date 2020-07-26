@@ -40,8 +40,8 @@ export function LayoutMobile({ content, sideNav, title }: LayoutMobileProps): Re
                     <Typography variant='h6' noWrap>
                         {title}
                     </Typography>
+                    <PageLinearProgress />
                 </Toolbar>
-                <PageLinearProgress />
             </AppBar>
             <SwipeableDrawer
                 open={isSideNavOpen}
