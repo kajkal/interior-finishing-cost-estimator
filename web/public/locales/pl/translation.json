@@ -65,6 +65,17 @@
   "notFoundPage": {
     "pageNotFound": "Nie znaleziono strony"
   },
+  "modal": {
+    "common": {
+      "cancel": "Anuluj"
+    },
+    "projectFileUpload": {
+      "title": "Dodaj plik do projektu '{{projectName}}'",
+      "upload": "Dodaj",
+      "resourceOwnerRoleRequiredError": "Do przeprowadzenia tej operacji potrzeba roli właściciela projektu",
+      "projectNotFoundError": "Projekt już nie istnieje"
+    }
+  },
   "form": {
     "common": {
       "optional": "Opcjonalne"
@@ -98,6 +109,19 @@
         "tooLong": "Wprowadzona nazwa jest za długa"
       }
     },
+    "projectFile": {
+      "label": "Upuść plik tutaj, lub kliknij aby wybrać plik",
+      "validation": {
+        "required": "Wybranie pliku do dodania jest wymaganie"
+      }
+    },
+    "projectFileDescription": {
+      "label": "Opis pliku",
+      "ariaLabel": "Wprowadź opis pliku",
+      "validation": {
+        "tooLong": "Opis jest za długi"
+      }
+    },
     "dropzone": {
       "validation": {
         "unknownError": "Błąd podczas przetwarzania pliku {{filename}}",
@@ -110,6 +134,7 @@
   "error": {
     "networkError": "Błąd połączenia z serwerem, spróbuj ponownie później",
     "unexpectedError": "Wystąpił nieoczekiwany błąd, spróbuj ponownie później",
-    "authorizationRequired": "Wymagana autoryzacja, zaloguj się i spróbuj ponownie"
+    "authorizationRequired": "Wymagana autoryzacja, zaloguj się i spróbuj ponownie",
+    "sessionExpired": "Twoja sesja wygasła, zaloguj się i spróbuj ponownie"
   }
 }

@@ -1,0 +1,5 @@
+mutation CreateProject($name: String!) {
+    createProject(name: $name) {
+        ...ProjectBasicData
+    }
+}

@@ -40,8 +40,8 @@ export function initApolloClient(): ApolloClient<unknown> {
             }) as unknown as ApolloLink,
 
         ]),
-        cache: new InMemoryCache(),
-
+        cache: initApolloCache(),
+        resolvers: {},
     });
 
     client.onClearStore(async () => {
@@ -49,4 +49,20 @@ export function initApolloClient(): ApolloClient<unknown> {
     });
 
     return client;
+}
+
+/**
+ * Exported for sake of testing
+ */
+export function initApolloCache() {
+    return new InMemoryCache({
+        typePolicies: {
+            User: {
+                keyFields: [ 'slug' ],
+            },
+            Project: {
+                keyFields: [ 'slug' ],
+            },
+        },
+    });
 }

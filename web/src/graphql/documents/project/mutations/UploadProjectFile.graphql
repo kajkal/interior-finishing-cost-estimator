@@ -1,0 +1,7 @@
+mutation UploadProjectFile($projectSlug: String!, $file: Upload!, $description: String) {
+    uploadProjectFile(projectSlug: $projectSlug, file: $file, description: $description) {
+        url
+        name
+        description
+    }
+}

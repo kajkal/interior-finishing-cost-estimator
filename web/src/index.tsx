@@ -14,6 +14,7 @@ import { DynamicThemeProvider } from './code/components/providers/theme/DynamicT
 import { BackdropSpinner } from './code/components/common/progress-indicators/BackdropSpinner';
 import { Navigator } from './code/components/navigation/Navigator';
 import { Layout } from './code/components/layout/Layout';
+import { Modals } from './code/components/modals/Modals';
 
 
 ReactDOM.render(
@@ -27,6 +28,7 @@ ReactDOM.render(
                             <Layout>
                                 <Navigator />
                             </Layout>
+                            <Modals/>
                         </ToastContextProvider>
                     </DynamicThemeProvider>
                 </ApolloContextProvider>

@@ -1,19 +1,5 @@
 query Me {
     me {
-        name
-        slug
-        email
-        products {
-            name
-        }
-        productCount
-        projects {
-            id
-            name
-            slug
-        }
-        offers {
-            name
-        }
+        ...UserFragment
     }
 }

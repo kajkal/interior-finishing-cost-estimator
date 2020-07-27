@@ -1,0 +1,8 @@
+fragment ProjectDetailedData on Project {
+    ...ProjectBasicData
+    files {
+        url
+        name
+        description
+    }
+}

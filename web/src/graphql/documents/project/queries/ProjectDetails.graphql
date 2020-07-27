@@ -1,0 +1,8 @@
+query ProjectDetails($slug: String!) {
+    me {
+        slug
+        project(slug: $slug) {
+            ...ProjectDetailedData
+        }
+    }
+}

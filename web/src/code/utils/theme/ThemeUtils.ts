@@ -31,6 +31,9 @@ export class ThemeUtils {
                     disableElevation: true,
                     size: 'large',
                 },
+                MuiDialog: {
+                    disableBackdropClick: true,
+                },
             },
             typography: {
                 button: {

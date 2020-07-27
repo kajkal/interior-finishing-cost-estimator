@@ -30,6 +30,7 @@ describe('index file', () => {
         mockComponent('../../code/components/providers/toast/ToastContextProvider');
         mockComponent('../../code/components/navigation/Navigator');
         mockComponent('../../code/components/layout/Layout');
+        mockComponent('../../code/components/modals/Modals');
     });
 
     beforeEach(() => {
@@ -59,6 +60,7 @@ describe('index file', () => {
             // verify if Layout and Navigator are present in DOM
             expect(screen.getByTestId('mock-Layout')).toBeInTheDocument();
             expect(screen.getByTestId('mock-Navigator')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-Modals')).toBeInTheDocument();
 
             // verify if service worker was unregistered
             expect(MockServiceWorker.unregister).toHaveBeenCalledTimes(1);

@@ -65,6 +65,17 @@
   "notFoundPage": {
     "pageNotFound": "Page not found"
   },
+  "modal": {
+    "common": {
+      "cancel": "Cancel"
+    },
+    "projectFileUpload": {
+      "title": "Upload file to project '{{projectName}}'",
+      "upload": "Upload",
+      "resourceOwnerRoleRequiredError": "Project owner role is required to perform this operation",
+      "projectNotFoundError": "Project no longer exists"
+    }
+  },
   "form": {
     "common": {
       "optional": "Optional"
@@ -98,6 +109,19 @@
         "tooLong": "Name is too long"
       }
     },
+    "projectFile": {
+      "label": "Drop file here, or click to browse",
+      "validation": {
+        "required": "Selecting a file to upload is required"
+      }
+    },
+    "projectFileDescription": {
+      "label": "File description",
+      "ariaLabel": "Enter file description",
+      "validation": {
+        "tooLong": "Description is too long"
+      }
+    },
     "dropzone": {
       "validation": {
         "unknownError": "Error with processing file {{filename}}",
@@ -110,6 +134,7 @@
   "error": {
     "networkError": "Network error occurred, try again later",
     "unexpectedError": "An unexpected error occurred, try again later",
-    "authorizationRequired": "Authorization required, log in and try again"
+    "authorizationRequired": "Authorization required, log in and try again",
+    "sessionExpired": "Your session has expired, log in and try again"
   }
 }

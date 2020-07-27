@@ -1,0 +1,5 @@
+fragment ProjectBasicData on Project {
+    id
+    slug
+    name
+}

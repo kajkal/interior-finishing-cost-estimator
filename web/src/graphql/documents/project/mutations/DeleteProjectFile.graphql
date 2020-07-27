@@ -1,0 +1,3 @@
+mutation DeleteProjectFile($projectSlug: String!, $resourceName: String!) {
+    deleteProjectFile(projectSlug: $projectSlug, resourceName: $resourceName)
+}

@@ -1,0 +1,15 @@
+fragment UserFragment on User {
+    name
+    slug
+    email
+    products {
+        name
+    }
+    productCount
+    projects {
+       ...ProjectBasicData
+    }
+    offers {
+        name
+    }
+}

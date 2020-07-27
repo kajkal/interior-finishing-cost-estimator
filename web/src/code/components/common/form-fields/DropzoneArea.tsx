@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { DropzoneOptions, useDropzone } from 'react-dropzone';
 
 import { makeStyles } from '@material-ui/core/styles';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Chip from '@material-ui/core/Chip';
@@ -70,6 +71,11 @@ export function DropzoneArea({ name, label, error, files, onDelete, onTouched, a
                                 />
                             ))
                         }
+                        {
+                            (files.length === 0) && (
+                                <CloudUploadIcon className={classes.uploadIcon}/>
+                            )
+                        }
                     </div>
 
                 </div>
@@ -124,7 +130,7 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     dropzoneArea: {
-        minHeight: 168,
+        minHeight: 192,
         borderRadius: theme.shape.borderRadius - 1, // -1 fixes undesirable border corner effect
         backgroundColor: theme.palette.background.paper,
     },
@@ -143,6 +149,11 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         flexWrap: 'wrap',
         padding: theme.spacing(1),
+    },
+    uploadIcon: {
+        color: theme.palette.text.secondary,
+        height: 64,
+        width: 64,
     },
     fileChip: {
         margin: theme.spacing(0.5),
