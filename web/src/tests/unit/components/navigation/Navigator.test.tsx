@@ -24,6 +24,7 @@ describe('Navigator component', () => {
         mockComponent('../../code/components/pages/profile/AuthorizedUserProfilePage');
         mockComponent('../../code/components/pages/settings/SettingsPage');
         mockComponent('../../code/components/pages/products/ProductsPage');
+        mockComponent('../../code/components/pages/project-create/CreateProjectPage');
         mockComponent('../../code/components/pages/project/ProjectPage');
         mockComponent('../../code/components/pages/profile/UserProfilePage');
         mockComponent('../../code/components/pages/not-found/PageNotFound');
@@ -128,6 +129,9 @@ describe('Navigator component', () => {
 
             navigate(nav.products());
             expect(screen.getByTestId('mock-ProductsPage')).toBeInTheDocument();
+
+            navigate(nav.createProject());
+            expect(screen.getByTestId('mock-CreateProjectPage')).toBeInTheDocument();
 
             navigate(nav.project('sample-project'));
             expect(screen.getByTestId('mock-ProjectPage')).toBeInTheDocument();

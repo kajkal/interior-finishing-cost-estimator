@@ -76,10 +76,12 @@ describe('ProjectsCollapsibleList component', () => {
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.projects(Expand|Collapse)$/ });
+        const linkToCreateNewProject = screen.getByRole('button', { name: 't:common.createProject' });
         const linkToProject1 = screen.getByRole('button', { name: 't:common.projectAriaLabel:{"name":"Sample project"}' });
         const linkToProject2 = screen.getByRole('button', { name: 't:common.projectAriaLabel:{"name":"Project sample"}' });
 
         // verify links
+        expect(linkToCreateNewProject).toHaveAttribute('href', nav.createProject());
         expect(linkToProject1).toHaveAttribute('href', nav.project('sample-project'));
         expect(linkToProject2).toHaveAttribute('href', nav.project('project-sample'));
 
@@ -89,6 +91,7 @@ describe('ProjectsCollapsibleList component', () => {
 
         // verify if links are visible when list is expanded
         expect(collapsibleListTrigger).toHaveAttribute('aria-label', 't:common.projectsCollapse');
+        expect(linkToCreateNewProject).toBeVisible();
         expect(linkToProject1).toBeVisible();
         expect(linkToProject2).toBeVisible();
 
@@ -97,7 +100,8 @@ describe('ProjectsCollapsibleList component', () => {
 
         // verify if links are invisible when list is collapsed
         expect(collapsibleListTrigger).toHaveAttribute('aria-label', 't:common.projectsExpand');
-        await waitFor(() => expect(linkToProject1).not.toBeVisible());
+        await waitFor(() => expect(linkToCreateNewProject).not.toBeVisible());
+        expect(linkToProject1).not.toBeVisible();
         expect(linkToProject2).not.toBeVisible();
     });
 

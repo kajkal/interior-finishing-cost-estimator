@@ -9,6 +9,7 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
+import AddIcon from '@material-ui/icons/Add';
 
 import { ConditionalTooltip } from '../../common/data-display/ConditionalTooltip';
 import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
@@ -62,6 +63,28 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, projec
 
             <Collapse in={expanded} timeout='auto'>
                 <List component='div' disablePadding dense>
+                    <ListItemNavLink
+                        to={nav.createProject()}
+                        className={listItemStyles.nested}
+                        aria-label={t('common.createProject')}
+                        end
+                    >
+
+                        <ListItemIcon>
+                            <AddIcon fontSize='small' />
+                        </ListItemIcon>
+
+                        <ListItemText
+                            primary={t('common.createProject')}
+                            className={clsx(listItemStyles.listItemText, {
+                                [ listItemStyles.listItemTextShow ]: isSideNavOpen,
+                            })}
+                            classes={{
+                                primary: listItemStyles.listItemTextInner,
+                            }}
+                        />
+
+                    </ListItemNavLink>
                     {
                         projects.map(({ id, slug, name }) => (
                             <ListItemNavLink

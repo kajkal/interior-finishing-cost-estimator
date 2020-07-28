@@ -17,6 +17,7 @@
     "logout": "Logout",
 
     "projects": "Projects",
+    "createProject": "Create new project",
     "projectsExpand": "Expand project list",
     "projectsCollapse": "Collapse project list",
     "projectAriaLabel": "View project {{name}}",

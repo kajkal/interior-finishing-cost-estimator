@@ -13,6 +13,7 @@
  *   /profile - authorized user profile page
  *   /settings - authorized user settings page
  *   /products - authorized user products page
+ *   /create-project - authorized user create new project page
  *   /projects/:projectSlug - authorized user projects page
  *
  *   /:userSlug/ - every other user' public profile page
@@ -30,6 +31,7 @@ export const navMap = {
     profile: '/profile',
     settings: '/settings',
     products: '/products',
+    createProject: '/create-project',
     projects: '/projects',
 
     // public user data
@@ -55,6 +57,7 @@ export const nav = {
     profile: () => navMap.profile,
     settings: () => navMap.settings,
     products: () => navMap.products,
+    createProject: () => navMap.createProject,
     project: (projectSlug: string) => navMap.projects + '/' + projectSlug,
 
     user: (userSlug: string) => ({
