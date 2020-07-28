@@ -1,14 +1,33 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+
+import { CreateProjectForm } from './CreateProjectForm';
 
 
-export interface CreateProjectPageProps {
-    // children: React.ReactNode;
-}
+export function CreateProjectPage(): React.ReactElement {
+    const classes = useStyles();
+    const { t } = useTranslation();
 
-export function CreateProjectPage(props: CreateProjectPageProps): React.ReactElement {
     return (
-        <div>
-            CreateProjectPage
-        </div>
+        <Container maxWidth='xs' disableGutters>
+
+            <Typography component='h1' variant='h5'>
+                {t('common.createProject')}
+            </Typography>
+
+            <CreateProjectForm formClassName={classes.form} />
+
+        </Container>
     );
 }
+
+
+const useStyles = makeStyles((theme) => ({
+    form: {
+        marginTop: theme.spacing(1),
+    },
+}));

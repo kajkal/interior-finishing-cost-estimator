@@ -66,6 +66,9 @@
   "notFoundPage": {
     "pageNotFound": "Page not found"
   },
+  "createProjectPage": {
+    "createProject": "Create project"
+  },
   "projectPage": {
     "files": "Files",
     "openFile": "Open file {{filename}}",
@@ -114,6 +117,15 @@
         "required": "Name is required",
         "tooShort": "Name is too short",
         "tooLong": "Name is too long"
+      }
+    },
+    "projectName": {
+      "label": "Project name",
+      "ariaLabel": "Enter project name",
+      "validation": {
+        "required": "Project name is required",
+        "tooShort": "Project name is too short",
+        "tooLong": "Project name is too long"
       }
     },
     "projectFile": {

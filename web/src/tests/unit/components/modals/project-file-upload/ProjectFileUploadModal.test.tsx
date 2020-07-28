@@ -195,7 +195,7 @@ describe('ProjectFileUploadModal component', () => {
                 await InputValidator.basedOn(ViewUnderTest.descriptionInput)
                     .expectError('a'.repeat(256), 't:form.projectFileDescription.validation.tooLong')
                     .expectNoError('')
-                    .expectNoError('validEmail@domain.com');
+                    .expectNoError('valid description');
             });
 
         });
