@@ -25,10 +25,6 @@ export const useSideNavListItemStyles = makeStyles((theme) => ({
     listItem: {
         [ theme.breakpoints.up('sm') ]: {
             opacity: 0,
-            transition: theme.transitions.create('opacity', {
-                easing: theme.transitions.easing.easeIn,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
         },
     },
     listItemShow: {

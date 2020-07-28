@@ -123,13 +123,10 @@ function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
         try {
             await uploadProjectFileMutation({
                 variables: { ...values, description: values.description || null },
-                update: async (cache, { data }) => {
+                update: (cache, { data }) => {
                     const uploadedFile = data?.uploadProjectFile;
                     uploadedFile && cache.modify({
-                        id: cache.identify({
-                            __typename: 'Project',
-                            slug: values.projectSlug,
-                        }),
+                        id: cache.identify({ __typename: 'Project', slug: values.projectSlug }),
                         fields: {
                             files: (existingFiles: ResourceData[] = []) => {
                                 const filesWithoutDuplicates = existingFiles.filter(({ name }) => name !== uploadedFile.name);
@@ -145,8 +142,8 @@ function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
                 .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
                 .handleUnauthorizedError(() => errorToast(({ t }) => t('error.sessionExpired')))
                 .handleGraphQlErrors({
-                    'RESOURCE_OWNER_ROLE_REQUIRED': () => errorToast(({ t }) => t('modal.projectFileUpload.resourceOwnerRoleRequiredError')),
-                    'PROJECT_NOT_FOUND': () => errorToast(({ t }) => t('modal.projectFileUpload.projectNotFoundError')),
+                    'RESOURCE_OWNER_ROLE_REQUIRED': () => errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError')),
+                    'PROJECT_NOT_FOUND': () => errorToast(({ t }) => t('projectPage.projectNotFoundError')),
                 })
                 .finish();
         }

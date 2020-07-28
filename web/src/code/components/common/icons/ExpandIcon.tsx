@@ -24,7 +24,7 @@ export function ExpandIcon({ expanded, className, ...rest }: ExpandIconProps): R
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
-        transition: theme.transitions.create([ 'transform', 'margin' ], {
+        transition: theme.transitions.create([ 'transform', 'margin', 'opacity' ], {
             duration: theme.transitions.duration.standard,
         }),
     },

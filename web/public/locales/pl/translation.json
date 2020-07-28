@@ -65,15 +65,21 @@
   "notFoundPage": {
     "pageNotFound": "Nie znaleziono strony"
   },
+  "projectPage": {
+    "files": "Pliki",
+    "openFile": "Otwórz plik {{filename}}",
+    "removeThisFile": "Usuń ten plik",
+    "uploadFile": "Dodaj plik",
+    "resourceOwnerRoleRequiredError": "Do przeprowadzenia tej operacji potrzeba roli właściciela projektu",
+    "projectNotFoundError": "Projekt już nie istnieje"
+  },
   "modal": {
     "common": {
       "cancel": "Anuluj"
     },
     "projectFileUpload": {
       "title": "Dodaj plik do projektu '{{projectName}}'",
-      "upload": "Dodaj",
-      "resourceOwnerRoleRequiredError": "Do przeprowadzenia tej operacji potrzeba roli właściciela projektu",
-      "projectNotFoundError": "Projekt już nie istnieje"
+      "upload": "Dodaj"
     }
   },
   "form": {

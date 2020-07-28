@@ -229,7 +229,7 @@ describe('ProjectFileUploadModal component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:modal.projectFileUpload.resourceOwnerRoleRequiredError');
+            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
         });
 
         it('should display notification about project not found', async () => {
@@ -240,7 +240,7 @@ describe('ProjectFileUploadModal component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:modal.projectFileUpload.projectNotFoundError');
+            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
         it('should display notification about expired session', async () => {

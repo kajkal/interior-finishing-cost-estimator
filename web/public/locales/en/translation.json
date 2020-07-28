@@ -65,15 +65,21 @@
   "notFoundPage": {
     "pageNotFound": "Page not found"
   },
+  "projectPage": {
+    "files": "Files",
+    "openFile": "Open file {{filename}}",
+    "removeThisFile": "Remove this file",
+    "uploadFile": "Upload file",
+    "resourceOwnerRoleRequiredError": "Project owner role is required to perform this operation",
+    "projectNotFoundError": "Project no longer exists"
+  },
   "modal": {
     "common": {
       "cancel": "Cancel"
     },
     "projectFileUpload": {
       "title": "Upload file to project '{{projectName}}'",
-      "upload": "Upload",
-      "resourceOwnerRoleRequiredError": "Project owner role is required to perform this operation",
-      "projectNotFoundError": "Project no longer exists"
+      "upload": "Upload"
     }
   },
   "form": {
