@@ -27,7 +27,7 @@ describe('index file', () => {
 
     beforeAll(() => {
         mockComponent('../../code/components/providers/apollo/ApolloContextProvider');
-        mockComponent('../../code/components/providers/toast/ToastContextProvider');
+        mockComponent('../../code/components/providers/toast/ToastProvider');
         mockComponent('../../code/components/navigation/Navigator');
         mockComponent('../../code/components/layout/Layout');
         mockComponent('../../code/components/modals/Modals');
@@ -55,7 +55,7 @@ describe('index file', () => {
 
             // verify if Apollo and Toast context providers are present
             expect(screen.getByTestId('mock-ApolloContextProvider')).toBeInTheDocument();
-            expect(screen.getByTestId('mock-ToastContextProvider')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-ToastProvider')).toBeInTheDocument();
 
             // verify if Layout and Navigator are present in DOM
             expect(screen.getByTestId('mock-Layout')).toBeInTheDocument();

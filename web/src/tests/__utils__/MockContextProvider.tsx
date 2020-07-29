@@ -1,10 +1,10 @@
 import React from 'react';
 import { InitialEntry } from 'history';
+import { ApolloCache } from '@apollo/client';
 import { RecoilRoot, RecoilRootProps } from 'recoil/dist';
 import { MockedProvider, MockedResponse } from '@apollo/client/testing';
-import { ApolloCache } from '@apollo/client';
 
-import { MockToastContextProvider } from './mocks/MockToastContextProvider';
+import { MockToastProvider } from './mocks/MockToastProvider';
 import { MockRouter } from './context-providers/MockRouter';
 
 
@@ -25,9 +25,8 @@ export function MockContextProvider({ children, mocks }: MockContextProviderProp
         <RecoilRoot initializeState={mocks?.recoilInitializeState}>
             <MockedProvider mocks={mocks?.mockResponses || []} cache={mocks?.apolloCache}>
                 <MockRouter initialEntries={mocks?.initialEntries}>
-                    <MockToastContextProvider>
-                        {children}
-                    </MockToastContextProvider>
+                    {children}
+                    <MockToastProvider />
                 </MockRouter>
             </MockedProvider>
         </RecoilRoot>

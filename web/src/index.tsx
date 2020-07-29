@@ -9,9 +9,9 @@ import './code/config/i18n'; // initialize i18n instance
 
 import * as serviceWorker from './serviceWorker';
 import { ApolloContextProvider } from './code/components/providers/apollo/ApolloContextProvider';
-import { ToastContextProvider } from './code/components/providers/toast/ToastContextProvider';
 import { DynamicThemeProvider } from './code/components/providers/theme/DynamicThemeProvider';
 import { BackdropSpinner } from './code/components/common/progress-indicators/BackdropSpinner';
+import { ToastProvider } from './code/components/providers/toast/ToastProvider';
 import { Navigator } from './code/components/navigation/Navigator';
 import { Layout } from './code/components/layout/Layout';
 import { Modals } from './code/components/modals/Modals';
@@ -24,12 +24,11 @@ ReactDOM.render(
                 <ApolloContextProvider>
                     <DynamicThemeProvider>
                         <CssBaseline />
-                        <ToastContextProvider>
-                            <Layout>
-                                <Navigator />
-                            </Layout>
-                            <Modals/>
-                        </ToastContextProvider>
+                        <Layout>
+                            <Navigator />
+                        </Layout>
+                        <ToastProvider />
+                        <Modals />
                     </DynamicThemeProvider>
                 </ApolloContextProvider>
             </React.Suspense>

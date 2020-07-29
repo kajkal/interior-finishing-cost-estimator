@@ -1,25 +1,22 @@
 import React from 'react';
+import { RecoilRoot } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { act, render, screen, waitFor } from '@testing-library/react';
+
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Color } from '@material-ui/lab/Alert/Alert';
 
-import { muteConsole } from '../../../../__utils__/muteConsole';
-
-import { ToastContextProvider } from '../../../../../code/components/providers/toast/ToastContextProvider';
-import { ShowToast } from '../../../../../code/components/providers/toast/context/ToastContext';
+import { ToastProvider } from '../../../../../code/components/providers/toast/ToastProvider';
 import { useToast } from '../../../../../code/components/providers/toast/useToast';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { RecoilRoot } from 'recoil/dist';
 
 
-describe('ToastContextProvider component', () => {
+describe('ToastProvider component', () => {
 
     const wrapper: React.ComponentType = ({ children }) => (
         <RecoilRoot>
             <ThemeProvider theme={createMuiTheme({ sideNavDrawer: { width: 100 } })}>
-                <ToastContextProvider>
-                    {children}
-                </ToastContextProvider>
+                <ToastProvider />
+                {children}
             </ThemeProvider>
         </RecoilRoot>
     );
@@ -77,7 +74,7 @@ describe('ToastContextProvider component', () => {
         verifyIfToastIsAutomaticallyClosedAfterTimeout('error');
     });
 
-    it('should display success toast and then close it on close button click', async () => {
+    it('should display toast and then close it on close button click', async () => {
         async function verifyIfToastIsClosedOnCloseButtonClick(severity: Color) {
             // verify if toast is not visible
             expect(screen.queryByRole('alert')).toBe(null);
@@ -100,44 +97,6 @@ describe('ToastContextProvider component', () => {
         await verifyIfToastIsClosedOnCloseButtonClick('success');
         await verifyIfToastIsClosedOnCloseButtonClick('warning');
         await verifyIfToastIsClosedOnCloseButtonClick('error');
-    });
-
-    it('should throw error when ToastContext is used without ToastContextProvider', () => {
-        function verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider(severity: Color) {
-            function SampleConsumer() {
-                const toast = useToast();
-                React.useEffect(() => {
-                    const toastRecord: Record<Color, ShowToast> = {
-                        info: toast.infoToast,
-                        success: toast.successToast,
-                        warning: toast.warningToast,
-                        error: toast.errorToast,
-                    };
-                    toastRecord[ severity ](() => null);
-                }, []);
-                return null;
-            }
-
-            try {
-                render(<SampleConsumer />);
-                expect('pass').toBe('should throw error');
-            } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error).toHaveProperty('message', 'Missing ToastContext.Provider');
-            }
-        }
-
-        // mute noisy ErrorBoundary errors
-        const consoleErrorMock = muteConsole('error', (message) => (
-            message.startsWith('Error: Uncaught [') || message.startsWith('The above error occurred')
-        ));
-
-        verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('info');
-        verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('success');
-        verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('warning');
-        verifyIfErrorIsThrownWhenToastContextIsUsedWithoutToastContextProvider('error');
-
-        expect(consoleErrorMock).toHaveBeenCalledTimes(8);
     });
 
 });
