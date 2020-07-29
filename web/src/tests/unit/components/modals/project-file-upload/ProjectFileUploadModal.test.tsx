@@ -12,7 +12,6 @@ import { InputValidator } from '../../../../__utils__/InputValidator';
 import { Project, UploadProjectFileDocument, UploadProjectFileMutationVariables } from '../../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
 import { ProjectFileUploadModal } from '../../../../../code/components/modals/project-file-upload/ProjectFileUploadModal';
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
 
 
@@ -154,28 +153,6 @@ describe('ProjectFileUploadModal component', () => {
                     ],
                 },
             }),
-            unauthorized: () => ({
-                request: {
-                    query: UploadProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        file: new File([], 'document.pdf', { type: 'application/pdf' }),
-                        description: 'Session expired',
-                    } as UploadProjectFileMutationVariables,
-                },
-                error: new UnauthorizedError('SESSION_EXPIRED'),
-            }),
-            networkError: () => ({
-                request: {
-                    query: UploadProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        file: new File([], 'document.pdf', { type: 'application/pdf' }),
-                        description: 'Network error',
-                    } as UploadProjectFileMutationVariables,
-                },
-                error: new Error('network error'),
-            }),
         };
 
         describe('validation', () => {
@@ -241,28 +218,6 @@ describe('ProjectFileUploadModal component', () => {
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
             expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
-        });
-
-        it('should display notification about expired session', async () => {
-            const mockResponse = mockResponseGenerator.unauthorized();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.sessionExpired');
-        });
-
-        it('should display notification about network error', async () => {
-            const mockResponse = mockResponseGenerator.networkError();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.networkError');
         });
 
     });

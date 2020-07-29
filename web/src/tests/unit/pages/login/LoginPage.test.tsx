@@ -130,16 +130,6 @@ describe('LoginPage component', () => {
                     ],
                 },
             }),
-            networkError: () => ({
-                request: {
-                    query: LoginDocument,
-                    variables: {
-                        email: generator.email(),
-                        password: generator.string({ length: 8 }),
-                    },
-                },
-                error: new Error('network error'),
-            }),
         };
 
         describe('validation', () => {
@@ -181,20 +171,6 @@ describe('LoginPage component', () => {
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
             expect(toast).toHaveTextContent('t:loginPage.badCredentials');
-
-            // verify if session login event was not triggered
-            expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);
-        });
-
-        it('should display notification about network error', async () => {
-            const mockResponse = mockResponseGenerator.networkError();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.networkError');
 
             // verify if session login event was not triggered
             expect(MockSessionChannel.publishLoginSessionAction).toHaveBeenCalledTimes(0);

@@ -12,8 +12,8 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
 import { MutationUploadProjectFileArgs, ResourceData, useUploadProjectFileMutation } from '../../../../graphql/generated-types';
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikDropzoneArea } from '../../common/form-fields/FormikDropzoneArea';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
@@ -139,13 +139,13 @@ function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
             onModalClose();
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleUnauthorizedError(() => errorToast(({ t }) => t('error.sessionExpired')))
-                .handleGraphQlErrors({
-                    'RESOURCE_OWNER_ROLE_REQUIRED': () => errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError')),
-                    'PROJECT_NOT_FOUND': () => errorToast(({ t }) => t('projectPage.projectNotFoundError')),
+                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
+                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
                 })
-                .finish();
+                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
+                    errorToast(({ t }) => t('projectPage.projectNotFoundError'))
+                })
+                .verifyIfAllErrorsAreHandled();
         }
     }, [ onModalClose, errorToast, uploadProjectFileMutation ]);
 }

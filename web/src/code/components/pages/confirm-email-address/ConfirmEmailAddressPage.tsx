@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { useConfirmEmailAddressMutation } from '../../../../graphql/generated-types';
 import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
 import { useVerifiedToken } from '../../../utils/hooks/useVerifiedToken';
@@ -26,12 +26,13 @@ export function ConfirmEmailAddressPage(): React.ReactElement {
                     successToast(({ t }) => t('emailConfirmationPage.emailConfirmedSuccessfully'));
                 } catch (error) {
                     ApolloErrorHandler.process(error)
-                        .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                        .handleGraphQlErrors({
-                            'EMAIL_ADDRESS_ALREADY_CONFIRMED': () => infoToast(({ t }) => t('emailConfirmationPage.emailAlreadyConfirmed')),
-                            'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN': () => errorToast(({ t }) => t('emailConfirmationPage.invalidEmailConfirmationToken')),
+                        .handleGraphQlError('EMAIL_ADDRESS_ALREADY_CONFIRMED', () => {
+                            infoToast(({ t }) => t('emailConfirmationPage.emailAlreadyConfirmed'));
                         })
-                        .finish();
+                        .handleGraphQlError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN', () => {
+                            errorToast(({ t }) => t('emailConfirmationPage.invalidEmailConfirmationToken'));
+                        })
+                        .verifyIfAllErrorsAreHandled();
                 }
             }();
         } else {

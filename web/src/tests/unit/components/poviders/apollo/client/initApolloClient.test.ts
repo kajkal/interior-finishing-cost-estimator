@@ -5,9 +5,9 @@ import { createUploadLink } from 'apollo-upload-client';
 import { AuthUtilsSpiesManager } from '../../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
 import { ApolloClientSpy } from '../../../../../__utils__/spies-managers/ApolloClientSpy';
 
-import { UnauthorizedError } from '../../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { initApolloClient } from '../../../../../../code/components/providers/apollo/client/initApolloClient';
 import { accessTokenVar } from '../../../../../../code/components/providers/apollo/client/accessTokenVar';
+import { UnauthorizedError } from '../../../../../../code/utils/auth/UnauthorizedError';
 
 
 describe('initApolloClient function', () => {
@@ -17,7 +17,7 @@ describe('initApolloClient function', () => {
 
     beforeEach(() => {
         ApolloClientSpy.setupSpies();
-        setContextSpy = jest.spyOn(linkContextModule, 'setContext');
+        setContextSpy = jest.spyOn(linkContextModule, 'setContext').mockClear();
         createUploadLinkSpy = jest.spyOn(require('apollo-upload-client'), 'createUploadLink') as typeof createUploadLinkSpy;
     });
 
@@ -67,9 +67,9 @@ describe('initApolloClient function', () => {
 
         function getPrepareOperationContextFunction() {
             initApolloClient();
-            const prepareOperationContextFnFn = setContextSpy.mock.calls[ 0 ][ 0 ];
-            expect(prepareOperationContextFnFn).toBeInstanceOf(Function);
-            return prepareOperationContextFnFn;
+            const prepareOperationContextFn = setContextSpy.mock.calls[ 0 ][ 0 ];
+            expect(prepareOperationContextFn).toBeInstanceOf(Function);
+            return prepareOperationContextFn;
         }
 
         it('should add auth header only for protected operations', async () => {

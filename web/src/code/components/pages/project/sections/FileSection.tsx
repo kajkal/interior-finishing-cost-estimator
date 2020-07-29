@@ -16,7 +16,7 @@ import Divider from '@material-ui/core/Divider';
 
 import { ProjectDetailedDataFragment, ResourceData, useDeleteProjectFileMutation } from '../../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../modals/project-file-upload/projectFileUploadModalAtom';
-import { ApolloErrorHandler } from '../../../providers/apollo/errors/ApolloErrorHandler';
+import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
 import { ConsciousFileIcon } from '../../../common/icons/ConsciousFileIcon';
 import { UploadFileIcon } from '../../../common/icons/UploadFileIcon';
 import { useToast } from '../../../providers/toast/useToast';
@@ -105,13 +105,13 @@ function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): 
             });
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleUnauthorizedError(() => errorToast(({ t }) => t('error.sessionExpired')))
-                .handleGraphQlErrors({
-                    'RESOURCE_OWNER_ROLE_REQUIRED': () => errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError')),
-                    'PROJECT_NOT_FOUND': () => errorToast(({ t }) => t('projectPage.projectNotFoundError')),
+                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
+                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
                 })
-                .finish();
+                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
+                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
+                })
+                .verifyIfAllErrorsAreHandled();
         }
     }, [ projectSlug, fileData.name, errorToast, deleteProjectFileMutation ]);
 

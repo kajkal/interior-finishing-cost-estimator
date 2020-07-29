@@ -11,6 +11,11 @@ export function initApolloClient(): ApolloClient<unknown> {
         link: from([
 
             /**
+             * onError link is added programmatically later.
+             * @see ApolloContextProvider
+             */
+
+            /**
              * Prepares GraphQL operation context before sending it as request to the server.
              * If operation is protected (require authorization) auth header is added.
              *

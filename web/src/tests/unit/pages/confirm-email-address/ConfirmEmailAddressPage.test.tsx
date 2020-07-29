@@ -77,13 +77,6 @@ describe('ConfirmEmailAddressPage component', () => {
                 ],
             },
         }),
-        networkError: () => ({
-            request: {
-                query: ConfirmEmailAddressDocument,
-                variables: { token: validEmailAddressConfirmationToken },
-            },
-            error: new Error('network error'),
-        }),
     };
 
     describe('invalid token search param', () => {
@@ -150,16 +143,6 @@ describe('ConfirmEmailAddressPage component', () => {
         const toast = await screen.findByTestId('MockToast');
         expect(toast).toHaveClass('error');
         expect(toast).toHaveTextContent('t:emailConfirmationPage.invalidEmailConfirmationToken');
-    });
-
-    it('should display notification about network error', async () => {
-        const mockResponse = mockResponseGenerator.networkError();
-        await renderAndAwaitMutationResponse(mockResponse);
-
-        // verify if toast is visible
-        const toast = await screen.findByTestId('MockToast');
-        expect(toast).toHaveClass('error');
-        expect(toast).toHaveTextContent('t:error.networkError');
     });
 
 });

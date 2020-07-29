@@ -9,8 +9,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationResetPasswordArgs, useResetPasswordMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { useToast } from '../../providers/toast/useToast';
@@ -106,20 +106,17 @@ function usePasswordResetFormSubmitHandler(locale: string) {
             navigate(nav.login(), { replace: true });
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleGraphQlErrors({
-                    'EXPIRED_PASSWORD_RESET_TOKEN': ({ extensions }) => {
-                        const { expiredAt = new Date().toISOString() } = extensions || {};
-                        const formattedExpirationDate = DateTime.fromISO(expiredAt).setLocale(locale).toLocaleString(DateTime.DATETIME_SHORT);
-                        errorToast(({ t }) => t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
-                        navigate(nav.forgotPassword(), { replace: true });
-                    },
-                    'INVALID_PASSWORD_RESET_TOKEN': () => {
-                        errorToast(({ t }) => t('passwordResetPage.invalidPasswordResetToken'));
-                        navigate(nav.forgotPassword(), { replace: true });
-                    },
+                .handleGraphQlError('EXPIRED_PASSWORD_RESET_TOKEN', ({ extensions }) => {
+                    const { expiredAt = new Date().toISOString() } = extensions || {};
+                    const formattedExpirationDate = DateTime.fromISO(expiredAt).setLocale(locale).toLocaleString(DateTime.DATETIME_SHORT);
+                    errorToast(({ t }) => t('passwordResetPage.expiredPasswordResetToken', { date: formattedExpirationDate }));
+                    navigate(nav.forgotPassword(), { replace: true });
                 })
-                .finish();
+                .handleGraphQlError('INVALID_PASSWORD_RESET_TOKEN', () => {
+                    errorToast(({ t }) => t('passwordResetPage.invalidPasswordResetToken'));
+                    navigate(nav.forgotPassword(), { replace: true });
+                })
+                .verifyIfAllErrorsAreHandled();
         }
     }, [ locale, navigate, successToast, errorToast, resetPasswordMutation ]);
 }

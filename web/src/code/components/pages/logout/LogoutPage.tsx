@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { useLogoutMutation } from '../../../../graphql/generated-types';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
 import { BackdropSpinner } from '../../common/progress-indicators/BackdropSpinner';
@@ -17,9 +17,7 @@ export function LogoutPage(): React.ReactElement | null {
                 await logoutMutation(); // invalidate refresh token cookie
                 await SessionChannel.publishLogoutSessionAction(); // trigger session logout event
             } catch (error) {
-                ApolloErrorHandler.process(error)
-                    .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                    .finish();
+                ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
             }
         }();
     }, [ errorToast, logoutMutation ]);

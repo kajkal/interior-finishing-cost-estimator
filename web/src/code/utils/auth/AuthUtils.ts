@@ -1,4 +1,4 @@
-import { UnauthorizedError } from '../../components/providers/apollo/errors/UnauthorizedError';
+import { UnauthorizedError } from './UnauthorizedError';
 import { TokenVerifier } from '../token/TokenVerifier';
 
 

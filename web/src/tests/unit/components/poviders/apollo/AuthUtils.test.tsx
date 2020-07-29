@@ -2,7 +2,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 
 import { TokenVerifierSpy } from '../../../../__utils__/spies-managers/TokenVerifierSpy';
 
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
+import { UnauthorizedError } from '../../../../../code/utils/auth/UnauthorizedError';
 import { AuthUtils } from '../../../../../code/utils/auth/AuthUtils';
 
 

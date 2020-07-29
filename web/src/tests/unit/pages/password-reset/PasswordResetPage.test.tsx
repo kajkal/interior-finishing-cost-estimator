@@ -157,16 +157,6 @@ describe('PasswordResetPage component', () => {
                     ],
                 },
             }),
-            networkError: () => ({
-                request: {
-                    query: ResetPasswordDocument,
-                    variables: {
-                        token: validPasswordResetToken,
-                        password: generator.string({ length: 8 }),
-                    },
-                },
-                error: new Error('network error'),
-            }),
         };
 
         describe('validation', () => {
@@ -240,20 +230,6 @@ describe('PasswordResetPage component', () => {
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
             expect(toast).toHaveTextContent('t:passwordResetPage.expiredPasswordResetToken:{"date":"6/13/2020, 6:45 PM"}');
-        });
-
-        it('should display alert about network error', async () => {
-            const mockResponse = mockResponseGenerator.networkError();
-            renderInMockContext({
-                initialEntries: [ `/?token=${validPasswordResetToken}` ],
-                mockResponses: [ mockResponse ],
-            });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.networkError');
         });
 
     });

@@ -1,17 +1,20 @@
 import React from 'react';
-import { NetworkStatus } from '@apollo/client';
-import { render, screen } from '@testing-library/react';
+import { RecoilRoot } from 'recoil/dist';
+import { NetworkStatus, Operation } from '@apollo/client';
+import * as errorModule from '@apollo/client/link/error';
+import { act, render, screen } from '@testing-library/react';
 
 import { MockSessionChannel } from '../../../../__mocks__/code/MockSessionChannel';
 import { AuthUtilsSpiesManager } from '../../../../__utils__/spies-managers/AuthUtilsSpiesManager';
 import { ApolloClientSpy } from '../../../../__utils__/spies-managers/ApolloClientSpy';
+import { MockToastProvider } from '../../../../__utils__/mocks/MockToastProvider';
 
 import * as initApolloClientModule from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { LoginSessionAction, LogoutSessionAction } from '../../../../../code/utils/communication/SessionChannel';
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { accessTokenVar } from '../../../../../code/components/providers/apollo/client/accessTokenVar';
 import { SessionActionType } from '../../../../../code/utils/communication/SessionActionType';
-import {LoginMutation, MeDocument } from '../../../../../graphql/generated-types';
+import { UnauthorizedError } from '../../../../../code/utils/auth/UnauthorizedError';
+import { LoginMutation, MeDocument } from '../../../../../graphql/generated-types';
 
 
 describe('ApolloContextProvider component', () => {
@@ -51,11 +54,14 @@ describe('ApolloContextProvider component', () => {
         });
 
         return render(
-            <React.Suspense fallback={<div data-testid='MockSpinner' />}>
-                <ApolloContextProvider>
-                    <div data-testid='SampleApolloClientConsumer' />
-                </ApolloContextProvider>
-            </React.Suspense>,
+            <RecoilRoot>
+                <React.Suspense fallback={<div data-testid='MockSpinner' />}>
+                    <ApolloContextProvider>
+                        <div data-testid='SampleApolloClientConsumer' />
+                        <MockToastProvider />
+                    </ApolloContextProvider>
+                </React.Suspense>
+            </RecoilRoot>,
         );
     }
 
@@ -122,6 +128,67 @@ describe('ApolloContextProvider component', () => {
 
             // verify accessToken cache value
             expect(accessTokenVar()).toBe(null);
+        });
+
+    });
+
+    describe('global error handling', () => {
+
+        let onErrorSpy: jest.SpiedFunction<typeof errorModule.onError>;
+
+        beforeEach(() => {
+            onErrorSpy = jest.spyOn(errorModule, 'onError').mockClear();
+        });
+
+        const operation = {
+            operationName: 'SampleOperation',
+        } as unknown as Operation;
+
+        async function getOnErrorFunction() {
+            ApolloClientSpy.query.mockResolvedValue({ loading: false, networkStatus: NetworkStatus.ready });
+            const { resolveValue } = deferRefreshAccessTokenPromise();
+            renderInMockContext();
+
+            resolveValue('REFRESHED_ACCESS_TOKEN');
+            expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();
+
+            const onErrorFn = onErrorSpy.mock.calls[ 0 ][ 0 ];
+            expect(onErrorFn).toBeInstanceOf(Function);
+            return (error: errorModule.ErrorResponse) => {
+                act(() => {
+                    onErrorFn(error);
+                });
+            };
+        }
+
+        it('should globally handle network errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: new TypeError('Failed to fetch'),
+                graphQLErrors: undefined,
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:error.networkError');
+        });
+
+        it('should globally handle unauthorized errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: new UnauthorizedError('SESSION_EXPIRED'),
+                graphQLErrors: undefined,
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:error.sessionExpired');
         });
 
     });

@@ -11,9 +11,9 @@ import Link from '@material-ui/core/Link';
 
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { ToastContentProps } from '../../providers/toast/interfaces/ToastContentProps';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
@@ -118,7 +118,7 @@ function useSignupFormValidationSchema(t: TFunction) {
  * Submit handler
  */
 function useSignupFormSubmitHandler(t: TFunction) {
-    const { successToast, errorToast } = useToast();
+    const { successToast } = useToast();
     const [ registerMutation ] = useRegisterMutation();
 
     return React.useCallback<FormikConfig<SignupFormData>['onSubmit']>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
@@ -140,13 +140,12 @@ function useSignupFormSubmitHandler(t: TFunction) {
             successToast(SignupSuccessToast, { disableAutoHide: true });
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleGraphQlErrors({
-                    'EMAIL_NOT_AVAILABLE': () => setFieldError('email', t('form.email.validation.notAvailable')),
+                .handleGraphQlError('EMAIL_NOT_AVAILABLE', () => {
+                    setFieldError('email', t('form.email.validation.notAvailable'));
                 })
-                .finish();
+                .verifyIfAllErrorsAreHandled();
         }
-    }, [ t, successToast, errorToast, registerMutation ]);
+    }, [ t, successToast, registerMutation ]);
 }
 
 

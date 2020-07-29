@@ -1,12 +1,15 @@
 import React from 'react';
+import { onError } from '@apollo/client/link/error';
 import { ApolloClient, ApolloProvider } from '@apollo/client';
 
 import { SessionAction, SessionChannel } from '../../../utils/communication/SessionChannel';
-import { MeDocument, MeQuery } from '../../../../graphql/generated-types';
 import { SessionActionType } from '../../../utils/communication/SessionActionType';
+import { ErrorHandler } from '../../../utils/error-handling/ErrorHandler';
+import { MeDocument, MeQuery } from '../../../../graphql/generated-types';
 import { initApolloClient } from './client/initApolloClient';
 import { AuthUtils } from '../../../utils/auth/AuthUtils';
 import { accessTokenVar } from './client/accessTokenVar';
+import { useToast } from '../toast/useToast';
 
 
 export interface ApolloContextProviderProps {
@@ -46,6 +49,23 @@ const apolloClientResource = function createApolloClientWithCurrentUserContextRe
 
 export function ApolloContextProvider({ children }: ApolloContextProviderProps): React.ReactElement {
     const client = apolloClientResource.read();
+    const { errorToast } = useToast();
+
+    React.useEffect(() => {
+
+        /**
+         * Global error handling.
+         */
+        client.setLink(onError(({ networkError }) => {
+            ErrorHandler.handleUnauthorizedError(networkError, () => {
+                errorToast(({ t }) => t('error.sessionExpired'));
+            });
+            ErrorHandler.handleNetworkError(networkError, () => {
+                errorToast(({ t }) => t('error.networkError'));
+            });
+        }).concat(client.link));
+
+    }, [ client, errorToast ]);
 
     React.useEffect(() => {
 

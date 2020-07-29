@@ -8,8 +8,8 @@ import { Form, Formik, FormikConfig } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationLoginArgs, useLoginMutation } from '../../../../graphql/generated-types';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
@@ -101,11 +101,10 @@ function useLoginFormSubmitHandler() {
             });
         } catch (error) {
             ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleGraphQlErrors({
-                    'BAD_CREDENTIALS': () => errorToast(({ t }) => t('loginPage.badCredentials')),
-                })
-                .finish();
+                .handleGraphQlError('BAD_CREDENTIALS', () => (
+                    errorToast(({ t }) => t('loginPage.badCredentials'))
+                ))
+                .verifyIfAllErrorsAreHandled();
         }
     }, [ errorToast, loginMutation ]);
 }

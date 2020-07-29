@@ -10,10 +10,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationCreateProjectArgs, Project, useCreateProjectMutation } from '../../../../graphql/generated-types';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
-import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
+import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
-import { useToast } from '../../providers/toast/useToast';
 import { nav } from '../../../config/nav';
 
 
@@ -81,7 +80,6 @@ function useLoginFormValidationSchema(t: TFunction) {
  */
 function useLoginFormSubmitHandler(userSlug: string | undefined) {
     const navigate = useNavigate();
-    const { errorToast } = useToast();
     const [ createProjectMutation ] = useCreateProjectMutation();
 
     return React.useCallback<FormikConfig<CreateProjectFormData>['onSubmit']>(async (values) => {
@@ -102,12 +100,9 @@ function useLoginFormSubmitHandler(userSlug: string | undefined) {
             });
             navigate(nav.project(data!.createProject.slug));
         } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleNetworkError(() => errorToast(({ t }) => t('error.networkError')))
-                .handleUnauthorizedError(() => errorToast(({ t }) => t('error.sessionExpired')))
-                .finish();
+            ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ userSlug, navigate, errorToast, createProjectMutation ]);
+    }, [ userSlug, navigate, createProjectMutation ]);
 }
 
 

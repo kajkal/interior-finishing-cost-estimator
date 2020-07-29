@@ -23,7 +23,7 @@ export function ToastProvider(): React.ReactElement {
         if (reason !== 'clickaway') {
             setToastState((prevState) => ({ ...prevState, open: false }));
         }
-    }, []);
+    }, [ setToastState ]);
 
     return (
         <Snackbar

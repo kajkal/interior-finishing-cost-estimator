@@ -7,10 +7,8 @@ import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCur
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
-import { generator } from '../../../__utils__/generator';
 
 import { CreateProjectDocument, CreateProjectMutation, CreateProjectMutationVariables, MutationCreateProjectArgs, Project, User } from '../../../../graphql/generated-types';
-import { UnauthorizedError } from '../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { CreateProjectPage } from '../../../../code/components/pages/project-create/CreateProjectPage';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { nav } from '../../../../code/config/nav';
@@ -76,24 +74,6 @@ describe('CreateProjectPage component', () => {
                     } as CreateProjectMutation,
                 },
             }),
-            unauthorized: () => ({
-                request: {
-                    query: CreateProjectDocument,
-                    variables: {
-                        name: generator.sentence({ words: 3 }),
-                    } as CreateProjectMutationVariables,
-                },
-                error: new UnauthorizedError('SESSION_EXPIRED'),
-            }),
-            networkError: () => ({
-                request: {
-                    query: CreateProjectDocument,
-                    variables: {
-                        name: generator.sentence({ words: 3 }),
-                    } as CreateProjectMutationVariables,
-                },
-                error: new Error('network error'),
-            }),
         };
 
         describe('validation', () => {
@@ -126,28 +106,6 @@ describe('CreateProjectPage component', () => {
             });
             expect(user?.projects).toBeDefined();
             expect(user?.projects).toEqual([ mockResponse.result.data.createProject ]);
-        });
-
-        it('should display notification about expired session', async () => {
-            const mockResponse = mockResponseGenerator.unauthorized();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.sessionExpired');
-        });
-
-        it('should display notification about network error', async () => {
-            const mockResponse = mockResponseGenerator.networkError();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.networkError');
         });
 
     });

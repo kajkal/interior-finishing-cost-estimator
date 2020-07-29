@@ -9,7 +9,6 @@ import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockCon
 
 import { DeleteProjectFileDocument, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment } from '../../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
-import { UnauthorizedError } from '../../../../../code/components/providers/apollo/errors/UnauthorizedError';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { FileSection } from '../../../../../code/components/pages/project/sections/FileSection';
 
@@ -164,26 +163,6 @@ describe('FileSection component', () => {
                     ],
                 },
             }),
-            unauthorized: () => ({
-                request: {
-                    query: DeleteProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        resourceName: sampleProject.files[ 0 ].name,
-                    } as DeleteProjectFileMutationVariables,
-                },
-                error: new UnauthorizedError('SESSION_EXPIRED'),
-            }),
-            networkError: () => ({
-                request: {
-                    query: DeleteProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        resourceName: sampleProject.files[ 0 ].name,
-                    } as DeleteProjectFileMutationVariables,
-                },
-                error: new Error('network error'),
-            }),
         };
 
         it('should render separate tile for each file', () => {
@@ -240,26 +219,6 @@ describe('FileSection component', () => {
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
             expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
-        });
-
-        it('should display notification about expired session', async () => {
-            renderInMockContext({ mockResponses: [ mockResponseGenerator.unauthorized() ] });
-            ViewUnderTest.clickDeleteFileButton(0);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.sessionExpired');
-        });
-
-        it('should display notification about network error', async () => {
-            renderInMockContext({ mockResponses: [ mockResponseGenerator.networkError() ] });
-            ViewUnderTest.clickDeleteFileButton(0);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:error.networkError');
         });
 
     });
