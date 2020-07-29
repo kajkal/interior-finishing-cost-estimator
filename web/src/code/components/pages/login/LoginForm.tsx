@@ -1,6 +1,6 @@
 import React from 'react';
+import clsx from 'clsx';
 import * as Yup from 'yup';
-import classNames from 'classnames';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
@@ -39,7 +39,7 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form className={classNames('login-form', formClassName)}>
+            <Form className={clsx('login-form', formClassName)}>
 
                 <FormikTextField
                     id='login-email-input'

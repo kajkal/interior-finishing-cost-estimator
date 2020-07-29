@@ -1,6 +1,6 @@
 import React from 'react';
+import clsx from 'clsx';
 import * as Yup from 'yup';
-import classNames from 'classnames';
 import { TFunction } from 'i18next';
 import { Trans, useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
@@ -11,6 +11,7 @@ import Link from '@material-ui/core/Link';
 
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
+import { ToastContentProps } from '../../providers/toast/interfaces/ToastContentProps';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { ApolloErrorHandler } from '../../providers/apollo/errors/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
@@ -19,7 +20,6 @@ import { createPasswordSchema } from '../../../utils/validation/passwordSchema';
 import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { createNameSchema } from '../../../utils/validation/nameSchema';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
-import { ToastContentProps } from '../../providers/toast/context/ToastContext';
 import { useToast } from '../../providers/toast/useToast';
 
 
@@ -48,7 +48,7 @@ export function SignupForm({ formClassName }: SignupFormProps): React.ReactEleme
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form className={classNames('signup-form', formClassName)}>
+            <Form className={clsx('signup-form', formClassName)}>
 
                 <FormikTextField
                     id={'signup-name-input'}
