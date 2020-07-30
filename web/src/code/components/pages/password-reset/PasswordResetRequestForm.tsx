@@ -37,7 +37,6 @@ export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestForm
             <Form className='password-reset-request-form'>
 
                 <FormikTextField
-                    id='password-reset-request-email-input'
                     aria-label={t('form.email.ariaLabel')}
                     name='email'
                     type='email'

@@ -73,7 +73,6 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
                                 />
 
                                 <FormikTextField
-                                    id={'project-file-upload-description-input'}
                                     aria-label={t('form.projectFileDescription.ariaLabel')}
                                     name='description'
                                     label={t('form.projectFileDescription.label')}

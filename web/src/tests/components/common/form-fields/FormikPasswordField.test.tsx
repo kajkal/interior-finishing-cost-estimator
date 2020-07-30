@@ -16,11 +16,7 @@ describe('FormikPasswordField component', () => {
             >
                 {() => (
                     <Form>
-                        <FormikPasswordField
-                            id='component-under-test'
-                            name='password'
-                            label='Password'
-                        />
+                        <FormikPasswordField name='password' label='Password' />
                     </Form>
                 )}
             </Formik>,

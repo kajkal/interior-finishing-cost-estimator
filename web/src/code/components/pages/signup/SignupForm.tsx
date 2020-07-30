@@ -52,7 +52,6 @@ export function SignupForm({ formClassName }: SignupFormProps): React.ReactEleme
             <Form className={clsx('signup-form', formClassName)}>
 
                 <FormikTextField
-                    id={'signup-name-input'}
                     aria-label={t('form.name.ariaLabel')}
                     name='name'
                     type='text'
@@ -62,7 +61,6 @@ export function SignupForm({ formClassName }: SignupFormProps): React.ReactEleme
                 />
 
                 <FormikTextField
-                    id={'signup-email-input'}
                     aria-label={t('form.email.ariaLabel')}
                     name='email'
                     type='email'
@@ -72,7 +70,6 @@ export function SignupForm({ formClassName }: SignupFormProps): React.ReactEleme
                 />
 
                 <FormikPasswordField
-                    id={'signup-password-input'}
                     aria-label={t('signupPage.passwordAriaLabel')}
                     name='password'
                     label={t('form.password.label')}
@@ -81,7 +78,6 @@ export function SignupForm({ formClassName }: SignupFormProps): React.ReactEleme
                 />
 
                 <FormikPasswordField
-                    id={'signup-password-confirmation-input'}
                     aria-label={t('signupPage.passwordConfirmationAriaLabel')}
                     name='passwordConfirmation'
                     label={t('signupPage.passwordConfirmationLabel')}

@@ -43,7 +43,6 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
             <Form className={clsx('login-form', formClassName)}>
 
                 <FormikTextField
-                    id='login-email-input'
                     aria-label={t('form.email.ariaLabel')}
                     name='email'
                     type='email'
@@ -53,7 +52,6 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
                 />
 
                 <FormikPasswordField
-                    id='login-password-input'
                     aria-label={t('form.password.ariaLabel')}
                     name='password'
                     label={t('form.password.label')}

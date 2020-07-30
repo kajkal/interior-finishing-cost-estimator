@@ -74,7 +74,6 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                 <input type='hidden' name='projectSlug' value={values.projectSlug} />
 
                                 <FormikTextField
-                                    id='update-project-project-name-input'
                                     aria-label={t('form.projectName.ariaLabel')}
                                     name='name'
                                     label={t('form.projectName.label')}

@@ -19,6 +19,7 @@ export function FormikTextField({ name, label, optional, InputProps, ...rest }: 
                         {...rest}
                         {...field}
 
+                        id={rest.id || field.name}
                         label={optional ? <LabelWithOptionalIndicator label={label} /> : label}
                         disabled={rest.disabled || form.isSubmitting}
                         error={Boolean(errorMessage)}

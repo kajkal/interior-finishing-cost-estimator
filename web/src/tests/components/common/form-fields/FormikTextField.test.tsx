@@ -21,7 +21,7 @@ describe('FormikTextField component', () => {
     );
 
     it('should render optional field indicator when field is marked as optional', () => {
-        const { rerender } = render(<FormikTextField id='_id' name='title' label='Title' />, { wrapper });
+        const { rerender } = render(<FormikTextField name='title' label='Title' />, { wrapper });
 
         const input = screen.getByLabelText(/Title/) as HTMLInputElement;
         expect(input.labels).toHaveLength(1);
@@ -29,7 +29,7 @@ describe('FormikTextField component', () => {
         // verify if field label does not contain indicator of optional field
         expect(input.labels![ 0 ]).not.toHaveTextContent(/optional/i);
 
-        rerender(<FormikTextField id='_id' name='title' label='Title' optional />);
+        rerender(<FormikTextField name='title' label='Title' optional />);
 
         // verify if indicator of optional field is visible
         expect(input.labels![ 0 ]).toHaveTextContent(/optional/i);
