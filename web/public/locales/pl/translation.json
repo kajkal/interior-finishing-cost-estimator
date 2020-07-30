@@ -93,7 +93,7 @@
       "urlWillChange": "Adres URL projektu ulegnie zmianie",
       "update": "Edytuj"
     },
-    "projectDeleteConfirmation": {
+    "projectDelete": {
       "title": "Usuń projekt '{{projectName}}'",
       "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
       "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?",

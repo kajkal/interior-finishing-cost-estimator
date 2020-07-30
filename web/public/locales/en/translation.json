@@ -93,7 +93,7 @@
       "urlWillChange": "Project URL will change",
       "update": "Edit"
     },
-    "projectDeleteConfirmation": {
+    "projectDelete": {
       "title": "Delete project '{{projectName}}'",
       "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
       "secondLine": "Are you sure you want to permanently delete this project?",

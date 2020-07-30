@@ -6,17 +6,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
-import { extendedUserEvent } from '../../../../__utils__/extendedUserEvent';
-import { InputValidator } from '../../../../__utils__/InputValidator';
 
-import { MutationUpdateProjectArgs, Project, UpdateProjectDocument, UpdateProjectMutation, UpdateProjectMutationVariables, User } from '../../../../../graphql/generated-types';
-import { projectUpdateModalAtom } from '../../../../../code/components/modals/project-update/projectUpdateModalAtom';
-import { ProjectUpdateModal } from '../../../../../code/components/modals/project-update/ProjectUpdateModal';
+import { DeleteProjectDocument, DeleteProjectMutation, DeleteProjectMutationVariables, Project, User } from '../../../../../graphql/generated-types';
+import { projectDeleteModalAtom } from '../../../../../code/components/modals/project-delete/projectDeleteModalAtom';
+import { ProjectDeleteModal } from '../../../../../code/components/modals/project-delete/ProjectDeleteModal';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
 import { nav } from '../../../../../code/config/nav';
 
 
-describe('ProjectUpdateModal component', () => {
+describe('ProjectDeleteModal component', () => {
 
     const sampleProject: Partial<Project> = {
         __typename: 'Project',
@@ -36,15 +34,15 @@ describe('ProjectUpdateModal component', () => {
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
-            const setModalState = useSetRecoilState(projectUpdateModalAtom);
+            const setModalState = useSetRecoilState(projectDeleteModalAtom);
             return (
                 <button
                     data-testid='open-modal-button'
                     onClick={() => setModalState({
                         open: true,
                         projectData: {
-                            name: sampleProject.name!,
                             slug: sampleProject.slug!,
+                            name: sampleProject.name!,
                         },
                     })}
                 />
@@ -53,7 +51,7 @@ describe('ProjectUpdateModal component', () => {
         return render(
             <MockContextProvider mocks={mocks}>
                 <OpenModalButton />
-                <ProjectUpdateModal isMobile={false} />
+                <ProjectDeleteModal />
             </MockContextProvider>,
         );
     }
@@ -74,27 +72,16 @@ describe('ProjectUpdateModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.projectUpdate.title:{"projectName":"${sampleProject.name}"}`);
-        }
-        static get projectNameInput() {
-            return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
+            return screen.queryByLabelText(`t:modal.projectDelete.title:{"projectName":"${sampleProject.name}"}`);
         }
         static get cancelButton() {
             return screen.getByRole('button', { name: 't:modal.common.cancel' });
         }
-        static get resetButton() {
-            return screen.getByRole('button', { name: 't:modal.common.reset' });
-        }
-        static get submitButton() {
-            return screen.getByRole('button', { name: 't:modal.projectUpdate.update' });
+        static get deleteButton() {
+            return screen.getByRole('button', { name: 't:modal.projectDelete.delete' });
         }
         static openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));
-        }
-        static async fillAndSubmitForm(data: MutationUpdateProjectArgs) {
-            ViewUnderTest.openModal();
-            await extendedUserEvent.type(this.projectNameInput, data.name || '');
-            userEvent.click(this.submitButton);
         }
     }
 
@@ -115,36 +102,28 @@ describe('ProjectUpdateModal component', () => {
         await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
     });
 
-    describe('project update form', () => {
+    describe('project delete form', () => {
 
         const mockResponseGenerator = {
             success: () => ({
                 request: {
-                    query: UpdateProjectDocument,
+                    query: DeleteProjectDocument,
                     variables: {
                         projectSlug: sampleProject.slug,
-                        name: 'Updated project name',
-                    } as UpdateProjectMutationVariables,
+                    } as DeleteProjectMutationVariables,
                 },
                 result: {
                     data: {
-                        updateProject: {
-                            __typename: 'Project',
-                            id: '-',
-                            slug: 'updated-project-name',
-                            name: 'Updated project name',
-                            files: [],
-                        },
-                    } as UpdateProjectMutation,
+                        deleteProject: true,
+                    } as DeleteProjectMutation,
                 },
             }),
             resourceOwnerRoleRequired: () => ({
                 request: {
-                    query: UpdateProjectDocument,
+                    query: DeleteProjectDocument,
                     variables: {
                         projectSlug: sampleProject.slug,
-                        name: 'Updated project name',
-                    } as UpdateProjectMutationVariables,
+                    } as DeleteProjectMutationVariables,
                 },
                 result: {
                     data: null,
@@ -155,11 +134,10 @@ describe('ProjectUpdateModal component', () => {
             }),
             projectNotFound: () => ({
                 request: {
-                    query: UpdateProjectDocument,
+                    query: DeleteProjectDocument,
                     variables: {
                         projectSlug: sampleProject.slug,
-                        name: 'Updated project name',
-                    } as UpdateProjectMutationVariables,
+                    } as DeleteProjectMutationVariables,
                 },
                 result: {
                     data: null,
@@ -170,25 +148,8 @@ describe('ProjectUpdateModal component', () => {
             }),
         };
 
-        describe('validation', () => {
 
-            it('should validate projectName input value', async () => {
-                renderInMockContext();
-                ViewUnderTest.openModal();
-                expect(ViewUnderTest.projectNameInput).toHaveFocus();
-
-                await InputValidator.basedOn(ViewUnderTest.projectNameInput)
-                    .expectError('', 't:form.projectName.validation.required')
-                    .expectError('aa', 't:form.projectName.validation.tooShort')
-                    .expectError('a'.repeat(51), 't:form.projectName.validation.tooLong')
-                    .expectNoError('a'.repeat(50), 't:modal.projectUpdate.urlWillChange')
-                    .expectNoError('valid project name', 't:modal.projectUpdate.urlWillChange')
-                    .expectNoError(sampleProject.name!);
-            });
-
-        });
-
-        it('should successfully update project and close modal (with changed slug)', async () => {
+        it('should successfully delete project, close modal and navigate away from project page', async () => {
             const cache = initApolloTestCache();
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ], apolloCache: cache });
@@ -207,36 +168,33 @@ describe('ProjectUpdateModal component', () => {
                 },
             });
 
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
+            ViewUnderTest.openModal();
+            userEvent.click(ViewUnderTest.deleteButton);
 
             // verify if modal was closed
             await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
 
             // verify updated cache
-            const updatedProject = mockResponse.result.data.updateProject;
-            const updatedProjectCacheRecordKey = cache.identify(updatedProject)!;
-            const updatedProjectDetailsCacheRecordKey = `project({"slug":"${updatedProject.slug}"})`;
             expect(cache.extract()).toEqual({
-                // <- old project record should be removed
-                [ updatedProjectCacheRecordKey ]: updatedProject, // <- updated project record
+                // <- removed project record
                 [ userCacheRecordKey ]: {
                     ...sampleUser,
-                    // <- removed old project details query result
-                    [ updatedProjectDetailsCacheRecordKey ]: { __ref: updatedProjectCacheRecordKey }, // <- updated project details query result
-                    projects: [ { __ref: updatedProjectCacheRecordKey } ], // <- projects list with updated ref
+                    // <- removed project details query result
+                    projects: [], // <- projects list without deleted project
                 },
                 'ROOT_MUTATION': expect.any(Object),
-                'ROOT_QUERY': expect.any(Object),
             });
 
             // verify if navigation occurred
-            expect(screen.getByTestId('location')).toHaveTextContent(nav.project(updatedProject.slug));
+            expect(screen.getByTestId('location')).toHaveTextContent(nav.createProject());
         });
 
         it('should display notification about missing project owner role', async () => {
             const mockResponse = mockResponseGenerator.resourceOwnerRoleRequired();
             renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
+
+            ViewUnderTest.openModal();
+            userEvent.click(ViewUnderTest.deleteButton);
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
@@ -247,7 +205,9 @@ describe('ProjectUpdateModal component', () => {
         it('should display notification about project not found', async () => {
             const mockResponse = mockResponseGenerator.projectNotFound();
             renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
+
+            ViewUnderTest.openModal();
+            userEvent.click(ViewUnderTest.deleteButton);
 
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');

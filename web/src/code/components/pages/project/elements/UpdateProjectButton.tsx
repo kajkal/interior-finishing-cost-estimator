@@ -14,6 +14,9 @@ export interface UpdateProjectButtonProps {
     project: ProjectDetailedDataFragment;
 }
 
+/**
+ * @see ProjectUpdateModal
+ */
 export function UpdateProjectButton({ project }: UpdateProjectButtonProps): React.ReactElement {
     const { t } = useTranslation();
     const setModalState = useSetRecoilState(projectUpdateModalAtom);

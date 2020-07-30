@@ -1,18 +1,18 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil/dist';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
-import { projectDeleteModalAtom } from '../../../../../code/components/modals/project-delete/projectDeleteModalAtom';
-import { DeleteProjectButton } from '../../../../../code/components/pages/project/elements/DeleteProjectButton';
+import { projectUpdateModalAtom } from '../../../../../code/components/modals/project-update/projectUpdateModalAtom';
+import { UpdateProjectButton } from '../../../../../code/components/pages/project/elements/UpdateProjectButton';
 import { Project } from '../../../../../graphql/generated-types';
 
 
-describe('DeleteProjectButton component', () => {
+describe('UpdateProjectButton component', () => {
 
-    const projectDeleteModalAtomSpy = jest.fn();
+    const projectUpdateModalAtomSpy = jest.fn();
     const sampleProject: Partial<Project> = {
         __typename: 'Project',
         slug: 'sample-project',
@@ -21,16 +21,16 @@ describe('DeleteProjectButton component', () => {
     };
 
     function renderInMockContext(mocks?: ContextMocks) {
-        projectDeleteModalAtomSpy.mockClear();
+        projectUpdateModalAtomSpy.mockClear();
         const Handle = () => {
-            const modalState = useRecoilValue(projectDeleteModalAtom);
-            projectDeleteModalAtomSpy(modalState);
+            const modalState = useRecoilValue(projectUpdateModalAtom);
+            projectUpdateModalAtomSpy(modalState);
             return null;
         };
         return render(
             <MockContextProvider mocks={mocks}>
                 <Handle />
-                <DeleteProjectButton project={sampleProject as Project} />
+                <UpdateProjectButton project={sampleProject as Project} />
             </MockContextProvider>,
         );
     }
@@ -38,10 +38,10 @@ describe('DeleteProjectButton component', () => {
     it('should pass project data to ProjectDeleteModal and open it', () => {
         renderInMockContext();
 
-        userEvent.click(screen.getByRole('button', { name: 't:projectPage.deleteThisProject' }));
+        userEvent.click(screen.getByRole('button', { name: 't:projectPage.updateThisProject' }));
 
         // verify if upload project file modal atom state changed
-        expect(projectDeleteModalAtomSpy).toHaveBeenLastCalledWith({
+        expect(projectUpdateModalAtomSpy).toHaveBeenLastCalledWith({
             open: true,
             projectData: sampleProject,
         });
