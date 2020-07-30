@@ -11,12 +11,14 @@ describe('Modals component', () => {
     beforeAll(() => {
         mockComponent('../../code/components/modals/project-file-upload/ProjectFileUploadModal');
         mockComponent('../../code/components/modals/project-delete-confirmation/ProjectDeleteConfirmationModal');
+        mockComponent('../../code/components/modals/project-update/ProjectUpdateModal');
     });
 
     it('should render all registered modals', () => {
         render(<Modals />);
         expect(screen.getByTestId('mock-ProjectFileUploadModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProjectDeleteConfirmationModal')).toBeVisible();
+        expect(screen.getByTestId('mock-ProjectUpdateModal')).toBeVisible();
     });
 
 });

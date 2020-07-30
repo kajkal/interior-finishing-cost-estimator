@@ -40,7 +40,7 @@ export function CreateProjectForm({ formClassName }: CreateProjectFormProps): Re
             <Form className={clsx('create-project-form', formClassName)}>
 
                 <FormikTextField
-                    id='create-project-email-input'
+                    id='create-project-project-name-input'
                     aria-label={t('form.projectName.ariaLabel')}
                     name='name'
                     label={t('form.projectName.label')}

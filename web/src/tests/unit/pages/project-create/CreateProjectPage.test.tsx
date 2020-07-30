@@ -93,12 +93,13 @@ describe('CreateProjectPage component', () => {
             await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(nav.project('apartment-renovation')));
 
             // verify updated cache
-            const newProjectCacheKey = cache.identify(mockResponse.result.data.createProject)!;
+            const createdProject = mockResponse.result.data.createProject;
+            const newProjectCacheKey = cache.identify(createdProject)!;
             expect(cache.extract()).toEqual({
-                [ newProjectCacheKey ]: mockResponse.result.data.createProject, // <- new project record
+                [ newProjectCacheKey ]: createdProject, // <- created project record
                 [ cache.identify(sampleUser)! ]: {
                     ...sampleUser,
-                    projects: [ { __ref: newProjectCacheKey } ], // <- project lists should be updated with ref to a new project
+                    projects: [ { __ref: newProjectCacheKey } ], // <- project lists updated with created project ref
                 },
                 'ROOT_MUTATION': expect.any(Object),
             });

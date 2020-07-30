@@ -21,12 +21,16 @@ export class InputValidator extends Promise<HTMLElement> {
         }) as InputValidator;
     }
 
-    expectNoError(value: string): InputValidator {
+    expectNoError(value: string, helperText?: string): InputValidator {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.type(inputElement, value);
 
             expect(inputElement).toBeValid();
-            expect(inputElement).not.toHaveDescription();
+            if (helperText) {
+                expect(inputElement).toHaveDescription(helperText);
+            } else {
+                expect(inputElement).not.toHaveDescription();
+            }
 
             return inputElement;
         }) as InputValidator;

@@ -70,6 +70,7 @@
     "createProject": "Utwórz projekt"
   },
   "projectPage": {
+    "updateThisProject": "Edytuj ten project",
     "deleteThisProject": "Usuń ten projekt",
     "files": "Pliki",
     "openFile": "Otwórz plik {{filename}}",
@@ -80,11 +81,17 @@
   },
   "modal": {
     "common": {
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "reset": "Resetuj"
     },
     "projectFileUpload": {
       "title": "Dodaj plik do projektu '{{projectName}}'",
       "upload": "Dodaj"
+    },
+    "projectUpdate": {
+      "title": "Edytuj projekt '{{projectName}}'",
+      "urlWillChange": "Adres URL projektu ulegnie zmianie",
+      "update": "Edytuj"
     },
     "projectDeleteConfirmation": {
       "title": "Usuń projekt '{{projectName}}'",

@@ -1,0 +1,5 @@
+mutation UpdateProject($projectSlug: String!, $name: String!) {
+    updateProject(projectSlug: $projectSlug, name: $name) {
+        ...ProjectDetailedData
+    }
+}

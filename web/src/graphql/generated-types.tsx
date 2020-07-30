@@ -116,7 +116,7 @@ export type MutationCreateProjectArgs = {
 
 
 export type MutationUpdateProjectArgs = {
-  projectId: Scalars['String'];
+  projectSlug: Scalars['String'];
   name: Scalars['String'];
 };
 
@@ -323,6 +323,20 @@ export type DeleteProjectFileMutationVariables = Exact<{
 export type DeleteProjectFileMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteProjectFile'>
+);
+
+export type UpdateProjectMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type UpdateProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProject: (
+    { __typename?: 'Project' }
+    & ProjectDetailedDataFragment
+  ) }
 );
 
 export type UploadProjectFileMutationVariables = Exact<{
@@ -732,6 +746,38 @@ export function useDeleteProjectFileMutation(baseOptions?: ApolloReactHooks.Muta
 export type DeleteProjectFileMutationHookResult = ReturnType<typeof useDeleteProjectFileMutation>;
 export type DeleteProjectFileMutationResult = ApolloReactCommon.MutationResult<DeleteProjectFileMutation>;
 export type DeleteProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>;
+export const UpdateProjectDocument = gql`
+    mutation UpdateProject($projectSlug: String!, $name: String!) {
+  updateProject(projectSlug: $projectSlug, name: $name) {
+    ...ProjectDetailedData
+  }
+}
+    ${ProjectDetailedDataFragmentDoc}`;
+
+/**
+ * __useUpdateProjectMutation__
+ *
+ * To run a mutation, you first call `useUpdateProjectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProjectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProjectMutation, { data, loading, error }] = useUpdateProjectMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useUpdateProjectMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProjectMutation, UpdateProjectMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument, baseOptions);
+      }
+export type UpdateProjectMutationHookResult = ReturnType<typeof useUpdateProjectMutation>;
+export type UpdateProjectMutationResult = ApolloReactCommon.MutationResult<UpdateProjectMutation>;
+export type UpdateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
 export const UploadProjectFileDocument = gql`
     mutation UploadProjectFile($projectSlug: String!, $file: Upload!, $description: String) {
   uploadProjectFile(projectSlug: $projectSlug, file: $file, description: $description) {

@@ -138,11 +138,11 @@ describe('DeleteProjectButton component', () => {
 
         // verify updated cache
         expect(cache.extract()).toEqual({
-            // <- project record should be removed
+            // <- removed project record
             [ userCacheRecordKey ]: {
                 ...sampleUser,
-                // <- project details query result should be removed
-                projects: [], // <- projects list should be without deleted project
+                // <- removed project details query result
+                projects: [], // <- projects list without deleted project
             },
             'ROOT_MUTATION': expect.any(Object),
         });

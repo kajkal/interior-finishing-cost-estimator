@@ -70,6 +70,7 @@
     "createProject": "Create project"
   },
   "projectPage": {
+    "updateThisProject": "Edit this project",
     "deleteThisProject": "Delete this project",
     "files": "Files",
     "openFile": "Open file {{filename}}",
@@ -80,11 +81,17 @@
   },
   "modal": {
     "common": {
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "reset": "Reset"
     },
     "projectFileUpload": {
       "title": "Upload file to project '{{projectName}}'",
       "upload": "Upload"
+    },
+    "projectUpdate": {
+      "title": "Edit project '{{projectName}}'",
+      "urlWillChange": "Project URL will change",
+      "update": "Edit"
     },
     "projectDeleteConfirmation": {
       "title": "Delete project '{{projectName}}'",

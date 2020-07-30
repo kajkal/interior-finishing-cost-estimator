@@ -44,6 +44,7 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
             open={open}
             onClose={handleModalClose}
             aria-labelledby={titleId}
+            fullWidth
         >
             <DialogTitle id={titleId}>
                 {t('modal.projectFileUpload.title', { projectName: projectData?.name })}
@@ -63,7 +64,7 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
                         <DialogContent>
                             <Form className='project-file-upload-form'>
 
-                                <input type='hidden' name='token' value={values.projectSlug} />
+                                <input type='hidden' name='projectSlug' value={values.projectSlug} />
 
                                 <FormikDropzoneArea
                                     name='file'
