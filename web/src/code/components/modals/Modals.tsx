@@ -1,6 +1,8 @@
 import React from 'react';
-import { ProjectFileUploadModal } from './project-file-upload/ProjectFileUploadModal';
+
 import { useMobileDetect } from '../../utils/hooks/useMobileDetect';
+import { ProjectFileUploadModal } from './project-file-upload/ProjectFileUploadModal';
+import { ProjectDeleteConfirmationModal } from './project-delete-confirmation/ProjectDeleteConfirmationModal';
 
 
 export function Modals(): React.ReactElement {
@@ -8,6 +10,7 @@ export function Modals(): React.ReactElement {
     return (
         <>
             <ProjectFileUploadModal isMobile={isMobile} />
+            <ProjectDeleteConfirmationModal />
         </>
     );
 }

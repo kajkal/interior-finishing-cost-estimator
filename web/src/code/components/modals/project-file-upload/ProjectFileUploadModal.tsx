@@ -18,13 +18,13 @@ import { FormikDropzoneArea } from '../../common/form-fields/FormikDropzoneArea'
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { projectFileUploadModalAtom } from './projectFileUploadModalAtom';
+import { ResponsiveModalProps } from '../ResponsiveModalProps';
 import { useToast } from '../../providers/toast/useToast';
-import { ModalProps } from '../ModalProps';
 
 
 type ProjectFileUploadFormData = MutationUploadProjectFileArgs;
 
-export function ProjectFileUploadModal({ isMobile }: ModalProps): React.ReactElement {
+export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const { t } = useTranslation();
     const [ { open, projectData }, setModalState ] = useRecoilState(projectFileUploadModalAtom);
 
@@ -143,7 +143,7 @@ function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
                     errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
                 })
                 .handleGraphQlError('PROJECT_NOT_FOUND', () => {
-                    errorToast(({ t }) => t('projectPage.projectNotFoundError'))
+                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
                 })
                 .verifyIfAllErrorsAreHandled();
         }

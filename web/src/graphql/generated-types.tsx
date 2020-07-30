@@ -122,7 +122,7 @@ export type MutationUpdateProjectArgs = {
 
 
 export type MutationDeleteProjectArgs = {
-  projectId: Scalars['String'];
+  projectSlug: Scalars['String'];
 };
 
 
@@ -305,7 +305,7 @@ export type CreateProjectMutation = (
 );
 
 export type DeleteProjectMutationVariables = Exact<{
-  projectId: Scalars['String'];
+  projectSlug: Scalars['String'];
 }>;
 
 
@@ -674,8 +674,8 @@ export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProject
 export type CreateProjectMutationResult = ApolloReactCommon.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
 export const DeleteProjectDocument = gql`
-    mutation DeleteProject($projectId: String!) {
-  deleteProject(projectId: $projectId)
+    mutation DeleteProject($projectSlug: String!) {
+  deleteProject(projectSlug: $projectSlug)
 }
     `;
 
@@ -692,7 +692,7 @@ export const DeleteProjectDocument = gql`
  * @example
  * const [deleteProjectMutation, { data, loading, error }] = useDeleteProjectMutation({
  *   variables: {
- *      projectId: // value for 'projectId'
+ *      projectSlug: // value for 'projectSlug'
  *   },
  * });
  */

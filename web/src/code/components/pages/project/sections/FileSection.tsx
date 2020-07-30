@@ -180,7 +180,7 @@ const OutlinedPaper = React.forwardRef<any, any>((props, ref) => (
 
 function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileButtonProps): React.ReactElement {
     const setModalState = useSetRecoilState(projectFileUploadModalAtom);
-    const handleClick = React.useCallback(() => {
+    const handleClick = () => {
         setModalState({
             open: true,
             projectData: {
@@ -188,7 +188,7 @@ function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileBu
                 name: projectName,
             },
         });
-    }, [ setModalState ]);
+    };
 
     return (
         <ButtonBase

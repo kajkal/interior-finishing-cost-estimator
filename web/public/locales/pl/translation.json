@@ -70,6 +70,7 @@
     "createProject": "Utwórz projekt"
   },
   "projectPage": {
+    "deleteThisProject": "Usuń ten projekt",
     "files": "Pliki",
     "openFile": "Otwórz plik {{filename}}",
     "removeThisFile": "Usuń ten plik",
@@ -84,6 +85,12 @@
     "projectFileUpload": {
       "title": "Dodaj plik do projektu '{{projectName}}'",
       "upload": "Dodaj"
+    },
+    "projectDeleteConfirmation": {
+      "title": "Usuń projekt '{{projectName}}'",
+      "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
+      "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?",
+      "delete": "Usuń"
     }
   },
   "form": {

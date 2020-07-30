@@ -70,6 +70,7 @@
     "createProject": "Create project"
   },
   "projectPage": {
+    "deleteThisProject": "Delete this project",
     "files": "Files",
     "openFile": "Open file {{filename}}",
     "removeThisFile": "Remove this file",
@@ -84,6 +85,12 @@
     "projectFileUpload": {
       "title": "Upload file to project '{{projectName}}'",
       "upload": "Upload"
+    },
+    "projectDeleteConfirmation": {
+      "title": "Delete project '{{projectName}}'",
+      "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
+      "secondLine": "Are you sure you want to permanently delete this project?",
+      "delete": "Delete"
     }
   },
   "form": {
