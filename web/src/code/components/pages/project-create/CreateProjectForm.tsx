@@ -91,8 +91,8 @@ function useLoginFormSubmitHandler(userSlug: string | undefined) {
                     createdProject && cache.modify({
                         id: cache.identify({ __typename: 'User', slug: userSlug }),
                         fields: {
-                            projects: (existingProjects: Project[] = []) => (
-                                [ ...existingProjects, createdProject ]
+                            projects: (existingProjects: Project[] = [], { toReference }) => (
+                                [ ...existingProjects, toReference(createdProject) ]
                             ),
                         },
                     });

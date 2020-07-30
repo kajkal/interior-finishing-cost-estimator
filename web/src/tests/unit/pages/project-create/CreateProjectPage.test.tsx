@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
@@ -49,12 +48,6 @@ describe('CreateProjectPage component', () => {
 
     describe('create new project form', () => {
 
-        const UserProjectsFragment = gql`
-            fragment UserProjects on User {
-                projects { id, slug, name }
-            }
-        `;
-
         const mockResponseGenerator = {
             success: () => ({
                 request: {
@@ -99,13 +92,16 @@ describe('CreateProjectPage component', () => {
             // verify if navigation occurred
             await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(nav.project('apartment-renovation')));
 
-            // verify if user cache was updated with new project
-            const user = cache.readFragment<Pick<User, 'projects'>>({
-                fragment: UserProjectsFragment,
-                id: cache.identify(sampleUser),
+            // verify updated cache
+            const newProjectCacheKey = cache.identify(mockResponse.result.data.createProject)!;
+            expect(cache.extract()).toEqual({
+                [ newProjectCacheKey ]: mockResponse.result.data.createProject, // <- new project record
+                [ cache.identify(sampleUser)! ]: {
+                    ...sampleUser,
+                    projects: [ { __ref: newProjectCacheKey } ], // <- project lists should be updated with ref to a new project
+                },
+                'ROOT_MUTATION': expect.any(Object),
             });
-            expect(user?.projects).toBeDefined();
-            expect(user?.projects).toEqual([ mockResponse.result.data.createProject ]);
         });
 
     });
