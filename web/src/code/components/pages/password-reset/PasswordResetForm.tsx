@@ -8,6 +8,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationResetPasswordArgs, useResetPasswordMutation } from '../../../../graphql/generated-types';
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
@@ -97,7 +98,8 @@ function usePasswordResetFormValidationSchema(t: TFunction) {
 function usePasswordResetFormSubmitHandler(locale: string) {
     const navigate = useNavigate();
     const { successToast, errorToast } = useToast();
-    const [ resetPasswordMutation ] = useResetPasswordMutation();
+    const [ resetPasswordMutation, { loading } ] = useResetPasswordMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<PasswordResetFormData>['onSubmit']>(async ({ passwordConfirmation: _, ...values }) => {
         try {

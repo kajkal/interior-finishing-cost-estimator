@@ -46,7 +46,7 @@ export function ProjectDeleteConfirmationModal(): React.ReactElement {
             </DialogContent>
 
             <DialogActions>
-                <Button type='button' variant='outlined' onClick={handleModalClose}>
+                <Button type='button' variant='outlined' onClick={handleModalClose} autoFocus>
                     {t('modal.common.cancel')}
                 </Button>
                 <Button type='button' variant='contained' onClick={handleModalConfirm} className={classes.deleteButton}>

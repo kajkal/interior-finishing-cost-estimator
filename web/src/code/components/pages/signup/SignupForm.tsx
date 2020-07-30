@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AlertTitle } from '@material-ui/lab';
 import Link from '@material-ui/core/Link';
 
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { MutationRegisterArgs, useRegisterMutation } from '../../../../graphql/generated-types';
 import { createPasswordConfirmationSchema } from '../../../utils/validation/passwordConfirmationSchema';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
@@ -119,7 +120,8 @@ function useSignupFormValidationSchema(t: TFunction) {
  */
 function useSignupFormSubmitHandler(t: TFunction) {
     const { successToast } = useToast();
-    const [ registerMutation ] = useRegisterMutation();
+    const [ registerMutation, { loading } ] = useRegisterMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<SignupFormData>['onSubmit']>(async ({ passwordConfirmation: _, ...values }, { setFieldError }) => {
         try {

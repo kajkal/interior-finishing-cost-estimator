@@ -9,7 +9,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import { projectDeleteConfirmationModalAtom } from '../../../modals/project-delete-confirmation/projectDeleteConfirmationModalAtom';
-import { PageLinearProgressRevealer } from '../../../common/progress-indicators/PageLinearProgressRevealer';
+import { usePageLinearProgressRevealer } from '../../../common/progress-indicators/usePageLinearProgressRevealer';
 import { useCurrentUserCachedData } from '../../../../utils/hooks/useCurrentUserCachedData';
 import { Project, useDeleteProjectMutation } from '../../../../../graphql/generated-types';
 import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
@@ -28,6 +28,7 @@ export function DeleteProjectButton({ projectSlug, projectName }: DeleteProjectB
     const { errorToast } = useToast();
     const userCachedData = useCurrentUserCachedData();
     const [ deleteProjectMutation, { loading } ] = useDeleteProjectMutation();
+    usePageLinearProgressRevealer(loading);
 
     const handleProjectDelete = React.useCallback(async () => {
         try {
@@ -84,7 +85,6 @@ export function DeleteProjectButton({ projectSlug, projectName }: DeleteProjectB
     return (
         <Tooltip title={t('projectPage.deleteThisProject')!} arrow>
             <IconButton onClick={handleClick} aria-label={t('projectPage.deleteThisProject')}>
-                <PageLinearProgressRevealer visible={loading} />
                 <DeleteIcon />
             </IconButton>
         </Tooltip>

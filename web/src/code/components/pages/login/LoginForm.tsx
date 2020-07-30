@@ -7,6 +7,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { MutationLoginArgs, useLoginMutation } from '../../../../graphql/generated-types';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
@@ -89,7 +90,8 @@ function useLoginFormValidationSchema(t: TFunction) {
  */
 function useLoginFormSubmitHandler() {
     const { errorToast } = useToast();
-    const [ loginMutation ] = useLoginMutation();
+    const [ loginMutation, { loading } ] = useLoginMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<LoginFormData>['onSubmit']>(async (values) => {
         try {

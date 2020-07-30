@@ -15,6 +15,7 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 
 import { ProjectDetailedDataFragment, ResourceData, useDeleteProjectFileMutation } from '../../../../../graphql/generated-types';
+import { usePageLinearProgressRevealer } from '../../../common/progress-indicators/usePageLinearProgressRevealer';
 import { projectFileUploadModalAtom } from '../../../modals/project-file-upload/projectFileUploadModalAtom';
 import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
 import { ConsciousFileIcon } from '../../../common/icons/ConsciousFileIcon';
@@ -83,7 +84,8 @@ interface FileTileProps {
 
 function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): React.ReactElement {
     const { errorToast } = useToast();
-    const [ deleteProjectFileMutation ] = useDeleteProjectFileMutation();
+    const [ deleteProjectFileMutation, { loading } ] = useDeleteProjectFileMutation();
+    usePageLinearProgressRevealer(loading);
 
     const handleFileDelete = React.useCallback(async (event: React.SyntheticEvent<HTMLElement>) => {
         event.stopPropagation();

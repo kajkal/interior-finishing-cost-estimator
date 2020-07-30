@@ -13,6 +13,7 @@ import { MutationUpdateProjectArgs, Project, UpdateProjectDocument, UpdateProjec
 import { projectUpdateModalAtom } from '../../../../../code/components/modals/project-update/projectUpdateModalAtom';
 import { ProjectUpdateModal } from '../../../../../code/components/modals/project-update/ProjectUpdateModal';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
+import { nav } from '../../../../../code/config/nav';
 
 
 describe('ProjectUpdateModal component', () => {
@@ -177,6 +178,8 @@ describe('ProjectUpdateModal component', () => {
             it('should validate projectName input value', async () => {
                 renderInMockContext();
                 ViewUnderTest.openModal();
+                expect(ViewUnderTest.projectNameInput).toHaveFocus();
+
                 await InputValidator.basedOn(ViewUnderTest.projectNameInput)
                     .expectError('', 't:form.projectName.validation.required')
                     .expectError('aa', 't:form.projectName.validation.tooShort')
@@ -228,6 +231,9 @@ describe('ProjectUpdateModal component', () => {
                 'ROOT_MUTATION': expect.any(Object),
                 'ROOT_QUERY': expect.any(Object),
             });
+
+            // verify if navigation occurred
+            expect(screen.getByTestId('location')).toHaveTextContent(nav.project(updatedProject.slug));
         });
 
         it('should display notification about missing project owner role', async () => {

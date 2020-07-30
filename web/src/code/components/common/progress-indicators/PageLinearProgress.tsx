@@ -10,8 +10,10 @@ import { ThemeType } from '../../../utils/theme/ThemeUtils';
 
 
 /**
- * Page linear progress - could be trigger by direct operations on pageProgressAtom
- * or by mounting PageLinearProgressRevealer component in DOM.
+ * Page linear progress - renders thin line below app header.
+ *
+ * @see pageProgressAtom - progress visibility atom
+ * @see usePageLinearProgressRevealer - trigger progress visibility
  */
 export function PageLinearProgress(): React.ReactElement {
     const classes = useStyles();

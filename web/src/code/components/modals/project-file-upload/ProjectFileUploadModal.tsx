@@ -12,6 +12,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
 import { MutationUploadProjectFileArgs, ResourceData, useUploadProjectFileMutation } from '../../../../graphql/generated-types';
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikDropzoneArea } from '../../common/form-fields/FormikDropzoneArea';
@@ -118,7 +119,8 @@ function useProjectFileUploadFormValidationSchema(t: TFunction) {
  */
 function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
     const { errorToast } = useToast();
-    const [ uploadProjectFileMutation ] = useUploadProjectFileMutation();
+    const [ uploadProjectFileMutation, { loading } ] = useUploadProjectFileMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<ProjectFileUploadFormData>['onSubmit']>(async (values) => {
         try {

@@ -9,6 +9,7 @@ import { Form, Formik, FormikConfig } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationCreateProjectArgs, Project, useCreateProjectMutation } from '../../../../graphql/generated-types';
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
@@ -80,7 +81,8 @@ function useLoginFormValidationSchema(t: TFunction) {
  */
 function useLoginFormSubmitHandler(userSlug: string | undefined) {
     const navigate = useNavigate();
-    const [ createProjectMutation ] = useCreateProjectMutation();
+    const [ createProjectMutation, { loading } ] = useCreateProjectMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<CreateProjectFormData>['onSubmit']>(async (values) => {
         try {

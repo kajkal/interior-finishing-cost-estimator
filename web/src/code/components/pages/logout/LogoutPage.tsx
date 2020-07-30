@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { useLogoutMutation } from '../../../../graphql/generated-types';
 import { SessionChannel } from '../../../utils/communication/SessionChannel';
@@ -9,7 +10,8 @@ import { useToast } from '../../providers/toast/useToast';
 
 export function LogoutPage(): React.ReactElement | null {
     const { errorToast } = useToast();
-    const [ logoutMutation ] = useLogoutMutation();
+    const [ logoutMutation, { loading } ] = useLogoutMutation();
+    usePageLinearProgressRevealer(loading);
 
     React.useEffect(() => {
         void async function logout() {

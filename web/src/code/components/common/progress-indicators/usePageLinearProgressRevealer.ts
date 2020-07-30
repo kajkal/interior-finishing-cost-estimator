@@ -3,11 +3,7 @@ import { useSetRecoilState } from 'recoil/dist';
 import { pageProgressAtom } from '../../atoms/page-progress/pageProgressAtom';
 
 
-export interface PageLinearProgressRevealerProps {
-    visible?: boolean;
-}
-
-export function PageLinearProgressRevealer({ visible = true }: PageLinearProgressRevealerProps): null {
+export function usePageLinearProgressRevealer(visible: boolean) {
     const setPageLoading = useSetRecoilState(pageProgressAtom);
 
     React.useEffect(() => {
@@ -17,5 +13,4 @@ export function PageLinearProgressRevealer({ visible = true }: PageLinearProgres
         };
     }, [ visible, setPageLoading ]);
 
-    return null;
 }

@@ -14,6 +14,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
 import { MutationUpdateProjectArgs, ProjectDetailsDocument, ProjectDetailsQuery, useUpdateProjectMutation } from '../../../../graphql/generated-types';
+import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
@@ -80,6 +81,7 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                     label={t('form.projectName.label')}
                                     fullWidth
                                     helperText={(projectData?.name !== values.name) ? t('modal.projectUpdate.urlWillChange') : undefined}
+                                    autoFocus
                                 />
 
                             </Form>
@@ -127,7 +129,8 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
     const navigate = useNavigate();
     const { errorToast } = useToast();
     const userCachedData = useCurrentUserCachedData();
-    const [ updateProjectMutation ] = useUpdateProjectMutation();
+    const [ updateProjectMutation, { loading } ] = useUpdateProjectMutation();
+    usePageLinearProgressRevealer(loading);
 
     return React.useCallback<FormikConfig<ProjectUpdateFormData>['onSubmit']>(async (values) => {
         try {
@@ -184,6 +187,7 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
                     }
                 },
             });
+            onModalClose();
         } catch (error) {
             ApolloErrorHandler.process(error)
                 .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
@@ -194,7 +198,5 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
                 })
                 .verifyIfAllErrorsAreHandled();
         }
-
-        onModalClose();
     }, [ onModalClose, navigate, errorToast, userCachedData, updateProjectMutation ]);
 }
