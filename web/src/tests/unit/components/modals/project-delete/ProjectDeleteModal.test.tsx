@@ -1,5 +1,4 @@
 import React from 'react';
-import { GraphQLError } from 'graphql';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -118,34 +117,6 @@ describe('ProjectDeleteModal component', () => {
                     } as DeleteProjectMutation,
                 },
             }),
-            resourceOwnerRoleRequired: () => ({
-                request: {
-                    query: DeleteProjectDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                    } as DeleteProjectMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'RESOURCE_OWNER_ROLE_REQUIRED' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
-            projectNotFound: () => ({
-                request: {
-                    query: DeleteProjectDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                    } as DeleteProjectMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'PROJECT_NOT_FOUND' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
         };
 
 
@@ -187,32 +158,6 @@ describe('ProjectDeleteModal component', () => {
 
             // verify if navigation occurred
             expect(screen.getByTestId('location')).toHaveTextContent(nav.createProject());
-        });
-
-        it('should display notification about missing project owner role', async () => {
-            const mockResponse = mockResponseGenerator.resourceOwnerRoleRequired();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-
-            ViewUnderTest.openModal();
-            userEvent.click(ViewUnderTest.deleteButton);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
-        });
-
-        it('should display notification about project not found', async () => {
-            const mockResponse = mockResponseGenerator.projectNotFound();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-
-            ViewUnderTest.openModal();
-            userEvent.click(ViewUnderTest.deleteButton);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
     });

@@ -134,8 +134,8 @@ describe('ErrorHandler class', () => {
         it('should call handler when GraphQL error with matching message is found', () => {
             // given
             const handler = jest.fn();
-            const graphQLError1 = { message: 'SAMPLE_ERROR_MESSAGE_1' } as unknown as GraphQLError;
-            const graphQLError2 = { message: 'SAMPLE_ERROR_MESSAGE_2' } as unknown as GraphQLError;
+            const graphQLError1 = new GraphQLError('SAMPLE_ERROR_MESSAGE_1');
+            const graphQLError2 = new GraphQLError('SAMPLE_ERROR_MESSAGE_2');
             const graphQLErrors = [ graphQLError1, graphQLError2 ];
 
             // when
@@ -165,8 +165,8 @@ describe('ErrorHandler class', () => {
         it('should not call handler when GraphQL error with matching message is not found', () => {
             // given
             const handler = jest.fn();
-            const graphQLError1 = { message: 'SAMPLE_ERROR_MESSAGE_1' } as unknown as GraphQLError;
-            const graphQLError2 = { message: 'SAMPLE_ERROR_MESSAGE_2' } as unknown as GraphQLError;
+            const graphQLError1 = new GraphQLError('SAMPLE_ERROR_MESSAGE_1');
+            const graphQLError2 = new GraphQLError('SAMPLE_ERROR_MESSAGE_2');
             const graphQLErrors = [ graphQLError1, graphQLError2 ];
 
             // when
@@ -181,8 +181,8 @@ describe('ErrorHandler class', () => {
         it('should not call handler when GraphQL error with matching message is already marked as handled', () => {
             // given
             const handler = jest.fn();
-            const graphQLError1 = { message: 'SAMPLE_ERROR_MESSAGE_1' } as unknown as GraphQLError;
-            const graphQLError2 = { message: 'SAMPLE_ERROR_MESSAGE_2' } as unknown as GraphQLError;
+            const graphQLError1 = new GraphQLError('SAMPLE_ERROR_MESSAGE_1');
+            const graphQLError2 = new GraphQLError('SAMPLE_ERROR_MESSAGE_2');
             const graphQLErrors = [ graphQLError1, graphQLError2 ];
 
             // when

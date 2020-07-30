@@ -111,7 +111,7 @@ describe('SignupPage component', () => {
                 result: {
                     data: null,
                     errors: [
-                        { message: 'EMAIL_NOT_AVAILABLE' } as unknown as GraphQLError,
+                        new GraphQLError('EMAIL_NOT_AVAILABLE'),
                     ],
                 },
             }),

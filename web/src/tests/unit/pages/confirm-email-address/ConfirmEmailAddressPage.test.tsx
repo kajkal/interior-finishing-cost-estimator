@@ -61,7 +61,7 @@ describe('ConfirmEmailAddressPage component', () => {
             result: {
                 data: null,
                 errors: [
-                    { message: 'EMAIL_ADDRESS_ALREADY_CONFIRMED' } as unknown as GraphQLError,
+                    new GraphQLError('EMAIL_ADDRESS_ALREADY_CONFIRMED'),
                 ],
             },
         }),
@@ -73,7 +73,7 @@ describe('ConfirmEmailAddressPage component', () => {
             result: {
                 data: null,
                 errors: [
-                    { message: 'INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN' } as unknown as GraphQLError,
+                    new GraphQLError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN'),
                 ],
             },
         }),

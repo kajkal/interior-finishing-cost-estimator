@@ -126,7 +126,7 @@ describe('LoginPage component', () => {
                 result: {
                     data: null,
                     errors: [
-                        { message: 'BAD_CREDENTIALS' } as unknown as GraphQLError,
+                        new GraphQLError('BAD_CREDENTIALS'),
                     ],
                 },
             }),

@@ -133,7 +133,7 @@ describe('PasswordResetPage component', () => {
                 result: {
                     data: null,
                     errors: [
-                        { message: 'INVALID_PASSWORD_RESET_TOKEN' } as unknown as GraphQLError,
+                        new GraphQLError('INVALID_PASSWORD_RESET_TOKEN'),
                     ],
                 },
             }),
@@ -148,12 +148,15 @@ describe('PasswordResetPage component', () => {
                 result: {
                     data: null,
                     errors: [
-                        {
-                            message: 'EXPIRED_PASSWORD_RESET_TOKEN',
-                            extensions: {
-                                expiredAt: '2020-06-13T16:45:00.000Z',
-                            },
-                        } as unknown as GraphQLError,
+                        new GraphQLError(
+                            'EXPIRED_PASSWORD_RESET_TOKEN',
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                            { expiredAt: '2020-06-13T16:45:00.000Z' },
+                        ),
                     ],
                 },
             }),

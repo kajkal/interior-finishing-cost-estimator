@@ -22,7 +22,6 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { projectUpdateModalAtom } from './projectUpdateModalAtom';
 import { ResponsiveModalProps } from '../ResponsiveModalProps';
-import { useToast } from '../../providers/toast/useToast';
 import { nav } from '../../../config/nav';
 
 
@@ -127,7 +126,6 @@ function useProjectUpdateFormValidationSchema(t: TFunction) {
  */
 function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
     const navigate = useNavigate();
-    const { errorToast } = useToast();
     const userCachedData = useCurrentUserCachedData();
     const [ updateProjectMutation, { loading } ] = useUpdateProjectMutation();
     usePageLinearProgressRevealer(loading);
@@ -189,14 +187,7 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
             });
             onModalClose();
         } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
-                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
-                })
-                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
-                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
-                })
-                .verifyIfAllErrorsAreHandled();
+            ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, navigate, errorToast, userCachedData, updateProjectMutation ]);
+    }, [ onModalClose, navigate, userCachedData, updateProjectMutation ]);
 }

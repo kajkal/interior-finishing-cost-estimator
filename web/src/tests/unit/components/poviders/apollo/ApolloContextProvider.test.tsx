@@ -1,4 +1,5 @@
 import React from 'react';
+import { GraphQLError } from 'graphql';
 import { RecoilRoot } from 'recoil/dist';
 import { NetworkStatus, Operation } from '@apollo/client';
 import * as errorModule from '@apollo/client/link/error';
@@ -142,7 +143,7 @@ describe('ApolloContextProvider component', () => {
 
         const operation = {
             operationName: 'SampleOperation',
-        } as unknown as Operation;
+        } as Operation;
 
         async function getOnErrorFunction() {
             ApolloClientSpy.query.mockResolvedValue({ loading: false, networkStatus: NetworkStatus.ready });
@@ -189,6 +190,36 @@ describe('ApolloContextProvider component', () => {
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
             expect(toast).toHaveTextContent('t:error.sessionExpired');
+        });
+
+        it('should globally handle {RESOURCE_OWNER_ROLE_REQUIRED} GraphQL errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: undefined,
+                graphQLErrors: [ new GraphQLError('RESOURCE_OWNER_ROLE_REQUIRED') ],
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
+        });
+
+        it('should globally handle {PROJECT_NOT_FOUND} GraphQL errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: undefined,
+                graphQLErrors: [ new GraphQLError('PROJECT_NOT_FOUND') ],
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
     });

@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { GraphQLError } from 'graphql';
 import { useRecoilValue } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -133,36 +132,6 @@ describe('FileSection component', () => {
                     },
                 },
             }),
-            resourceOwnerRoleRequired: () => ({
-                request: {
-                    query: DeleteProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        resourceName: sampleProject.files[ 0 ].name,
-                    } as DeleteProjectFileMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'RESOURCE_OWNER_ROLE_REQUIRED' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
-            projectNotFound: () => ({
-                request: {
-                    query: DeleteProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        resourceName: sampleProject.files[ 0 ].name,
-                    } as DeleteProjectFileMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'PROJECT_NOT_FOUND' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
         };
 
         it('should render separate tile for each file', () => {
@@ -199,26 +168,6 @@ describe('FileSection component', () => {
                 id: cache.identify(sampleProject),
             });
             await waitFor(() => expect(getProject()?.files).toEqual([ sampleProject.files[ 1 ] ]));
-        });
-
-        it('should display notification about missing project owner role', async () => {
-            renderInMockContext({ mockResponses: [ mockResponseGenerator.resourceOwnerRoleRequired() ] });
-            ViewUnderTest.clickDeleteFileButton(0);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
-        });
-
-        it('should display notification about project not found', async () => {
-            renderInMockContext({ mockResponses: [ mockResponseGenerator.projectNotFound() ] });
-            ViewUnderTest.clickDeleteFileButton(0);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
     });

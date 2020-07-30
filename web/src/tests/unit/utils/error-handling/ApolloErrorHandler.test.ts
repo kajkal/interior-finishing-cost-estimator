@@ -18,7 +18,7 @@ describe('ApolloErrorHandler class', () => {
 
     it('should handle all errors', () => {
         const handler = jest.fn();
-        const graphQLError1 = { message: 'SAMPLE_ERROR_MESSAGE' } as unknown as GraphQLError;
+        const graphQLError1 = new GraphQLError('SAMPLE_ERROR_MESSAGE');
         const apolloError = new ApolloError({
             graphQLErrors: [ graphQLError1 ],
             networkError: null,
@@ -39,8 +39,8 @@ describe('ApolloErrorHandler class', () => {
     it('should log unhandled GraphQL errors', () => {
         // given
         const handler = jest.fn();
-        const graphQLError1 = { message: 'SAMPLE_ERROR_MESSAGE_1' } as unknown as GraphQLError;
-        const graphQLError2 = { message: 'SAMPLE_ERROR_MESSAGE_2' } as unknown as GraphQLError;
+        const graphQLError1 = new GraphQLError('SAMPLE_ERROR_MESSAGE_1');
+        const graphQLError2 = new GraphQLError('SAMPLE_ERROR_MESSAGE_2');
         const apolloError = new ApolloError({
             graphQLErrors: [ graphQLError1, graphQLError2 ],
             networkError: null,
@@ -66,7 +66,7 @@ describe('ApolloErrorHandler class', () => {
         // given
         const handler = jest.fn();
         const networkError = new Error('NETWORK_ERROR');
-        const graphQLError = { message: 'SAMPLE_ERROR_MESSAGE' } as unknown as GraphQLError;
+        const graphQLError = new GraphQLError('SAMPLE_ERROR_MESSAGE');
         const apolloError = new ApolloError({
             graphQLErrors: [ graphQLError ],
             networkError: networkError,

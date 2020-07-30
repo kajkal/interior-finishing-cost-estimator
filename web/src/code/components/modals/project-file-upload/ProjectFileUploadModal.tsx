@@ -20,7 +20,6 @@ import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton'
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { projectFileUploadModalAtom } from './projectFileUploadModalAtom';
 import { ResponsiveModalProps } from '../ResponsiveModalProps';
-import { useToast } from '../../providers/toast/useToast';
 
 
 type ProjectFileUploadFormData = MutationUploadProjectFileArgs;
@@ -118,7 +117,6 @@ function useProjectFileUploadFormValidationSchema(t: TFunction) {
  * Submit handler
  */
 function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
-    const { errorToast } = useToast();
     const [ uploadProjectFileMutation, { loading } ] = useUploadProjectFileMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -141,14 +139,7 @@ function useProjectFileUploadFormSubmitHandler(onModalClose: () => void) {
             });
             onModalClose();
         } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
-                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
-                })
-                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
-                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
-                })
-                .verifyIfAllErrorsAreHandled();
+            ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, errorToast, uploadProjectFileMutation ]);
+    }, [ onModalClose, uploadProjectFileMutation ]);
 }

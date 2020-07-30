@@ -63,7 +63,7 @@ describe('initApolloClient function', () => {
 
         const sampleOperation = {
             operationName: 'SampleOperation',
-        } as unknown as apolloClientModule.Operation;
+        } as apolloClientModule.Operation;
 
         function getPrepareOperationContextFunction() {
             initApolloClient();

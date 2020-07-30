@@ -56,12 +56,18 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
         /**
          * Global error handling.
          */
-        client.setLink(onError(({ networkError }) => {
+        client.setLink(onError(({ networkError, graphQLErrors }) => {
             ErrorHandler.handleUnauthorizedError(networkError, () => {
                 errorToast(({ t }) => t('error.sessionExpired'));
             });
             ErrorHandler.handleNetworkError(networkError, () => {
                 errorToast(({ t }) => t('error.networkError'));
+            });
+            ErrorHandler.handleGraphQlError(graphQLErrors, 'RESOURCE_OWNER_ROLE_REQUIRED', () => {
+                errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
+            });
+            ErrorHandler.handleGraphQlError(graphQLErrors, 'PROJECT_NOT_FOUND', () => {
+                errorToast(({ t }) => t('projectPage.projectNotFoundError'));
             });
         }).concat(client.link));
 

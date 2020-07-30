@@ -1,6 +1,5 @@
 import React from 'react';
 import * as Yup from 'yup';
-import { TFunction } from 'i18next';
 import { useNavigate } from 'react-router';
 import { Reference } from '@apollo/client';
 import { useRecoilState } from 'recoil/dist';
@@ -22,7 +21,6 @@ import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCac
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { projectDeleteModalAtom } from './projectDeleteModalAtom';
-import { useToast } from '../../providers/toast/useToast';
 import { nav } from '../../../config/nav';
 
 
@@ -37,7 +35,7 @@ export function ProjectDeleteModal(): React.ReactElement {
         setModalState((prevState) => ({ ...prevState, open: false }));
     }, [ setModalState ]);
 
-    const validationSchema = useProjectDeleteFormValidationSchema(t);
+    const validationSchema = useProjectDeleteFormValidationSchema();
     const handleSubmit = useProjectDeleteFormSubmitHandler(handleModalClose);
 
     useModalNavigationBlocker(handleModalClose, open);
@@ -94,10 +92,10 @@ export function ProjectDeleteModal(): React.ReactElement {
 /**
  * Validation schema
  */
-function useProjectDeleteFormValidationSchema(t: TFunction) {
+function useProjectDeleteFormValidationSchema() {
     return React.useMemo(() => Yup.object<ProjectDeleteFormData>({
         projectSlug: Yup.string().min(3).required(),
-    }).defined(), [ t ]);
+    }).defined(), []);
 }
 
 
@@ -106,7 +104,6 @@ function useProjectDeleteFormValidationSchema(t: TFunction) {
  */
 function useProjectDeleteFormSubmitHandler(onModalClose: () => void) {
     const navigate = useNavigate();
-    const { errorToast } = useToast();
     const userCachedData = useCurrentUserCachedData();
     const [ deleteProjectMutation, { loading } ] = useDeleteProjectMutation();
     usePageLinearProgressRevealer(loading);
@@ -145,16 +142,9 @@ function useProjectDeleteFormSubmitHandler(onModalClose: () => void) {
             });
             onModalClose();
         } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
-                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
-                })
-                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
-                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
-                })
-                .verifyIfAllErrorsAreHandled();
+            ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, navigate, errorToast, userCachedData?.slug, deleteProjectMutation ]);
+    }, [ onModalClose, navigate, userCachedData, deleteProjectMutation ]);
 }
 
 

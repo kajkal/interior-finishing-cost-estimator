@@ -20,7 +20,6 @@ import { projectFileUploadModalAtom } from '../../../modals/project-file-upload/
 import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
 import { ConsciousFileIcon } from '../../../common/icons/ConsciousFileIcon';
 import { UploadFileIcon } from '../../../common/icons/UploadFileIcon';
-import { useToast } from '../../../providers/toast/useToast';
 import { Section } from './Section';
 
 
@@ -83,7 +82,6 @@ interface FileTileProps {
 }
 
 function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): React.ReactElement {
-    const { errorToast } = useToast();
     const [ deleteProjectFileMutation, { loading } ] = useDeleteProjectFileMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -106,16 +104,9 @@ function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): 
                 },
             });
         } catch (error) {
-            ApolloErrorHandler.process(error)
-                .handleGraphQlError('RESOURCE_OWNER_ROLE_REQUIRED', () => {
-                    errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
-                })
-                .handleGraphQlError('PROJECT_NOT_FOUND', () => {
-                    errorToast(({ t }) => t('projectPage.projectNotFoundError'));
-                })
-                .verifyIfAllErrorsAreHandled();
+            ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ projectSlug, fileData.name, errorToast, deleteProjectFileMutation ]);
+    }, [ projectSlug, fileData.name, deleteProjectFileMutation ]);
 
     const descriptionId = `file-tile-${index}-description`;
 

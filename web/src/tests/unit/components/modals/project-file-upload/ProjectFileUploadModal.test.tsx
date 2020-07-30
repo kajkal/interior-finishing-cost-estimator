@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { GraphQLError } from 'graphql';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -121,38 +120,6 @@ describe('ProjectFileUploadModal component', () => {
                     },
                 },
             }),
-            resourceOwnerRoleRequired: () => ({
-                request: {
-                    query: UploadProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        file: new File([], 'document.pdf', { type: 'application/pdf' }),
-                        description: 'Not mine project',
-                    } as UploadProjectFileMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'RESOURCE_OWNER_ROLE_REQUIRED' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
-            projectNotFound: () => ({
-                request: {
-                    query: UploadProjectFileDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        file: new File([], 'document.pdf', { type: 'application/pdf' }),
-                        description: 'Not existing project',
-                    } as UploadProjectFileMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'PROJECT_NOT_FOUND' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
         };
 
         describe('validation', () => {
@@ -196,28 +163,6 @@ describe('ProjectFileUploadModal component', () => {
             expect(project!.files).toEqual([
                 mockResponse.result.data.uploadProjectFile,
             ]);
-        });
-
-        it('should display notification about missing project owner role', async () => {
-            const mockResponse = mockResponseGenerator.resourceOwnerRoleRequired();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
-        });
-
-        it('should display notification about project not found', async () => {
-            const mockResponse = mockResponseGenerator.projectNotFound();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
     });

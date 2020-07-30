@@ -1,5 +1,4 @@
 import React from 'react';
-import { GraphQLError } from 'graphql';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -138,36 +137,6 @@ describe('ProjectUpdateModal component', () => {
                     } as UpdateProjectMutation,
                 },
             }),
-            resourceOwnerRoleRequired: () => ({
-                request: {
-                    query: UpdateProjectDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        name: 'Updated project name',
-                    } as UpdateProjectMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'RESOURCE_OWNER_ROLE_REQUIRED' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
-            projectNotFound: () => ({
-                request: {
-                    query: UpdateProjectDocument,
-                    variables: {
-                        projectSlug: sampleProject.slug,
-                        name: 'Updated project name',
-                    } as UpdateProjectMutationVariables,
-                },
-                result: {
-                    data: null,
-                    errors: [
-                        { message: 'PROJECT_NOT_FOUND' } as unknown as GraphQLError,
-                    ],
-                },
-            }),
         };
 
         describe('validation', () => {
@@ -231,28 +200,6 @@ describe('ProjectUpdateModal component', () => {
 
             // verify if navigation occurred
             expect(screen.getByTestId('location')).toHaveTextContent(nav.project(updatedProject.slug));
-        });
-
-        it('should display notification about missing project owner role', async () => {
-            const mockResponse = mockResponseGenerator.resourceOwnerRoleRequired();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
-        });
-
-        it('should display notification about project not found', async () => {
-            const mockResponse = mockResponseGenerator.projectNotFound();
-            renderInMockContext({ mockResponses: [ mockResponse ] });
-            await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
-
-            // verify if toast is visible
-            const toast = await screen.findByTestId('MockToast');
-            expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
         });
 
     });
