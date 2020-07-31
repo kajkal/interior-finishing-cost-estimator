@@ -187,7 +187,7 @@ export type LoginMutation = (
     & Pick<InitialData, 'accessToken'>
     & { user: (
       { __typename?: 'User' }
-      & UserFragmentFragment
+      & UserDetailedDataFragment
     ) }
   ) }
 );
@@ -198,17 +198,6 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 export type LogoutMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'logout'>
-);
-
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MeQuery = (
-  { __typename?: 'Query' }
-  & { me: (
-    { __typename?: 'User' }
-    & UserFragmentFragment
-  ) }
 );
 
 export type RegisterMutationVariables = Exact<{
@@ -225,7 +214,7 @@ export type RegisterMutation = (
     & Pick<InitialData, 'accessToken'>
     & { user: (
       { __typename?: 'User' }
-      & UserFragmentFragment
+      & UserDetailedDataFragment
     ) }
   ) }
 );
@@ -249,32 +238,6 @@ export type SendPasswordResetInstructionsMutationVariables = Exact<{
 export type SendPasswordResetInstructionsMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendPasswordResetInstructions'>
-);
-
-export type ReadProjectsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ReadProjectsQuery = (
-  { __typename?: 'Query' }
-  & { projects: Array<(
-    { __typename?: 'Project' }
-    & ProjectBasicDataFragment
-  )> }
-);
-
-export type UserFragmentFragment = (
-  { __typename?: 'User' }
-  & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
-  & { products: Array<(
-    { __typename?: 'Product' }
-    & Pick<Product, 'name'>
-  )>, projects: Array<(
-    { __typename?: 'Project' }
-    & ProjectBasicDataFragment
-  )>, offers: Array<(
-    { __typename?: 'Offer' }
-    & Pick<Offer, 'name'>
-  )> }
 );
 
 export type ProjectBasicDataFragment = (
@@ -314,17 +277,6 @@ export type DeleteProjectMutation = (
   & Pick<Mutation, 'deleteProject'>
 );
 
-export type DeleteProjectFileMutationVariables = Exact<{
-  projectSlug: Scalars['String'];
-  resourceName: Scalars['String'];
-}>;
-
-
-export type DeleteProjectFileMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteProjectFile'>
-);
-
 export type UpdateProjectMutationVariables = Exact<{
   projectSlug: Scalars['String'];
   name: Scalars['String'];
@@ -337,6 +289,17 @@ export type UpdateProjectMutation = (
     { __typename?: 'Project' }
     & ProjectDetailedDataFragment
   ) }
+);
+
+export type DeleteProjectFileMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+  resourceName: Scalars['String'];
+}>;
+
+
+export type DeleteProjectFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteProjectFile'>
 );
 
 export type UploadProjectFileMutationVariables = Exact<{
@@ -371,6 +334,32 @@ export type ProjectDetailsQuery = (
   ) }
 );
 
+export type UserDetailedDataFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
+  & { products: Array<(
+    { __typename?: 'Product' }
+    & Pick<Product, 'name'>
+  )>, projects: Array<(
+    { __typename?: 'Project' }
+    & ProjectBasicDataFragment
+  )>, offers: Array<(
+    { __typename?: 'Offer' }
+    & Pick<Offer, 'name'>
+  )> }
+);
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me: (
+    { __typename?: 'User' }
+    & UserDetailedDataFragment
+  ) }
+);
+
 export const ProjectBasicDataFragmentDoc = gql`
     fragment ProjectBasicData on Project {
   id
@@ -378,8 +367,18 @@ export const ProjectBasicDataFragmentDoc = gql`
   name
 }
     `;
-export const UserFragmentFragmentDoc = gql`
-    fragment UserFragment on User {
+export const ProjectDetailedDataFragmentDoc = gql`
+    fragment ProjectDetailedData on Project {
+  ...ProjectBasicData
+  files {
+    url
+    name
+    description
+  }
+}
+    ${ProjectBasicDataFragmentDoc}`;
+export const UserDetailedDataFragmentDoc = gql`
+    fragment UserDetailedData on User {
   name
   slug
   email
@@ -392,16 +391,6 @@ export const UserFragmentFragmentDoc = gql`
   }
   offers {
     name
-  }
-}
-    ${ProjectBasicDataFragmentDoc}`;
-export const ProjectDetailedDataFragmentDoc = gql`
-    fragment ProjectDetailedData on Project {
-  ...ProjectBasicData
-  files {
-    url
-    name
-    description
   }
 }
     ${ProjectBasicDataFragmentDoc}`;
@@ -439,11 +428,11 @@ export const LoginDocument = gql`
   login(email: $email, password: $password) {
     accessToken
     user {
-      ...UserFragment
+      ...UserDetailedData
     }
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    ${UserDetailedDataFragmentDoc}`;
 
 /**
  * __useLoginMutation__
@@ -497,48 +486,16 @@ export function useLogoutMutation(baseOptions?: ApolloReactHooks.MutationHookOpt
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = ApolloReactCommon.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = ApolloReactCommon.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
-export const MeDocument = gql`
-    query Me {
-  me {
-    ...UserFragment
-  }
-}
-    ${UserFragmentFragmentDoc}`;
-
-/**
- * __useMeQuery__
- *
- * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
- * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useMeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useMeQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        return ApolloReactHooks.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-      }
-export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-        }
-export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
-export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
-export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
 export const RegisterDocument = gql`
     mutation Register($name: String!, $email: String!, $password: String!) {
   register(name: $name, email: $email, password: $password) {
     accessToken
     user {
-      ...UserFragment
+      ...UserDetailedData
     }
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    ${UserDetailedDataFragmentDoc}`;
 
 /**
  * __useRegisterMutation__
@@ -624,38 +581,6 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
-export const ReadProjectsDocument = gql`
-    query ReadProjects {
-  projects @client {
-    ...ProjectBasicData
-  }
-}
-    ${ProjectBasicDataFragmentDoc}`;
-
-/**
- * __useReadProjectsQuery__
- *
- * To run a query within a React component, call `useReadProjectsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReadProjectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReadProjectsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useReadProjectsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ReadProjectsQuery, ReadProjectsQueryVariables>) {
-        return ApolloReactHooks.useQuery<ReadProjectsQuery, ReadProjectsQueryVariables>(ReadProjectsDocument, baseOptions);
-      }
-export function useReadProjectsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ReadProjectsQuery, ReadProjectsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<ReadProjectsQuery, ReadProjectsQueryVariables>(ReadProjectsDocument, baseOptions);
-        }
-export type ReadProjectsQueryHookResult = ReturnType<typeof useReadProjectsQuery>;
-export type ReadProjectsLazyQueryHookResult = ReturnType<typeof useReadProjectsLazyQuery>;
-export type ReadProjectsQueryResult = ApolloReactCommon.QueryResult<ReadProjectsQuery, ReadProjectsQueryVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($name: String!) {
   createProject(name: $name) {
@@ -716,36 +641,6 @@ export function useDeleteProjectMutation(baseOptions?: ApolloReactHooks.Mutation
 export type DeleteProjectMutationHookResult = ReturnType<typeof useDeleteProjectMutation>;
 export type DeleteProjectMutationResult = ApolloReactCommon.MutationResult<DeleteProjectMutation>;
 export type DeleteProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
-export const DeleteProjectFileDocument = gql`
-    mutation DeleteProjectFile($projectSlug: String!, $resourceName: String!) {
-  deleteProjectFile(projectSlug: $projectSlug, resourceName: $resourceName)
-}
-    `;
-
-/**
- * __useDeleteProjectFileMutation__
- *
- * To run a mutation, you first call `useDeleteProjectFileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteProjectFileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [deleteProjectFileMutation, { data, loading, error }] = useDeleteProjectFileMutation({
- *   variables: {
- *      projectSlug: // value for 'projectSlug'
- *      resourceName: // value for 'resourceName'
- *   },
- * });
- */
-export function useDeleteProjectFileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>(DeleteProjectFileDocument, baseOptions);
-      }
-export type DeleteProjectFileMutationHookResult = ReturnType<typeof useDeleteProjectFileMutation>;
-export type DeleteProjectFileMutationResult = ApolloReactCommon.MutationResult<DeleteProjectFileMutation>;
-export type DeleteProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>;
 export const UpdateProjectDocument = gql`
     mutation UpdateProject($projectSlug: String!, $name: String!) {
   updateProject(projectSlug: $projectSlug, name: $name) {
@@ -778,6 +673,36 @@ export function useUpdateProjectMutation(baseOptions?: ApolloReactHooks.Mutation
 export type UpdateProjectMutationHookResult = ReturnType<typeof useUpdateProjectMutation>;
 export type UpdateProjectMutationResult = ApolloReactCommon.MutationResult<UpdateProjectMutation>;
 export type UpdateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
+export const DeleteProjectFileDocument = gql`
+    mutation DeleteProjectFile($projectSlug: String!, $resourceName: String!) {
+  deleteProjectFile(projectSlug: $projectSlug, resourceName: $resourceName)
+}
+    `;
+
+/**
+ * __useDeleteProjectFileMutation__
+ *
+ * To run a mutation, you first call `useDeleteProjectFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProjectFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteProjectFileMutation, { data, loading, error }] = useDeleteProjectFileMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *      resourceName: // value for 'resourceName'
+ *   },
+ * });
+ */
+export function useDeleteProjectFileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>(DeleteProjectFileDocument, baseOptions);
+      }
+export type DeleteProjectFileMutationHookResult = ReturnType<typeof useDeleteProjectFileMutation>;
+export type DeleteProjectFileMutationResult = ApolloReactCommon.MutationResult<DeleteProjectFileMutation>;
+export type DeleteProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>;
 export const UploadProjectFileDocument = gql`
     mutation UploadProjectFile($projectSlug: String!, $file: Upload!, $description: String) {
   uploadProjectFile(projectSlug: $projectSlug, file: $file, description: $description) {
@@ -849,3 +774,35 @@ export function useProjectDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQu
 export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQuery>;
 export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
 export type ProjectDetailsQueryResult = ApolloReactCommon.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
+export const MeDocument = gql`
+    query Me {
+  me {
+    ...UserDetailedData
+  }
+}
+    ${UserDetailedDataFragmentDoc}`;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        return ApolloReactHooks.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+      }
+export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
