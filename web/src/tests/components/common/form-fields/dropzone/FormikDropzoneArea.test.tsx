@@ -4,9 +4,9 @@ import { Form, Formik } from 'formik';
 import userEvent from '@testing-library/user-event';
 import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 
-import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
+import { extendedUserEvent } from '../../../../__utils__/extendedUserEvent';
 
-import { FormikDropzoneArea } from '../../../../code/components/common/form-fields/FormikDropzoneArea';
+import { FormikDropzoneArea } from '../../../../../code/components/common/form-fields/dropzone/FormikDropzoneArea';
 
 
 describe('FormikDropzoneArea component', () => {

@@ -1,11 +1,9 @@
 import React from 'react';
-import { useTheme } from '@material-ui/core/styles';
-import { useMediaQuery } from '@material-ui/core';
+import { useMobileDetect } from '../../../utils/hooks/useMobileDetect';
 
 
 export function useCollapsibleList(initialState: boolean, isSideNavOpen: boolean, onSideNavToggle: () => void) {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isMobile = useMobileDetect();
     const [ expanded, setExpanded ] = React.useState(initialState);
 
     const handleClick = () => {

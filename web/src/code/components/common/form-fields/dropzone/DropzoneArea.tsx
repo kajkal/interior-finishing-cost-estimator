@@ -8,7 +8,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Chip from '@material-ui/core/Chip';
 
-import { ThemeType } from '../../../utils/theme/ThemeUtils';
+import { ThemeType } from '../../../../utils/theme/ThemeUtils';
 
 
 export interface DropzoneAreaProps extends DropzoneOptions {
