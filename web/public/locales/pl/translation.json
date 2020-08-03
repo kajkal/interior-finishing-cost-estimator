@@ -162,6 +162,31 @@
         "tooLarge": "Rozmiar pliku {{filename}} przekracza dopuszczalny limit {{maxSizeInMb}} MB",
         "toManyFiles": "Wybrano zbyt wiele plików"
       }
+    },
+    "editor": {
+      "toolbar": {
+        "historyControls": "Sterowniki historii",
+        "undo": "Cofnij",
+        "redo": "Ponów",
+        "headerControls": "Sterowniki nagłówków",
+        "title": "Tytuł",
+        "subtitle": "Podtytuł",
+        "markControls": "Sterowniki makr",
+        "bold": "Pogrubienie",
+        "italic": "Kursywya",
+        "underline": "Podkreślenie",
+        "superscript": "Indeks górny",
+        "listControls": "Sterowniki list",
+        "todoList": "Lista rzeczy do zrobienia",
+        "bulletedList": "Lista punktowana",
+        "numberedList": "Lista numerowana",
+        "attachmentControls": "Sterowniki załączników",
+        "insertLink": "Dodaj link",
+        "insertLinkPrompt": "Wprowadź adres URL linku",
+        "insertImage": "Dodaj obraz",
+        "insertImagePrompt": "Wprowadź adres URL obrazu"
+      },
+      "ariaLabel": "Edytor tekstu"
     }
   },
   "error": {

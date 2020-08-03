@@ -8,6 +8,7 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
+    "@udecode/slate-plugins": "^0.65.0",
     "apollo-upload-client": "^14.1.1",
     "broadcast-channel": "^3.1.0",
     "formik": "^2.1.5",
@@ -26,6 +27,10 @@
     "react-router-dom": "^6.0.0-beta.0",
     "react-scripts": "3.4.1",
     "recoil": "0.0.10",
+    "slate": "^0.58.4",
+    "slate-history": "^0.58.4",
+    "slate-hyperscript": "^0.58.4",
+    "slate-react": "^0.58.4",
     "yup": "^0.29.2"
   },
   "scripts": {
@@ -74,6 +79,7 @@
     "@types/yup": "^0.29.3",
     "chance": "^1.1.6",
     "cross-env": "^7.0.2",
+    "jest-environment-jsdom-sixteen": "^1.0.3",
     "node-sass": "^4.14.1",
     "react-test-renderer": "^16.13.1",
     "typescript": "~3.9.7"
