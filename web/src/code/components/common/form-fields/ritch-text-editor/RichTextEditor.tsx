@@ -31,9 +31,12 @@ export interface RichTextEditorProps {
     onChange: (value: SlateDocument) => void;
     onTouched?: () => void;
     autoFocus?: boolean;
+    classes?: {
+        toolbar?: string;
+    };
 }
 
-export function RichTextEditor({ name, label, error, disabled, value, onChange, onTouched, autoFocus }: RichTextEditorProps): React.ReactElement {
+export function RichTextEditor({ name, label, error, disabled, value, onChange, onTouched, autoFocus, ...rest }: RichTextEditorProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const editor = React.useMemo(() => pipe(createEditor(), ...withPlugins), []);
@@ -53,7 +56,7 @@ export function RichTextEditor({ name, label, error, disabled, value, onChange, 
                     onChange={onChange as (value: Node[]) => void}
                 >
 
-                    <Toolbar>
+                    <Toolbar className={rest.classes?.toolbar}>
 
                         <ToolbarButtonGroup aria-label={t('form.editor.toolbar.historyControls')}>
                             <HistoryButton type='undo' disabled={disabled} />

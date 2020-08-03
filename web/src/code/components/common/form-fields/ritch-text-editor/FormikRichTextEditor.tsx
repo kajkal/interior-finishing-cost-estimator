@@ -3,17 +3,16 @@ import { useField, useFormikContext } from 'formik';
 import { SlateDocument } from '@udecode/slate-plugins';
 
 import { LabelWithOptionalIndicator } from '../LabelWithOptionalIndicator';
-import { RichTextEditor } from './RichTextEditor';
+import { RichTextEditor, RichTextEditorProps } from './RichTextEditor';
 
 
-export interface FormikRichTextEditorProps {
+export interface FormikRichTextEditorProps extends Pick<RichTextEditorProps, 'autoFocus' | 'classes'> {
     name: string;
     label: string;
     optional?: boolean;
-    autoFocus?: boolean;
 }
 
-export function FormikRichTextEditor({ name, label, optional, autoFocus }: FormikRichTextEditorProps): React.ReactElement {
+export function FormikRichTextEditor({ name, label, optional, ...rest }: FormikRichTextEditorProps): React.ReactElement {
     const { isSubmitting } = useFormikContext();
     const [ { value }, meta, { setValue, setTouched } ] = useField<SlateDocument>(name);
 
@@ -30,7 +29,7 @@ export function FormikRichTextEditor({ name, label, optional, autoFocus }: Formi
             value={value}
             onChange={setValue}
             onTouched={handleTouched}
-            autoFocus={autoFocus}
+            {...rest}
         />
     );
 }
