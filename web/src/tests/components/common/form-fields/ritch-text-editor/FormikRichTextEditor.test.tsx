@@ -10,8 +10,8 @@ import { SlateDocument } from '@udecode/slate-plugins';
 import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import { FormikRichTextEditor } from '../../../../../code/components/common/form-fields/ritch-text-editor/FormikRichTextEditor';
-import { verifyIfDocumentIsNotEmpty } from '../../../../../code/utils/validation/richTestEditorSchema';
 import { emptyEditorValue } from '../../../../../code/components/common/form-fields/ritch-text-editor/options';
+import { isSlateDocumentNotEmpty } from '../../../../../code/utils/validation/richTestEditorSchema';
 
 
 describe('FormikRichTextEditor component', () => {
@@ -30,7 +30,7 @@ describe('FormikRichTextEditor component', () => {
                     content: config.node || emptyEditorValue,
                 }}
                 validationSchema={Yup.object({
-                    content: Yup.array().min(1).test('match', 'Required error', verifyIfDocumentIsNotEmpty),
+                    content: Yup.array().min(1).test('match', 'Required error', isSlateDocumentNotEmpty),
                 })}
                 onSubmit={config.onSubmit || jest.fn()}
             >
@@ -38,7 +38,7 @@ describe('FormikRichTextEditor component', () => {
                     <Form>
                         <FormikRichTextEditor
                             name='content'
-                            label='Enter content'
+                            label='Content'
                             autoFocus={config.autoFocus}
                         />
                         <button type='submit' data-testid='submit-button' />
@@ -89,7 +89,7 @@ describe('FormikRichTextEditor component', () => {
             return screen.getByRole('button', { name: 't:form.editor.toolbar.insertImage' });
         }
         static get editor() {
-            return screen.getByLabelText('t:form.editor.ariaLabel');
+            return screen.getByRole('textbox');
         }
         static get submitButton() {
             return screen.getByTestId('submit-button');

@@ -1,13 +1,17 @@
 import { SlateDocument, SlateDocumentDescendant } from '@udecode/slate-plugins';
 
 
-function verifyIfChildIsNotEmpty({ text, children }: SlateDocumentDescendant) {
+function isSlateChildNotEmpty({ text, children }: SlateDocumentDescendant) {
     if (text || (Array.isArray(children) && children.length > 1)) {
         return true;
     }
-    return Array.isArray(children) && children.some(verifyIfChildIsNotEmpty);
+    return Array.isArray(children) && children.some(isSlateChildNotEmpty);
 }
 
-export function verifyIfDocumentIsNotEmpty(document: SlateDocument): boolean {
-    return document.some(verifyIfChildIsNotEmpty);
+export function isSlateDocumentNotEmpty(document: SlateDocument): boolean {
+    return document.some(isSlateChildNotEmpty);
+}
+
+export function isSlateDocumentEmpty(document: SlateDocument): boolean {
+    return !isSlateDocumentNotEmpty(document);
 }

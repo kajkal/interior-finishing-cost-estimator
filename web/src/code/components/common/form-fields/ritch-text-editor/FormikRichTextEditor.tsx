@@ -6,7 +6,7 @@ import { LabelWithOptionalIndicator } from '../LabelWithOptionalIndicator';
 import { RichTextEditor, RichTextEditorProps } from './RichTextEditor';
 
 
-export interface FormikRichTextEditorProps extends Pick<RichTextEditorProps, 'autoFocus' | 'classes'> {
+export interface FormikRichTextEditorProps extends Pick<RichTextEditorProps, 'id' | 'autoFocus' | 'aria-label'> {
     name: string;
     label: string;
     optional?: boolean;
@@ -14,7 +14,7 @@ export interface FormikRichTextEditorProps extends Pick<RichTextEditorProps, 'au
 
 export function FormikRichTextEditor({ name, label, optional, ...rest }: FormikRichTextEditorProps): React.ReactElement {
     const { isSubmitting } = useFormikContext();
-    const [ { value }, meta, { setValue, setTouched } ] = useField<SlateDocument>(name);
+    const [ field, meta, { setValue, setTouched } ] = useField<SlateDocument>(name);
 
     const handleTouched = () => {
         setTouched(true);
@@ -22,13 +22,14 @@ export function FormikRichTextEditor({ name, label, optional, ...rest }: FormikR
 
     return (
         <RichTextEditor
+            id={rest.id || field.name}
             name={name}
             label={optional ? <LabelWithOptionalIndicator label={label} /> : label}
             error={meta.touched ? meta.error : undefined}
             disabled={isSubmitting}
-            value={value}
+            value={field.value}
             onChange={setValue}
-            onTouched={handleTouched}
+            onBlur={handleTouched}
             {...rest}
         />
     );

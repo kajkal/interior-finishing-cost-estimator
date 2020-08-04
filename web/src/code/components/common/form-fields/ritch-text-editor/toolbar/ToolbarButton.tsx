@@ -28,7 +28,8 @@ export function ToolbarButton(props: ToolbarButtonProps): React.ReactElement {
                     disabled={disabled}
                     aria-pressed={active}
                     aria-label={label}
-                    focusRipple
+                    // focusRipple
+                    tabIndex={-1} // toolbar buttons dont work on onClick/onKeyDown etc so no need to keep them keyboard accessible
                     {...rest}
                 >
                     <span className={classes.label}>{children}</span>
