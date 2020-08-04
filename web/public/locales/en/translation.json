@@ -187,6 +187,9 @@
         "insertImagePrompt": "Enter the URL of the image:"
       },
       "ariaLabel": "Rich text editor"
+    },
+    "currencyAmount": {
+      "currencySelectAriaLabel": "Select currency"
     }
   },
   "error": {

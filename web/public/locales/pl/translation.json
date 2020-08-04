@@ -187,6 +187,9 @@
         "insertImagePrompt": "Wprowadź adres URL obrazu"
       },
       "ariaLabel": "Edytor tekstu"
+    },
+    "currencyAmount": {
+      "currencySelectAriaLabel": "Wybierz walutę"
     }
   },
   "error": {

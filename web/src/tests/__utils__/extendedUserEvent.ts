@@ -2,12 +2,27 @@ import userEvent from '@testing-library/user-event';
 import { act, fireEvent, waitFor } from '@testing-library/react';
 
 
+export async function flushPromises() {
+    await act(async () => {
+        await new Promise((resolve) => setImmediate(resolve));
+    });
+}
+
+
 async function type(element: HTMLElement, text: string) {
     userEvent.clear(element);
     await userEvent.type(element, text);
     fireEvent.blur(element);
 
     await waitFor(() => expect(element).toHaveValue(text));
+}
+
+
+async function typeNumber(element: HTMLElement, text: string) {
+    userEvent.clear(element);
+    await userEvent.paste(element, text); // userEvent.type doesn't work as expected in case of 'react-number-format' input
+    fireEvent.blur(element);
+    await flushPromises(); // formik validation
 }
 
 
@@ -35,4 +50,5 @@ async function drop(element: HTMLElement, files: File[]) {
 export const extendedUserEvent = {
     type,
     drop,
+    typeNumber,
 };

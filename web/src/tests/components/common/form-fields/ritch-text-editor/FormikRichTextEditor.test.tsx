@@ -36,7 +36,6 @@ describe('FormikRichTextEditor component', () => {
             >
                 {() => (
                     <Form>
-                        <div data-testid='for-blur' />
                         <FormikRichTextEditor
                             name='content'
                             label='Enter content'
