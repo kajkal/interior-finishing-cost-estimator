@@ -58,7 +58,7 @@ describe('FormikCurrencyAmountField component', () => {
             return screen.getByLabelText('Price', { selector: 'input' }) as HTMLInputElement;
         }
         static get currencySelect() {
-            return screen.getByLabelText('t:form.currencyAmount.currencySelectAriaLabel');
+            return screen.getByLabelText('t:form.common.currencyAmount.currencySelectAriaLabel');
         }
         static get currencyOptions() {
             return screen.findAllByRole('option');

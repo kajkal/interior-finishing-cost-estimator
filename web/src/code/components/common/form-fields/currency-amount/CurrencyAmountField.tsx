@@ -73,7 +73,7 @@ function CurrencySelectAdornment({ currencies, selectedCurrency, onCurrencyChang
     return (
         <InputAdornment position='end'>
             <InputLabel id='currency-select-label' className={classes.hiddenLabel}>
-                {t('form.currencyAmount.currencySelectAriaLabel')}
+                {t('form.common.currencyAmount.currencySelectAriaLabel')}
             </InputLabel>
             <Select
                 {...rest}

@@ -42,13 +42,13 @@ export function FormikDropzoneArea({ name, label, accept, multiple = false, auto
     const translateError = ({ file: { name }, errors: [ error ] }: FileRejection) => {
         switch (error.code) {
             case 'file-invalid-type':
-                return t('form.dropzone.validation.invalidType');
+                return t('form.common.dropzone.validation.invalidType');
             case 'file-too-large':
-                return t('form.dropzone.validation.tooLarge', { filename: name, maxSizeInMb: maxSizeInB / 1e+6 });
+                return t('form.common.dropzone.validation.tooLarge', { filename: name, maxSizeInMb: maxSizeInB / 1e+6 });
             case 'too-many-files':
-                return t('form.dropzone.validation.toManyFiles');
+                return t('form.common.dropzone.validation.toManyFiles');
             default:
-                return t('form.dropzone.validation.unknownError', { filename: name });
+                return t('form.common.dropzone.validation.unknownError', { filename: name });
         }
     };
 

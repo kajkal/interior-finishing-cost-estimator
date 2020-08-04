@@ -43,21 +43,21 @@ function getMarkConfig(type: MarkType, t: TFunction) {
             return {
                 markType: MARK_BOLD,
                 Icon: FormatBoldIcon,
-                label: t('form.editor.toolbar.bold'),
+                label: t('form.common.editor.toolbar.bold'),
                 shortcut: 'Ctrl+B',
             };
         case 'italic':
             return {
                 markType: MARK_ITALIC,
                 Icon: FormatItalicIcon,
-                label: t('form.editor.toolbar.italic'),
+                label: t('form.common.editor.toolbar.italic'),
                 shortcut: 'Ctrl+I',
             };
         case 'underline':
             return {
                 markType: MARK_UNDERLINE,
                 Icon: FormatUnderlinedIcon,
-                label: t('form.editor.toolbar.underline'),
+                label: t('form.common.editor.toolbar.underline'),
                 shortcut: 'Ctrl+U',
             };
         case 'superscript':
@@ -65,7 +65,7 @@ function getMarkConfig(type: MarkType, t: TFunction) {
                 markType: MARK_SUPERSCRIPT,
                 clear: MARK_SUBSCRIPT,
                 Icon: SuperscriptIcon,
-                label: t('form.editor.toolbar.superscript'),
+                label: t('form.common.editor.toolbar.superscript'),
                 shortcut: 'Ctrl+.',
             };
     }

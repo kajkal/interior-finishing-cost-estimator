@@ -37,7 +37,7 @@ describe('InsertLinkButton component', () => {
 
     class ViewUnderTest {
         static get insertLinkButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.insertLink' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.insertLink' });
         }
     }
 

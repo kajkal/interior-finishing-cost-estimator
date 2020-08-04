@@ -23,7 +23,7 @@ export function InsertLinkButton({ options, disabled }: InsertLinkButtonProps): 
         const [ match ] = getNodesByType(editor, ELEMENT_LINK);
         const existingLinkNode = match?.[ 0 ] as unknown as LinkNode | undefined;
 
-        const url = window.prompt(t('form.editor.toolbar.insertLinkPrompt'), existingLinkNode?.url);
+        const url = window.prompt(t('form.common.editor.toolbar.insertLinkPrompt'), existingLinkNode?.url);
         if (url) {
             upsertLinkAtSelection(editor, url, options);
         }
@@ -32,7 +32,7 @@ export function InsertLinkButton({ options, disabled }: InsertLinkButtonProps): 
     return (
         <ToolbarButton
             active={isNodeTypeIn(editor, ELEMENT_LINK)}
-            label={t('form.editor.toolbar.insertLink')}
+            label={t('form.common.editor.toolbar.insertLink')}
             onMouseDown={handleMouseDown}
             disabled={disabled}
         >

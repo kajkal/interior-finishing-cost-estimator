@@ -98,7 +98,7 @@ describe('FormikDropzoneArea component', () => {
 
         // verify if error is visible
         expect(ViewUnderTest.dropzone).toBeInvalid();
-        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.dropzone.validation.invalidType');
+        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.common.dropzone.validation.invalidType');
     });
 
     it('should reject too large file and display error', async () => {
@@ -110,7 +110,7 @@ describe('FormikDropzoneArea component', () => {
 
         // verify if error is visible
         expect(ViewUnderTest.dropzone).toBeInvalid();
-        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.dropzone.validation.tooLarge:{"filename":"me.png","maxSizeInMb":100}');
+        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.common.dropzone.validation.tooLarge:{"filename":"me.png","maxSizeInMb":100}');
     });
 
     it('should reject multiple files and display error', async () => {
@@ -125,7 +125,7 @@ describe('FormikDropzoneArea component', () => {
 
         // verify if error is visible
         expect(ViewUnderTest.dropzone).toBeInvalid();
-        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.dropzone.validation.toManyFiles');
+        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.common.dropzone.validation.toManyFiles');
     });
 
     it('should reject invalid file and display error', async () => {
@@ -137,7 +137,7 @@ describe('FormikDropzoneArea component', () => {
 
         // verify if error is visible
         expect(ViewUnderTest.dropzone).toBeInvalid();
-        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.dropzone.validation.unknownError:{"filename":"invalid"}');
+        expect(ViewUnderTest.dropzone).toHaveDescription('t:form.common.dropzone.validation.unknownError:{"filename":"invalid"}');
     });
 
     it('should display error on touch when no files are selected', async () => {

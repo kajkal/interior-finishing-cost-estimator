@@ -49,14 +49,14 @@ function getHistoryButtonConfig(type: HistoryButtonType, t: TFunction) {
         case 'undo':
             return {
                 Icon: UndoIcon,
-                label: t('form.editor.toolbar.undo'),
+                label: t('form.common.editor.toolbar.undo'),
                 shortcut: 'Ctrl+Z',
                 historyKey: 'undos' as keyof History,
             };
         case 'redo':
             return {
                 Icon: RedoIcon,
-                label: t('form.editor.toolbar.redo'),
+                label: t('form.common.editor.toolbar.redo'),
                 shortcut: 'Ctrl+Shift+Z',
                 historyKey: 'redos' as keyof History,
             };

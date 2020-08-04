@@ -50,43 +50,43 @@ describe('FormikRichTextEditor component', () => {
 
     class ViewUnderTest {
         static get undoButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.undo' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.undo' });
         }
         static get redoButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.redo' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.redo' });
         }
         static get titleButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.title' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.title' });
         }
         static get subtitleButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.subtitle' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.subtitle' });
         }
         static get boldButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.bold' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.bold' });
         }
         static get italicButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.italic' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.italic' });
         }
         static get underlineButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.underline' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.underline' });
         }
         static get superscriptButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.superscript' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.superscript' });
         }
         static get bulletedListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.bulletedList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.bulletedList' });
         }
         static get numberedListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.numberedList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.numberedList' });
         }
         static get todoListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.todoList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.todoList' });
         }
         static get insertLinkButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.insertLink' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.insertLink' });
         }
         static get insertImageButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.insertImage' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.insertImage' });
         }
         static get editor() {
             return screen.getByRole('textbox');
@@ -100,26 +100,26 @@ describe('FormikRichTextEditor component', () => {
         renderInFormikContext();
 
         // verify toolbar
-        expect(screen.getByRole('group', { name: 't:form.editor.toolbar.historyControls' })).toBeVisible();
+        expect(screen.getByRole('group', { name: 't:form.common.editor.toolbar.historyControls' })).toBeVisible();
         expect(ViewUnderTest.undoButton).toBeVisible();
         expect(ViewUnderTest.redoButton).toBeVisible();
 
-        expect(screen.getByRole('group', { name: 't:form.editor.toolbar.headerControls' })).toBeVisible();
+        expect(screen.getByRole('group', { name: 't:form.common.editor.toolbar.headerControls' })).toBeVisible();
         expect(ViewUnderTest.titleButton).toBeVisible();
         expect(ViewUnderTest.subtitleButton).toBeVisible();
 
-        expect(screen.getByRole('group', { name: 't:form.editor.toolbar.markControls' })).toBeVisible();
+        expect(screen.getByRole('group', { name: 't:form.common.editor.toolbar.markControls' })).toBeVisible();
         expect(ViewUnderTest.boldButton).toBeVisible();
         expect(ViewUnderTest.italicButton).toBeVisible();
         expect(ViewUnderTest.underlineButton).toBeVisible();
         expect(ViewUnderTest.superscriptButton).toBeVisible();
 
-        expect(screen.getByRole('group', { name: 't:form.editor.toolbar.listControls' })).toBeVisible();
+        expect(screen.getByRole('group', { name: 't:form.common.editor.toolbar.listControls' })).toBeVisible();
         expect(ViewUnderTest.bulletedListButton).toBeVisible();
         expect(ViewUnderTest.numberedListButton).toBeVisible();
         expect(ViewUnderTest.todoListButton).toBeVisible();
 
-        expect(screen.getByRole('group', { name: 't:form.editor.toolbar.attachmentControls' })).toBeVisible();
+        expect(screen.getByRole('group', { name: 't:form.common.editor.toolbar.attachmentControls' })).toBeVisible();
         expect(ViewUnderTest.insertLinkButton).toBeVisible();
         expect(ViewUnderTest.insertImageButton).toBeVisible();
 

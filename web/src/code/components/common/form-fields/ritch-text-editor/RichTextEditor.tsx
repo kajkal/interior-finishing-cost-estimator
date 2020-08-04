@@ -54,21 +54,21 @@ export function RichTextEditor({ id, name, label, error, disabled, value, onChan
 
                 <Toolbar>
 
-                    <ToolbarButtonGroup aria-label={t('form.editor.toolbar.historyControls')}>
+                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.historyControls')}>
                         <HistoryButton type='undo' disabled={disabled} />
                         <HistoryButton type='redo' disabled={disabled} />
                     </ToolbarButtonGroup>
 
                     <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.editor.toolbar.headerControls')}>
+                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.headerControls')}>
                         <BlockButton type='title' disabled={disabled} />
                         <BlockButton type='subtitle' disabled={disabled} />
                     </ToolbarButtonGroup>
 
                     <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.editor.toolbar.markControls')}>
+                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.markControls')}>
                         <MarkButton type='bold' disabled={disabled} />
                         <MarkButton type='italic' disabled={disabled} />
                         <MarkButton type='underline' disabled={disabled} />
@@ -77,7 +77,7 @@ export function RichTextEditor({ id, name, label, error, disabled, value, onChan
 
                     <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.editor.toolbar.listControls')}>
+                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.listControls')}>
                         <BlockButton type='bulleted' options={options.list} disabled={disabled} />
                         <BlockButton type='numbered' options={options.list} disabled={disabled} />
                         <BlockButton type='todo' disabled={disabled} />
@@ -85,7 +85,7 @@ export function RichTextEditor({ id, name, label, error, disabled, value, onChan
 
                     <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.editor.toolbar.attachmentControls')}>
+                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.attachmentControls')}>
                         <InsertLinkButton options={options.link} disabled={disabled} />
                         <InsertImageButton options={options.image} disabled={disabled} />
                     </ToolbarButtonGroup>

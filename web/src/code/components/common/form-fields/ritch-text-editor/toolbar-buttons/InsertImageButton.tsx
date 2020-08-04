@@ -23,7 +23,7 @@ export function InsertImageButton({ options, disabled }: InsertImageButtonProps)
         const [ match ] = getNodesByType(editor, ELEMENT_IMAGE);
         const existingSelectedImageNode = match?.[ 0 ] as unknown as ImageNode | undefined;
 
-        const url = window.prompt(t('form.editor.toolbar.insertImagePrompt'), existingSelectedImageNode?.url);
+        const url = window.prompt(t('form.common.editor.toolbar.insertImagePrompt'), existingSelectedImageNode?.url);
         if (url) {
             insertImage(editor, url, { img: options.img });
         }
@@ -31,7 +31,7 @@ export function InsertImageButton({ options, disabled }: InsertImageButtonProps)
 
     return (
         <ToolbarButton
-            label={t('form.editor.toolbar.insertImage')}
+            label={t('form.common.editor.toolbar.insertImage')}
             onMouseDown={handleMouseDown}
             disabled={disabled}
         >

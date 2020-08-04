@@ -36,7 +36,7 @@ describe('InsertImageButton component', () => {
 
     class ViewUnderTest {
         static get insertImageButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.insertImage' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.insertImage' });
         }
     }
 

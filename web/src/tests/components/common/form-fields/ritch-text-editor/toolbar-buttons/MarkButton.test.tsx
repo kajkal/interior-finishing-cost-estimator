@@ -49,19 +49,19 @@ describe('MarkButton component', () => {
     }
 
     it('should toggle bold mark', () => {
-        verifyMark('bold', 't:form.editor.toolbar.bold');
+        verifyMark('bold', 't:form.common.editor.toolbar.bold');
     });
 
     it('should toggle italic mark', () => {
-        verifyMark('italic', 't:form.editor.toolbar.italic');
+        verifyMark('italic', 't:form.common.editor.toolbar.italic');
     });
 
     it('should toggle underline mark', () => {
-        verifyMark('underline', 't:form.editor.toolbar.underline');
+        verifyMark('underline', 't:form.common.editor.toolbar.underline');
     });
 
     it('should toggle superscript mark', () => {
-        verifyMark('superscript', 't:form.editor.toolbar.superscript');
+        verifyMark('superscript', 't:form.common.editor.toolbar.superscript');
     });
 
 });

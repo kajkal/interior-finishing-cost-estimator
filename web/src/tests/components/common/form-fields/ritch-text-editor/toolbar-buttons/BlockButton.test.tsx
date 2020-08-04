@@ -30,19 +30,19 @@ describe('BlockButton component', () => {
 
     class ViewUnderTest {
         static get titleButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.title' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.title' });
         }
         static get subtitleButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.subtitle' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.subtitle' });
         }
         static get bulletedListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.bulletedList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.bulletedList' });
         }
         static get numberedListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.numberedList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.numberedList' });
         }
         static get todoListButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.todoList' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.todoList' });
         }
     }
 

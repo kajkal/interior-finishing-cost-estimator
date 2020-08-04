@@ -102,7 +102,42 @@
   },
   "form": {
     "common": {
-      "optional": "Optional"
+      "optional": "Optional",
+      "dropzone": {
+        "validation": {
+          "unknownError": "Error with processing file {{filename}}",
+          "invalidType": "Wrong file type, please select again",
+          "tooLarge": "File {{filename}} size exceed the allowed limit of {{maxSizeInMb}} MB",
+          "toManyFiles": "Too many files selected"
+        }
+      },
+      "editor": {
+        "toolbar": {
+          "historyControls": "History controls",
+          "undo": "Undo",
+          "redo": "Redo",
+          "headerControls": "Header controls",
+          "title": "Title",
+          "subtitle": "Subtitle",
+          "markControls": "Mark controls",
+          "bold": "Bold",
+          "italic": "Italic",
+          "underline": "Underline",
+          "superscript": "Superscript",
+          "listControls": "List controls",
+          "todoList": "TODO list",
+          "bulletedList": "Bulleted list",
+          "numberedList": "Numbered list",
+          "attachmentControls": "Attachment controls",
+          "insertLink": "Insert link",
+          "insertLinkPrompt": "Enter the URL of the link:",
+          "insertImage": "Insert image",
+          "insertImagePrompt": "Enter the URL of the image:"
+        }
+      },
+      "currencyAmount": {
+        "currencySelectAriaLabel": "Select currency"
+      }
     },
     "password": {
       "label": "Password",
@@ -154,42 +189,6 @@
       "validation": {
         "tooLong": "Description is too long"
       }
-    },
-    "dropzone": {
-      "validation": {
-        "unknownError": "Error with processing file {{filename}}",
-        "invalidType": "Wrong file type, please select again",
-        "tooLarge": "File {{filename}} size exceed the allowed limit of {{maxSizeInMb}} MB",
-        "toManyFiles": "Too many files selected"
-      }
-    },
-    "editor": {
-      "toolbar": {
-        "historyControls": "History controls",
-        "undo": "Undo",
-        "redo": "Redo",
-        "headerControls": "Header controls",
-        "title": "Title",
-        "subtitle": "Subtitle",
-        "markControls": "Mark controls",
-        "bold": "Bold",
-        "italic": "Italic",
-        "underline": "Underline",
-        "superscript": "Superscript",
-        "listControls": "List controls",
-        "todoList": "TODO list",
-        "bulletedList": "Bulleted list",
-        "numberedList": "Numbered list",
-        "attachmentControls": "Attachment controls",
-        "insertLink": "Insert link",
-        "insertLinkPrompt": "Enter the URL of the link:",
-        "insertImage": "Insert image",
-        "insertImagePrompt": "Enter the URL of the image:"
-      },
-      "ariaLabel": "Rich text editor"
-    },
-    "currencyAmount": {
-      "currencySelectAriaLabel": "Select currency"
     }
   },
   "error": {

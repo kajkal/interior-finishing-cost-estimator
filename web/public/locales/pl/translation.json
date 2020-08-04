@@ -102,7 +102,42 @@
   },
   "form": {
     "common": {
-      "optional": "Opcjonalne"
+      "optional": "Opcjonalne",
+      "dropzone": {
+        "validation": {
+          "unknownError": "Błąd podczas przetwarzania pliku {{filename}}",
+          "invalidType": "Niepoprawny format pliku",
+          "tooLarge": "Rozmiar pliku {{filename}} przekracza dopuszczalny limit {{maxSizeInMb}} MB",
+          "toManyFiles": "Wybrano zbyt wiele plików"
+        }
+      },
+      "editor": {
+        "toolbar": {
+          "historyControls": "Sterowniki historii",
+          "undo": "Cofnij",
+          "redo": "Ponów",
+          "headerControls": "Sterowniki nagłówków",
+          "title": "Tytuł",
+          "subtitle": "Podtytuł",
+          "markControls": "Sterowniki makr",
+          "bold": "Pogrubienie",
+          "italic": "Kursywya",
+          "underline": "Podkreślenie",
+          "superscript": "Indeks górny",
+          "listControls": "Sterowniki list",
+          "todoList": "Lista rzeczy do zrobienia",
+          "bulletedList": "Lista punktowana",
+          "numberedList": "Lista numerowana",
+          "attachmentControls": "Sterowniki załączników",
+          "insertLink": "Dodaj link",
+          "insertLinkPrompt": "Wprowadź adres URL linku",
+          "insertImage": "Dodaj obraz",
+          "insertImagePrompt": "Wprowadź adres URL obrazu"
+        }
+      },
+      "currencyAmount": {
+        "currencySelectAriaLabel": "Wybierz walutę"
+      }
     },
     "password": {
       "label": "Hasło",
@@ -154,42 +189,6 @@
       "validation": {
         "tooLong": "Opis jest za długi"
       }
-    },
-    "dropzone": {
-      "validation": {
-        "unknownError": "Błąd podczas przetwarzania pliku {{filename}}",
-        "invalidType": "Niepoprawny format pliku",
-        "tooLarge": "Rozmiar pliku {{filename}} przekracza dopuszczalny limit {{maxSizeInMb}} MB",
-        "toManyFiles": "Wybrano zbyt wiele plików"
-      }
-    },
-    "editor": {
-      "toolbar": {
-        "historyControls": "Sterowniki historii",
-        "undo": "Cofnij",
-        "redo": "Ponów",
-        "headerControls": "Sterowniki nagłówków",
-        "title": "Tytuł",
-        "subtitle": "Podtytuł",
-        "markControls": "Sterowniki makr",
-        "bold": "Pogrubienie",
-        "italic": "Kursywya",
-        "underline": "Podkreślenie",
-        "superscript": "Indeks górny",
-        "listControls": "Sterowniki list",
-        "todoList": "Lista rzeczy do zrobienia",
-        "bulletedList": "Lista punktowana",
-        "numberedList": "Lista numerowana",
-        "attachmentControls": "Sterowniki załączników",
-        "insertLink": "Dodaj link",
-        "insertLinkPrompt": "Wprowadź adres URL linku",
-        "insertImage": "Dodaj obraz",
-        "insertImagePrompt": "Wprowadź adres URL obrazu"
-      },
-      "ariaLabel": "Edytor tekstu"
-    },
-    "currencyAmount": {
-      "currencySelectAriaLabel": "Wybierz walutę"
     }
   },
   "error": {

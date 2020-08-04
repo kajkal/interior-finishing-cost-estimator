@@ -58,31 +58,31 @@ function getBlockConfig(type: BlockType, t: TFunction) {
             return {
                 blockType: ELEMENT_H1,
                 Icon: LooksOneIcon,
-                label: t('form.editor.toolbar.title'),
+                label: t('form.common.editor.toolbar.title'),
             };
         case 'subtitle':
             return {
                 blockType: ELEMENT_H2,
                 Icon: LooksTwoIcon,
-                label: t('form.editor.toolbar.subtitle'),
+                label: t('form.common.editor.toolbar.subtitle'),
             };
         case 'todo':
             return {
                 blockType: ELEMENT_TODO_LI,
                 Icon: CheckIcon,
-                label: t('form.editor.toolbar.todoList'),
+                label: t('form.common.editor.toolbar.todoList'),
             };
         case 'bulleted':
             return {
                 blockType: ELEMENT_UL,
                 Icon: FormatListBulletedIcon,
-                label: t('form.editor.toolbar.bulletedList'),
+                label: t('form.common.editor.toolbar.bulletedList'),
             };
         case 'numbered':
             return {
                 blockType: ELEMENT_OL,
                 Icon: FormatListNumberedIcon,
-                label: t('form.editor.toolbar.numberedList'),
+                label: t('form.common.editor.toolbar.numberedList'),
             };
     }
 }

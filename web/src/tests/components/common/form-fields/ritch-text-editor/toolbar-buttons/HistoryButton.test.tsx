@@ -45,10 +45,10 @@ describe('HistoryButton component', () => {
 
     class ViewUnderTest {
         static get undoButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.undo' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.undo' });
         }
         static get redoButton() {
-            return screen.getByRole('button', { name: 't:form.editor.toolbar.redo' });
+            return screen.getByRole('button', { name: 't:form.common.editor.toolbar.redo' });
         }
     }
 
