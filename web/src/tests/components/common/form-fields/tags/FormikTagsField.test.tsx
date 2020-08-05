@@ -30,7 +30,11 @@ describe('FormikTagsField component', () => {
                     tags: [],
                 }}
                 validationSchema={Yup.object({
-                    tags: Yup.array<TagOption>().defined(),
+                    tags: Yup.array<TagOption>().of(
+                        Yup.object<TagOption>({
+                            name: Yup.string().max(12, 'Tag name is too long').required(),
+                        }).required(),
+                    ).defined(),
                 })}
                 onSubmit={mockHandleSubmit}
             >
@@ -93,20 +97,20 @@ describe('FormikTagsField component', () => {
         // verify option label
         const options = await ViewUnderTest.tagOptions;
         expect(options).toHaveLength(1);
-        expect(options[0]).toHaveTextContent('t:form.common.tags.addTag:{"tagName":"New by click"}');
+        expect(options[ 0 ]).toHaveTextContent('t:form.common.tags.addTag:{"tagName":"New by click"}');
 
         // confirm tag creation
-        userEvent.click(options[0]);
+        userEvent.click(options[ 0 ]);
 
         // verify if tags chips are visible
-        expect(screen.getByRole('button', {name: 'New by click'})).toBeVisible();
+        expect(screen.getByRole('button', { name: 'New by click' })).toBeVisible();
 
         userEvent.click(ViewUnderTest.submitButton);
 
         await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
         expect(handleSubmit).toHaveBeenCalledWith({
             tags: [
-                { inputValue: 'New by click', name: 't:form.common.tags.addTag:{"tagName":"New by click"}' },
+                { name: 'New by click', label: 't:form.common.tags.addTag:{"tagName":"New by click"}' },
             ],
         }, expect.any(Object));
     });
@@ -116,17 +120,17 @@ describe('FormikTagsField component', () => {
         renderInFormikContext(handleSubmit);
 
         // type new tag name
-        await userEvent.type(ViewUnderTest.tagsSelect, 'New by enter{enter}');
+        await userEvent.type(ViewUnderTest.tagsSelect, '  New by enter  {enter}'); // name should be trimmed
 
         // verify if tags chips are visible
-        expect(screen.getByRole('button', {name: 'New by enter'})).toBeVisible();
+        expect(screen.getByRole('button', { name: 'New by enter' })).toBeVisible();
 
         userEvent.click(ViewUnderTest.submitButton);
 
         await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(2)); // actually is called once
         expect(handleSubmit).toHaveBeenCalledWith({
             tags: [
-                { inputValue: 'New by enter', name: 't:form.common.tags.addTag:{"tagName":"New by enter"}' },
+                { name: 'New by enter', label: 't:form.common.tags.addTag:{"tagName":"New by enter"}' },
             ],
         }, expect.any(Object));
     });
@@ -144,6 +148,17 @@ describe('FormikTagsField component', () => {
         expect(handleSubmit).toHaveBeenCalledWith({
             tags: [],
         }, expect.any(Object));
+    });
+
+    it('should parse and display error in case of failed tag name validation', async () => {
+        const handleSubmit = jest.fn();
+        renderInFormikContext(handleSubmit);
+
+        // type new tag name
+        await userEvent.type(ViewUnderTest.tagsSelect, 'Definitely too long tag name{enter}');
+
+        await waitFor(() => expect(ViewUnderTest.tagsSelect).toBeInvalid());
+        expect(ViewUnderTest.tagsSelect).toHaveDescription('Tag name is too long');
     });
 
 });

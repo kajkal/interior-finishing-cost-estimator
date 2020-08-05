@@ -3,7 +3,7 @@ import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import Autocomplete, { AutocompleteRenderOptionState, createFilterOptions } from '@material-ui/lab/Autocomplete';
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
 import NewReleasesIcon from '@material-ui/icons/NewReleases';
 import Tooltip from '@material-ui/core/Tooltip/Tooltip';
@@ -16,8 +16,11 @@ import match from 'autosuggest-highlight/match';
 
 export interface TagOption {
     name: string;
+    /**
+     * Label is present only in options added by user.
+     * Example option added by user: {name: 'new tag', label: 'Add tag "new tag"'}.
+     */
     label?: string;
-    inputValue?: string;
 }
 
 export interface TagsFieldProps extends Omit<FilledTextFieldProps, 'variant' | 'onChange' | 'value'> {
@@ -54,20 +57,6 @@ export function TagsField({ id, definedTagOptions, value, onChange, disabled, ..
                 }}
 
                 options={definedTagOptions}
-                getOptionLabel={(option) => option.name}
-                renderOption={(option, { inputValue }) => {
-                    const matches = match(option.name, inputValue);
-                    const parts = parse(option.name, matches);
-                    return (
-                        <div>
-                            {parts.map((part, index) => (
-                                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                                    {part.text}
-                                </span>
-                            ))}
-                        </div>
-                    );
-                }}
                 filterSelectedOptions
                 filterOptions={(options, params) => {
                     const filtered = filter(options, params);
@@ -79,6 +68,8 @@ export function TagsField({ id, definedTagOptions, value, onChange, disabled, ..
 
                     return filtered;
                 }}
+                getOptionLabel={getOptionLabel}
+                renderOption={optionRenderer}
 
                 renderInput={({ InputProps, ...params }) => (
                     <TextField
@@ -94,10 +85,10 @@ export function TagsField({ id, definedTagOptions, value, onChange, disabled, ..
                         <Chip
                             {...getTagProps({ index })}
                             variant='outlined'
-                            label={option.inputValue || option.name}
+                            label={option.name}
                             icon={
-                                (option.inputValue)
-                                    ? <Tooltip arrow title={t('form.common.tags.newTag')!}><NewReleasesIcon /></Tooltip>
+                                (option.label)
+                                    ? <Tooltip title={t('form.common.tags.newTag')!}><NewReleasesIcon /></Tooltip>
                                     // ? <NewReleasesIcon titleAccess={t('form.common.tags.newTag')}/>
                                     : undefined
                             }
@@ -110,12 +101,19 @@ export function TagsField({ id, definedTagOptions, value, onChange, disabled, ..
     );
 }
 
+/**
+ * Utils
+ */
+
+function getOptionLabel(option: TagOption): string {
+    return option.label || option.name;
+}
 
 function createNewTagOption(inputValue: string, t: TFunction): TagOption | null {
     const tagName = inputValue.trim();
     return tagName ? {
-        inputValue: tagName,
-        name: t('form.common.tags.addTag', { tagName: tagName }),
+        name: tagName,
+        label: t('form.common.tags.addTag', { tagName: tagName }),
     } : null;
 }
 
@@ -124,9 +122,30 @@ function isValidTagOption(option: TagOption | undefined | null): option is TagOp
 }
 
 
+/**
+ * Renderers
+ */
+
+function optionRenderer(option: TagOption, { inputValue }: AutocompleteRenderOptionState): React.ReactNode {
+    const optionLabel = getOptionLabel(option);
+    const matches = match(optionLabel, inputValue);
+    const parts = parse(optionLabel, matches);
+
+    return (
+        <div>
+            {parts.map((part, index) => (
+                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                    {part.text}
+                </span>
+            ))}
+        </div>
+    );
+}
+
+
 const useStyles = makeStyles({
     inputWithTags: {
-        padding: [ [ 24, 39, 5, 8 ], '!important' ] as unknown as number,
+        padding: [ [ 28, 39, 5, 8 ], '!important' ] as unknown as number,
     },
     paper: {
         // in order to cover input borders

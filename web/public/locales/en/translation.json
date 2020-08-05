@@ -143,7 +143,10 @@
       },
       "tags": {
         "addTag": "Add tag \"{{tagName}}\"",
-        "newTag": "New tag"
+        "newTag": "New tag",
+        "validation": {
+          "tooLong": "Tag name is too long"
+        }
       }
     },
     "password": {
