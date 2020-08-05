@@ -136,7 +136,14 @@
         }
       },
       "currencyAmount": {
-        "currencySelectAriaLabel": "Select currency"
+        "currencySelectAriaLabel": "Select a currency",
+        "validation": {
+          "invalidCurrency": "Selecting a currency is required"
+        }
+      },
+      "tags": {
+        "addTag": "Add tag \"{{tagName}}\"",
+        "newTag": "New tag"
       }
     },
     "password": {

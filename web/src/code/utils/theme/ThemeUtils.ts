@@ -21,7 +21,9 @@ export class ThemeUtils {
         const theme = responsiveFontSizes(createMuiTheme({
             palette: {
                 primary: {
-                    main: '#1976d2', // #5C8C0D
+                    main: (themeType === ThemeType.light)
+                        ? '#1976d2'
+                        : '#90caf9',
                 },
                 secondary: pink,
                 type: themeType,
@@ -66,6 +68,9 @@ export class ThemeUtils {
                     '&:hover': {
                         borderColor: theme.palette.text.primary,
                         backgroundColor: theme.palette.background.paper,
+                        '@media (hover: none)': {
+                            backgroundColor: theme.palette.background.paper,
+                        },
                     },
                     '&$focused': {
                         borderColor: theme.palette.primary.main,

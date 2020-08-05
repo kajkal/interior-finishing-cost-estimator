@@ -12,11 +12,11 @@ describe('RichTextPreviewer component', () => {
     it('should render rich text in readonly mode', () => {
         const { container } = render(
             <RichTextPreviewer
-                value={[ {
+                value={JSON.stringify([ {
                     children: [
                         { type: 'p', children: [ { text: 'Hello ' }, { bold: true, text: 'world' } ] },
                     ],
-                } ]}
+                } ])}
             />,
         );
 

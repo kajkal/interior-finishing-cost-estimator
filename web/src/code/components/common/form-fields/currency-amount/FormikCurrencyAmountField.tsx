@@ -19,6 +19,7 @@ export function FormikCurrencyAmountField({ name, label, optional, ...rest }: Fo
     return (
         <CurrencyAmountField
             {...field}
+            {...rest}
             onChange={setValue}
 
             currencies={supportedCurrencies}

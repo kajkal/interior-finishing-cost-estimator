@@ -136,7 +136,14 @@
         }
       },
       "currencyAmount": {
-        "currencySelectAriaLabel": "Wybierz walutę"
+        "currencySelectAriaLabel": "Wybierz walutę",
+        "validation": {
+          "invalidCurrency": "Wybranie waluty jest wymagane"
+        }
+      },
+      "tags": {
+        "addTag": "Dodaj tag \"{{tagName}}\"",
+        "newTag": "Nowy tag"
       }
     },
     "password": {
