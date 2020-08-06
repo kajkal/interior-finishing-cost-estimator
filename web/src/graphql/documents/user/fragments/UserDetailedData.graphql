@@ -3,7 +3,7 @@ fragment UserDetailedData on User {
     slug
     email
     products {
-        name
+        ...ProductData
     }
     productCount
     projects {

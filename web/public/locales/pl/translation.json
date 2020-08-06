@@ -98,6 +98,10 @@
       "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
       "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?",
       "delete": "Usuń"
+    },
+    "productCreate": {
+      "title": "Zdefiniuj produkt",
+      "create": "Dodaj"
     }
   },
   "form": {
@@ -199,6 +203,32 @@
       "validation": {
         "tooLong": "Opis jest za długi"
       }
+    },
+    "productName": {
+      "label": "Nazwa produktu",
+      "ariaLabel": "Wprowadź nazwę produktu",
+      "validation": {
+        "required": "Nazwa produktu jest wymagana",
+        "tooShort": "Wprowadzona nazwa produktu jest za krótka",
+        "tooLong": "Wprowadzona nazwa produktu jest za długa"
+      }
+    },
+    "productDescription": {
+      "label": "Opis produktu",
+      "ariaLabel": "Wprowadź opis produktu",
+      "validation": {
+        "required": "Opis produktu jest wymagany"
+      }
+    },
+    "productPrice": {
+      "label": "Cena produktu",
+      "ariaLabel": "Wprowadź cenę produktu",
+      "validation": {
+        "tooHigh": "Wprowadzona cena produktu jest za wysoka"
+      }
+    },
+    "productTags": {
+      "label": "Tagi"
     }
   },
   "error": {

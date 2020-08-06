@@ -1,0 +1,15 @@
+mutation CreateProduct(
+    $name: String!
+    $tags: [String!]!
+    $description: String!
+    $price: CurrencyAmountFormData
+) {
+    createProduct(
+        name: $name
+        tags: $tags
+        description: $description
+        price: $price
+    ) {
+        ...ProductData
+    }
+}

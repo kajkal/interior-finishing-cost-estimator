@@ -1,0 +1,10 @@
+fragment ProductData on Product {
+    id
+    name
+    tags
+    description
+    price {
+        currency
+        amount
+    }
+}

@@ -98,6 +98,10 @@
       "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
       "secondLine": "Are you sure you want to permanently delete this project?",
       "delete": "Delete"
+    },
+    "productCreate": {
+      "title": "Define new product",
+      "create": "Add"
     }
   },
   "form": {
@@ -199,6 +203,32 @@
       "validation": {
         "tooLong": "Description is too long"
       }
+    },
+    "productName": {
+      "label": "Product name",
+      "ariaLabel": "Enter product name",
+      "validation": {
+        "required": "Product name is required",
+        "tooShort": "Product name it too short",
+        "tooLong": "Product name it too long"
+      }
+    },
+    "productDescription": {
+      "label": "Product description",
+      "ariaLabel": "Enter product description",
+      "validation": {
+        "required": "Product description is required"
+      }
+    },
+    "productPrice": {
+      "label": "Product price",
+      "ariaLabel": "Enter product price",
+      "validation": {
+        "tooHigh": "Product price is too high"
+      }
+    },
+    "productTags": {
+      "label": "Tags"
     }
   },
   "error": {

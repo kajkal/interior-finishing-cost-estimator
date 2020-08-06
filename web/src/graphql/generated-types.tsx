@@ -14,6 +14,7 @@ export type Scalars = {
   Upload: any;
 };
 
+
 export type Query = {
   __typename?: 'Query';
   /** Returns data of the currently authenticated user. */
@@ -46,6 +47,15 @@ export type Product = {
   __typename?: 'Product';
   id: Scalars['ID'];
   name: Scalars['String'];
+  tags: Array<Scalars['String']>;
+  description: Scalars['String'];
+  price: CurrencyAmount;
+};
+
+export type CurrencyAmount = {
+  __typename?: 'CurrencyAmount';
+  currency: Scalars['String'];
+  amount: Scalars['Float'];
 };
 
 export type Project = {
@@ -110,6 +120,14 @@ export type MutationResetPasswordArgs = {
 };
 
 
+export type MutationCreateProductArgs = {
+  name: Scalars['String'];
+  tags: Array<Scalars['String']>;
+  description: Scalars['String'];
+  price?: Maybe<CurrencyAmountFormData>;
+};
+
+
 export type MutationCreateProjectArgs = {
   name: Scalars['String'];
 };
@@ -154,6 +172,11 @@ export type MutationConfirmEmailAddressArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type CurrencyAmountFormData = {
+  currency: Scalars['String'];
+  amount: Scalars['Float'];
 };
 
 
@@ -238,6 +261,31 @@ export type SendPasswordResetInstructionsMutationVariables = Exact<{
 export type SendPasswordResetInstructionsMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendPasswordResetInstructions'>
+);
+
+export type ProductDataFragment = (
+  { __typename?: 'Product' }
+  & Pick<Product, 'id' | 'name' | 'tags' | 'description'>
+  & { price: (
+    { __typename?: 'CurrencyAmount' }
+    & Pick<CurrencyAmount, 'currency' | 'amount'>
+  ) }
+);
+
+export type CreateProductMutationVariables = Exact<{
+  name: Scalars['String'];
+  tags: Array<Scalars['String']>;
+  description: Scalars['String'];
+  price?: Maybe<CurrencyAmountFormData>;
+}>;
+
+
+export type CreateProductMutation = (
+  { __typename?: 'Mutation' }
+  & { createProduct: (
+    { __typename?: 'Product' }
+    & ProductDataFragment
+  ) }
 );
 
 export type ProjectBasicDataFragment = (
@@ -339,7 +387,7 @@ export type UserDetailedDataFragment = (
   & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
   & { products: Array<(
     { __typename?: 'Product' }
-    & Pick<Product, 'name'>
+    & ProductDataFragment
   )>, projects: Array<(
     { __typename?: 'Project' }
     & ProjectBasicDataFragment
@@ -377,13 +425,25 @@ export const ProjectDetailedDataFragmentDoc = gql`
   }
 }
     ${ProjectBasicDataFragmentDoc}`;
+export const ProductDataFragmentDoc = gql`
+    fragment ProductData on Product {
+  id
+  name
+  tags
+  description
+  price {
+    currency
+    amount
+  }
+}
+    `;
 export const UserDetailedDataFragmentDoc = gql`
     fragment UserDetailedData on User {
   name
   slug
   email
   products {
-    name
+    ...ProductData
   }
   productCount
   projects {
@@ -393,7 +453,8 @@ export const UserDetailedDataFragmentDoc = gql`
     name
   }
 }
-    ${ProjectBasicDataFragmentDoc}`;
+    ${ProductDataFragmentDoc}
+${ProjectBasicDataFragmentDoc}`;
 export const ConfirmEmailAddressDocument = gql`
     mutation ConfirmEmailAddress($token: String!) {
   confirmEmailAddress(token: $token)
@@ -581,6 +642,40 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export const CreateProductDocument = gql`
+    mutation CreateProduct($name: String!, $tags: [String!]!, $description: String!, $price: CurrencyAmountFormData) {
+  createProduct(name: $name, tags: $tags, description: $description, price: $price) {
+    ...ProductData
+  }
+}
+    ${ProductDataFragmentDoc}`;
+
+/**
+ * __useCreateProductMutation__
+ *
+ * To run a mutation, you first call `useCreateProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProductMutation, { data, loading, error }] = useCreateProductMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      tags: // value for 'tags'
+ *      description: // value for 'description'
+ *      price: // value for 'price'
+ *   },
+ * });
+ */
+export function useCreateProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateProductMutation, CreateProductMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateProductMutation, CreateProductMutationVariables>(CreateProductDocument, baseOptions);
+      }
+export type CreateProductMutationHookResult = ReturnType<typeof useCreateProductMutation>;
+export type CreateProductMutationResult = ApolloReactCommon.MutationResult<CreateProductMutation>;
+export type CreateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProductMutation, CreateProductMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($name: String!) {
   createProject(name: $name) {
