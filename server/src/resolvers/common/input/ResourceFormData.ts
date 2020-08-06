@@ -10,8 +10,8 @@ export class ResourceFormData {
     @IsNotEmpty()
     file!: FileUpload;
 
-    @Field({ nullable: true })
+    @Field(() => String, { nullable: true })
     @Length(1, 255)
-    description?: string;
+    description?: string | null;
 
 }

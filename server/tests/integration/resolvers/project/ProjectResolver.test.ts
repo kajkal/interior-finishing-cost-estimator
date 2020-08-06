@@ -358,7 +358,7 @@ describe('ProjectResolver', () => {
 
             it('should validate uploaded file description', async () => {
                 // should be optional
-                await send.withAuth({ description: null! }).expectValidationSuccess();
+                await send.withAuth({ description: null }).expectValidationSuccess();
                 await send.withAuth({ description: undefined }).expectValidationSuccess();
                 // should accept valid
                 await send.withAuth({ description: 'a'.repeat(1) }).expectValidationSuccess();

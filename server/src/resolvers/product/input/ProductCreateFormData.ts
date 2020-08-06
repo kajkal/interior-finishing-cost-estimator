@@ -15,12 +15,12 @@ export class ProductCreateFormData {
     @Length(3)
     description!: string;
 
-    @Field({ nullable: true })
+    @Field(() => CurrencyAmountFormData, { nullable: true })
     @ValidateNested()
-    price?: CurrencyAmountFormData;
+    price?: CurrencyAmountFormData | null;
 
     @Field(() => [ String ], { nullable: true })
     @Length(1, 255, { each: true })
-    tags?: string[];
+    tags?: string[] | null;
 
 }

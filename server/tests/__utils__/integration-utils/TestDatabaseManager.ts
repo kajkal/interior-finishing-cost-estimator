@@ -70,6 +70,7 @@ export class TestDatabaseManager {
         const productData = {
             user: userId,
             name: generator.word(),
+            description: `[{"sample":"${generator.sentence()}"}]`,
             ...partialProductData,
         };
 
