@@ -12,19 +12,27 @@ export interface FormikTagsFieldProps extends Pick<TagsFieldProps, 'id' | 'label
 
 export function FormikTagsField({ name, label, optional, definedTagOptions, ...rest }: FormikTagsFieldProps): React.ReactElement {
     const { isSubmitting } = useFormikContext();
-    const [ field, meta, { setValue } ] = useField<TagOption[]>(name);
+    const [ { onChange, ...field }, meta ] = useField<TagOption[]>(name);
     const errorMessage = meta.touched ? parseTagsError(meta.error) : undefined;
+
+    const handleChange = React.useCallback((value: TagOption[]) => {
+        onChange({ target: { name: name, value } });
+    }, [ name, onChange ]);
+
+    const fieldLabel = React.useMemo(() => (
+        optional ? <LabelWithOptionalIndicator label={label} /> : label
+    ), [ label, optional ]);
 
     return (
         <TagsField
             {...field}
             {...rest}
-            onChange={setValue}
+            onChange={handleChange}
 
             definedTagOptions={definedTagOptions}
 
             id={rest.id || field.name}
-            label={optional ? <LabelWithOptionalIndicator label={label} /> : label}
+            label={fieldLabel}
             disabled={rest.disabled || isSubmitting}
             error={Boolean(errorMessage)}
             helperText={errorMessage || rest.helperText}

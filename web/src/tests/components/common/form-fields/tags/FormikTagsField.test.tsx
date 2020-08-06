@@ -150,6 +150,21 @@ describe('FormikTagsField component', () => {
         }, expect.any(Object));
     });
 
+    it('should ignore creation of tag with the name already selected', async () => {
+        renderInFormikContext();
+
+        // type new tag name
+        await userEvent.type(ViewUnderTest.tagsSelect, 'New tag{enter}');
+        await userEvent.type(ViewUnderTest.tagsSelect, ' New tag   {enter}');
+        await userEvent.type(ViewUnderTest.tagsSelect, 'New tag  {enter}');
+
+        // verify if only one tag chip is visible
+        const tagChips = screen.getAllByRole('button', { name: /tag/ });
+        expect(tagChips).toHaveLength(1);
+        expect(tagChips[ 0 ]).toHaveTextContent('New tag');
+    });
+
+
     it('should parse and display error in case of failed tag name validation', async () => {
         const handleSubmit = jest.fn();
         renderInFormikContext(handleSubmit);

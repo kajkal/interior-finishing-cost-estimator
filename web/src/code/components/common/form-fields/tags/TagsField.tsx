@@ -31,75 +31,79 @@ export interface TagsFieldProps extends Omit<FilledTextFieldProps, 'variant' | '
 
 const filter = createFilterOptions<TagOption>();
 
-export function TagsField({ id, definedTagOptions, value, onChange, disabled, ...rest }: TagsFieldProps): React.ReactElement {
-    const classes = useStyles();
-    const { t } = useTranslation();
+export const TagsField = React.memo(
+    function TagsField({ id, definedTagOptions, value, onChange, disabled, ...rest }: TagsFieldProps): React.ReactElement {
+        const classes = useStyles();
+        const { t } = useTranslation();
 
-    return (
-        <FormControl fullWidth margin='normal'>
-            <Autocomplete<TagOption, true, false, true>
-                classes={{
-                    inputRoot: (value.length) ? classes.inputWithTags : undefined,
-                    paper: classes.paper,
-                }}
+        return (
+            <FormControl fullWidth margin='normal'>
+                <Autocomplete<TagOption, true, false, true>
+                    classes={{
+                        inputRoot: (value.length) ? classes.inputWithTags : undefined,
+                        paper: classes.paper,
+                    }}
 
-                id={id}
-                freeSolo
-                multiple
-                handleHomeEndKeys
+                    id={id}
+                    freeSolo
+                    multiple
+                    handleHomeEndKeys
+                    openOnFocus
 
-                disabled={disabled}
-                value={value}
-                onChange={(event, newValue) => {
-                    onChange(newValue
-                        .map((item) => (typeof item === 'string') ? createNewTagOption(item, t) : item)
-                        .filter(isValidTagOption));
-                }}
+                    disabled={disabled}
+                    value={value}
+                    onChange={(event, newValue) => {
+                        onChange(newValue
+                            .map((item) => (typeof item === 'string') ? createNewTagOption(item, value, t) : item)
+                            .filter(isValidTagOption));
+                    }}
 
-                options={definedTagOptions}
-                filterSelectedOptions
-                filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
+                    options={definedTagOptions}
+                    filterSelectedOptions
+                    filterOptions={(options, params) => {
+                        const filtered = filter(options, params);
 
-                    // Suggest the creation of a new value
-                    if (params.inputValue.trim() !== '') {
-                        filtered.push(createNewTagOption(params.inputValue, t)!);
+                        // Suggest the creation of a new value
+                        if (params.inputValue.trim() !== '') {
+                            const newTagSuggestion = createNewTagOption(params.inputValue, value, t);
+                            newTagSuggestion && filtered.push(newTagSuggestion);
+                        }
+
+                        return filtered;
+                    }}
+                    getOptionLabel={getOptionLabel}
+                    renderOption={optionRenderer}
+
+                    renderInput={({ InputProps, ...params }) => (
+                        <TextField
+                            {...rest}
+                            {...params}
+                            variant='filled'
+                            InputProps={{ ...InputProps, disableUnderline: true }}
+                        />
+                    )}
+
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index: number) => (
+                            <Chip
+                                {...getTagProps({ index })}
+                                variant='outlined'
+                                label={option.name}
+                                icon={
+                                    (option.label)
+                                        ? <Tooltip title={t('form.common.tags.newTag')!}><NewReleasesIcon /></Tooltip>
+                                        // ? <NewReleasesIcon titleAccess={t('form.common.tags.newTag')}/>
+                                        : undefined
+                                }
+                            />
+                        ))
                     }
 
-                    return filtered;
-                }}
-                getOptionLabel={getOptionLabel}
-                renderOption={optionRenderer}
-
-                renderInput={({ InputProps, ...params }) => (
-                    <TextField
-                        {...rest}
-                        {...params}
-                        variant='filled'
-                        InputProps={{ ...InputProps, disableUnderline: true }}
-                    />
-                )}
-
-                renderTags={(value, getTagProps) =>
-                    value.map((option, index: number) => (
-                        <Chip
-                            {...getTagProps({ index })}
-                            variant='outlined'
-                            label={option.name}
-                            icon={
-                                (option.label)
-                                    ? <Tooltip title={t('form.common.tags.newTag')!}><NewReleasesIcon /></Tooltip>
-                                    // ? <NewReleasesIcon titleAccess={t('form.common.tags.newTag')}/>
-                                    : undefined
-                            }
-                        />
-                    ))
-                }
-
-            />
-        </FormControl>
-    );
-}
+                />
+            </FormControl>
+        );
+    },
+);
 
 /**
  * Utils
@@ -109,12 +113,18 @@ function getOptionLabel(option: TagOption): string {
     return option.label || option.name;
 }
 
-function createNewTagOption(inputValue: string, t: TFunction): TagOption | null {
+function createNewTagOption(inputValue: string, selectedOptions: TagOption[], t: TFunction): TagOption | null {
     const tagName = inputValue.trim();
-    return tagName ? {
-        name: tagName,
-        label: t('form.common.tags.addTag', { tagName: tagName }),
-    } : null;
+    return (tagName && isNewTagOptionUnique(tagName, selectedOptions))
+        ? {
+            name: tagName,
+            label: t('form.common.tags.addTag', { tagName: tagName }),
+        }
+        : null;
+}
+
+function isNewTagOptionUnique(newOptionName: string, selectedOptions: TagOption[]): boolean {
+    return !selectedOptions.some(({ name }) => name === newOptionName);
 }
 
 function isValidTagOption(option: TagOption | undefined | null): option is TagOption {

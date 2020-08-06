@@ -181,6 +181,10 @@ describe('FormikRichTextEditor component', () => {
 
         // verify if editor is focused
         expect(ViewUnderTest.editor).toHaveFocus();
+
+        // verify if label has 'focused' class
+        expect(ViewUnderTest.editor.previousElementSibling).toBeInstanceOf(HTMLLabelElement);
+        expect(ViewUnderTest.editor.previousElementSibling).toHaveClass('MuiInputLabel-shrink', 'Mui-focused');
     });
 
     it('should render title node', () => {

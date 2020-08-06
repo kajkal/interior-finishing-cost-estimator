@@ -77,17 +77,17 @@ describe('ProjectFileUploadModal component', () => {
     it('should close modal on cancel button click', async () => {
         renderInMockContext();
 
-        // verify is modal is not visible
+        // verify if modal is not visible
         expect(ViewUnderTest.modal).toBeNull();
 
         ViewUnderTest.openModal();
 
-        // verify is modal is visible
+        // verify if modal is visible
         expect(ViewUnderTest.modal).toBeVisible();
 
         userEvent.click(ViewUnderTest.cancelButton);
 
-        // verify is modal is again not visible
+        // verify if modal is again not visible
         await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
     });
 

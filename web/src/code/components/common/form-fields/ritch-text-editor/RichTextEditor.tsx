@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { ReactEditor, Slate } from 'slate-react';
+import { Slate } from 'slate-react';
 import { createEditor, Node } from 'slate';
 import { useTranslation } from 'react-i18next';
 import { EditablePlugins, pipe, SlateDocument } from '@udecode/slate-plugins';
@@ -37,105 +37,135 @@ export interface RichTextEditorProps {
     autoFocus?: boolean;
 }
 
-export function RichTextEditor({ id, name, label, error, disabled, value, onChange, 'aria-label': ariaLabel, ...rest }: RichTextEditorProps): React.ReactElement {
-    const classes = useStyles();
-    const { t } = useTranslation();
-    const editor = React.useMemo(() => pipe(createEditor(), ...withPlugins), []);
-    const helperTextId = error ? 'editor-helper-text' : undefined;
-    const focused = ReactEditor.isFocused(editor);
+export const RichTextEditor = React.memo(
+    function RichTextEditor({ id, name, label, error, disabled, value, onChange, 'aria-label': ariaLabel, ...rest }: RichTextEditorProps): React.ReactElement {
+        const classes = useStyles();
+        const { t } = useTranslation();
+        const editor = React.useMemo(() => pipe(createEditor(), ...withPlugins), []);
+        const [ editorRef, focused ] = useMakeshiftEditorFocusDetector(rest.autoFocus);
+        const helperTextId = error ? 'editor-helper-text' : undefined;
 
-    return (
-        <Slate
-            editor={editor}
-            value={value}
-            onChange={onChange as (value: Node[]) => void}
-        >
-            <FormControl fullWidth margin='normal' aria-label={ariaLabel}>
+        return (
+            <Slate
+                editor={editor}
+                value={value}
+                onChange={onChange as (value: Node[]) => void}
+            >
+                <FormControl fullWidth margin='normal' aria-label={ariaLabel}>
 
-                <Toolbar>
+                    <Toolbar>
 
-                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.historyControls')}>
-                        <HistoryButton type='undo' disabled={disabled} />
-                        <HistoryButton type='redo' disabled={disabled} />
-                    </ToolbarButtonGroup>
+                        <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.historyControls')}>
+                            <HistoryButton type='undo' disabled={disabled} />
+                            <HistoryButton type='redo' disabled={disabled} />
+                        </ToolbarButtonGroup>
 
-                    <Divider className={classes.divider} flexItem orientation='vertical' />
+                        <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.headerControls')}>
-                        <BlockButton type='title' disabled={disabled} />
-                        <BlockButton type='subtitle' disabled={disabled} />
-                    </ToolbarButtonGroup>
+                        <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.headerControls')}>
+                            <BlockButton type='title' disabled={disabled} />
+                            <BlockButton type='subtitle' disabled={disabled} />
+                        </ToolbarButtonGroup>
 
-                    <Divider className={classes.divider} flexItem orientation='vertical' />
+                        <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.markControls')}>
-                        <MarkButton type='bold' disabled={disabled} />
-                        <MarkButton type='italic' disabled={disabled} />
-                        <MarkButton type='underline' disabled={disabled} />
-                        <MarkButton type='superscript' disabled={disabled} />
-                    </ToolbarButtonGroup>
+                        <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.markControls')}>
+                            <MarkButton type='bold' disabled={disabled} />
+                            <MarkButton type='italic' disabled={disabled} />
+                            <MarkButton type='underline' disabled={disabled} />
+                            <MarkButton type='superscript' disabled={disabled} />
+                        </ToolbarButtonGroup>
 
-                    <Divider className={classes.divider} flexItem orientation='vertical' />
+                        <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.listControls')}>
-                        <BlockButton type='bulleted' options={options.list} disabled={disabled} />
-                        <BlockButton type='numbered' options={options.list} disabled={disabled} />
-                        <BlockButton type='todo' disabled={disabled} />
-                    </ToolbarButtonGroup>
+                        <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.listControls')}>
+                            <BlockButton type='bulleted' options={options.list} disabled={disabled} />
+                            <BlockButton type='numbered' options={options.list} disabled={disabled} />
+                            <BlockButton type='todo' disabled={disabled} />
+                        </ToolbarButtonGroup>
 
-                    <Divider className={classes.divider} flexItem orientation='vertical' />
+                        <Divider className={classes.divider} flexItem orientation='vertical' />
 
-                    <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.attachmentControls')}>
-                        <InsertLinkButton options={options.link} disabled={disabled} />
-                        <InsertImageButton options={options.image} disabled={disabled} />
-                    </ToolbarButtonGroup>
+                        <ToolbarButtonGroup aria-label={t('form.common.editor.toolbar.attachmentControls')}>
+                            <InsertLinkButton options={options.link} disabled={disabled} />
+                            <InsertImageButton options={options.image} disabled={disabled} />
+                        </ToolbarButtonGroup>
 
-                </Toolbar>
+                    </Toolbar>
 
-                <Paper
-                    elevation={0}
-                    className={clsx(classes.editor, {
-                        [ classes.disabled ]: disabled,
-                        [ classes.focused ]: focused,
-                    })}
-                >
-
-                    <InputLabel
-                        focused={focused}
-                        shrink={focused || isSlateDocumentNotEmpty(value)}
-                        variant='filled'
-                        htmlFor={id}
+                    <Paper
+                        ref={editorRef}
+                        elevation={0}
+                        className={clsx(classes.editor, {
+                            [ classes.disabled ]: disabled,
+                            [ classes.focused ]: focused,
+                        })}
                     >
-                        {label}
-                    </InputLabel>
 
-                    <EditablePlugins
-                        {...rest}
-                        id={id}
-                        name={name}
-                        readOnly={disabled}
-                        aria-invalid={Boolean(error)}
-                        aria-describedby={helperTextId}
-                        aria-disabled={disabled || undefined}
-                        className={classes.editorArea}
-                        style={{}} // override redundant styles
-                        plugins={plugins}
-                        spellCheck
-                    />
+                        <InputLabel
+                            focused={focused}
+                            shrink={focused || isSlateDocumentNotEmpty(value)}
+                            variant='filled'
+                            htmlFor={id}
+                        >
+                            {label}
+                        </InputLabel>
 
-                </Paper>
+                        <EditablePlugins
+                            {...rest}
+                            id={id}
+                            name={name}
+                            readOnly={disabled}
+                            aria-invalid={Boolean(error)}
+                            aria-describedby={helperTextId}
+                            aria-disabled={disabled || undefined}
+                            data-testid='slate-editor'
+                            className={classes.editorArea}
+                            style={{}} // override redundant styles
+                            plugins={plugins}
+                            spellCheck
+                        />
 
-                {
-                    error && (
-                        <FormHelperText id={helperTextId} error variant='filled'>
-                            {error}
-                        </FormHelperText>
-                    )
-                }
+                    </Paper>
 
-            </FormControl>
-        </Slate>
-    );
+                    {
+                        error && (
+                            <FormHelperText id={helperTextId} error variant='filled'>
+                                {error}
+                            </FormHelperText>
+                        )
+                    }
+
+                </FormControl>
+            </Slate>
+        );
+    },
+);
+
+/**
+ * {ReactEditor.isFocused(editor)} could tell if editor is focused only at the time of the render.
+ * Code bellow tries to fix this.
+ */
+function useMakeshiftEditorFocusDetector(autoFocus?: boolean): [ React.RefObject<HTMLDivElement>, boolean ] {
+    const editorRef = React.useRef<HTMLDivElement>(null);
+    const [ focused, setFocused ] = React.useState(Boolean(autoFocus));
+
+    React.useEffect(() => {
+        let timeoutId: number;
+
+        function handleFocusIn({ target }: FocusEvent) {
+            const isFocusWithinEditor = (target instanceof HTMLElement) && editorRef.current?.contains(target);
+            timeoutId = window.setTimeout(() => setFocused(Boolean(isFocusWithinEditor)), 5); // otherwise editor loses cursor
+        }
+
+        document.addEventListener('focusin', handleFocusIn);
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            clearTimeout(timeoutId);
+        };
+    }, [ editorRef, setFocused ]);
+
+    return [ editorRef, focused ];
 }
 
 const useStyles = makeStyles((theme) => ({
