@@ -26,7 +26,7 @@ export async function connectToDatabase(): Promise<MikroORM> {
                 Project,
                 Offer,
             ],
-            ensureIndexes: true,
+            // ensureIndexes: true,
             // debug: true,
         });
 
