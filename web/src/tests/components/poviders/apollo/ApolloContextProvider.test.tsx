@@ -204,7 +204,7 @@ describe('ApolloContextProvider component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.resourceOwnerRoleRequiredError');
+            expect(toast).toHaveTextContent('t:error.resourceOwnerRoleRequired');
         });
 
         it('should globally handle {PROJECT_NOT_FOUND} GraphQL errors', async () => {

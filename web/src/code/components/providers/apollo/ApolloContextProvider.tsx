@@ -64,7 +64,7 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
                 errorToast(({ t }) => t('error.networkError'));
             });
             ErrorHandler.handleGraphQlError(graphQLErrors, 'RESOURCE_OWNER_ROLE_REQUIRED', () => {
-                errorToast(({ t }) => t('projectPage.resourceOwnerRoleRequiredError'));
+                errorToast(({ t }) => t('error.resourceOwnerRoleRequired'));
             });
             ErrorHandler.handleGraphQlError(graphQLErrors, 'PROJECT_NOT_FOUND', () => {
                 errorToast(({ t }) => t('projectPage.projectNotFoundError'));

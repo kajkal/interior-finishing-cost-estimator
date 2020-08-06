@@ -76,7 +76,6 @@
     "openFile": "Otwórz plik {{filename}}",
     "removeThisFile": "Usuń ten plik",
     "uploadFile": "Dodaj plik",
-    "resourceOwnerRoleRequiredError": "Do przeprowadzenia tej operacji potrzeba roli właściciela projektu",
     "projectNotFoundError": "Projekt już nie istnieje"
   },
   "modal": {
@@ -235,6 +234,7 @@
     "networkError": "Błąd połączenia z serwerem, spróbuj ponownie później",
     "unexpectedError": "Wystąpił nieoczekiwany błąd, spróbuj ponownie później",
     "authorizationRequired": "Wymagana autoryzacja, zaloguj się i spróbuj ponownie",
-    "sessionExpired": "Twoja sesja wygasła, zaloguj się i spróbuj ponownie"
+    "sessionExpired": "Twoja sesja wygasła, zaloguj się i spróbuj ponownie",
+    "resourceOwnerRoleRequired": "Do przeprowadzenia tej operacji potrzeba roli właściciela zasobu"
   }
 }

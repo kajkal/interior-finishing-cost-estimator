@@ -76,7 +76,6 @@
     "openFile": "Open file {{filename}}",
     "removeThisFile": "Remove this file",
     "uploadFile": "Upload file",
-    "resourceOwnerRoleRequiredError": "Project owner role is required to perform this operation",
     "projectNotFoundError": "Project no longer exists"
   },
   "modal": {
@@ -235,6 +234,7 @@
     "networkError": "Network error occurred, try again later",
     "unexpectedError": "An unexpected error occurred, try again later",
     "authorizationRequired": "Authorization required, log in and try again",
-    "sessionExpired": "Your session has expired, log in and try again"
+    "sessionExpired": "Your session has expired, log in and try again",
+    "resourceOwnerRoleRequired": "Resource owner role is required to perform this operation"
   }
 }
