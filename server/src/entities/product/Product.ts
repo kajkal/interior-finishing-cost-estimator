@@ -20,16 +20,16 @@ export class Product extends BaseEntity {
     @Property()
     name!: string;
 
-    @Field(() => [String])
+    @Field(() => [ String ], { nullable: true })
     @Property()
-    tags!: string[];
+    tags?: string[];
 
     @Field()
     @Property()
     description!: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Property()
-    price!: CurrencyAmount;
+    price?: CurrencyAmount;
 
 }

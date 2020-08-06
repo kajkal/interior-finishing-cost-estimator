@@ -77,7 +77,7 @@ describe('RegisterResolver', () => {
             expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
             expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: expect.any(String) });
             expect(response.header[ 'set-cookie' ]).toEqual([
-                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly$/),
+                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly; SameSite=None$/),
             ]);
 
             // verify if access token was generated

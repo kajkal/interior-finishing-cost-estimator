@@ -3,10 +3,10 @@ import { IsSlug } from '../../../decorators/IsSlug';
 
 
 @ArgsType()
-export class ProjectDeleteFormData {
+export class ElementSlug {
 
     @Field()
     @IsSlug()
-    projectSlug!: string;
+    slug!: string;
 
 }

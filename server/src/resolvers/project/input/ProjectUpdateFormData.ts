@@ -1,13 +1,14 @@
 import { ArgsType, Field } from 'type-graphql';
-import { IsMongoId, Length } from 'class-validator';
+import { Length } from 'class-validator';
+import { IsSlug } from '../../../decorators/IsSlug';
 
 
 @ArgsType()
 export class ProjectUpdateFormData {
 
     @Field()
-    @IsMongoId()
-    projectId!: string;
+    @IsSlug()
+    projectSlug!: string;
 
     @Field()
     @Length(3, 64)

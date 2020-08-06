@@ -1,5 +1,5 @@
 import { ArgsType, Field } from 'type-graphql';
-import { IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 
@@ -11,7 +11,6 @@ export class ResourceFormData {
     file!: FileUpload;
 
     @Field({ nullable: true })
-    @IsOptional()
     @Length(1, 255)
     description?: string;
 

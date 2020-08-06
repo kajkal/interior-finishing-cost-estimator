@@ -44,7 +44,7 @@ describe('mongodb loader', () => {
                 Project,
                 Offer,
             ],
-            ensureIndexes: true,
+            // ensureIndexes: true,
         }));
         expect(Container.set).toHaveBeenCalledTimes(2 + 4);
         expect(MockOrm.em.getRepository).toHaveBeenCalledTimes(4);

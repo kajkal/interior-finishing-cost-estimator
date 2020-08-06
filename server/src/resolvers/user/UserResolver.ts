@@ -1,8 +1,9 @@
 import { Inject, Service } from 'typedi';
-import { Authorized, Ctx, FieldResolver, Int, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, FieldResolver, Int, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { UserRepository } from '../../repositories/UserRepository';
+import { ElementSlug } from '../common/input/ElementSlug';
 import { Product } from '../../entities/product/Product';
 import { Project } from '../../entities/project/Project';
 import { Offer } from '../../entities/offer/Offer';
@@ -20,26 +21,31 @@ export class UserResolver {
 
     @FieldResolver(() => [ Product ])
     async products(@Root() user: User) {
-        console.log('loading products for user', user.email);
-        return await user.products.loadItems();
+        const products = await user.products.init();
+        return products.getItems();
     }
 
     @FieldResolver(() => Int)
     async productCount(@Root() user: User) {
-        console.log('loading productCount for user', user.email);
         await user.products.init();
         return user.products.count();
     }
 
-    @FieldResolver(() => [ Project ])
+    @FieldResolver(() => [ Project ], { description: 'User\' all projects.' })
     async projects(@Root() user: User) {
-        console.log('loading projects for user', user.email);
-        return await user.projects.loadItems();
+        const projects = await user.projects.init();
+        return projects.getItems();
+    }
+
+    @FieldResolver(() => Project, { nullable: true, description: 'User project with given project id.' })
+    async project(@Args() { slug }: ElementSlug, @Root() user: User) {
+        const projects = await user.projects.init({ where: { slug } });
+        const [ project ] = projects.getItems();
+        return project;
     }
 
     @FieldResolver(() => [ Offer ])
     async offers(@Root() user: User) {
-        console.log('loading offers for user', user.email);
         return await user.offers.loadItems();
     }
 

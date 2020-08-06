@@ -1,0 +1,187 @@
+import { MockLogger } from '../../../__mocks__/utils/logger';
+
+import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { ProductRepositorySpy } from '../../../__utils__/spies/repositories/ProductRepositorySpy';
+import { useValidationUtils } from '../../../__utils__/integration-utils/useValidationUtils';
+import { getAuthHeader } from '../../../__utils__/integration-utils/authUtils';
+import { generator } from '../../../__utils__/generator';
+
+import { ProductCreateFormData } from '../../../../src/resolvers/product/input/ProductCreateFormData';
+import { ProductResolver } from '../../../../src/resolvers/product/ProductResolver';
+
+
+describe('ProductResolver', () => {
+
+    const testUtils = useIntegrationTestsUtils();
+
+    beforeEach(async () => {
+        MockLogger.setupMocks();
+
+        // repositories
+        ProductRepositorySpy.setupSpies();
+    });
+
+    describe('create product mutation', () => {
+
+        const createProductMutation = `
+            mutation CreateProduct(
+              $name: String!
+              $description: String!
+              $price: CurrencyAmountFormData
+              $tags: [String!]
+            ) {
+              createProduct(
+                name: $name
+                description: $description
+                price: $price
+                tags: $tags
+              ) {
+                id
+                name
+                description
+                price {
+                  currency
+                  amount
+                }
+                tags
+              }
+            }
+        `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<ProductCreateFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProductResolver.prototype, 'createProduct'),
+                query: createProductMutation,
+                validFormData: {
+                    name: 'Sample product name',
+                    description: '[{"sample":"rich text description"}]',
+                    price: { currency: 'PLN', amount: 4.5 },
+                    tags: [ 'Sample tag' ],
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate product name', async () => {
+                // should accept valid
+                await send.withAuth({ name: 'a'.repeat(3) }).expectValidationSuccess();
+                await send.withAuth({ name: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
+                await send.withAuth({ name: 'a'.repeat(256) }).expectValidationError('name');
+            });
+
+            it('should validate product description', async () => {
+                // should accept valid
+                await send.withAuth({ description: 'a'.repeat(3) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ description: 'a'.repeat(2) }).expectValidationError('description');
+            });
+
+            it('should validate product price', async () => {
+                // should be optional
+                await send.withAuth({ price: null! }).expectValidationSuccess();
+                await send.withAuth({ price: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({ price: { currency: 'EUR', amount: 0 } }).expectValidationSuccess();
+                await send.withAuth({ price: { currency: 'PLN', amount: 1e6 } }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ price: { currency: '$', amount: 0 } }).expectValidationError('price');
+                await send.withAuth({ price: { currency: 'EUR', amount: -1 } }).expectValidationError('price');
+                await send.withAuth({ price: { currency: 'EUR', amount: 1e6 + 1 } }).expectValidationError('price');
+            });
+
+            it('should validate product tags', async () => {
+                // should be optional
+                await send.withAuth({ tags: null! }).expectValidationSuccess();
+                await send.withAuth({ tags: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({ tags: [] }).expectValidationSuccess();
+                await send.withAuth({ tags: [ 'a'.repeat(255) ] }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ tags: [ '' ] }).expectValidationError('tags');
+                await send.withAuth({ tags: [ 'Valid name', '' ] }).expectValidationError('tags');
+                await send.withAuth({ tags: [ 'a'.repeat(256) ] }).expectValidationError('tags');
+            });
+
+        });
+
+        it('should create product with all available fields', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProductCreateFormData = {
+                name: generator.sentence({ words: 5 }).replace(/\./g, ''),
+                description: '[{"sample":"rich text description"}]',
+                price: { currency: 'PLN', amount: 4.5 },
+                tags: [ 'Sample tag' ],
+            };
+            const response = await testUtils.postGraphQL({
+                query: createProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            console.log('response', JSON.stringify(response.body, null, 2));
+
+            // verify if new product was created and saved in db
+            expect(ProductRepositorySpy.create).toHaveBeenCalledTimes(1);
+            expect(ProductRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    createProduct: {
+                        id: expect.any(String),
+                        name: formData.name,
+                        description: formData.description,
+                        price: formData.price,
+                        tags: formData.tags,
+                    },
+                },
+            });
+        });
+
+        it('should create product with only required fields', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProductCreateFormData = {
+                name: generator.sentence({ words: 5 }).replace(/\./g, ''),
+                description: '[{"sample":"rich text description"}]',
+            };
+            const response = await testUtils.postGraphQL({
+                query: createProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            console.log('response', JSON.stringify(response.body, null, 2));
+
+            // verify if new product was created and saved in db
+            expect(ProductRepositorySpy.create).toHaveBeenCalledTimes(1);
+            expect(ProductRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    createProduct: {
+                        id: expect.any(String),
+                        name: formData.name,
+                        description: formData.description,
+                        price: null,
+                        tags: null,
+                    },
+                },
+            });
+        });
+
+    });
+
+});

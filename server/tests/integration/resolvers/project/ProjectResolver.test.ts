@@ -6,7 +6,8 @@ import { MockLogger } from '../../../__mocks__/utils/logger';
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
 import { ProjectRepositorySpy } from '../../../__utils__/spies/repositories/ProjectRepositorySpy';
 import { StorageServiceSpy } from '../../../__utils__/spies/services/storage/StorageServiceSpy';
-import { createAccessToken } from '../../../__utils__/integration-utils/authUtils';
+import { useValidationUtils } from '../../../__utils__/integration-utils/useValidationUtils';
+import { getAuthHeader } from '../../../__utils__/integration-utils/authUtils';
 import { generator } from '../../../__utils__/generator';
 
 import { ProjectCreateFormData } from '../../../../src/resolvers/project/input/ProjectCreateFormData';
@@ -14,6 +15,7 @@ import { ProjectUpdateFormData } from '../../../../src/resolvers/project/input/P
 import { ProjectDeleteFormData } from '../../../../src/resolvers/project/input/ProjectDeleteFormData';
 import { ResourceCreateFormData } from '../../../../src/resolvers/project/input/ResourceCreateFormData';
 import { ResourceDeleteFormData } from '../../../../src/resolvers/project/input/ResourceDeleteFormData';
+import { ProjectResolver } from '../../../../src/resolvers/project/ProjectResolver';
 
 
 describe('ProjectResolver', () => {
@@ -62,22 +64,6 @@ describe('ProjectResolver', () => {
         });
     }
 
-    function expectNotAuthorizedError(response: Response) {
-        // verify if access was logged
-        expect(MockLogger.warn).toHaveBeenCalledTimes(1);
-        expect(MockLogger.warn).toHaveBeenCalledWith(expect.objectContaining({ message: 'invalid token' }));
-
-        // verify mutation response
-        expect(response.body).toEqual({
-            data: null,
-            errors: [
-                expect.objectContaining({
-                    message: 'INVALID_ACCESS_TOKEN',
-                }),
-            ],
-        });
-    }
-
     describe('create project mutation ', () => {
 
         const createProjectMutation = `
@@ -90,7 +76,33 @@ describe('ProjectResolver', () => {
             }
         `;
 
-        it('should create project for logged user', async () => {
+        describe('validation', () => {
+
+            const send = useValidationUtils<ProjectCreateFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProjectResolver.prototype, 'createProject'),
+                query: createProjectMutation,
+                validFormData: {
+                    name: 'Sample project name',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate project name', async () => {
+                // should accept valid
+                await send.withAuth({ name: 'a'.repeat(3) }).expectValidationSuccess();
+                await send.withAuth({ name: 'a'.repeat(64) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
+                await send.withAuth({ name: 'a'.repeat(65) }).expectValidationError('name');
+            });
+
+        });
+
+        it('should create project', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectCreateFormData: ProjectCreateFormData = {
                 name: generator.sentence({ words: 5 }).replace(/\./g, ''),
@@ -98,7 +110,7 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: createProjectMutation,
                 variables: projectCreateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
 
             // verify if new project object was created and saved in db
             expect(ProjectRepositorySpy.create).toHaveBeenCalledTimes(1);
@@ -120,69 +132,82 @@ describe('ProjectResolver', () => {
             });
         });
 
-        it('should return error when user is not authenticated', async () => {
-            const projectCreateFormData: ProjectCreateFormData = {
-                name: generator.sentence({ words: 5 }).replace(/\./g, ''),
-            };
-            const response = await testUtils.postGraphQL({
-                query: createProjectMutation,
-                variables: projectCreateFormData,
-            });
-            expectNotAuthorizedError(response);
-        });
-
     });
 
     describe('update project mutation', () => {
 
         const updateProjectMutation = `
-            mutation UpdateProject($projectId: String!, $name: String!) {
-              updateProject(projectId: $projectId, name: $name) {
-                id
+            mutation UpdateProject($projectSlug: String!, $name: String!) {
+              updateProject(projectSlug: $projectSlug, name: $name) {
                 name
                 slug
               }
             }
         `;
 
+        describe('validation', () => {
+
+            const send = useValidationUtils<ProjectUpdateFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProjectResolver.prototype, 'updateProject'),
+                query: updateProjectMutation,
+                validFormData: {
+                    projectSlug: 'sample-valid-slug',
+                    name: 'sample name',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate project slug', async () => {
+                // should accept valid
+                await send.withAuth({ projectSlug: 'valid' }).expectValidationSuccess();
+                await send.withAuth({ projectSlug: 'valid-1' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ projectSlug: '-invalid' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'invalid-' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'in valid' }).expectValidationError('projectSlug');
+            });
+
+            it('should validate project updated name', async () => {
+                // should accept valid
+                await send.withAuth({ name: 'a'.repeat(3) }).expectValidationSuccess();
+                await send.withAuth({ name: 'a'.repeat(64) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
+                await send.withAuth({ name: 'a'.repeat(65) }).expectValidationError('name');
+            });
+
+        });
+
         it('should return error when user is not a project owner', async () => {
             const projectOwner = await testUtils.db.populateWithUser();
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(projectOwner.id);
             const projectUpdateFormData: ProjectUpdateFormData = {
-                projectId: projectToUpdate.id,
+                projectSlug: projectToUpdate.slug,
                 name: 'sample name',
             };
             const response = await testUtils.postGraphQL({
                 query: updateProjectMutation,
                 variables: projectUpdateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectUserIsNotProjectOwnerError(response);
         });
 
         it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectUpdateFormData: ProjectUpdateFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
-                name: 'sample name',
+                projectSlug: 'not-found',
+                name: 'Not Found',
             };
             const response = await testUtils.postGraphQL({
                 query: updateProjectMutation,
                 variables: projectUpdateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectProjectNotFoundError(response);
-        });
-
-        it('should return error when user is not authenticated', async () => {
-            const projectUpdateFormData: ProjectUpdateFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
-                name: 'sample name',
-            };
-            const response = await testUtils.postGraphQL({
-                query: updateProjectMutation,
-                variables: projectUpdateFormData,
-            });
-            expectNotAuthorizedError(response);
         });
 
     });
@@ -190,21 +215,48 @@ describe('ProjectResolver', () => {
     describe('delete project mutation', () => {
 
         const deleteProjectMutation = `
-            mutation DeleteProject($projectId: String!) {
-              deleteProject(projectId: $projectId)
+            mutation DeleteProject($projectSlug: String!) {
+              deleteProject(projectSlug: $projectSlug)
             }
         `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<ProjectDeleteFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProjectResolver.prototype, 'deleteProject'),
+                query: deleteProjectMutation,
+                validFormData: {
+                    projectSlug: 'sample-valid-slug',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate project slug', async () => {
+                // should accept valid
+                await send.withAuth({ projectSlug: 'valid' }).expectValidationSuccess();
+                await send.withAuth({ projectSlug: 'valid-1' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ projectSlug: '-invalid' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'invalid-' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'in valid' }).expectValidationError('projectSlug');
+            });
+
+        });
 
         it('should return true when user is a project owner', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToDelete = await testUtils.db.populateWithProject(user.id);
             const projectDeleteFormData: ProjectDeleteFormData = {
-                projectId: projectToDelete.id,
+                projectSlug: projectToDelete.slug,
             };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
                 variables: projectDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -223,36 +275,25 @@ describe('ProjectResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const projectToDelete = await testUtils.db.populateWithProject(projectOwner.id);
             const projectDeleteFormData: ProjectDeleteFormData = {
-                projectId: projectToDelete.id,
+                projectSlug: projectToDelete.slug,
             };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
                 variables: projectDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectUserIsNotProjectOwnerError(response);
         });
 
         it('should return error when project is not found', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectDeleteFormData: ProjectDeleteFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
+                projectSlug: 'not-found',
             };
             const response = await testUtils.postGraphQL({
                 query: deleteProjectMutation,
                 variables: projectDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectProjectNotFoundError(response);
-        });
-
-        it('should return error when user is not authenticated', async () => {
-            const projectDeleteFormData: ProjectDeleteFormData = {
-                projectId: '5f0b4777903f9e20fc1e8a9c',
-            };
-            const response = await testUtils.postGraphQL({
-                query: deleteProjectMutation,
-                variables: projectDeleteFormData,
-            });
-            expectNotAuthorizedError(response);
         });
 
     });
@@ -283,6 +324,52 @@ describe('ProjectResolver', () => {
             } as unknown as FileUpload;
         }
 
+        describe('validation', () => {
+
+            const send = useValidationUtils<ResourceCreateFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProjectResolver.prototype, 'uploadProjectFile'),
+                query: uploadProjectFileMutation,
+                validFormData: {
+                    projectSlug: 'sample-valid-slug',
+                    file: createFile('sampleFile.pdf'),
+                    description: 'sample file description',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate project slug', async () => {
+                // should accept valid
+                await send.withAuth({ projectSlug: 'valid' }).expectValidationSuccess();
+                await send.withAuth({ projectSlug: 'valid-1' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ projectSlug: '-invalid' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'invalid-' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'in valid' }).expectValidationError('projectSlug');
+            });
+
+            it('should validate uploaded file', async () => {
+                // should accept valid
+                await send.withAuth({ file: {} as FileUpload }).expectValidationSuccess();
+            });
+
+            it('should validate uploaded file description', async () => {
+                // should be optional
+                await send.withAuth({ description: null! }).expectValidationSuccess();
+                await send.withAuth({ description: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({ description: 'a'.repeat(1) }).expectValidationSuccess();
+                await send.withAuth({ description: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ description: '' }).expectValidationError('description');
+                await send.withAuth({ description: 'a'.repeat(256) }).expectValidationError('description');
+            });
+
+        });
+
         it('should return uploaded file data when user is a project owner', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id);
@@ -294,7 +381,7 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: uploadProjectFileMutation,
                 variables: resourceCreateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
 
             // verify if resource was uploaded
             expect(StorageServiceSpy.uploadResource).toHaveBeenCalledTimes(1);
@@ -327,7 +414,7 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: uploadProjectFileMutation,
                 variables: resourceCreateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectUserIsNotProjectOwnerError(response);
         });
 
@@ -341,21 +428,8 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: uploadProjectFileMutation,
                 variables: resourceCreateFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectProjectNotFoundError(response);
-        });
-
-        it('should return error when user is not authenticated', async () => {
-            const resourceCreateFormData: ResourceCreateFormData = {
-                projectSlug: 'some-project',
-                file: createFile('sampleFile.pdf'),
-                description: 'sample file description',
-            };
-            const response = await testUtils.postGraphQL({
-                query: uploadProjectFileMutation,
-                variables: resourceCreateFormData,
-            });
-            expectNotAuthorizedError(response);
         });
 
     });
@@ -372,6 +446,43 @@ describe('ProjectResolver', () => {
             StorageServiceSpy.deleteResources.mockImplementation(() => Promise.resolve());
         });
 
+        describe('validation', () => {
+
+            const send = useValidationUtils<ResourceDeleteFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProjectResolver.prototype, 'deleteProjectFile'),
+                query: deleteProjectFileMutation,
+                validFormData: {
+                    projectSlug: 'sample-valid-slug',
+                    resourceName: 'sampleFile.pdf',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate project slug', async () => {
+                // should accept valid
+                await send.withAuth({ projectSlug: 'valid' }).expectValidationSuccess();
+                await send.withAuth({ projectSlug: 'valid-1' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ projectSlug: '-invalid' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'invalid-' }).expectValidationError('projectSlug');
+                await send.withAuth({ projectSlug: 'in valid' }).expectValidationError('projectSlug');
+            });
+
+            it('should validate resource to delete name', async () => {
+                // should accept valid
+                await send.withAuth({ resourceName: 'a'.repeat(1) }).expectValidationSuccess();
+                await send.withAuth({ resourceName: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ resourceName: '' }).expectValidationError('resourceName');
+                await send.withAuth({ resourceName: 'a'.repeat(256) }).expectValidationError('resourceName');
+            });
+
+        });
+
         it('should return true when user is a project owner', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id);
@@ -382,7 +493,7 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: deleteProjectFileMutation,
                 variables: resourceDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
 
             // verify if resource was deleted
             expect(StorageServiceSpy.deleteResources).toHaveBeenCalledTimes(1);
@@ -411,7 +522,7 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: deleteProjectFileMutation,
                 variables: resourceDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectUserIsNotProjectOwnerError(response);
         });
 
@@ -424,20 +535,8 @@ describe('ProjectResolver', () => {
             const response = await testUtils.postGraphQL({
                 query: deleteProjectFileMutation,
                 variables: resourceDeleteFormData,
-            }).set('Authorization', createAccessToken(user).authHeader);
+            }).set('Authorization', getAuthHeader(user));
             expectProjectNotFoundError(response);
-        });
-
-        it('should return error when user is not authenticated', async () => {
-            const resourceDeleteFormData: ResourceDeleteFormData = {
-                projectSlug: 'some-project',
-                resourceName: 'sampleFile.pdf',
-            };
-            const response = await testUtils.postGraphQL({
-                query: deleteProjectFileMutation,
-                variables: resourceDeleteFormData,
-            });
-            expectNotAuthorizedError(response);
         });
 
     });

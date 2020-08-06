@@ -1,11 +1,12 @@
 import { Inject, Service } from 'typedi';
 import { ApolloError } from 'apollo-server-express';
-import { Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
 import { ProductRepository } from '../../repositories/ProductRepository';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
-import { logAccess } from '../../utils/logAccess';
+import { ProductCreateFormData } from './input/ProductCreateFormData';
 import { Product } from '../../entities/product/Product';
+import { logAccess } from '../../utils/logAccess';
 
 
 @Service()
@@ -25,8 +26,13 @@ export class ProductResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Product)
-    async createProduct(@Ctx() context: AuthorizedContext): Promise<Product> {
-        throw new ApolloError('not yet implemented');
+    async createProduct(@Args() data: ProductCreateFormData, @Ctx() context: AuthorizedContext): Promise<Product> {
+        const { sub: userId } = context.jwtPayload;
+
+        const product = this.productRepository.create({ ...data, user: userId });
+        await this.productRepository.persistAndFlush(product);
+
+        return product;
     }
 
     @Authorized()

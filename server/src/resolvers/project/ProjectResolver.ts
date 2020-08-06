@@ -10,9 +10,9 @@ import { StorageService } from '../../services/storage/StorageService';
 import { ResourceData } from '../common/output/ResourceData';
 import { ProjectCreateFormData } from './input/ProjectCreateFormData';
 import { ProjectUpdateFormData } from './input/ProjectUpdateFormData';
-import { ProjectDeleteFormData } from './input/ProjectDeleteFormData';
 import { ResourceCreateFormData } from './input/ResourceCreateFormData';
 import { ResourceDeleteFormData } from './input/ResourceDeleteFormData';
+import { ProjectDeleteFormData } from './input/ProjectDeleteFormData';
 
 
 @Service()
@@ -55,12 +55,17 @@ export class ProjectResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Project)
-    async updateProject(@Args() { projectId, ...data }: ProjectUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Project> {
-        const projectToUpdate = await this.projectRepository.findOne({ id: projectId });
+    async updateProject(@Args() { projectSlug, ...data }: ProjectUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Project> {
+        const projectToUpdate = await this.projectRepository.findOne({ slug: projectSlug });
 
         if (projectToUpdate) {
             if (projectToUpdate.user.id === context.jwtPayload.sub) {
-                Object.assign(projectToUpdate, data);
+
+                if (projectToUpdate.name !== data.name) {
+                    projectToUpdate.name = data.name;
+                    projectToUpdate.slug = await this.projectRepository.generateUniqueSlug(data.name);
+                }
+
                 await this.projectRepository.persistAndFlush(projectToUpdate);
                 return projectToUpdate;
             }
@@ -74,8 +79,8 @@ export class ProjectResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
-    async deleteProject(@Args() { projectId }: ProjectDeleteFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const projectToRemove = await this.projectRepository.findOne({ id: projectId });
+    async deleteProject(@Args() { projectSlug }: ProjectDeleteFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
+        const projectToRemove = await this.projectRepository.findOne({ slug: projectSlug });
 
         if (projectToRemove) {
             if (projectToRemove.user.id === context.jwtPayload.sub) {
@@ -103,7 +108,7 @@ export class ProjectResolver {
                     userId: context.jwtPayload.sub,
                     directory: projectToUpdate.id,
                     metadata: {
-                        description: data.description,
+                        description: data.description || undefined, // null is replaced to ''
                     },
                 });
             }

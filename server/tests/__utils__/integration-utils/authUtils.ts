@@ -11,3 +11,8 @@ export function createAccessToken(userData: Pick<User, 'id'>) {
         tokenValue: accessToken,
     };
 }
+
+export function getAuthHeader(userData: Pick<User, 'id'>) {
+    const accessToken = Container.get(AuthService).generateAccessToken(userData);
+    return `Bearer ${accessToken}`;
+}
