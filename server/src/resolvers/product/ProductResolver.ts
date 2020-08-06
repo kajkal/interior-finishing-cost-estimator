@@ -1,10 +1,11 @@
 import { Inject, Service } from 'typedi';
-import { ApolloError } from 'apollo-server-express';
+import { ApolloError, ForbiddenError, UserInputError } from 'apollo-server-express';
 import { Args, Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
 import { ProductRepository } from '../../repositories/ProductRepository';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { ProductCreateFormData } from './input/ProductCreateFormData';
+import { ProductDeleteFormData } from './input/ProductDeleteFormData';
 import { Product } from '../../entities/product/Product';
 import { logAccess } from '../../utils/logAccess';
 
@@ -45,8 +46,19 @@ export class ProductResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
-    async deleteProduct(@Ctx() context: AuthorizedContext): Promise<Boolean> {
-        throw new ApolloError('not yet implemented');
+    async deleteProduct(@Args() { productId }: ProductDeleteFormData, @Ctx() context: AuthorizedContext): Promise<Boolean> {
+        const productToDelete = await this.productRepository.findOne({id: productId});
+
+        if (productToDelete) {
+            if (productToDelete.user.id === context.jwtPayload.sub) {
+                await this.productRepository.removeAndFlush(productToDelete);
+                return true;
+            }
+
+            throw new ForbiddenError('RESOURCE_OWNER_ROLE_REQUIRED');
+        }
+
+        throw new UserInputError('PRODUCT_NOT_FOUND');
     }
 
 }

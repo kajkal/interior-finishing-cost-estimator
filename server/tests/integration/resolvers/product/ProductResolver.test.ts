@@ -1,3 +1,4 @@
+import { Response } from 'supertest';
 import { MockLogger } from '../../../__mocks__/utils/logger';
 
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
@@ -7,6 +8,7 @@ import { getAuthHeader } from '../../../__utils__/integration-utils/authUtils';
 import { generator } from '../../../__utils__/generator';
 
 import { ProductCreateFormData } from '../../../../src/resolvers/product/input/ProductCreateFormData';
+import { ProductDeleteFormData } from '../../../../src/resolvers/product/input/ProductDeleteFormData';
 import { ProductResolver } from '../../../../src/resolvers/product/ProductResolver';
 
 
@@ -20,6 +22,38 @@ describe('ProductResolver', () => {
         // repositories
         ProductRepositorySpy.setupSpies();
     });
+
+    function expectUserIsNotProductOwnerError(response: Response) {
+        // verify if access was logged
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+        // verify mutation response
+        expect(response.body).toEqual({
+            data: null,
+            errors: [
+                expect.objectContaining({
+                    message: 'RESOURCE_OWNER_ROLE_REQUIRED',
+                }),
+            ],
+        });
+    }
+
+    function expectProductNotFoundError(response: Response) {
+        // verify if access was logged
+        expect(MockLogger.info).toHaveBeenCalledTimes(1);
+        expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access-error' }));
+
+        // verify mutation response
+        expect(response.body).toEqual({
+            data: null,
+            errors: [
+                expect.objectContaining({
+                    message: 'PRODUCT_NOT_FOUND',
+                }),
+            ],
+        });
+    }
 
     describe('create product mutation', () => {
 
@@ -180,6 +214,91 @@ describe('ProductResolver', () => {
                     },
                 },
             });
+        });
+
+    });
+
+    describe('delete product mutation', () => {
+
+        const deleteProductMutation = `
+            mutation DeleteProduct($productId: String!) {
+              deleteProduct(productId: $productId)
+            }
+        `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<ProductDeleteFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(ProductResolver.prototype, 'deleteProduct'),
+                query: deleteProductMutation,
+                validFormData: {
+                    productId: '5f09e24646904045d48e5598',
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate product id', async () => {
+                // should accept valid
+                await send.withAuth({ productId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                await send.withAuth({ productId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ productId: '' }).expectValidationError('productId');
+                await send.withAuth({ productId: 'invalid-id' }).expectValidationError('productId');
+            });
+
+        });
+
+        it('should delete product', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const productToDelete = await testUtils.db.populateWithProduct(user.id);
+            const formData: ProductDeleteFormData = {
+                productId: productToDelete.id,
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    deleteProduct: true,
+                },
+            });
+        });
+
+        it('should return error when user is not a product owner', async () => {
+            const productOwner = await testUtils.db.populateWithUser();
+            const user = await testUtils.db.populateWithUser();
+            const productToDelete = await testUtils.db.populateWithProduct(productOwner.id);
+            const formData: ProductDeleteFormData = {
+                productId: productToDelete.id,
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectUserIsNotProductOwnerError(response);
+        });
+
+        it('should return error when product is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProductDeleteFormData = {
+                productId: '5f09e24646904045d48e5598',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectProductNotFoundError(response);
         });
 
     });
