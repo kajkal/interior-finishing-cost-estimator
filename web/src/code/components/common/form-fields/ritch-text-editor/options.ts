@@ -1,3 +1,4 @@
+import { Range } from 'slate';
 import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { BoldPlugin, DEFAULTS_BOLD, DEFAULTS_IMAGE, DEFAULTS_ITALIC, DEFAULTS_LIST, DEFAULTS_STRIKETHROUGH, DEFAULTS_SUBSUPSCRIPT, DEFAULTS_UNDERLINE, ELEMENT_H1, ELEMENT_H2, ELEMENT_PARAGRAPH, ELEMENT_TODO_LI, ExitBreakPlugin, HeadingPlugin, ImagePlugin, isBlockAboveEmpty, isSelectionAtBlockStart, ItalicPlugin, LinkPlugin, ListPlugin, ParagraphPlugin, ResetBlockTypePlugin, SlateDocument, SlatePlugin, SoftBreakPlugin, StrikethroughPlugin, SubscriptPlugin, SuperscriptPlugin, TodoListPlugin, UnderlinePlugin, withDeserializeHTML, withImageUpload, withInlineVoid, withLink, withToggleType, withTrailingNode, withTransforms } from '@udecode/slate-plugins';
@@ -95,6 +96,11 @@ export const withPlugins = [
     withInlineVoid({ plugins }),
     withDeserializeHTML({ plugins }),
 ] as const;
+
+export const cursorAtTheBeginning: Range = {
+    anchor: { path: [ 0, 0, 0 ], offset: 0 },
+    focus: { path: [ 0, 0, 0 ], offset: 0 },
+};
 
 export const emptyEditorValue: SlateDocument = [
     {

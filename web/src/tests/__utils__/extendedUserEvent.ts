@@ -18,7 +18,7 @@ async function type(element: HTMLElement, text: string) {
 }
 
 
-async function typeNumber(element: HTMLElement, text: string) {
+async function paste(element: HTMLElement, text: string) {
     userEvent.clear(element);
     await userEvent.paste(element, text); // userEvent.type doesn't work as expected in case of 'react-number-format' input
     fireEvent.blur(element);
@@ -50,5 +50,5 @@ async function drop(element: HTMLElement, files: File[]) {
 export const extendedUserEvent = {
     type,
     drop,
-    typeNumber,
+    paste,
 };

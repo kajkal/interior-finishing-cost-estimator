@@ -19,8 +19,8 @@ export type Query = {
   __typename?: 'Query';
   /** Returns data of the currently authenticated user. */
   me: User;
-  products: Array<Offer>;
   projects: Array<Project>;
+  products: Array<Offer>;
 };
 
 export type User = {
@@ -47,9 +47,9 @@ export type Product = {
   __typename?: 'Product';
   id: Scalars['ID'];
   name: Scalars['String'];
-  tags: Array<Scalars['String']>;
   description: Scalars['String'];
-  price: CurrencyAmount;
+  price?: Maybe<CurrencyAmount>;
+  tags?: Maybe<Array<Scalars['String']>>;
 };
 
 export type CurrencyAmount = {
@@ -122,9 +122,23 @@ export type MutationResetPasswordArgs = {
 
 export type MutationCreateProductArgs = {
   name: Scalars['String'];
-  tags: Array<Scalars['String']>;
   description: Scalars['String'];
   price?: Maybe<CurrencyAmountFormData>;
+  tags?: Maybe<Array<Scalars['String']>>;
+};
+
+
+export type MutationUpdateProductArgs = {
+  name: Scalars['String'];
+  description: Scalars['String'];
+  price?: Maybe<CurrencyAmountFormData>;
+  tags?: Maybe<Array<Scalars['String']>>;
+  productId: Scalars['String'];
+};
+
+
+export type MutationDeleteProductArgs = {
+  productId: Scalars['String'];
 };
 
 
@@ -266,23 +280,50 @@ export type SendPasswordResetInstructionsMutation = (
 export type ProductDataFragment = (
   { __typename?: 'Product' }
   & Pick<Product, 'id' | 'name' | 'tags' | 'description'>
-  & { price: (
+  & { price?: Maybe<(
     { __typename?: 'CurrencyAmount' }
     & Pick<CurrencyAmount, 'currency' | 'amount'>
-  ) }
+  )> }
 );
 
 export type CreateProductMutationVariables = Exact<{
   name: Scalars['String'];
-  tags: Array<Scalars['String']>;
   description: Scalars['String'];
   price?: Maybe<CurrencyAmountFormData>;
+  tags?: Maybe<Array<Scalars['String']>>;
 }>;
 
 
 export type CreateProductMutation = (
   { __typename?: 'Mutation' }
   & { createProduct: (
+    { __typename?: 'Product' }
+    & ProductDataFragment
+  ) }
+);
+
+export type DeleteProductMutationVariables = Exact<{
+  productId: Scalars['String'];
+}>;
+
+
+export type DeleteProductMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteProduct'>
+);
+
+export type UpdateProductMutationVariables = Exact<{
+  productId: Scalars['String'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+  price?: Maybe<CurrencyAmountFormData>;
+  tags?: Maybe<Array<Scalars['String']>>;
+}>;
+
+
+export type UpdateProductMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProduct: (
     { __typename?: 'Product' }
     & ProductDataFragment
   ) }
@@ -643,8 +684,8 @@ export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof 
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
 export const CreateProductDocument = gql`
-    mutation CreateProduct($name: String!, $tags: [String!]!, $description: String!, $price: CurrencyAmountFormData) {
-  createProduct(name: $name, tags: $tags, description: $description, price: $price) {
+    mutation CreateProduct($name: String!, $description: String!, $price: CurrencyAmountFormData, $tags: [String!]) {
+  createProduct(name: $name, description: $description, price: $price, tags: $tags) {
     ...ProductData
   }
 }
@@ -664,9 +705,9 @@ export const CreateProductDocument = gql`
  * const [createProductMutation, { data, loading, error }] = useCreateProductMutation({
  *   variables: {
  *      name: // value for 'name'
- *      tags: // value for 'tags'
  *      description: // value for 'description'
  *      price: // value for 'price'
+ *      tags: // value for 'tags'
  *   },
  * });
  */
@@ -676,6 +717,70 @@ export function useCreateProductMutation(baseOptions?: ApolloReactHooks.Mutation
 export type CreateProductMutationHookResult = ReturnType<typeof useCreateProductMutation>;
 export type CreateProductMutationResult = ApolloReactCommon.MutationResult<CreateProductMutation>;
 export type CreateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProductMutation, CreateProductMutationVariables>;
+export const DeleteProductDocument = gql`
+    mutation DeleteProduct($productId: String!) {
+  deleteProduct(productId: $productId)
+}
+    `;
+
+/**
+ * __useDeleteProductMutation__
+ *
+ * To run a mutation, you first call `useDeleteProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteProductMutation, { data, loading, error }] = useDeleteProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useDeleteProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProductMutation, DeleteProductMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteProductMutation, DeleteProductMutationVariables>(DeleteProductDocument, baseOptions);
+      }
+export type DeleteProductMutationHookResult = ReturnType<typeof useDeleteProductMutation>;
+export type DeleteProductMutationResult = ApolloReactCommon.MutationResult<DeleteProductMutation>;
+export type DeleteProductMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProductMutation, DeleteProductMutationVariables>;
+export const UpdateProductDocument = gql`
+    mutation UpdateProduct($productId: String!, $name: String!, $description: String!, $price: CurrencyAmountFormData, $tags: [String!]) {
+  updateProduct(productId: $productId, name: $name, description: $description, price: $price, tags: $tags) {
+    ...ProductData
+  }
+}
+    ${ProductDataFragmentDoc}`;
+
+/**
+ * __useUpdateProductMutation__
+ *
+ * To run a mutation, you first call `useUpdateProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProductMutation, { data, loading, error }] = useUpdateProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *      name: // value for 'name'
+ *      description: // value for 'description'
+ *      price: // value for 'price'
+ *      tags: // value for 'tags'
+ *   },
+ * });
+ */
+export function useUpdateProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProductMutation, UpdateProductMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateProductMutation, UpdateProductMutationVariables>(UpdateProductDocument, baseOptions);
+      }
+export type UpdateProductMutationHookResult = ReturnType<typeof useUpdateProductMutation>;
+export type UpdateProductMutationResult = ApolloReactCommon.MutationResult<UpdateProductMutation>;
+export type UpdateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProductMutation, UpdateProductMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($name: String!) {
   createProject(name: $name) {

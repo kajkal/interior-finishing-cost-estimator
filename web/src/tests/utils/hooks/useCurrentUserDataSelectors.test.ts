@@ -27,6 +27,7 @@ describe('useCurrentUserDataSelectors hook', () => {
             mockUseCurrentUserCachedData.mockReturnValue({
                 ...sampleUser,
                 products: [
+                    { tags: null } as Product,
                     { tags: [ 'C', 'A' ] } as Product,
                     { tags: [ 'A', 'B' ] } as Product,
                 ],

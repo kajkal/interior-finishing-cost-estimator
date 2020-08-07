@@ -27,7 +27,7 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
         let memo = initialState;
         return () => {
             if (products && (memo === initialState)) {
-                const uniqueTags = Array.from(new Set(products.flatMap(({ tags }) => tags)));
+                const uniqueTags = Array.from(new Set(products.flatMap(({ tags }) => tags || [])));
                 const sortedTags = uniqueTags.sort((a, b) => a.localeCompare(b));
                 memo = sortedTags.map((name) => ({ name }));
             }

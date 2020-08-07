@@ -1,10 +1,12 @@
-mutation CreateProduct(
+mutation UpdateProduct(
+    $productId: String!
     $name: String!
     $description: String!
     $price: CurrencyAmountFormData
     $tags: [String!]
 ) {
-    createProduct(
+    updateProduct(
+        productId: $productId
         name: $name
         description: $description
         price: $price

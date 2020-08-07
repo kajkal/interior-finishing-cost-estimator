@@ -78,10 +78,19 @@
     "uploadFile": "Upload file",
     "projectNotFoundError": "Project no longer exists"
   },
+  "product": {
+    "productNotFoundError": "Product no longer exists",
+    "updateModal": {
+      "title": "Edit product"
+    }
+  },
   "modal": {
     "common": {
       "cancel": "Cancel",
-      "reset": "Reset"
+      "reset": "Reset",
+      "create": "Add",
+      "update": "Edit",
+      "delete": "Delete"
     },
     "projectFileUpload": {
       "title": "Upload file to project '{{projectName}}'",
@@ -147,6 +156,7 @@
       "tags": {
         "addTag": "Add tag \"{{tagName}}\"",
         "newTag": "New tag",
+        "clear": "Clear",
         "validation": {
           "tooLong": "Tag name is too long"
         }

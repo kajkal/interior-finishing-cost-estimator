@@ -16,9 +16,10 @@ export type HistoryButtonType = 'undo' | 'redo';
 export interface HistoryButtonProps {
     type: HistoryButtonType;
     disabled?: boolean;
+    onCall?: () => void;
 }
 
-export function HistoryButton({ type, disabled }: HistoryButtonProps): React.ReactElement {
+export function HistoryButton({ type, disabled, onCall }: HistoryButtonProps): React.ReactElement {
     const { t } = useTranslation();
     const editor = useSlate() as ReactEditor & HistoryEditor;
     const { Icon, label, shortcut, historyKey } = getHistoryButtonConfig(type, t);
@@ -30,6 +31,7 @@ export function HistoryButton({ type, disabled }: HistoryButtonProps): React.Rea
         event.preventDefault();
         event.stopPropagation();
         editor[ type ]();
+        onCall && onCall();
     };
 
     return (

@@ -80,7 +80,7 @@ describe('FormikCurrencyAmountField component', () => {
         const handleSubmit = jest.fn();
         render(<FormikCurrencyAmountField name='price' label='Price' />, { wrapper: createWrapper(handleSubmit) });
 
-        await extendedUserEvent.typeNumber(ViewUnderTest.amountInput, '21.50');
+        await extendedUserEvent.paste(ViewUnderTest.amountInput, '21.50');
         userEvent.click(ViewUnderTest.submitButton);
 
         await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
@@ -119,7 +119,7 @@ describe('FormikCurrencyAmountField component', () => {
         await waitFor(() => expect(ViewUnderTest.amountInput).toBeInvalid());
         expect(ViewUnderTest.amountInput).toHaveDescription('Price is required');
 
-        await extendedUserEvent.typeNumber(ViewUnderTest.amountInput, '100.4');
+        await extendedUserEvent.paste(ViewUnderTest.amountInput, '100.4');
 
         // verify if error is visible
         await waitFor(() => expect(ViewUnderTest.amountInput).toBeInvalid());
@@ -131,17 +131,17 @@ describe('FormikCurrencyAmountField component', () => {
 
         // currency with 2 decimal places
         await ViewUnderTest.selectCurrency('PLN');
-        await extendedUserEvent.typeNumber(ViewUnderTest.amountInput, '1.1111');
+        await extendedUserEvent.paste(ViewUnderTest.amountInput, '1.1111');
         expect(ViewUnderTest.amountInput).toHaveValue('1.11');
 
         // currency with 0 decimal places
         await ViewUnderTest.selectCurrency('KRW');
-        await extendedUserEvent.typeNumber(ViewUnderTest.amountInput, '1.1111');
+        await extendedUserEvent.paste(ViewUnderTest.amountInput, '1.1111');
         expect(ViewUnderTest.amountInput).toHaveValue('1');
 
         // currency with 3 decimal places
         await ViewUnderTest.selectCurrency('LYD');
-        await extendedUserEvent.typeNumber(ViewUnderTest.amountInput, '1.1111');
+        await extendedUserEvent.paste(ViewUnderTest.amountInput, '1.1111');
         expect(ViewUnderTest.amountInput).toHaveValue('1.111');
     });
 

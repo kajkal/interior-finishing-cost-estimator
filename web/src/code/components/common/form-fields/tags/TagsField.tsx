@@ -49,6 +49,7 @@ export const TagsField = React.memo(
                     multiple
                     handleHomeEndKeys
                     openOnFocus
+                    clearText={t('form.common.tags.clear')}
 
                     disabled={disabled}
                     value={value}
@@ -60,6 +61,7 @@ export const TagsField = React.memo(
 
                     options={definedTagOptions}
                     filterSelectedOptions
+                    getOptionSelected={isOptionSelected}
                     filterOptions={(options, params) => {
                         const filtered = filter(options, params);
 
@@ -129,6 +131,10 @@ function isNewTagOptionUnique(newOptionName: string, selectedOptions: TagOption[
 
 function isValidTagOption(option: TagOption | undefined | null): option is TagOption {
     return Boolean(option);
+}
+
+function isOptionSelected(option: TagOption, value: TagOption) {
+    return option.name === value.name;
 }
 
 

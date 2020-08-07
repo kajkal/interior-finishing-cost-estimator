@@ -6,8 +6,8 @@
 
 import React from 'react';
 import { useSetRecoilState } from 'recoil/dist';
-import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { CurrencyAmountFieldController } from '../../../__utils__/field-controllers/CurrencyAmountFieldController';
@@ -16,19 +16,32 @@ import { TextFieldController } from '../../../__utils__/field-controllers/TextFi
 import { TagsFieldController } from '../../../__utils__/field-controllers/TagsFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 
-import { CreateProductDocument, CreateProductMutation, CreateProductMutationVariables, User } from '../../../../graphql/generated-types';
-import { productCreateModalAtom } from '../../../../code/components/modals/product-create/productCreateModalAtom';
-import { ProductCreateModal } from '../../../../code/components/modals/product-create/ProductCreateModal';
+import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../../../code/components/modals/product-update/productUpdateModalAtom';
+import { Product, UpdateProductDocument, UpdateProductMutation, UpdateProductMutationVariables, User } from '../../../../graphql/generated-types';
+import { ProductUpdateModal } from '../../../../code/components/modals/product-update/ProductUpdateModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { supportedCurrencies } from '../../../../code/config/supportedCurrencies';
 
 
-describe('ProductCreateModal component', () => {
+describe('ProductUpdateModal component', () => {
 
     const sampleUser: Partial<User> = {
         __typename: 'User',
         slug: 'sample-user',
-        products: [],
+        products: [ /* relation with sampleProduct is created on apollo cache level */ ],
+    };
+
+    const sampleProduct: Product = {
+        __typename: 'Product',
+        id: '5f09e24646904045d48e5598',
+        name: 'Sample product name',
+        description: JSON.stringify([ {
+            children: [
+                { type: 'p', children: [ { text: 'Sample description' } ] },
+            ],
+        } ]),
+        price: { currency: 'PLN', amount: 4.5 },
+        tags: [ 'Sample tag', 'Other tag' ],
     };
 
     beforeEach(() => {
@@ -37,18 +50,21 @@ describe('ProductCreateModal component', () => {
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
-            const setModalState = useSetRecoilState(productCreateModalAtom);
+            const setModalState = useSetRecoilState(productUpdateModalAtom);
             return (
                 <button
                     data-testid='open-modal-button'
-                    onClick={() => setModalState({ open: true })}
+                    onClick={() => setModalState({
+                        open: true,
+                        productData: mapProductToProductUpdateFormData(sampleProduct),
+                    })}
                 />
             );
         };
         return render(
             <MockContextProvider mocks={mocks}>
                 <OpenModalButton />
-                <ProductCreateModal isMobile={false} />
+                <ProductUpdateModal isMobile={false} />
             </MockContextProvider>,
         );
     }
@@ -56,13 +72,17 @@ describe('ProductCreateModal component', () => {
     function initApolloTestCache() {
         const cache = initApolloCache();
         return cache.restore({
-            [ cache.identify(sampleUser)! ]: sampleUser,
+            [ cache.identify(sampleProduct)! ]: sampleProduct,
+            [ cache.identify(sampleUser)! ]: {
+                ...sampleUser,
+                products: [ { __ref: cache.identify(sampleProduct) } ],
+            },
         });
     }
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.productCreate.title`);
+            return screen.queryByLabelText(`t:product.updateModal.title`);
         }
         static get productNameInput() {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
@@ -79,27 +99,27 @@ describe('ProductCreateModal component', () => {
         static get cancelButton() {
             return screen.getByRole('button', { name: 't:modal.common.cancel' });
         }
-        static get createButton() {
-            return screen.getByRole('button', { name: 't:modal.productCreate.create' });
+        static get submitButton() {
+            return screen.getByRole('button', { name: 't:modal.common.update' });
         }
         static async openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));
-            await waitFor(() => expect(ViewUnderTest.modal).toBeInTheDocument());
+            await waitFor(() => expect(ViewUnderTest.modal).toBeVisible());
         }
-        static async fillAndSubmitForm(data: CreateProductMutationVariables) {
+        static async fillAndSubmitForm(data: UpdateProductMutationVariables) {
             await ViewUnderTest.openModal();
 
             await TextFieldController.from(ViewUnderTest.productNameInput)
                 .type(data.name);
             await EditorFieldController.from(ViewUnderTest.productDescriptionInput)
-                .typeInEditor('Sample description');
+                .typeInEditor('Sample updated description');
             await CurrencyAmountFieldController.from(ViewUnderTest.productPriceInput)
                 .pasteAmount(`${data.price?.amount || ''}`)
                 .selectCurrency(data.price?.currency || supportedCurrencies[ 0 ]);
             await TagsFieldController.from(ViewUnderTest.productTagsInput).removeAllTags()
                 .addNewTags(data.tags);
 
-            userEvent.click(this.createButton);
+            userEvent.click(this.submitButton);
         }
     }
 
@@ -120,30 +140,31 @@ describe('ProductCreateModal component', () => {
         await waitForElementToBeRemoved(ViewUnderTest.modal);
     });
 
-    describe('product create form', () => {
+    describe('product update form', () => {
 
         const mockResponseGenerator = {
             success: () => ({
                 request: {
-                    query: CreateProductDocument,
+                    query: UpdateProductDocument,
                     variables: {
-                        name: 'Mist Grey Porcelain Floor Tile',
-                        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-                        price: { amount: 14.04, currency: 'PLN' },
-                        tags: [ 'Bathroom' ],
-                    } as CreateProductMutationVariables,
+                        productId: sampleProduct.id,
+                        name: 'Updated product name',
+                        description: '[{"children":[{"type":"p","children":[{"text":"Sample updated description"}]}]}]',
+                        price: null,
+                        tags: null,
+                    } as UpdateProductMutationVariables,
                 },
                 result: {
                     data: {
-                        createProduct: {
+                        updateProduct: {
                             __typename: 'Product',
-                            id: 'sampleProjectId',
-                            name: 'Mist Grey Porcelain Floor Tile',
-                            description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-                            price: { amount: 14.04, currency: 'PLN' },
-                            tags: [ 'Bathroom' ],
+                            id: sampleProduct.id,
+                            name: 'Updated product name',
+                            description: '[{"children":[{"type":"p","children":[{"text":"Sample updated description"}]}]}]',
+                            price: null,
+                            tags: null,
                         },
-                    } as CreateProductMutation,
+                    } as UpdateProductMutation,
                 },
             }),
         };
@@ -164,7 +185,7 @@ describe('ProductCreateModal component', () => {
                     .type('valid project name').expectNoError();
             });
 
-            it('should validate productDescription input value', async () => {
+            it('should validate productDescription value', async () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
 
@@ -193,15 +214,21 @@ describe('ProductCreateModal component', () => {
 
         });
 
-        it('should successfully create product and close modal', async () => {
+        it('should successfully update product and close modal', async () => {
             const cache = initApolloTestCache();
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ], apolloCache: cache });
 
             const userCacheRecordKey = cache.identify(sampleUser)!;
+            const productCacheRecordKey = cache.identify(sampleProduct)!;
+
             // verify initial cache records
             expect(cache.extract()).toEqual({
-                [ userCacheRecordKey ]: sampleUser,
+                [ productCacheRecordKey ]: sampleProduct,
+                [ userCacheRecordKey ]: {
+                    ...sampleUser,
+                    products: [ { __ref: productCacheRecordKey } ],
+                },
             });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -210,13 +237,12 @@ describe('ProductCreateModal component', () => {
             await waitForElementToBeRemoved(ViewUnderTest.modal);
 
             // verify updated cache
-            const createdProject = mockResponse.result.data.createProduct;
-            const createdProductCacheRecordKey = cache.identify(createdProject)!;
+            const updatedProduct = mockResponse.result.data.updateProduct;
             expect(cache.extract()).toEqual({
-                [ createdProductCacheRecordKey ]: createdProject, // <- updated product record
+                [ productCacheRecordKey ]: updatedProduct, // <- updated product record
                 [ userCacheRecordKey ]: {
                     ...sampleUser,
-                    products: [ { __ref: createdProductCacheRecordKey } ], // <- product list with new product ref
+                    products: [ { __ref: productCacheRecordKey } ], // <- no changes here
                 },
                 'ROOT_MUTATION': expect.any(Object),
             });

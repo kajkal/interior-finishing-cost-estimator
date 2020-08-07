@@ -78,10 +78,19 @@
     "uploadFile": "Dodaj plik",
     "projectNotFoundError": "Projekt już nie istnieje"
   },
+  "product": {
+    "updateModal": {
+      "title": "Edytuj produkt"
+    },
+    "productNotFoundError": "Produkt już nie istnieje"
+  },
   "modal": {
     "common": {
       "cancel": "Anuluj",
-      "reset": "Resetuj"
+      "reset": "Resetuj",
+      "create": "Dodaj",
+      "update": "Edytuj",
+      "delete": "Usuń"
     },
     "projectFileUpload": {
       "title": "Dodaj plik do projektu '{{projectName}}'",
@@ -147,6 +156,7 @@
       "tags": {
         "addTag": "Dodaj tag \"{{tagName}}\"",
         "newTag": "Nowy tag",
+        "clear": "Wyczyść",
         "validation": {
           "tooLong": "Wprowadzona nazwa tagu jest za długa"
         }

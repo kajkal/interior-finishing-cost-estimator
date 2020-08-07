@@ -1,5 +1,5 @@
 import { ReactEditor } from 'slate-react';
-import { Transforms } from 'slate';
+import { Node, Transforms } from 'slate';
 
 
 let isFocusedSpy: jest.SpiedFunction<typeof ReactEditor.isFocused>;
@@ -18,7 +18,7 @@ function typeInEditor(text: string) {
     const editor = isFocusedSpy.mock.calls[ 0 ][ 0 ];
     Transforms.select(editor, {
         anchor: { path: [ 0, 0, 0 ], offset: 0 },
-        focus: { path: [ 0, 0, 0 ], offset: 0 },
+        focus: { path: [ 0, 0, 0 ], offset: Node.string(editor.children[ 0 ]).length },
     });
     Transforms.insertText(editor, text);
 }

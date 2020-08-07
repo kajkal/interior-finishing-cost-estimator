@@ -71,12 +71,12 @@ export function ProductCreateModal({ isMobile }: ResponsiveModalProps): React.Re
             <Formik<ProductCreateFormData>
                 initialValues={{
                     name: '',
-                    tags: [],
                     description: emptyEditorValue,
                     price: {
                         currency: 'PLN',
                         amount: undefined,
                     },
+                    tags: [],
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -141,21 +141,26 @@ export function ProductCreateModal({ isMobile }: ResponsiveModalProps): React.Re
  */
 function useProductCreateFormValidationSchema(t: TFunction) {
     return React.useMemo(() => Yup.object<ProductCreateFormData>({
+
         name: Yup.string()
             .required(t('form.productName.validation.required'))
             .min(3, t('form.productName.validation.tooShort'))
             .max(255, t('form.productName.validation.tooLong')),
+
         description: Yup.mixed<SlateDocument>()
             .test('match', t('form.productDescription.validation.required'), isSlateDocumentNotEmpty),
+
         price: Yup.object<CurrencyAmount>({
             currency: Yup.string().required(t('form.common.currencyAmount.validation.invalidCurrency')),
             amount: Yup.number().max(1e6, t('form.productPrice.validation.tooHigh')),
         }).defined(),
+
         tags: Yup.array<TagOption>().of(
             Yup.object<TagOption>({
                 name: Yup.string().max(255, t('form.common.tags.validation.tooLong')).required(),
             }).required(),
         ).defined(),
+
     }).defined(), [ t ]);
 }
 
@@ -172,9 +177,9 @@ function useProductCreateFormSubmitHandler(onModalClose: () => void, userSlug: s
             await createProductMutation({
                 variables: {
                     name: name,
-                    tags: tags.map(({ name }) => name),
                     description: JSON.stringify(description),
                     price: isValidCurrencyAmountFormData(price) ? price : null,
+                    tags: tags.length ? tags.map(({ name }) => name) : null,
                 },
                 update: (cache, { data }) => {
                     const createdProduct = data?.createProduct;

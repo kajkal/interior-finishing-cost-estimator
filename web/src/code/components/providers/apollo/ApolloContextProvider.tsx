@@ -69,6 +69,9 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
             ErrorHandler.handleGraphQlError(graphQLErrors, 'PROJECT_NOT_FOUND', () => {
                 errorToast(({ t }) => t('projectPage.projectNotFoundError'));
             });
+            ErrorHandler.handleGraphQlError(graphQLErrors, 'PRODUCT_NOT_FOUND', () => {
+                errorToast(({ t }) => t('product.productNotFoundError'));
+            });
         }).concat(client.link));
 
     }, [ client, errorToast ]);

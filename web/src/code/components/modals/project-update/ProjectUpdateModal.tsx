@@ -38,11 +38,6 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
     const validationSchema = useProjectUpdateFormValidationSchema(t);
     const handleSubmit = useProjectUpdateFormSubmitHandler(handleModalClose);
 
-    const areInitialValues = (currentValues: ProjectUpdateFormData) => (
-        (projectData?.slug !== currentValues.projectSlug) ||
-        (projectData?.name !== currentValues.name)
-    );
-
     useModalNavigationBlocker(handleModalClose, open);
     const titleId = 'project-update-modal-title';
 
@@ -66,43 +61,52 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
-                {({ values, submitForm, resetForm }) => (
-                    <>
-                        <DialogContent>
-                            <Form className='update-project-form'>
+                {({ values, initialValues, submitForm, resetForm }) => {
+                    const inInitialState = areValuesEqInitialValues(values, initialValues);
+                    return (
+                        <>
+                            <DialogContent>
+                                <Form className='update-project-form'>
 
-                                <input type='hidden' name='projectSlug' value={values.projectSlug} />
+                                    <input type='hidden' name='projectSlug' value={values.projectSlug} />
 
-                                <FormikTextField
-                                    aria-label={t('form.projectName.ariaLabel')}
-                                    name='name'
-                                    label={t('form.projectName.label')}
-                                    fullWidth
-                                    helperText={(projectData?.name !== values.name) ? t('modal.projectUpdate.urlWillChange') : undefined}
-                                    autoFocus
-                                />
+                                    <FormikTextField
+                                        aria-label={t('form.projectName.ariaLabel')}
+                                        name='name'
+                                        label={t('form.projectName.label')}
+                                        fullWidth
+                                        helperText={(projectData?.name !== values.name) ? t('modal.projectUpdate.urlWillChange') : undefined}
+                                        autoFocus
+                                    />
 
-                            </Form>
-                        </DialogContent>
+                                </Form>
+                            </DialogContent>
 
-                        <DialogActions>
-                            <Button type='button' variant='outlined' onClick={handleModalClose}>
-                                {t('modal.common.cancel')}
-                            </Button>
-                            <Button type='button' variant='outlined' onClick={resetForm as () => void}
-                                disabled={!areInitialValues(values)}>
-                                {t('modal.common.reset')}
-                            </Button>
-                            <FormikSubmitButton type='button' onClick={submitForm} disabled={!areInitialValues(values)}>
-                                {t('modal.projectUpdate.update')}
-                            </FormikSubmitButton>
-                        </DialogActions>
-                    </>
-                )}
+                            <DialogActions>
+                                <Button type='button' variant='outlined' onClick={handleModalClose}>
+                                    {t('modal.common.cancel')}
+                                </Button>
+                                <Button type='button' variant='outlined' onClick={resetForm as () => void}
+                                    disabled={inInitialState}>
+                                    {t('modal.common.reset')}
+                                </Button>
+                                <FormikSubmitButton type='button' onClick={submitForm} disabled={inInitialState}>
+                                    {t('modal.projectUpdate.update')}
+                                </FormikSubmitButton>
+                            </DialogActions>
+                        </>
+                    );
+                }}
             </Formik>
 
         </Dialog>
     );
+}
+
+
+function areValuesEqInitialValues(values: ProjectUpdateFormData, initialValues: ProjectUpdateFormData): boolean {
+    return (values.projectSlug === initialValues.projectSlug)
+        && (values.name === initialValues.name);
 }
 
 

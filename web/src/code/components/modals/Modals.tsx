@@ -5,6 +5,7 @@ import { ProjectFileUploadModal } from './project-file-upload/ProjectFileUploadM
 import { ProjectDeleteModal } from './project-delete/ProjectDeleteModal';
 import { ProjectUpdateModal } from './project-update/ProjectUpdateModal';
 import { ProductCreateModal } from './product-create/ProductCreateModal';
+import { ProductUpdateModal } from './product-update/ProductUpdateModal';
 
 
 export function Modals(): React.ReactElement {
@@ -15,6 +16,7 @@ export function Modals(): React.ReactElement {
             <ProjectDeleteModal />
             <ProjectUpdateModal isMobile={isMobile} />
             <ProductCreateModal isMobile={isMobile} />
+            <ProductUpdateModal isMobile={isMobile} />
         </>
     );
 }
