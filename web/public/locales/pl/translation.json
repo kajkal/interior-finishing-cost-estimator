@@ -96,6 +96,10 @@
     "updateModal": {
       "title": "Edytuj produkt"
     },
+    "deleteModal": {
+      "title": "Usuń produkt '{{productName}}'",
+      "firstLine": "Czy na pewno chcesz permanentnie usunąć ten produkt?"
+    },
     "productNotFoundError": "Produkt już nie istnieje"
   },
   "form": {

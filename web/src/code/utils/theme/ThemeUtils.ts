@@ -145,6 +145,11 @@ export class ThemeUtils {
                     },
                 },
             },
+            MuiDialogContent: {
+                root: {
+                    paddingBottom: theme.spacing(3),
+                }
+            },
         };
 
         return theme;

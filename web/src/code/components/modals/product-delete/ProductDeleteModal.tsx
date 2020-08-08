@@ -1,6 +1,5 @@
 import React from 'react';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router';
 import { Reference } from '@apollo/client';
 import { useRecoilState } from 'recoil/dist';
 import { useTranslation } from 'react-i18next';
@@ -9,47 +8,46 @@ import { Form, Formik, FormikConfig } from 'formik';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+import { MutationDeleteProductArgs, useDeleteProductMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
-import { MutationDeleteProjectArgs, useDeleteProjectMutation } from '../../../../graphql/generated-types';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
-import { projectDeleteModalAtom } from './projectDeleteModalAtom';
-import { nav } from '../../../config/nav';
+import { productDeleteModalAtom } from './productDeleteModalAtom';
 
 
-type ProjectDeleteFormData = MutationDeleteProjectArgs;
+type ProductDeleteFormData = MutationDeleteProductArgs;
 
-export function ProjectDeleteModal(): React.ReactElement {
+export function ProductDeleteModal(): React.ReactElement {
     const { t } = useTranslation();
-    const [ { open, projectData }, setModalState ] = useRecoilState(projectDeleteModalAtom);
+    const [ { open, productData }, setModalState ] = useRecoilState(productDeleteModalAtom);
 
     const handleModalClose = React.useCallback(() => {
         setModalState((prevState) => ({ ...prevState, open: false }));
     }, [ setModalState ]);
 
-    const validationSchema = useProjectDeleteFormValidationSchema();
-    const handleSubmit = useProjectDeleteFormSubmitHandler(handleModalClose);
+    const validationSchema = useProductDeleteFormValidationSchema();
+    const handleSubmit = useProductDeleteFormSubmitHandler(handleModalClose);
 
     useModalNavigationBlocker(handleModalClose, open);
-    const titleId = 'delete-project-modal-title';
-    const contentId = 'delete-project-modal-content';
+    const titleId = 'delete-product-modal-title';
+    const contentId = 'delete-product-modal-content';
 
     return (
         <Dialog open={open} onClose={handleModalClose} aria-labelledby={titleId} aria-describedby={contentId}>
 
             <DialogTitle id={titleId}>
-                {t('project.deleteModal.title', { projectName: projectData?.name })}
+                {t('product.deleteModal.title', { productName: productData?.name })}
             </DialogTitle>
 
-            <Formik<ProjectDeleteFormData>
+            <Formik<ProductDeleteFormData>
                 initialValues={{
-                    projectSlug: projectData?.slug || '',
+                    productId: productData?.id || '',
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -57,15 +55,13 @@ export function ProjectDeleteModal(): React.ReactElement {
                 {({ values, submitForm }) => (
                     <>
                         <DialogContent id={contentId}>
+
                             <Typography color='textSecondary'>
-                                {t('project.deleteModal.firstLine')}
-                            </Typography>
-                            <Typography color='textSecondary'>
-                                {t('project.deleteModal.secondLine')}
+                                {t('product.deleteModal.firstLine')}
                             </Typography>
 
-                            <Form className='delete-project-form'>
-                                <input type='hidden' name='projectSlug' value={values.projectSlug} />
+                            <Form className='delete-product-form'>
+                                <input type='hidden' name='productId' value={values.productId} />
                             </Form>
 
                         </DialogContent>
@@ -90,9 +86,9 @@ export function ProjectDeleteModal(): React.ReactElement {
 /**
  * Validation schema
  */
-function useProjectDeleteFormValidationSchema() {
-    return React.useMemo(() => Yup.object<ProjectDeleteFormData>({
-        projectSlug: Yup.string().min(3).required(),
+function useProductDeleteFormValidationSchema() {
+    return React.useMemo(() => Yup.object<ProductDeleteFormData>({
+        productId: Yup.string().length(24).required(),
     }).defined(), []);
 }
 
@@ -100,40 +96,29 @@ function useProjectDeleteFormValidationSchema() {
 /**
  * Submit handler
  */
-function useProjectDeleteFormSubmitHandler(onModalClose: () => void) {
-    const navigate = useNavigate();
-    const userCachedData = useCurrentUserCachedData();
-    const [ deleteProjectMutation, { loading } ] = useDeleteProjectMutation();
+function useProductDeleteFormSubmitHandler(onModalClose: () => void) {
+    const userSlug = useCurrentUserCachedData()?.slug;
+    const [ deleteProductMutation, { loading } ] = useDeleteProductMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<ProjectDeleteFormData>['onSubmit']>(async (values) => {
+    return React.useCallback<FormikConfig<ProductDeleteFormData>['onSubmit']>(async (values) => {
         try {
-            await deleteProjectMutation({
+            await deleteProductMutation({
                 variables: values,
                 update: (cache, { data }) => {
-                    const isSuccess = data?.deleteProject;
-                    const userSlug = userCachedData?.slug;
-
-                    if (isSuccess && userSlug) {
-                        // navigate first in order to prevent refetch of ProjectDetails query
-                        navigate(nav.createProject(), { replace: true });
-
+                    const isSuccess = data?.deleteProduct;
+                    if (isSuccess) {
                         cache.modify({
                             id: cache.identify({ __typename: 'User', slug: userSlug }),
                             fields: {
-                                project: (existingProjectRef: Reference, { readField, DELETE }) => (
-                                    (readField('slug', existingProjectRef) === values.projectSlug)
-                                        ? DELETE
-                                        : existingProjectRef
-                                ),
-                                projects: (existingProjectRefs: Reference[] = [], { readField }) => (
-                                    existingProjectRefs.filter((projectRef) => readField('slug', projectRef) !== values.projectSlug)
+                                products: (existingProductRefs: Reference[] = [], { readField }) => (
+                                    existingProductRefs.filter((productRef) => readField('id', productRef) !== values.productId)
                                 ),
                             },
                         });
 
                         cache.evict({
-                            id: cache.identify({ __typename: 'Project', slug: values.projectSlug }),
+                            id: cache.identify({ __typename: 'Product', id: values.productId }),
                         });
                     }
                 },
@@ -142,5 +127,5 @@ function useProjectDeleteFormSubmitHandler(onModalClose: () => void) {
         } catch (error) {
             ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, navigate, userCachedData, deleteProjectMutation ]);
+    }, [ onModalClose, userSlug, deleteProductMutation ]);
 }

@@ -12,8 +12,10 @@ describe('Modals component', () => {
         mockComponent('/code/components/modals/project-update/ProjectUpdateModal');
         mockComponent('/code/components/modals/project-delete/ProjectDeleteModal');
         mockComponent('/code/components/modals/project-file-upload/ProjectFileUploadModal');
+
         mockComponent('/code/components/modals/product-create/ProductCreateModal');
         mockComponent('/code/components/modals/product-update/ProductUpdateModal');
+        mockComponent('/code/components/modals/product-delete/ProductDeleteModal');
     });
 
     it('should render all registered modals', () => {
@@ -21,8 +23,10 @@ describe('Modals component', () => {
         expect(screen.getByTestId('mock-ProjectUpdateModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProjectDeleteModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProjectFileUploadModal')).toBeVisible();
+
         expect(screen.getByTestId('mock-ProductCreateModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProductUpdateModal')).toBeVisible();
+        expect(screen.getByTestId('mock-ProductDeleteModal')).toBeVisible();
     });
 
 });
