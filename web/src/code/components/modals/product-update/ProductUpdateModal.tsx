@@ -118,14 +118,14 @@ export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
 
                             <DialogActions>
                                 <Button type='button' variant='outlined' onClick={handleModalClose}>
-                                    {t('modal.common.cancel')}
+                                    {t('form.common.cancel')}
                                 </Button>
                                 <Button type='button' variant='outlined' onClick={resetForm as () => void}
                                     disabled={inInitialState}>
-                                    {t('modal.common.reset')}
+                                    {t('form.common.reset')}
                                 </Button>
                                 <FormikSubmitButton type='button' onClick={submitForm} disabled={inInitialState}>
-                                    {t('modal.common.update')}
+                                    {t('form.common.update')}
                                 </FormikSubmitButton>
                             </DialogActions>
                         </>

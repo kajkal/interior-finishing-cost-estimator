@@ -67,7 +67,7 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
                 errorToast(({ t }) => t('error.resourceOwnerRoleRequired'));
             });
             ErrorHandler.handleGraphQlError(graphQLErrors, 'PROJECT_NOT_FOUND', () => {
-                errorToast(({ t }) => t('projectPage.projectNotFoundError'));
+                errorToast(({ t }) => t('project.projectNotFoundError'));
             });
             ErrorHandler.handleGraphQlError(graphQLErrors, 'PRODUCT_NOT_FOUND', () => {
                 errorToast(({ t }) => t('product.productNotFoundError'));

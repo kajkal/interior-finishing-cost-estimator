@@ -71,13 +71,13 @@ describe('ProjectDeleteModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.projectDelete.title:{"projectName":"${sampleProject.name}"}`);
+            return screen.queryByLabelText(`t:project.deleteModal.title:{"projectName":"${sampleProject.name}"}`);
         }
         static get cancelButton() {
-            return screen.getByRole('button', { name: 't:modal.common.cancel' });
+            return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get deleteButton() {
-            return screen.getByRole('button', { name: 't:modal.projectDelete.delete' });
+            return screen.getByRole('button', { name: 't:form.common.delete' });
         }
         static openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));

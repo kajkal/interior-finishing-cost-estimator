@@ -47,7 +47,7 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
             fullWidth
         >
             <DialogTitle id={titleId}>
-                {t('modal.projectFileUpload.title', { projectName: projectData?.name })}
+                {t('project.fileUploadModal.title', { projectName: projectData?.name })}
             </DialogTitle>
 
             <Formik<ProjectFileUploadFormData>
@@ -85,10 +85,10 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
 
                         <DialogActions>
                             <Button type='button' variant='outlined' onClick={handleModalClose}>
-                                {t('modal.common.cancel')}
+                                {t('form.common.cancel')}
                             </Button>
                             <FormikSubmitButton type='button' onClick={submitForm}>
-                                {t('modal.projectFileUpload.upload')}
+                                {t('project.fileUploadModal.upload')}
                             </FormikSubmitButton>
                         </DialogActions>
                     </>

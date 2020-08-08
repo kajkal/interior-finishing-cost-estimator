@@ -219,7 +219,7 @@ describe('ApolloContextProvider component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:projectPage.projectNotFoundError');
+            expect(toast).toHaveTextContent('t:project.projectNotFoundError');
         });
 
         it('should globally handle {PRODUCT_NOT_FOUND} GraphQL errors', async () => {

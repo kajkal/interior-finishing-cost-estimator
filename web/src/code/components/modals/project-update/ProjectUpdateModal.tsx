@@ -50,7 +50,7 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
             fullWidth
         >
             <DialogTitle id={titleId}>
-                {t('modal.projectUpdate.title', { projectName: projectData?.name })}
+                {t('project.updateModal.title', { projectName: projectData?.name })}
             </DialogTitle>
 
             <Formik<ProjectUpdateFormData>
@@ -75,7 +75,7 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                         name='name'
                                         label={t('form.projectName.label')}
                                         fullWidth
-                                        helperText={(projectData?.name !== values.name) ? t('modal.projectUpdate.urlWillChange') : undefined}
+                                        helperText={(projectData?.name !== values.name) ? t('project.updateModal.urlWillChange') : undefined}
                                         autoFocus
                                     />
 
@@ -84,14 +84,14 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
 
                             <DialogActions>
                                 <Button type='button' variant='outlined' onClick={handleModalClose}>
-                                    {t('modal.common.cancel')}
+                                    {t('form.common.cancel')}
                                 </Button>
                                 <Button type='button' variant='outlined' onClick={resetForm as () => void}
                                     disabled={inInitialState}>
-                                    {t('modal.common.reset')}
+                                    {t('form.common.reset')}
                                 </Button>
                                 <FormikSubmitButton type='button' onClick={submitForm} disabled={inInitialState}>
-                                    {t('modal.projectUpdate.update')}
+                                    {t('form.common.update')}
                                 </FormikSubmitButton>
                             </DialogActions>
                         </>

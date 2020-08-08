@@ -38,7 +38,7 @@ describe('UpdateProjectButton component', () => {
     it('should pass project data to ProjectDeleteModal and open it', () => {
         renderInMockContext();
 
-        userEvent.click(screen.getByRole('button', { name: 't:projectPage.updateThisProject' }));
+        userEvent.click(screen.getByRole('button', { name: 't:project.updateThisProject' }));
 
         // verify if upload project file modal atom state changed
         expect(projectUpdateModalAtomSpy).toHaveBeenLastCalledWith({

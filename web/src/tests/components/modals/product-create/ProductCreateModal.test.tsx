@@ -62,7 +62,7 @@ describe('ProductCreateModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.productCreate.title`);
+            return screen.queryByLabelText(`t:product.createModal.title`);
         }
         static get productNameInput() {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
@@ -77,10 +77,10 @@ describe('ProductCreateModal component', () => {
             return screen.getByLabelText(/t:form.productTags.label/, { selector: 'input' });
         }
         static get cancelButton() {
-            return screen.getByRole('button', { name: 't:modal.common.cancel' });
+            return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get createButton() {
-            return screen.getByRole('button', { name: 't:modal.productCreate.create' });
+            return screen.getByRole('button', { name: 't:form.common.create' });
         }
         static async openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));

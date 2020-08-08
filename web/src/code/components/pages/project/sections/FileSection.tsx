@@ -32,7 +32,7 @@ export function FileSection({ project }: FileSectionProps): React.ReactElement {
     const { t } = useTranslation();
 
     return (
-        <Section id='files' title={t('projectPage.files')} className={classes.fileList}>
+        <Section id='files' title={t('project.files')} className={classes.fileList}>
 
             <UploadFileButton
                 t={t}
@@ -119,18 +119,18 @@ function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): 
                 href={fileData.url}
                 rel='noreferrer'
                 target='_blank'
-                aria-label={t('projectPage.openFile', { filename: fileData.name })}
+                aria-label={t('project.openFile', { filename: fileData.name })}
                 aria-describedby={descriptionId}
             >
 
                 <ConsciousFileIcon className={classes.previewIcon} filename={fileData.name} />
 
-                <Tooltip title={t('projectPage.removeThisFile')!}>
+                <Tooltip title={t('project.removeThisFile')!}>
                     <IconButton
                         size='small'
                         className={classes.deleteButton}
                         onClick={handleFileDelete}
-                        aria-label={t('projectPage.removeThisFile')}
+                        aria-label={t('project.removeThisFile')}
                     >
                         <ClearIcon />
                     </IconButton>
@@ -196,7 +196,7 @@ function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileBu
 
             <div className={classes.textContainer}>
                 <Typography variant='body2' component='span'>
-                    {t('projectPage.uploadFile')}
+                    {t('project.uploadFile')}
                 </Typography>
             </div>
 

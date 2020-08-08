@@ -46,7 +46,7 @@ export function ProjectDeleteModal(): React.ReactElement {
         <Dialog open={open} onClose={handleModalClose} aria-labelledby={titleId} aria-describedby={contentId}>
 
             <DialogTitle id={titleId}>
-                {t('modal.projectDelete.title', { projectName: projectData?.name })}
+                {t('project.deleteModal.title', { projectName: projectData?.name })}
             </DialogTitle>
 
             <Formik<ProjectDeleteFormData>
@@ -60,10 +60,10 @@ export function ProjectDeleteModal(): React.ReactElement {
                     <>
                         <DialogContent id={contentId}>
                             <Typography color='textSecondary'>
-                                {t('modal.projectDelete.firstLine')}
+                                {t('project.deleteModal.firstLine')}
                             </Typography>
                             <Typography color='textSecondary' className={classes.contentBottom}>
-                                {t('modal.projectDelete.secondLine')}
+                                {t('project.deleteModal.secondLine')}
                             </Typography>
 
                             <Form className='delete-project-form'>
@@ -74,10 +74,10 @@ export function ProjectDeleteModal(): React.ReactElement {
 
                         <DialogActions>
                             <Button type='button' variant='outlined' onClick={handleModalClose} autoFocus>
-                                {t('modal.common.cancel')}
+                                {t('form.common.cancel')}
                             </Button>
                             <FormikSubmitButton type='button' onClick={submitForm} className={classes.deleteButton}>
-                                {t('modal.projectDelete.delete')}
+                                {t('form.common.delete')}
                             </FormikSubmitButton>
                         </DialogActions>
                     </>

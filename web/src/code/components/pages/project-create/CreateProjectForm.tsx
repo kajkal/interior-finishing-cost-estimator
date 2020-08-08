@@ -51,7 +51,7 @@ export function CreateProjectForm({ formClassName }: CreateProjectFormProps): Re
                     className={classes.submit}
                     fullWidth
                 >
-                    {t('createProjectPage.createProject')}
+                    {t('project.createProject')}
                 </FormikSubmitButton>
 
             </Form>

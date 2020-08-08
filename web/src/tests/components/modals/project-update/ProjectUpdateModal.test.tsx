@@ -73,19 +73,19 @@ describe('ProjectUpdateModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.projectUpdate.title:{"projectName":"${sampleProject.name}"}`);
+            return screen.queryByLabelText(`t:project.updateModal.title:{"projectName":"${sampleProject.name}"}`);
         }
         static get projectNameInput() {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
         }
         static get cancelButton() {
-            return screen.getByRole('button', { name: 't:modal.common.cancel' });
+            return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get resetButton() {
-            return screen.getByRole('button', { name: 't:modal.common.reset' });
+            return screen.getByRole('button', { name: 't:form.common.reset' });
         }
         static get submitButton() {
-            return screen.getByRole('button', { name: 't:modal.projectUpdate.update' });
+            return screen.getByRole('button', { name: 't:form.common.update' });
         }
         static openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));
@@ -150,8 +150,8 @@ describe('ProjectUpdateModal component', () => {
                     .expectError('', 't:form.projectName.validation.required')
                     .expectError('aa', 't:form.projectName.validation.tooShort')
                     .expectError('a'.repeat(51), 't:form.projectName.validation.tooLong')
-                    .expectNoError('a'.repeat(50), 't:modal.projectUpdate.urlWillChange')
-                    .expectNoError('valid project name', 't:modal.projectUpdate.urlWillChange')
+                    .expectNoError('a'.repeat(50), 't:project.updateModal.urlWillChange')
+                    .expectNoError('valid project name', 't:project.updateModal.urlWillChange')
                     .expectNoError(sampleProject.name!);
             });
 

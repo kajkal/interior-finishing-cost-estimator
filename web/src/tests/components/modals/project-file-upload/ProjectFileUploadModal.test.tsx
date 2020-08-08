@@ -49,7 +49,7 @@ describe('ProjectFileUploadModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText(`t:modal.projectFileUpload.title:{"projectName":"${sampleProject.name}"}`);
+            return screen.queryByLabelText(`t:project.fileUploadModal.title:{"projectName":"${sampleProject.name}"}`);
         }
         static get fileDropzone() {
             return screen.getByLabelText('t:form.projectFile.label');
@@ -58,10 +58,10 @@ describe('ProjectFileUploadModal component', () => {
             return screen.getByLabelText(/^t:form.projectFileDescription.label/, { selector: 'input' });
         }
         static get cancelButton() {
-            return screen.getByRole('button', { name: 't:modal.common.cancel' });
+            return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get submitButton() {
-            return screen.getByRole('button', { name: 't:modal.projectFileUpload.upload' });
+            return screen.getByRole('button', { name: 't:project.fileUploadModal.upload' });
         }
         static openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));

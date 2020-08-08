@@ -65,7 +65,7 @@ export function ProductCreateModal({ isMobile }: ResponsiveModalProps): React.Re
             fullWidth
         >
             <DialogTitle id={titleId}>
-                {t('modal.productCreate.title')}
+                {t('product.createModal.title')}
             </DialogTitle>
 
             <Formik<ProductCreateFormData>
@@ -121,10 +121,10 @@ export function ProductCreateModal({ isMobile }: ResponsiveModalProps): React.Re
 
                         <DialogActions>
                             <Button type='button' variant='outlined' onClick={handleModalClose}>
-                                {t('modal.common.cancel')}
+                                {t('form.common.cancel')}
                             </Button>
                             <FormikSubmitButton type='button' onClick={submitForm}>
-                                {t('modal.productCreate.create')}
+                                {t('form.common.create')}
                             </FormikSubmitButton>
                         </DialogActions>
                     </>

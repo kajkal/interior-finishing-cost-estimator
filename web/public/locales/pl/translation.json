@@ -66,54 +66,45 @@
   "notFoundPage": {
     "pageNotFound": "Nie znaleziono strony"
   },
-  "createProjectPage": {
-    "createProject": "Utwórz projekt"
-  },
-  "projectPage": {
+  "project": {
+    "createProject": "Utwórz projekt",
     "updateThisProject": "Edytuj ten project",
     "deleteThisProject": "Usuń ten projekt",
     "files": "Pliki",
     "openFile": "Otwórz plik {{filename}}",
     "removeThisFile": "Usuń ten plik",
     "uploadFile": "Dodaj plik",
+    "fileUploadModal": {
+      "title": "Dodaj plik do projektu '{{projectName}}'",
+      "upload": "Dodaj"
+    },
+    "updateModal": {
+      "title": "Edytuj projekt '{{projectName}}'",
+      "urlWillChange": "Adres URL projektu ulegnie zmianie"
+    },
+    "deleteModal": {
+      "title": "Usuń projekt '{{projectName}}'",
+      "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
+      "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?"
+    },
     "projectNotFoundError": "Projekt już nie istnieje"
   },
   "product": {
+    "createModal": {
+      "title": "Zdefiniuj produkt"
+    },
     "updateModal": {
       "title": "Edytuj produkt"
     },
     "productNotFoundError": "Produkt już nie istnieje"
   },
-  "modal": {
+  "form": {
     "common": {
       "cancel": "Anuluj",
       "reset": "Resetuj",
       "create": "Dodaj",
       "update": "Edytuj",
-      "delete": "Usuń"
-    },
-    "projectFileUpload": {
-      "title": "Dodaj plik do projektu '{{projectName}}'",
-      "upload": "Dodaj"
-    },
-    "projectUpdate": {
-      "title": "Edytuj projekt '{{projectName}}'",
-      "urlWillChange": "Adres URL projektu ulegnie zmianie",
-      "update": "Edytuj"
-    },
-    "projectDelete": {
-      "title": "Usuń projekt '{{projectName}}'",
-      "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
-      "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?",
-      "delete": "Usuń"
-    },
-    "productCreate": {
-      "title": "Zdefiniuj produkt",
-      "create": "Dodaj"
-    }
-  },
-  "form": {
-    "common": {
+      "delete": "Usuń",
       "optional": "Opcjonalne",
       "dropzone": {
         "validation": {

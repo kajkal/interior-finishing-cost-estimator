@@ -58,7 +58,7 @@ describe('FileSection component', () => {
 
     class ViewUnderTest {
         static get uploadFileButton() {
-            return screen.getByRole('button', { name: 't:projectPage.uploadFile' });
+            return screen.getByRole('button', { name: 't:project.uploadFile' });
         }
         static get fileTiles() {
             return screen.getAllByRole('link');
@@ -68,12 +68,12 @@ describe('FileSection component', () => {
             const fileTile = ViewUnderTest.fileTiles[ index ];
             expect(fileTile).toBeInstanceOf(HTMLAnchorElement);
             expect(fileTile).toBeVisible();
-            const deleteButton = fileTile.querySelector('button[aria-label="t:projectPage.removeThisFile"]');
+            const deleteButton = fileTile.querySelector('button[aria-label="t:project.removeThisFile"]');
             expect(deleteButton).toBeInstanceOf(HTMLButtonElement);
             userEvent.click(deleteButton!);
         }
         static expandSection() {
-            userEvent.click(screen.getByRole('button', { name: 't:projectPage.files' }));
+            userEvent.click(screen.getByRole('button', { name: 't:project.files' }));
         }
     }
 

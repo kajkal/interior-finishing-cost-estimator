@@ -38,7 +38,7 @@ describe('CreateProjectPage component', () => {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
         }
         static get submitButton() {
-            return screen.getByRole('button', { name: 't:createProjectPage.createProject' });
+            return screen.getByRole('button', { name: 't:project.createProject' });
         }
         static async fillAndSubmitForm(data: MutationCreateProjectArgs) {
             await extendedUserEvent.type(this.projectNameInput, data.name);

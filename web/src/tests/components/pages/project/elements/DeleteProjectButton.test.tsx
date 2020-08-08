@@ -38,7 +38,7 @@ describe('DeleteProjectButton component', () => {
     it('should pass project data to ProjectDeleteModal and open it', () => {
         renderInMockContext();
 
-        userEvent.click(screen.getByRole('button', { name: 't:projectPage.deleteThisProject' }));
+        userEvent.click(screen.getByRole('button', { name: 't:project.deleteThisProject' }));
 
         // verify if upload project file modal atom state changed
         expect(projectDeleteModalAtomSpy).toHaveBeenLastCalledWith({

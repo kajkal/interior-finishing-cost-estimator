@@ -66,54 +66,45 @@
   "notFoundPage": {
     "pageNotFound": "Page not found"
   },
-  "createProjectPage": {
-    "createProject": "Create project"
-  },
-  "projectPage": {
+  "project": {
+    "createProject": "Create project",
     "updateThisProject": "Edit this project",
     "deleteThisProject": "Delete this project",
     "files": "Files",
     "openFile": "Open file {{filename}}",
     "removeThisFile": "Remove this file",
     "uploadFile": "Upload file",
+    "fileUploadModal": {
+      "title": "Upload file to project '{{projectName}}'",
+      "upload": "Upload"
+    },
+    "updateModal": {
+      "title": "Edit project '{{projectName}}'",
+      "urlWillChange": "Project URL will change"
+    },
+    "deleteModal": {
+      "title": "Delete project '{{projectName}}'",
+      "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
+      "secondLine": "Are you sure you want to permanently delete this project?"
+    },
     "projectNotFoundError": "Project no longer exists"
   },
   "product": {
-    "productNotFoundError": "Product no longer exists",
+    "createModal": {
+      "title": "Define new product"
+    },
     "updateModal": {
       "title": "Edit product"
-    }
+    },
+    "productNotFoundError": "Product no longer exists"
   },
-  "modal": {
+  "form": {
     "common": {
       "cancel": "Cancel",
       "reset": "Reset",
       "create": "Add",
       "update": "Edit",
-      "delete": "Delete"
-    },
-    "projectFileUpload": {
-      "title": "Upload file to project '{{projectName}}'",
-      "upload": "Upload"
-    },
-    "projectUpdate": {
-      "title": "Edit project '{{projectName}}'",
-      "urlWillChange": "Project URL will change",
-      "update": "Edit"
-    },
-    "projectDelete": {
-      "title": "Delete project '{{projectName}}'",
-      "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
-      "secondLine": "Are you sure you want to permanently delete this project?",
-      "delete": "Delete"
-    },
-    "productCreate": {
-      "title": "Define new product",
-      "create": "Add"
-    }
-  },
-  "form": {
-    "common": {
+      "delete": "Delete",
       "optional": "Optional",
       "dropzone": {
         "validation": {

@@ -97,10 +97,10 @@ describe('ProductUpdateModal component', () => {
             return screen.getByLabelText(/t:form.productTags.label/, { selector: 'input' });
         }
         static get cancelButton() {
-            return screen.getByRole('button', { name: 't:modal.common.cancel' });
+            return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get submitButton() {
-            return screen.getByRole('button', { name: 't:modal.common.update' });
+            return screen.getByRole('button', { name: 't:form.common.update' });
         }
         static async openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));
