@@ -28,7 +28,7 @@ export function DeleteProjectButton({ project }: DeleteProjectButtonProps): Reac
     };
 
     return (
-        <Tooltip title={t('projectPage.deleteThisProject')!} arrow>
+        <Tooltip title={t('projectPage.deleteThisProject')!}>
             <IconButton onClick={handleClick} aria-label={t('projectPage.deleteThisProject')}>
                 <DeleteIcon />
             </IconButton>

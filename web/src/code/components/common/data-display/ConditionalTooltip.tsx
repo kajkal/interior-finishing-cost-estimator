@@ -15,6 +15,5 @@ export function ConditionalTooltip({ children, condition, title, ...rest }: Cond
 }
 
 ConditionalTooltip.defaultProps = {
-    arrow: true,
     placement: 'right',
 };

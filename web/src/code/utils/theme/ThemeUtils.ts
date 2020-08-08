@@ -36,6 +36,9 @@ export class ThemeUtils {
                 MuiDialog: {
                     disableBackdropClick: true,
                 },
+                MuiTooltip: {
+                    arrow: true,
+                },
             },
             typography: {
                 button: {

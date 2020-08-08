@@ -28,7 +28,7 @@ export function UpdateProjectButton({ project }: UpdateProjectButtonProps): Reac
     };
 
     return (
-        <Tooltip title={t('projectPage.updateThisProject')!} arrow>
+        <Tooltip title={t('projectPage.updateThisProject')!}>
             <IconButton onClick={handleClick} aria-label={t('projectPage.updateThisProject')}>
                 <EditIcon />
             </IconButton>

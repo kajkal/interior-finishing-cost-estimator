@@ -18,7 +18,7 @@ export function ToolbarButton(props: ToolbarButtonProps): React.ReactElement {
     const classes = useStyles();
 
     return (
-        <Tooltip arrow title={shortcut ? `${label} (${shortcut})` : label}>
+        <Tooltip title={shortcut ? `${label} (${shortcut})` : label}>
             <div className={classes.tooltipAnchor}>
                 <ButtonBase
                     className={clsx(classes.root, {

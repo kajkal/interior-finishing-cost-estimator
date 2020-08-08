@@ -125,7 +125,7 @@ function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): 
 
                 <ConsciousFileIcon className={classes.previewIcon} filename={fileData.name} />
 
-                <Tooltip title={t('projectPage.removeThisFile')!} arrow>
+                <Tooltip title={t('projectPage.removeThisFile')!}>
                     <IconButton
                         size='small'
                         className={classes.deleteButton}
