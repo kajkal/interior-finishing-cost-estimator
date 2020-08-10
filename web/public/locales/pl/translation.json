@@ -90,6 +90,11 @@
     "projectNotFoundError": "Projekt już nie istnieje"
   },
   "product": {
+    "products": "Produkty",
+    "addProduct": "Dodaj produkt",
+    "productHistory": "Historia produktu",
+    "created": "Utworzono",
+    "updated": "Zmodyfikowano",
     "createModal": {
       "title": "Zdefiniuj produkt"
     },
@@ -99,6 +104,17 @@
     "deleteModal": {
       "title": "Usuń produkt '{{productName}}'",
       "firstLine": "Czy na pewno chcesz permanentnie usunąć ten produkt?"
+    },
+    "filters": {
+      "productFilters": "Filtry produktów",
+      "searchPlaceholder": "Szukaj....",
+      "searchAriaLabel": "Szukaj produkty po nazwie",
+      "dateAriaLabel": "Szukaj produkty po dacie utworzenia produktu",
+      "fromDate": "Od",
+      "toDate": "Do",
+      "tagsAriaLabel": "Szukaj produktów po tagach",
+      "selectAllTags": "Wybierz wszystkie tagi",
+      "toggleTag": "Przełącz tag '{{tagName}}'"
     },
     "productNotFoundError": "Produkt już nie istnieje"
   },

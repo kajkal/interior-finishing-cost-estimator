@@ -1,19 +1,30 @@
-import React from 'react';
-
-import { TagOption } from '../../components/common/form-fields/tags/TagsField';
 import { useCurrentUserCachedData } from './useCurrentUserCachedData';
-import { MeQuery } from '../../../graphql/generated-types';
+import { MeQuery, Product } from '../../../graphql/generated-types';
 
+
+export interface Tag {
+    name: string;
+    occurrenceCount: number;
+}
+
+export interface ProductsDatesStatistics {
+    min: string;
+    max: string;
+}
 
 export interface CurrentUserDataSelectors {
 
     /**
      * User' products tags
      */
-    tags: () => Pick<TagOption, 'name'>[];
+    tags: () => Tag[];
+
+    /**
+     * Products dates related statistics
+     */
+    dates: () => ProductsDatesStatistics | undefined;
 
 }
-
 
 /**
  * Hook with lazy current user cached data selectors.
@@ -22,19 +33,39 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
     const userData = useCurrentUserCachedData();
     const products = userData?.products;
 
-    const tagsSelector = React.useMemo(() => {
-        const initialState: Pick<TagOption, 'name'>[] = [];
-        let memo = initialState;
-        return () => {
-            if (products && (memo === initialState)) {
-                const uniqueTags = Array.from(new Set(products.flatMap(({ tags }) => tags || [])));
-                const sortedTags = uniqueTags.sort((a, b) => a.localeCompare(b));
-                memo = sortedTags.map((name) => ({ name }));
-            }
-            return memo;
-        };
-    }, [ products ]);
+    const tagsSelector = () => {
+        const valueFromMemory: Tag[] | undefined = tagsMemory.get(products!);
+        if (products && products.length && !valueFromMemory) {
+            const tagNameOccurrenceCountMap = products.reduce((map, { tags }) => {
+                tags?.forEach((tag) => {
+                    const tagOccurrenceCount = map.get(tag) || 0;
+                    map.set(tag, tagOccurrenceCount + 1)
+                })
+                return map;
+            }, new Map<string, number>());
+            const tags = Array.from(tagNameOccurrenceCountMap, ([name, occurrenceCount]) => ({ name,  occurrenceCount}));
+            const sortedTags = tags.sort(({ name: a }, { name: b }) => a.localeCompare(b));
+            tagsMemory.set(products, sortedTags);
+            return sortedTags;
+        }
+        return valueFromMemory || [];
+    }
 
+    const datesSelector = () => {
+        const valueFromMemory: ProductsDatesStatistics | undefined = datesMemory.get(products!);
+        if (products && products.length && !valueFromMemory) {
+            const dates = products.reduce(({ min, max }, { createdAt }) => ({
+                min: (min.localeCompare(createdAt) < 0) ? min : createdAt,
+                max: (max.localeCompare(createdAt) > 0) ? max : createdAt,
+            }), { min: products[ 0 ].createdAt, max: products[ 0 ].createdAt });
+            datesMemory.set(products, dates);
+            return dates;
+        }
+        return valueFromMemory;
+    }
 
-    return [ { tags: tagsSelector }, userData ];
+    return [ { tags: tagsSelector, dates: datesSelector }, userData ];
 }
+
+const tagsMemory = new WeakMap<Product[], Tag[]>();
+const datesMemory = new WeakMap<Product[], ProductsDatesStatistics>();

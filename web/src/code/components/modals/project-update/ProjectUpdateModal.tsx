@@ -71,11 +71,11 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                     <input type='hidden' name='projectSlug' value={values.projectSlug} />
 
                                     <FormikTextField
-                                        aria-label={t('form.projectName.ariaLabel')}
                                         name='name'
                                         label={t('form.projectName.label')}
-                                        fullWidth
+                                        aria-label={t('form.projectName.ariaLabel')}
                                         helperText={(projectData?.name !== values.name) ? t('project.updateModal.urlWillChange') : undefined}
+                                        fullWidth
                                         autoFocus
                                     />
 

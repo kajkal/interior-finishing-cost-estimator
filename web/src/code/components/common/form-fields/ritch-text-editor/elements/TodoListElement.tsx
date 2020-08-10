@@ -28,9 +28,11 @@ export function TodoListElement({ attributes, element, children }: TodoListEleme
                     disabled: classes.disabled,
                     checked: classes.checked,
                 }}
+                size='small'
                 color='primary'
             />
             <Typography
+                variant='body2'
                 className={classes.text}
                 contentEditable={!readOnly}
                 suppressContentEditableWarning
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
     checkbox: {
         alignSelf: 'flex-start',
-        padding: theme.spacing(1),
+        padding: theme.spacing(0.5),
         '&$disabled': {
             color: theme.palette.text.secondary,
             '&$checked': {
@@ -58,6 +60,6 @@ const useStyles = makeStyles((theme) => ({
     disabled: {},
     checked: {},
     text: {
-        marginTop: theme.spacing(1),
+        marginTop: theme.spacing(0.5),
     },
 }));

@@ -100,7 +100,7 @@ describe('PasswordResetPage component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:passwordResetPage.expiredPasswordResetToken:{"date":"6/12/2020, 6:35 PM"}');
+            expect(toast).toHaveTextContent('t:passwordResetPage.expiredPasswordResetToken:{"date":"6/12/2020, 4:35 PM"}');
         });
 
     });
@@ -232,7 +232,7 @@ describe('PasswordResetPage component', () => {
             // verify if toast is visible
             const toast = await screen.findByTestId('MockToast');
             expect(toast).toHaveClass('error');
-            expect(toast).toHaveTextContent('t:passwordResetPage.expiredPasswordResetToken:{"date":"6/13/2020, 6:45 PM"}');
+            expect(toast).toHaveTextContent('t:passwordResetPage.expiredPasswordResetToken:{"date":"6/13/2020, 4:45 PM"}');
         });
 
     });

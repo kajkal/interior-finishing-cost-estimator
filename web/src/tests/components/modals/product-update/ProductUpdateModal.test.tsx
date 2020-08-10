@@ -42,6 +42,7 @@ describe('ProductUpdateModal component', () => {
         } ]),
         price: { currency: 'PLN', amount: 4.5 },
         tags: [ 'Sample tag', 'Other tag' ],
+        createdAt: '2020-08-06T12:00:00.000Z',
     };
 
     beforeEach(() => {
@@ -163,6 +164,7 @@ describe('ProductUpdateModal component', () => {
                             description: '[{"children":[{"type":"p","children":[{"text":"Sample updated description"}]}]}]',
                             price: null,
                             tags: null,
+                            createdAt: '2020-08-06T12:00:00.000Z',
                         },
                     } as UpdateProductMutation,
                 },

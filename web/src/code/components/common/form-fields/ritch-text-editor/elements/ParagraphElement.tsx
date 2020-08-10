@@ -5,6 +5,6 @@ import Typography from '@material-ui/core/Typography';
 
 export function ParagraphElement({ attributes, children }: ParagraphElementProps): React.ReactElement {
     return (
-        <Typography gutterBottom {...attributes}>{children}</Typography>
+        <Typography gutterBottom {...attributes} variant='body2'>{children}</Typography>
     );
 }

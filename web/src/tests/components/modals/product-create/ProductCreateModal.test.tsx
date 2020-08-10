@@ -142,6 +142,7 @@ describe('ProductCreateModal component', () => {
                             description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
                             price: { amount: 14.04, currency: 'PLN' },
                             tags: [ 'Bathroom' ],
+                            createdAt: '2020-08-06T12:00:00.000Z',
                         },
                     } as CreateProductMutation,
                 },

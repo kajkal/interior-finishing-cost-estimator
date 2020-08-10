@@ -10,6 +10,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
   /** The `Upload` scalar type represents a file upload. */
   Upload: any;
 };
@@ -50,6 +52,8 @@ export type Product = {
   description: Scalars['String'];
   price?: Maybe<CurrencyAmount>;
   tags?: Maybe<Array<Scalars['String']>>;
+  createdAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type CurrencyAmount = {
@@ -57,6 +61,7 @@ export type CurrencyAmount = {
   currency: Scalars['String'];
   amount: Scalars['Float'];
 };
+
 
 export type Project = {
   __typename?: 'Project';
@@ -279,7 +284,7 @@ export type SendPasswordResetInstructionsMutation = (
 
 export type ProductDataFragment = (
   { __typename?: 'Product' }
-  & Pick<Product, 'id' | 'name' | 'tags' | 'description'>
+  & Pick<Product, 'id' | 'name' | 'tags' | 'description' | 'createdAt' | 'updatedAt'>
   & { price?: Maybe<(
     { __typename?: 'CurrencyAmount' }
     & Pick<CurrencyAmount, 'currency' | 'amount'>
@@ -476,6 +481,8 @@ export const ProductDataFragmentDoc = gql`
     currency
     amount
   }
+  createdAt
+  updatedAt
 }
     `;
 export const UserDetailedDataFragmentDoc = gql`

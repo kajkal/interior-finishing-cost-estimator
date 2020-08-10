@@ -23,7 +23,7 @@ export function SignupPage(): React.ReactElement {
     }
 
     return (
-        <Container maxWidth='xs' disableGutters>
+        <Container maxWidth='xs'>
 
             <Typography component='h1' variant='h5'>
                 {t('signupPage.signUp')}

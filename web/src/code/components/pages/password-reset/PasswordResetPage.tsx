@@ -37,7 +37,7 @@ export function PasswordResetPage(): React.ReactElement {
     }
 
     return (
-        <Container maxWidth='xs' disableGutters>
+        <Container maxWidth='xs'>
             <Typography component='h1' variant='h5' className={classes.header}>
                 {t('passwordResetPage.resetPassword')}
             </Typography>

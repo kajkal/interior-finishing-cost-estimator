@@ -113,7 +113,6 @@ export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                     />
 
                                 </Form>
-
                             </DialogContent>
 
                             <DialogActions>

@@ -13,7 +13,7 @@ export function CreateProjectPage(): React.ReactElement {
     const { t } = useTranslation();
 
     return (
-        <Container maxWidth='xs' disableGutters>
+        <Container maxWidth='xs'>
 
             <Typography component='h1' variant='h5'>
                 {t('common.createProject')}

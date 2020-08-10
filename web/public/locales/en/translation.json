@@ -90,6 +90,11 @@
     "projectNotFoundError": "Project no longer exists"
   },
   "product": {
+    "products": "Products",
+    "addProduct": "Add product",
+    "productHistory": "Product history",
+    "created": "Created",
+    "updated": "Updated",
     "createModal": {
       "title": "Define new product"
     },
@@ -99,6 +104,17 @@
     "deleteModal": {
       "title": "Delete product '{{productName}}'",
       "firstLine": "Are you sure you want to permanently delete this product?"
+    },
+    "filters": {
+      "productFilters": "Product filters",
+      "searchPlaceholder": "Search...",
+      "searchAriaLabel": "Search products by name",
+      "dateAriaLabel": "Search products by creation date",
+      "fromDate": "From",
+      "toDate": "To",
+      "tagsAriaLabel": "Search products by tags",
+      "selectAllTags": "Select all tags",
+      "toggleTag": "Toggle tag '{{tagName}}'"
     },
     "productNotFoundError": "Product no longer exists"
   },

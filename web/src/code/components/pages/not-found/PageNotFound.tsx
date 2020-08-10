@@ -11,7 +11,7 @@ export function PageNotFound(): React.ReactElement {
     const { t } = useTranslation();
 
     return (
-        <Container maxWidth='xs' disableGutters>
+        <Container maxWidth='xs'>
 
             <Typography component='h1' variant='h1' className={classes.centered}>
                 {'404'}
