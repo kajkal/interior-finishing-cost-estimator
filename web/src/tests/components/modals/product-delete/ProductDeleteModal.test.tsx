@@ -19,13 +19,10 @@ describe('ProductDeleteModal component', () => {
         slug: 'sample-user',
     };
 
-    const sampleProduct: Product = {
+    const sampleProduct: Pick<Product, '__typename' | 'id' | 'name'> = {
         __typename: 'Product',
         id: '5f09e24646904045d48e5598',
         name: 'Sample product name',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-        price: null,
-        tags: null,
     };
 
     beforeEach(() => {

@@ -149,7 +149,6 @@ describe('ProjectUpdateModal component', () => {
                     data: {
                         updateProject: {
                             __typename: 'Project',
-                            id: '-',
                             slug: 'updated-project-name',
                             name: 'Updated project name',
                             location: {

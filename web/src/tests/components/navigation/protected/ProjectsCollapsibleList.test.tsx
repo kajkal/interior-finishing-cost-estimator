@@ -12,8 +12,8 @@ describe('ProjectsCollapsibleList component', () => {
 
     const mockHandleSideNavToggle = jest.fn();
     const projects = [
-        { id: '1', name: 'Sample project', slug: 'sample-project' },
-        { id: '2', name: 'Project sample', slug: 'project-sample' },
+        { name: 'Sample project', slug: 'sample-project' },
+        { name: 'Project sample', slug: 'project-sample' },
     ];
 
     beforeEach(() => {

@@ -65,11 +65,10 @@ export type CurrencyAmount = {
 
 export type Project = {
   __typename?: 'Project';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  location?: Maybe<Location>;
   /** Unique project slug. Used in URLs */
   slug: Scalars['String'];
+  name: Scalars['String'];
+  location?: Maybe<Location>;
   files: Array<ResourceData>;
 };
 
@@ -353,7 +352,7 @@ export type UpdateProductMutation = (
 
 export type ProjectBasicDataFragment = (
   { __typename?: 'Project' }
-  & Pick<Project, 'id' | 'slug' | 'name'>
+  & Pick<Project, 'slug' | 'name'>
 );
 
 export type ProjectDetailedDataFragment = (
@@ -478,7 +477,6 @@ export type MeQuery = (
 
 export const ProjectBasicDataFragmentDoc = gql`
     fragment ProjectBasicData on Project {
-  id
   slug
   name
 }

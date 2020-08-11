@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import { Entity, IdentifiedReference, ManyToOne, Property } from 'mikro-orm';
 
 import { BaseEntity } from '../BaseEntity';
@@ -10,8 +10,9 @@ import { Location } from './Location';
 @Entity({ tableName: 'projects' })
 export class Project extends BaseEntity {
 
-    @Field(() => ID)
-    id!: string;
+    @Field({ description: 'Unique project slug. Used in URLs' })
+    @Property({ unique: true })
+    slug!: string;
 
     @ManyToOne()
     user!: IdentifiedReference<User>;
@@ -23,9 +24,5 @@ export class Project extends BaseEntity {
     @Field(() => Location, { nullable: true })
     @Property()
     location?: Location | null;
-
-    @Field({ description: 'Unique project slug. Used in URLs' })
-    @Property({ unique: true })
-    slug!: string;
 
 }

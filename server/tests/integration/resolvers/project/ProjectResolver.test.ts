@@ -69,7 +69,6 @@ describe('ProjectResolver', () => {
         const createProjectMutation = `
             mutation CreateProject($name: String!, $location: LocationFormData) {
               createProject(name: $name, location: $location) {
-                id
                 name
                 slug
               }
@@ -147,7 +146,6 @@ describe('ProjectResolver', () => {
             expect(response.body).toEqual({
                 data: {
                     createProject: {
-                        id: expect.any(String),
                         name: projectCreateFormData.name,
                         slug: projectCreateFormData.name.toLowerCase().replace(/\s/g, '-'),
                     },

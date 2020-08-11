@@ -67,7 +67,6 @@ describe('CreateProjectPage component', () => {
                     data: {
                         createProject: {
                             __typename: 'Project',
-                            id: 'project-id',
                             slug: 'apartment-renovation',
                             name: 'Apartment renovation',
                         },

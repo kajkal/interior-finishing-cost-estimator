@@ -23,7 +23,7 @@ import { nav } from '../../../config/nav';
 export interface ProjectsCollapsibleListProps {
     isSideNavOpen: boolean;
     onSideNavToggle: () => void;
-    projects: Pick<Project, 'id' | 'slug' | 'name'>[];
+    projects: Pick<Project, 'slug' | 'name'>[];
 }
 
 export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, projects }: ProjectsCollapsibleListProps): React.ReactElement {
@@ -86,9 +86,9 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, projec
 
                     </ListItemNavLink>
                     {
-                        projects.map(({ id, slug, name }) => (
+                        projects.map(({ slug, name }) => (
                             <ListItemNavLink
-                                key={id}
+                                key={slug}
                                 to={nav.project(slug)}
                                 className={listItemStyles.nested}
                                 aria-label={t('common.projectAriaLabel', { name })}
