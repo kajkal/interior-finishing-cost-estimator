@@ -1,3 +1,4 @@
+import { wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
 import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
@@ -55,16 +56,18 @@ export class ProjectResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Project)
-    async updateProject(@Args() { projectSlug, ...data }: ProjectUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Project> {
+    async updateProject(@Args() { projectSlug, name: newName, ...data }: ProjectUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Project> {
         const projectToUpdate = await this.projectRepository.findOne({ slug: projectSlug });
 
         if (projectToUpdate) {
             if (projectToUpdate.user.id === context.jwtPayload.sub) {
 
-                if (projectToUpdate.name !== data.name) {
-                    projectToUpdate.name = data.name;
-                    projectToUpdate.slug = await this.projectRepository.generateUniqueSlug(data.name);
+                if (projectToUpdate.name !== newName) {
+                    projectToUpdate.name = newName;
+                    projectToUpdate.slug = await this.projectRepository.generateUniqueSlug(newName);
                 }
+
+                wrap(projectToUpdate).assign(data);
 
                 await this.projectRepository.persistAndFlush(projectToUpdate);
                 return projectToUpdate;

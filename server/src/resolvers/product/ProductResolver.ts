@@ -1,7 +1,7 @@
 import { wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
-import { Args, Authorized, Ctx, Mutation, Resolver, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, FieldResolver, Mutation, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { ProductRepository } from '../../repositories/ProductRepository';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
@@ -18,6 +18,18 @@ export class ProductResolver {
 
     @Inject()
     private readonly productRepository!: ProductRepository;
+
+
+    @FieldResolver(() => Date)
+    createdAt(@Root() product: Product): Date {
+        return product.createdAt;
+    }
+
+    @FieldResolver(() => Date, { nullable: true })
+    updatedAt(@Root() product: Product): Date | undefined {
+        return product.updatedAt;
+    }
+
 
     @Authorized()
     @UseMiddleware(logAccess)

@@ -3,6 +3,7 @@ import { Entity, IdentifiedReference, ManyToOne, Property } from 'mikro-orm';
 
 import { BaseEntity } from '../BaseEntity';
 import { User } from '../user/User';
+import { Location } from './Location';
 
 
 @ObjectType()
@@ -18,6 +19,10 @@ export class Project extends BaseEntity {
     @Field()
     @Property()
     name!: string;
+
+    @Field(() => Location, { nullable: true })
+    @Property()
+    location?: Location | null;
 
     @Field({ description: 'Unique project slug. Used in URLs' })
     @Property({ unique: true })

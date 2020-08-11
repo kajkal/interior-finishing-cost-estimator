@@ -1,17 +1,14 @@
 import { ArgsType, Field } from 'type-graphql';
-import { Length } from 'class-validator';
+
+import { ProjectCreateFormData } from './ProjectCreateFormData';
 import { IsSlug } from '../../../decorators/IsSlug';
 
 
 @ArgsType()
-export class ProjectUpdateFormData {
+export class ProjectUpdateFormData extends ProjectCreateFormData {
 
     @Field()
     @IsSlug()
     projectSlug!: string;
-
-    @Field()
-    @Length(3, 64)
-    name!: string;
 
 }

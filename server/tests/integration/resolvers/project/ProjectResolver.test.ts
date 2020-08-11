@@ -67,8 +67,8 @@ describe('ProjectResolver', () => {
     describe('create project mutation ', () => {
 
         const createProjectMutation = `
-            mutation CreateProject($name: String!) {
-              createProject(name: $name) {
+            mutation CreateProject($name: String!, $location: LocationFormData) {
+              createProject(name: $name, location: $location) {
                 id
                 name
                 slug
@@ -84,6 +84,7 @@ describe('ProjectResolver', () => {
                 query: createProjectMutation,
                 validFormData: {
                     name: 'Sample project name',
+                    location: null,
                 },
             });
 
@@ -98,6 +99,28 @@ describe('ProjectResolver', () => {
                 // should reject invalid
                 await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
                 await send.withAuth({ name: 'a'.repeat(65) }).expectValidationError('name');
+            });
+
+            it('should validate project location', async () => {
+                // should be optional
+                await send.withAuth({ location: null }).expectValidationSuccess();
+                await send.withAuth({ location: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({
+                    location: {
+                        placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
+                        main: 'Kraków',
+                        secondary: 'Poland',
+                    },
+                }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({
+                    location: {
+                        placeId: '',
+                        main: '',
+                        secondary: '',
+                    },
+                }).expectValidationError('location');
             });
 
         });
@@ -137,10 +160,23 @@ describe('ProjectResolver', () => {
     describe('update project mutation', () => {
 
         const updateProjectMutation = `
-            mutation UpdateProject($projectSlug: String!, $name: String!) {
-              updateProject(projectSlug: $projectSlug, name: $name) {
+            mutation UpdateProject(
+              $projectSlug: String!
+              $name: String!
+              $location: LocationFormData
+            ) {
+              updateProject(
+                projectSlug: $projectSlug
+                name: $name
+                location: $location
+              ) {
                 name
                 slug
+                location {
+                  placeId
+                  main
+                  secondary
+                }
               }
             }
         `;
@@ -154,6 +190,7 @@ describe('ProjectResolver', () => {
                 validFormData: {
                     projectSlug: 'sample-valid-slug',
                     name: 'sample name',
+                    location: null,
                 },
             });
 
@@ -180,6 +217,64 @@ describe('ProjectResolver', () => {
                 await send.withAuth({ name: 'a'.repeat(65) }).expectValidationError('name');
             });
 
+            it('should validate project location', async () => {
+                // should be optional
+                await send.withAuth({ location: null }).expectValidationSuccess();
+                await send.withAuth({ location: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({
+                    location: {
+                        placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
+                        main: 'Kraków',
+                        secondary: 'Poland',
+                    },
+                }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({
+                    location: {
+                        placeId: '',
+                        main: '',
+                        secondary: '',
+                    },
+                }).expectValidationError('location');
+            });
+
+        });
+
+        it('should update project', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(user.id);
+            const formData: ProjectUpdateFormData = {
+                projectSlug: projectToUpdate.slug,
+                name: 'Updated project name',
+                location: {
+                    placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
+                    main: 'Kraków',
+                    secondary: 'Poland',
+                },
+            };
+            const response = await testUtils.postGraphQL({
+                query: updateProjectMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if project object was updated and saved in db
+            expect(ProjectRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    updateProject: {
+                        name: 'Updated project name',
+                        slug: 'updated-project-name',
+                        location: formData.location,
+                    },
+                },
+            });
         });
 
         it('should return error when user is not a project owner', async () => {
