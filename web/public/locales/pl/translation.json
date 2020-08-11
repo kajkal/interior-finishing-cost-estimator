@@ -126,6 +126,7 @@
       "update": "Edytuj",
       "delete": "Usuń",
       "optional": "Opcjonalne",
+      "noOption": "Brak wyników",
       "dropzone": {
         "validation": {
           "unknownError": "Błąd podczas przetwarzania pliku {{filename}}",

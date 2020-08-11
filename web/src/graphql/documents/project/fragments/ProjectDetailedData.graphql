@@ -1,5 +1,10 @@
 fragment ProjectDetailedData on Project {
     ...ProjectBasicData
+    location {
+        placeId
+        main
+        secondary
+    }
     files {
         url
         name

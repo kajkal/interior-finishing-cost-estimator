@@ -126,6 +126,7 @@
       "update": "Edit",
       "delete": "Delete",
       "optional": "Optional",
+      "noOption": "No option",
       "dropzone": {
         "validation": {
           "unknownError": "Error with processing file {{filename}}",

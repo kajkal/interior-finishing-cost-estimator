@@ -67,9 +67,17 @@ export type Project = {
   __typename?: 'Project';
   id: Scalars['ID'];
   name: Scalars['String'];
+  location?: Maybe<Location>;
   /** Unique project slug. Used in URLs */
   slug: Scalars['String'];
   files: Array<ResourceData>;
+};
+
+export type Location = {
+  __typename?: 'Location';
+  placeId: Scalars['String'];
+  main: Scalars['String'];
+  secondary: Scalars['String'];
 };
 
 /** Wrapper for resource file data. */
@@ -341,7 +349,10 @@ export type ProjectBasicDataFragment = (
 
 export type ProjectDetailedDataFragment = (
   { __typename?: 'Project' }
-  & { files: Array<(
+  & { location?: Maybe<(
+    { __typename?: 'Location' }
+    & Pick<Location, 'placeId' | 'main' | 'secondary'>
+  )>, files: Array<(
     { __typename?: 'ResourceData' }
     & Pick<ResourceData, 'url' | 'name' | 'description'>
   )> }
@@ -464,6 +475,11 @@ export const ProjectBasicDataFragmentDoc = gql`
 export const ProjectDetailedDataFragmentDoc = gql`
     fragment ProjectDetailedData on Project {
   ...ProjectBasicData
+  location {
+    placeId
+    main
+    secondary
+  }
   files {
     url
     name
