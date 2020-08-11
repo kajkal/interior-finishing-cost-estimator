@@ -1,5 +1,5 @@
-mutation CreateProject($name: String!) {
-    createProject(name: $name) {
+mutation CreateProject($name: String!, $location: LocationFormData) {
+    createProject(name: $name, location: $location) {
         ...ProjectBasicData
     }
 }

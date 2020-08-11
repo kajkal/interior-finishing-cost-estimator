@@ -158,13 +158,14 @@ export type MutationDeleteProductArgs = {
 
 export type MutationCreateProjectArgs = {
   name: Scalars['String'];
+  location?: Maybe<LocationFormData>;
 };
 
 
 export type MutationUpdateProjectArgs = {
-  projectSlug: Scalars['String'];
   name: Scalars['String'];
   location?: Maybe<LocationFormData>;
+  projectSlug: Scalars['String'];
 };
 
 
@@ -369,6 +370,7 @@ export type ProjectDetailedDataFragment = (
 
 export type CreateProjectMutationVariables = Exact<{
   name: Scalars['String'];
+  location?: Maybe<LocationFormData>;
 }>;
 
 
@@ -814,8 +816,8 @@ export type UpdateProductMutationHookResult = ReturnType<typeof useUpdateProduct
 export type UpdateProductMutationResult = ApolloReactCommon.MutationResult<UpdateProductMutation>;
 export type UpdateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProductMutation, UpdateProductMutationVariables>;
 export const CreateProjectDocument = gql`
-    mutation CreateProject($name: String!) {
-  createProject(name: $name) {
+    mutation CreateProject($name: String!, $location: LocationFormData) {
+  createProject(name: $name, location: $location) {
     ...ProjectBasicData
   }
 }
@@ -835,6 +837,7 @@ export const CreateProjectDocument = gql`
  * const [createProjectMutation, { data, loading, error }] = useCreateProjectMutation({
  *   variables: {
  *      name: // value for 'name'
+ *      location: // value for 'location'
  *   },
  * });
  */

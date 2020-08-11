@@ -3,8 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
+import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 
 import { CreateProjectDocument, CreateProjectMutation, CreateProjectMutationVariables, MutationCreateProjectArgs, Project, User } from '../../../../graphql/generated-types';
@@ -37,11 +38,16 @@ describe('CreateProjectPage component', () => {
         static get projectNameInput() {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
         }
+        static get projectLocationInput() {
+            return screen.getByLabelText(/t:form.projectLocation.label/, { selector: 'input' });
+        }
         static get submitButton() {
             return screen.getByRole('button', { name: 't:project.createProject' });
         }
         static async fillAndSubmitForm(data: MutationCreateProjectArgs) {
-            await extendedUserEvent.type(this.projectNameInput, data.name);
+            await TextFieldController.from(ViewUnderTest.projectNameInput).type(data.name);
+            await LocationFieldController.from(ViewUnderTest.projectLocationInput).selectLocation(data.location);
+
             userEvent.click(this.submitButton);
         }
     }
@@ -54,6 +60,7 @@ describe('CreateProjectPage component', () => {
                     query: CreateProjectDocument,
                     variables: {
                         name: 'Apartment renovation',
+                        location: null,
                     } as CreateProjectMutationVariables,
                 },
                 result: {

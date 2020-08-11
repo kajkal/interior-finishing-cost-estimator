@@ -10,9 +10,12 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { MutationCreateProjectArgs, Project, useCreateProjectMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
+import { mapLocationOptionToLocationFormData } from '../../../utils/mappers/locationMapper';
+import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
+import { LocationOption } from '../../common/form-fields/location/LocationField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { nav } from '../../../config/nav';
 
@@ -21,7 +24,9 @@ export interface CreateProjectFormProps {
     formClassName: string;
 }
 
-type CreateProjectFormData = MutationCreateProjectArgs;
+interface CreateProjectFormData extends Omit<MutationCreateProjectArgs, 'location'> {
+    location: LocationOption | null;
+}
 
 export function CreateProjectForm({ formClassName }: CreateProjectFormProps): React.ReactElement {
     const classes = useStyles();
@@ -34,6 +39,7 @@ export function CreateProjectForm({ formClassName }: CreateProjectFormProps): Re
         <Formik<CreateProjectFormData>
             initialValues={{
                 name: '',
+                location: null,
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -47,10 +53,13 @@ export function CreateProjectForm({ formClassName }: CreateProjectFormProps): Re
                     fullWidth
                 />
 
-                <FormikSubmitButton
-                    className={classes.submit}
-                    fullWidth
-                >
+                <FormikLocationField
+                    name='location'
+                    label={t('form.projectLocation.label')}
+                    optional
+                />
+
+                <FormikSubmitButton className={classes.submit} fullWidth>
                     {t('project.createProject')}
                 </FormikSubmitButton>
 
@@ -71,6 +80,8 @@ function useLoginFormValidationSchema(t: TFunction) {
             .max(50, t('form.projectName.validation.tooLong'))
             .required(t('form.projectName.validation.required')),
 
+        location: Yup.mixed<LocationOption>().defined(),
+
     }).defined(), [ t ]);
 }
 
@@ -83,10 +94,13 @@ function useLoginFormSubmitHandler(userSlug: string | undefined) {
     const [ createProjectMutation, { loading } ] = useCreateProjectMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<CreateProjectFormData>['onSubmit']>(async (values) => {
+    return React.useCallback<FormikConfig<CreateProjectFormData>['onSubmit']>(async ({ location, ...values }) => {
         try {
             const { data } = await createProjectMutation({
-                variables: values,
+                variables: {
+                    ...values,
+                    location: mapLocationOptionToLocationFormData(location),
+                },
                 update: (cache, { data }) => {
                     const createdProject = data?.createProject;
                     createdProject && cache.modify({

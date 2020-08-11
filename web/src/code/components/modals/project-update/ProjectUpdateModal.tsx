@@ -13,7 +13,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { ProjectDetailsDocument, ProjectDetailsQuery, useUpdateProjectMutation } from '../../../../graphql/generated-types';
+import { ProjectDetailsDocument, ProjectDetailsQuery, UpdateProjectMutationVariables, useUpdateProjectMutation } from '../../../../graphql/generated-types';
 import { mapLocationOptionToLocationFormData, mapLocationToLocationOption } from '../../../utils/mappers/locationMapper';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
@@ -28,9 +28,7 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 import { nav } from '../../../config/nav';
 
 
-interface ProjectUpdateFormData {
-    projectSlug: string;
-    name: string;
+interface ProjectUpdateFormData extends Omit<UpdateProjectMutationVariables, 'location'> {
     location: LocationOption | null;
 }
 

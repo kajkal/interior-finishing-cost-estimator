@@ -148,7 +148,14 @@ export class ThemeUtils {
             MuiDialogContent: {
                 root: {
                     paddingBottom: theme.spacing(3),
-                }
+                },
+            },
+            MuiContainer: {
+                maxWidthXs: {
+                    [ theme.breakpoints.up('xs') ]: {
+                        maxWidth: 500,
+                    },
+                },
             },
         };
 
