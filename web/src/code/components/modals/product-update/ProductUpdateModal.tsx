@@ -34,7 +34,7 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const [ { tags }, userData ] = useCurrentUserDataSelectors();
+    const [ { tags } ] = useCurrentUserDataSelectors();
     const [ { open, productData }, setModalState ] = useRecoilState(productUpdateModalAtom);
 
     const handleModalClose = React.useCallback(() => {
@@ -42,7 +42,7 @@ export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
     }, [ setModalState ]);
 
     const validationSchema = useProductUpdateFormValidationSchema(t);
-    const handleSubmit = useProductUpdateFormSubmitHandler(handleModalClose, userData?.slug);
+    const handleSubmit = useProductUpdateFormSubmitHandler(handleModalClose);
 
     useModalNavigationBlocker(handleModalClose, open);
     const titleId = 'product-update-modal-title';
@@ -182,7 +182,7 @@ function useProductUpdateFormValidationSchema(t: TFunction) {
 /**
  * Submit handler
  */
-function useProductUpdateFormSubmitHandler(onModalClose: () => void, userSlug: string | undefined) {
+function useProductUpdateFormSubmitHandler(onModalClose: () => void) {
     const [ updateProductMutation, { loading } ] = useUpdateProductMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -200,7 +200,7 @@ function useProductUpdateFormSubmitHandler(onModalClose: () => void, userSlug: s
         } catch (error) {
             ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, userSlug, updateProductMutation ]);
+    }, [ onModalClose, updateProductMutation ]);
 }
 
 function isValidCurrencyAmountFormData(price: CurrencyAmount): price is CurrencyAmountFormData {

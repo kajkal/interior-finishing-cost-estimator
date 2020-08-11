@@ -54,7 +54,7 @@ describe('useLazyAutocompleteService hook', () => {
         // simulate script load event
         await act(async () => {
             await fireEvent.load(scriptElement);
-        })
+        });
 
         // verify if service was created and hook returned valid getPlacePredictions function
         expect(MockAutocompleteService).toHaveBeenCalledTimes(1);
@@ -82,7 +82,6 @@ describe('useLazyAutocompleteService hook', () => {
     it('should call callback with results from google maps api', async () => {
         const now = Date.now();
         const dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
-        const delay = 100;
 
         const mockGetPlacePredictions = jest.fn();
         const MockAutocompleteService = jest.fn().mockImplementation(() => ({
@@ -90,7 +89,7 @@ describe('useLazyAutocompleteService hook', () => {
         }));
         window.google = { maps: { places: { AutocompleteService: MockAutocompleteService } } } as any;
 
-        const { result } = renderHook(useLazyAutocompleteService, { initialProps: delay });
+        const { result } = renderHook(useLazyAutocompleteService);
         await act(async () => {
             await fireEvent.load(document.head.children[ 0 ]);
         });
@@ -110,7 +109,7 @@ describe('useLazyAutocompleteService hook', () => {
         expect(callback1).toHaveBeenCalledTimes(1);
         expect(callback1).toHaveBeenCalledWith([ 1, 2, 3, 4, 5 ]);
 
-        dateNowSpy.mockReturnValue(now + delay); // throttle is based on current Date.now()
+        dateNowSpy.mockReturnValue(now + 200); // throttle is based on current Date.now()
 
         // verify when service return null
         mockGetPlacePredictions.mockClear().mockImplementation((_request, callback) => {

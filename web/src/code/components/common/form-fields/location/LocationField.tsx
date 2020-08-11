@@ -33,10 +33,10 @@ export interface LocationFieldProps extends Omit<FilledTextFieldProps, 'variant'
 
 export function LocationField({ id, value, onChange, disabled, ...rest }: LocationFieldProps): React.ReactElement {
     const classes = useStyles();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [ inputValue, setInputValue ] = React.useState('');
     const [ options, setOptions ] = React.useState<LocationOption[]>([]);
-    const { getPlacePredictions } = useLazyAutocompleteService();
+    const { getPlacePredictions } = useLazyAutocompleteService(i18n.language);
 
     React.useEffect(() => {
         if (!getPlacePredictions) {
@@ -56,7 +56,7 @@ export function LocationField({ id, value, onChange, disabled, ...rest }: Locati
         return () => {
             getPlacePredictions.cancel();
         };
-    }, [ value, inputValue, fetch, getPlacePredictions ]);
+    }, [ value, inputValue, getPlacePredictions ]);
 
     return (
         <FormControl fullWidth margin='normal'>
