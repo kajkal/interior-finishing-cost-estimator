@@ -73,6 +73,7 @@ export type Project = {
   files: Array<ResourceData>;
 };
 
+/** Data extracted from place object https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#library_5 */
 export type Location = {
   __typename?: 'Location';
   placeId: Scalars['String'];
@@ -163,6 +164,7 @@ export type MutationCreateProjectArgs = {
 export type MutationUpdateProjectArgs = {
   projectSlug: Scalars['String'];
   name: Scalars['String'];
+  location?: Maybe<LocationFormData>;
 };
 
 
@@ -204,6 +206,12 @@ export type MutationLoginArgs = {
 export type CurrencyAmountFormData = {
   currency: Scalars['String'];
   amount: Scalars['Float'];
+};
+
+export type LocationFormData = {
+  placeId: Scalars['String'];
+  main: Scalars['String'];
+  secondary: Scalars['String'];
 };
 
 
@@ -385,6 +393,7 @@ export type DeleteProjectMutation = (
 export type UpdateProjectMutationVariables = Exact<{
   projectSlug: Scalars['String'];
   name: Scalars['String'];
+  location?: Maybe<LocationFormData>;
 }>;
 
 
@@ -865,8 +874,8 @@ export type DeleteProjectMutationHookResult = ReturnType<typeof useDeleteProject
 export type DeleteProjectMutationResult = ApolloReactCommon.MutationResult<DeleteProjectMutation>;
 export type DeleteProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
 export const UpdateProjectDocument = gql`
-    mutation UpdateProject($projectSlug: String!, $name: String!) {
-  updateProject(projectSlug: $projectSlug, name: $name) {
+    mutation UpdateProject($projectSlug: String!, $name: String!, $location: LocationFormData) {
+  updateProject(projectSlug: $projectSlug, name: $name, location: $location) {
     ...ProjectDetailedData
   }
 }
@@ -887,6 +896,7 @@ export const UpdateProjectDocument = gql`
  *   variables: {
  *      projectSlug: // value for 'projectSlug'
  *      name: // value for 'name'
+ *      location: // value for 'location'
  *   },
  * });
  */

@@ -212,6 +212,9 @@
         "tooLong": "Wprowadzona nazwa projektu jest za długa"
       }
     },
+    "projectLocation": {
+      "label": "Lokalizacja projektu"
+    },
     "projectFile": {
       "label": "Upuść plik tutaj, lub kliknij aby wybrać plik",
       "validation": {

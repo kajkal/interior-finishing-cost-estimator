@@ -13,11 +13,14 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { MutationUpdateProjectArgs, ProjectDetailsDocument, ProjectDetailsQuery, useUpdateProjectMutation } from '../../../../graphql/generated-types';
+import { ProjectDetailsDocument, ProjectDetailsQuery, useUpdateProjectMutation } from '../../../../graphql/generated-types';
+import { mapLocationOptionToLocationFormData, mapLocationToLocationOption } from '../../../utils/mappers/locationMapper';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
+import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
+import { LocationOption } from '../../common/form-fields/location/LocationField';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { projectUpdateModalAtom } from './projectUpdateModalAtom';
@@ -25,7 +28,11 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 import { nav } from '../../../config/nav';
 
 
-type ProjectUpdateFormData = MutationUpdateProjectArgs;
+interface ProjectUpdateFormData {
+    projectSlug: string;
+    name: string;
+    location: LocationOption | null;
+}
 
 export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const { t } = useTranslation();
@@ -57,6 +64,7 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                 initialValues={{
                     projectSlug: projectData?.slug || '',
                     name: projectData?.name || '',
+                    location: mapLocationToLocationOption(projectData?.location || null),
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -77,6 +85,12 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                                         helperText={(projectData?.name !== values.name) ? t('project.updateModal.urlWillChange') : undefined}
                                         fullWidth
                                         autoFocus
+                                    />
+
+                                    <FormikLocationField
+                                        name='location'
+                                        label={t('form.projectLocation.label')}
+                                        optional
                                     />
 
                                 </Form>
@@ -106,7 +120,8 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
 
 function areValuesEqInitialValues(values: ProjectUpdateFormData, initialValues: ProjectUpdateFormData): boolean {
     return (values.projectSlug === initialValues.projectSlug)
-        && (values.name === initialValues.name);
+        && (values.name === initialValues.name)
+        && (values.location?.place_id === initialValues.location?.place_id);
 }
 
 
@@ -120,6 +135,7 @@ function useProjectUpdateFormValidationSchema(t: TFunction) {
             .min(3, t('form.projectName.validation.tooShort'))
             .max(50, t('form.projectName.validation.tooLong'))
             .required(t('form.projectName.validation.required')),
+        location: Yup.mixed<LocationOption>().defined(),
     }).defined(), [ t ]);
 }
 
@@ -133,10 +149,13 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
     const [ updateProjectMutation, { loading } ] = useUpdateProjectMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<ProjectUpdateFormData>['onSubmit']>(async (values) => {
+    return React.useCallback<FormikConfig<ProjectUpdateFormData>['onSubmit']>(async ({ location, ...values }) => {
         try {
             await updateProjectMutation({
-                variables: values,
+                variables: {
+                    ...values,
+                    location: mapLocationOptionToLocationFormData(location),
+                },
                 update: (cache, { data }) => {
                     const updatedProject = data?.updateProject;
                     const prevProjectSlug = values.projectSlug;

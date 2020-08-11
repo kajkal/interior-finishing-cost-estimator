@@ -1,5 +1,13 @@
-mutation UpdateProject($projectSlug: String!, $name: String!) {
-    updateProject(projectSlug: $projectSlug, name: $name) {
+mutation UpdateProject(
+    $projectSlug: String!
+    $name: String!
+    $location: LocationFormData
+) {
+    updateProject(
+        projectSlug: $projectSlug
+        name: $name
+        location: $location
+    ) {
         ...ProjectDetailedData
     }
 }

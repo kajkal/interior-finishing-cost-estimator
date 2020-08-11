@@ -4,7 +4,7 @@ import { Project } from '../../../../graphql/generated-types';
 
 export interface ProjectUpdateModalAtomValue {
     open: boolean;
-    projectData?: Pick<Project, 'slug' | 'name'>;
+    projectData?: Pick<Project, 'slug' | 'name' | 'location'>;
 }
 
 export const projectUpdateModalAtom = atom<ProjectUpdateModalAtomValue>({

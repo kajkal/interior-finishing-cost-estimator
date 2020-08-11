@@ -1,11 +1,18 @@
+/**
+ * @jest-environment jsdom-sixteen
+ *
+ * ^ because of 'Error: Uncaught [TypeError: document.createRange is not a function]'
+ */
+
 import React from 'react';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
+import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { InputValidator } from '../../../__utils__/InputValidator';
 
 import { MutationUpdateProjectArgs, Project, UpdateProjectDocument, UpdateProjectMutation, UpdateProjectMutationVariables, User } from '../../../../graphql/generated-types';
@@ -21,6 +28,7 @@ describe('ProjectUpdateModal component', () => {
         __typename: 'Project',
         slug: 'sample-project',
         name: 'Sample project',
+        location: null,
         files: [],
     };
 
@@ -44,6 +52,7 @@ describe('ProjectUpdateModal component', () => {
                         projectData: {
                             name: sampleProject.name!,
                             slug: sampleProject.slug!,
+                            location: sampleProject.location,
                         },
                     })}
                 />
@@ -78,6 +87,9 @@ describe('ProjectUpdateModal component', () => {
         static get projectNameInput() {
             return screen.getByLabelText('t:form.projectName.label', { selector: 'input' });
         }
+        static get projectLocationInput() {
+            return screen.getByLabelText(/t:form.projectLocation.label/, { selector: 'input' });
+        }
         static get cancelButton() {
             return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
@@ -92,7 +104,10 @@ describe('ProjectUpdateModal component', () => {
         }
         static async fillAndSubmitForm(data: MutationUpdateProjectArgs) {
             ViewUnderTest.openModal();
-            await extendedUserEvent.type(this.projectNameInput, data.name || '');
+
+            await TextFieldController.from(ViewUnderTest.projectNameInput).type(data.name);
+            await LocationFieldController.from(ViewUnderTest.projectLocationInput).selectLocation(data.location);
+
             userEvent.click(this.submitButton);
         }
     }
@@ -123,6 +138,11 @@ describe('ProjectUpdateModal component', () => {
                     variables: {
                         projectSlug: sampleProject.slug,
                         name: 'Updated project name',
+                        location: {
+                            placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
+                            main: 'Kraków',
+                            secondary: 'Poland',
+                        },
                     } as UpdateProjectMutationVariables,
                 },
                 result: {
@@ -131,6 +151,12 @@ describe('ProjectUpdateModal component', () => {
                             __typename: 'Project',
                             id: '-',
                             slug: 'updated-project-name',
+                            location: {
+                                __typename: 'Location',
+                                placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
+                                main: 'Kraków',
+                                secondary: 'Poland',
+                            },
                             name: 'Updated project name',
                             files: [],
                         },

@@ -212,6 +212,9 @@
         "tooLong": "Project name is too long"
       }
     },
+    "projectLocation": {
+      "label": "Project location"
+    },
     "projectFile": {
       "label": "Drop file here, or click to browse",
       "validation": {
