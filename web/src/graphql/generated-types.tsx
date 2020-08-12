@@ -23,6 +23,13 @@ export type Query = {
   me: User;
   projects: Array<Project>;
   products: Array<Offer>;
+  /** Returns user', publicly available, profile data */
+  profile: Profile;
+};
+
+
+export type QueryProfileArgs = {
+  userSlug: Scalars['String'];
 };
 
 export type User = {
@@ -38,6 +45,8 @@ export type User = {
   /** User project with given project id. */
   project?: Maybe<Project>;
   offers: Array<Offer>;
+  /** User' avatar url */
+  avatar?: Maybe<Scalars['String']>;
 };
 
 
@@ -49,6 +58,7 @@ export type Product = {
   __typename?: 'Product';
   id: Scalars['ID'];
   name: Scalars['String'];
+  /** Serialized description */
   description: Scalars['String'];
   price?: Maybe<CurrencyAmount>;
   tags?: Maybe<Array<Scalars['String']>>;
@@ -94,6 +104,16 @@ export type Offer = {
   name: Scalars['String'];
 };
 
+export type Profile = {
+  __typename?: 'Profile';
+  userSlug: Scalars['String'];
+  name: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
+  /** Serialized user profile */
+  description?: Maybe<Scalars['String']>;
+  location?: Maybe<Location>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** Sends password reset instructions to given email address. */
@@ -119,6 +139,7 @@ export type Mutation = {
   login: InitialData;
   /** Invalidates user session. */
   logout: Scalars['Boolean'];
+  updateProfile: Profile;
 };
 
 
@@ -201,6 +222,14 @@ export type MutationConfirmEmailAddressArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationUpdateProfileArgs = {
+  avatar?: Maybe<Scalars['Upload']>;
+  removeCurrentAvatar?: Maybe<Scalars['Boolean']>;
+  description?: Maybe<Scalars['String']>;
+  location?: Maybe<LocationFormData>;
 };
 
 export type CurrencyAmountFormData = {
@@ -451,7 +480,7 @@ export type ProjectDetailsQuery = (
 
 export type UserDetailedDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'name' | 'slug' | 'email' | 'productCount'>
+  & Pick<User, 'name' | 'slug' | 'email' | 'avatar' | 'productCount'>
   & { products: Array<(
     { __typename?: 'Product' }
     & ProductDataFragment
@@ -464,6 +493,31 @@ export type UserDetailedDataFragment = (
   )> }
 );
 
+export type UserProfileDataFragment = (
+  { __typename?: 'Profile' }
+  & Pick<Profile, 'userSlug' | 'name' | 'avatar' | 'description'>
+  & { location?: Maybe<(
+    { __typename?: 'Location' }
+    & Pick<Location, 'placeId' | 'main' | 'secondary'>
+  )> }
+);
+
+export type UpdateProfileMutationVariables = Exact<{
+  description?: Maybe<Scalars['String']>;
+  location?: Maybe<LocationFormData>;
+  avatar?: Maybe<Scalars['Upload']>;
+  removeCurrentAvatar?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateProfileMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProfile: (
+    { __typename?: 'Profile' }
+    & UserProfileDataFragment
+  ) }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -472,6 +526,19 @@ export type MeQuery = (
   & { me: (
     { __typename?: 'User' }
     & UserDetailedDataFragment
+  ) }
+);
+
+export type ProfileQueryVariables = Exact<{
+  userSlug: Scalars['String'];
+}>;
+
+
+export type ProfileQuery = (
+  { __typename?: 'Query' }
+  & { profile: (
+    { __typename?: 'Profile' }
+    & UserProfileDataFragment
   ) }
 );
 
@@ -515,6 +582,7 @@ export const UserDetailedDataFragmentDoc = gql`
   name
   slug
   email
+  avatar
   products {
     ...ProductData
   }
@@ -528,6 +596,19 @@ export const UserDetailedDataFragmentDoc = gql`
 }
     ${ProductDataFragmentDoc}
 ${ProjectBasicDataFragmentDoc}`;
+export const UserProfileDataFragmentDoc = gql`
+    fragment UserProfileData on Profile {
+  userSlug
+  name
+  avatar
+  description
+  location {
+    placeId
+    main
+    secondary
+  }
+}
+    `;
 export const ConfirmEmailAddressDocument = gql`
     mutation ConfirmEmailAddress($token: String!) {
   confirmEmailAddress(token: $token)
@@ -1008,6 +1089,40 @@ export function useProjectDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQu
 export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQuery>;
 export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
 export type ProjectDetailsQueryResult = ApolloReactCommon.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
+export const UpdateProfileDocument = gql`
+    mutation UpdateProfile($description: String, $location: LocationFormData, $avatar: Upload, $removeCurrentAvatar: Boolean) {
+  updateProfile(description: $description, location: $location, avatar: $avatar, removeCurrentAvatar: $removeCurrentAvatar) {
+    ...UserProfileData
+  }
+}
+    ${UserProfileDataFragmentDoc}`;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      description: // value for 'description'
+ *      location: // value for 'location'
+ *      avatar: // value for 'avatar'
+ *      removeCurrentAvatar: // value for 'removeCurrentAvatar'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, baseOptions);
+      }
+export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
+export type UpdateProfileMutationResult = ApolloReactCommon.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -1040,3 +1155,36 @@ export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptio
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
+export const ProfileDocument = gql`
+    query Profile($userSlug: String!) {
+  profile(userSlug: $userSlug) {
+    ...UserProfileData
+  }
+}
+    ${UserProfileDataFragmentDoc}`;
+
+/**
+ * __useProfileQuery__
+ *
+ * To run a query within a React component, call `useProfileQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProfileQuery({
+ *   variables: {
+ *      userSlug: // value for 'userSlug'
+ *   },
+ * });
+ */
+export function useProfileQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
+        return ApolloReactHooks.useQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
+      }
+export function useProfileLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
+        }
+export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
+export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
+export type ProfileQueryResult = ApolloReactCommon.QueryResult<ProfileQuery, ProfileQueryVariables>;

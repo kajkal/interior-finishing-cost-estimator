@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState, useSetRecoilState } from 'recoil/dist';
 
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { darken, lighten, makeStyles, Theme } from '@material-ui/core/styles';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionActions from '@material-ui/core/AccordionActions';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -17,11 +17,13 @@ import Chip from '@material-ui/core/Chip';
 import HistoryIcon from '@material-ui/icons/History';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
 
 import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../modals/product-update/productUpdateModalAtom';
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
 import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
 import { productsFiltersAtom, ProductsFiltersAtomValue } from './filters/productsFiltersAtom';
+import { productCreateModalAtom } from '../../modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom } from '../../modals/product-delete/productDeleteModalAtom';
 import { isTagExclusivelySelected, productFilter } from './filters/productsFiltersUtils';
 import { ProductFilterSearch } from './filters/ProductFilterSearch';
@@ -29,22 +31,41 @@ import { formatAmount } from '../../../config/supportedCurrencies';
 import { ProductFilterDate } from './filters/ProductFilterDate';
 import { ProductFilterTags } from './filters/ProductFilterTags';
 import { Product } from '../../../../graphql/generated-types';
+import { PageActions } from '../../common/page/PageActions';
 import { ExpandIcon } from '../../common/icons/ExpandIcon';
-import { ProductsPageHeader } from './ProductsPageHeader';
+import { PageHeader } from '../../common/page/PageHeader';
+import { PageTitle } from '../../common/page/PageTitle';
+import { ThemeType } from '../../../utils/theme/ThemeUtils';
 
 
 export function ProductsPage(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const [ filters, setFilters ] = useRecoilState(productsFiltersAtom);
+    const setProductCreateModalModalState = useSetRecoilState(productCreateModalAtom);
     const [ { tags, dates }, userCachedData ] = useCurrentUserDataSelectors();
     const products = userCachedData?.products;
     const filteredProducts = React.useMemo(() => productFilter(products || [], filters), [ products, filters ]);
 
+    const handleProductCreateModalOpen = () => {
+        setProductCreateModalModalState({ open: true });
+    };
+
     return (
         <Container maxWidth='lg'>
 
-            <ProductsPageHeader />
+            <PageHeader>
+                <PageTitle>
+                    {t('product.products')}
+                </PageTitle>
+                <PageActions>
+                    <Tooltip title={t('product.addProduct')!}>
+                        <IconButton onClick={handleProductCreateModalOpen} aria-label={t('product.addProduct')}>
+                            <AddIcon />
+                        </IconButton>
+                    </Tooltip>
+                </PageActions>
+            </PageHeader>
 
             <div className={classes.filtersContainer} role='group' aria-label={t('product.filters.productFilters')}>
 
@@ -262,11 +283,26 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 
     MuiAccordionRoot: {
-        border: '1px solid transparent',
+        border: `1px solid ${theme.palette.divider}`,
+        transition: theme.transitions.create([ 'margin', 'border-color' ], {
+            duration: theme.transitions.duration.shortest,
+        }),
+        margin: theme.spacing(1, 0),
         boxShadow: 'unset',
+        '&:hover': {
+            border: `1px solid ${(theme.palette.type === ThemeType.light)
+                ? lighten(theme.palette.text.disabled, 0.5)
+                : darken(theme.palette.text.disabled, 0.4)
+            }`,
+        },
         '&$MuiAccordionExpanded': {
-            borderColor: theme.palette.divider,
+            borderColor: (theme.palette.type === ThemeType.light)
+                ? lighten(theme.palette.text.disabled, 0.2)
+                : darken(theme.palette.text.disabled, 0.2),
             borderRadius: theme.shape.borderRadius,
+        },
+        '&:before': {
+            display: 'none',
         },
     },
     MuiAccordionExpanded: {},

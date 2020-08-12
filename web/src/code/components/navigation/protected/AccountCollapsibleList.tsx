@@ -23,9 +23,10 @@ export interface AccountCollapsibleListProps {
     isSideNavOpen: boolean;
     onSideNavToggle: () => void;
     userName: string;
+    avatarUrl: string | undefined | null;
 }
 
-export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userName }: AccountCollapsibleListProps): React.ReactElement {
+export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userName, avatarUrl }: AccountCollapsibleListProps): React.ReactElement {
     const classes = useStyles();
     const listItemStyles = useSideNavListItemStyles();
     const { t } = useTranslation();
@@ -46,7 +47,12 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userNam
                 >
 
                     <ListItemAvatar>
-                        <Avatar variant='rounded' alt={userName} /*src='/dev_avatar.jpg'*/ className={classes.avatar} />
+                        <Avatar
+                            variant='rounded'
+                            alt={userName}
+                            src={avatarUrl || undefined}
+                            className={classes.avatar}
+                        />
                     </ListItemAvatar>
 
                     <ListItemText

@@ -1,0 +1,15 @@
+mutation UpdateProfile(
+    $description: String
+    $location: LocationFormData
+    $avatar: Upload
+    $removeCurrentAvatar: Boolean
+) {
+    updateProfile(
+        description: $description
+        location: $location
+        avatar: $avatar
+        removeCurrentAvatar: $removeCurrentAvatar
+    ) {
+        ...UserProfileData
+    }
+}

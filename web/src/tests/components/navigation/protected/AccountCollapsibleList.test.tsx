@@ -21,6 +21,7 @@ describe('AccountCollapsibleList component', () => {
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
             userName={'Sample Name'}
+            avatarUrl={null}
         />, { wrapper: MockRouter });
 
         // simulate 'isSideNavOpen' prop change on 'onSideNavToggle' prop call
@@ -29,6 +30,7 @@ describe('AccountCollapsibleList component', () => {
                 isSideNavOpen={true}
                 onSideNavToggle={mockHandleSideNavToggle}
                 userName={'Sample Name'}
+                avatarUrl={null}
             />);
         });
 
@@ -51,6 +53,7 @@ describe('AccountCollapsibleList component', () => {
             isSideNavOpen={false}
             onSideNavToggle={mockHandleSideNavToggle}
             userName={'Sample Name'}
+            avatarUrl={null}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.account(Expand|Collapse)$/ });
@@ -60,6 +63,7 @@ describe('AccountCollapsibleList component', () => {
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
             userName={'Sample Name'}
+            avatarUrl={null}
         />);
         expect(collapsibleListTrigger).toHaveAttribute('title', '');
     });
@@ -69,6 +73,7 @@ describe('AccountCollapsibleList component', () => {
             isSideNavOpen={true}
             onSideNavToggle={mockHandleSideNavToggle}
             userName={'Sample Name'}
+            avatarUrl={null}
         />, { wrapper: MockRouter });
 
         const collapsibleListTrigger = screen.getByRole('button', { name: /^t:common.account(Expand|Collapse)$/ });

@@ -66,6 +66,14 @@
   "notFoundPage": {
     "pageNotFound": "Page not found"
   },
+  "user": {
+    "updateProfile": "Edit your profile",
+    "userNotFoundError": "User not found",
+    "currentAvatar": "Your current profile picture",
+    "updateProfileModal": {
+      "title": "Edit profile"
+    }
+  },
   "project": {
     "createProject": "Create project",
     "updateThisProject": "Edit this project",
@@ -202,6 +210,16 @@
         "tooShort": "Name is too short",
         "tooLong": "Name is too long"
       }
+    },
+    "avatar": {
+      "label": "Profile picture"
+    },
+    "profile": {
+      "label": "Profile",
+      "ariaLabel": "Enter your profile description"
+    },
+    "location": {
+      "label": "Location"
     },
     "projectName": {
       "label": "Project name",

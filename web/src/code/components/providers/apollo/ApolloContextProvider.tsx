@@ -63,6 +63,9 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
             ErrorHandler.handleNetworkError(networkError, () => {
                 errorToast(({ t }) => t('error.networkError'));
             });
+            ErrorHandler.handleGraphQlError(graphQLErrors, 'USER_NOT_FOUND', () => {
+                errorToast(({ t }) => t('user.userNotFoundError'));
+            });
             ErrorHandler.handleGraphQlError(graphQLErrors, 'RESOURCE_OWNER_ROLE_REQUIRED', () => {
                 errorToast(({ t }) => t('error.resourceOwnerRoleRequired'));
             });

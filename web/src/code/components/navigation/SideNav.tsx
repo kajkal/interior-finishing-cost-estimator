@@ -36,6 +36,7 @@ export function SideNav(): React.ReactElement {
                                 isSideNavOpen={isSideNavOpen}
                                 onSideNavToggle={onSideNavToggle}
                                 userName={userData.name}
+                                avatarUrl={userData.avatar}
                             />
                             <ProjectsCollapsibleList
                                 isSideNavOpen={isSideNavOpen}

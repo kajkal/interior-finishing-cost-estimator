@@ -8,9 +8,10 @@ import { plugins } from './options';
 
 export interface RichTextPreviewerProps {
     value: string;
+    className?: string;
 }
 
-export function RichTextPreviewer({ value }: RichTextPreviewerProps): React.ReactElement {
+export function RichTextPreviewer({ value, className }: RichTextPreviewerProps): React.ReactElement {
     const editor = React.useMemo(() => pipe(createEditor(), withReact), []);
     const parsedValue = React.useMemo<SlateDocument>(() => JSON.parse(value), [ value ]);
 
@@ -20,6 +21,7 @@ export function RichTextPreviewer({ value }: RichTextPreviewerProps): React.Reac
                 readOnly
                 style={{}} // override redundant styles
                 plugins={plugins}
+                className={className}
             />
         </Slate>
     );

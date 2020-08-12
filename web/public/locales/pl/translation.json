@@ -66,6 +66,14 @@
   "notFoundPage": {
     "pageNotFound": "Nie znaleziono strony"
   },
+  "user": {
+    "updateProfile": "Edytuj swój profil",
+    "userNotFoundError": "Użytkownik nie znaleziony",
+    "currentAvatar": "Twoje obecne zdjęcie profilowe",
+    "updateProfileModal": {
+      "title": "Edytuj profil"
+    }
+  },
   "project": {
     "createProject": "Utwórz projekt",
     "updateThisProject": "Edytuj ten project",
@@ -202,6 +210,16 @@
         "tooShort": "Wprowadzona nazwa jest za krótka",
         "tooLong": "Wprowadzona nazwa jest za długa"
       }
+    },
+    "avatar": {
+      "label": "Zdjęcie profilowe"
+    },
+    "profile": {
+      "label": "Profil",
+      "ariaLabel": "Wprowadź opis swojego profilu"
+    },
+    "location": {
+      "label": "Miejscowość"
     },
     "projectName": {
       "label": "Nazwa projektu",

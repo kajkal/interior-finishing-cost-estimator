@@ -1,0 +1,11 @@
+fragment UserProfileData on Profile {
+    userSlug
+    name
+    avatar
+    description
+    location {
+        placeId
+        main
+        secondary
+    }
+}

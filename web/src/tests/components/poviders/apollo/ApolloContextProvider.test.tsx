@@ -192,6 +192,21 @@ describe('ApolloContextProvider component', () => {
             expect(toast).toHaveTextContent('t:error.sessionExpired');
         });
 
+        it('should globally handle {USER_NOT_FOUND} GraphQL errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: undefined,
+                graphQLErrors: [ new GraphQLError('USER_NOT_FOUND') ],
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:user.userNotFoundError');
+        });
+
         it('should globally handle {RESOURCE_OWNER_ROLE_REQUIRED} GraphQL errors', async () => {
             const onErrorFn = await getOnErrorFunction();
             onErrorFn({

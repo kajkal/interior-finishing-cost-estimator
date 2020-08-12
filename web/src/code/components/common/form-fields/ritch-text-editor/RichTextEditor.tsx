@@ -186,6 +186,6 @@ const useStyles = makeStyles((theme) => ({
     disabled: {},
     editorArea: {
         padding: '27px 12px 10px',
-        minHeight: 100,
+        minHeight: 192,
     },
 }));

@@ -68,6 +68,9 @@ export function initApolloCache() {
             Project: {
                 keyFields: [ 'slug' ],
             },
+            Profile: {
+                keyFields: [ 'userSlug' ],
+            },
         },
     });
 }
