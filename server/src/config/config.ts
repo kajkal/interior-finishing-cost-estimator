@@ -88,7 +88,7 @@ export const config = {
                     noTimestamp: true,
                 },
             } as TokenConfig<EmailAddressConfirmationTokenPayload>,
-            urlBase: `${process.env.WEB_CLIENT_URL}/confirm-email-address`,
+            urlBase: `${process.env.WEB_CLIENT_URL}/signup/confirm-email-address`,
         },
         passwordReset: {
             jwt: {
@@ -97,7 +97,7 @@ export const config = {
                     expiresIn: '2h',
                 },
             } as TokenConfig<PasswordResetTokenPayload>,
-            urlBase: `${process.env.WEB_CLIENT_URL}/reset-password`,
+            urlBase: `${process.env.WEB_CLIENT_URL}/login/reset-password`,
         },
     },
 

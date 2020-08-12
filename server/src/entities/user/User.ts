@@ -5,6 +5,7 @@ import { BaseEntity } from '../BaseEntity';
 import { Product } from '../product/Product';
 import { Project } from '../project/Project';
 import { Offer } from '../offer/Offer';
+import { Location } from '../common/Location';
 
 
 @ObjectType()
@@ -27,10 +28,44 @@ export class User extends BaseEntity {
     password!: string;
 
     /**
+     * Indicates whether the user has publicly available profile.
+     * When hidden is set to true - user' profile become private - not accessible for any other user.
+     */
+    @Property()
+    hidden: boolean = false;
+
+
+    /**
+     * --------------------------------------------------
+     * Meta
+     * --------------------------------------------------
+     */
+
+    /**
      * Indicates whether the user has confirmed that the given email address is his.
      */
     @Property()
-    isEmailAddressConfirmed?: boolean = false;
+    isEmailAddressConfirmed: boolean = false;
+
+
+    /**
+     * --------------------------------------------------
+     * Profile
+     * --------------------------------------------------
+     */
+
+    @Property()
+    profileDescription?: string | null;
+
+    @Property()
+    location?: Location | null;
+
+
+    /**
+     * --------------------------------------------------
+     * Relations
+     * --------------------------------------------------
+     */
 
     /**
      * @see UserResolver#products

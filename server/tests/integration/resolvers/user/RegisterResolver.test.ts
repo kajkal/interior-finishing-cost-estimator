@@ -172,7 +172,9 @@ describe('RegisterResolver', () => {
 
             // verify if user was updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
-            expect(user.isEmailAddressConfirmed).toBe(true);
+            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
+                isEmailAddressConfirmed: true,
+            }));
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);

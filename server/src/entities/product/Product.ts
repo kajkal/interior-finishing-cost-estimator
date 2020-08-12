@@ -20,7 +20,7 @@ export class Product extends BaseEntity {
     @Property()
     name!: string;
 
-    @Field()
+    @Field({ description: 'Serialized description' })
     @Property()
     description!: string;
 

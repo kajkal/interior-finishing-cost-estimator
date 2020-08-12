@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import { ApolloServer } from 'apollo-server-express';
-import { EntityManager, RequestContext } from 'mikro-orm';
+import { EntityManager } from 'mikro-orm';
 
 import { MockExpress, MockExpressFunction } from '../../__mocks__/libraries/express';
 import { MockApolloServer } from '../../__mocks__/libraries/apollo-server-express';
@@ -11,13 +11,16 @@ import { createExpressServer } from '../../../src/loaders/express';
 
 describe('express loader', () => {
 
-    const MockEntityManager = 'ENTITY_MANAGER_TEST_VALUE';
+    const MockEntityManager = {
+        fork: jest.fn(),
+    };
 
     beforeAll(() => {
         Container.set(EntityManager, MockEntityManager);
     });
 
     beforeEach(() => {
+        MockEntityManager.fork.mockClear();
         MockLogger.setupMocks();
     });
 
@@ -65,11 +68,12 @@ describe('express loader', () => {
         expect(MockLogger.info).toHaveBeenCalledWith('Server started', 'SERVER_ADDRESS_TEST_VALUE');
 
         // test MicroORM create context function
-        const microOrmCreateReqContextSpy = jest.spyOn(RequestContext, 'create').mockReturnValueOnce(undefined);
         const microOrmCreateReqContextFn = MockExpress.use.mock.calls[ 1 ][ 0 ];
-        microOrmCreateReqContextFn('REQ', 'RES', 'NEXT_FN_TEST_VALUE');
-        expect(microOrmCreateReqContextSpy).toHaveBeenCalledTimes(1);
-        expect(microOrmCreateReqContextSpy).toHaveBeenCalledWith(MockEntityManager, 'NEXT_FN_TEST_VALUE');
+        const mockNextFn = jest.fn();
+        microOrmCreateReqContextFn('REQ', 'RES', mockNextFn);
+        expect(MockEntityManager.fork).toHaveBeenCalledTimes(1);
+        expect(MockEntityManager.fork).toHaveBeenCalledWith(true, true);
+        expect(mockNextFn).toHaveBeenCalledTimes(1);
         done();
     });
 

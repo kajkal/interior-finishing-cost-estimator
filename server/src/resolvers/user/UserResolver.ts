@@ -2,6 +2,7 @@ import { Inject, Service } from 'typedi';
 import { Args, Authorized, Ctx, FieldResolver, Int, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
+import { StorageService } from '../../services/storage/StorageService';
 import { UserRepository } from '../../repositories/UserRepository';
 import { ElementSlug } from '../common/input/ElementSlug';
 import { Product } from '../../entities/product/Product';
@@ -17,6 +18,9 @@ export class UserResolver {
 
     @Inject()
     private readonly userRepository!: UserRepository;
+
+    @Inject()
+    private readonly storageService!: StorageService;
 
 
     @FieldResolver(() => [ Product ])
@@ -47,6 +51,12 @@ export class UserResolver {
     @FieldResolver(() => [ Offer ])
     async offers(@Root() user: User) {
         return await user.offers.loadItems();
+    }
+
+    @FieldResolver(() => String, { nullable: true, description: 'User\' avatar url' })
+    async avatar(@Root() user: User): Promise<string | null> {
+        const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
+        return avatar?.url || null;
     }
 
 

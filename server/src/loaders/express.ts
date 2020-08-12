@@ -1,10 +1,10 @@
 import cors from 'cors';
 import { Server } from 'http';
 import { Container } from 'typedi';
-import Express, { NextFunction, Request, Response } from 'express';
-import { EntityManager, RequestContext } from 'mikro-orm';
-
 import { ApolloServer } from 'apollo-server-express';
+import { EntityManager, RequestContext } from 'mikro-orm';
+import Express, { NextFunction, Request, Response } from 'express';
+
 import { AuthService } from '../services/auth/AuthService';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
@@ -44,9 +44,17 @@ export function createExpressServer(apolloServer: ApolloServer): Promise<Server>
     }));
     app.post('/refresh_token', handleRefreshTokenRequest);
 
-    // fork em for each request
     const em = Container.get(EntityManager);
-    app.use((req, res, next) => RequestContext.create(em, next));
+    app.use((req, res, next) => {
+        /**
+         * FIXME - fork em for each request.
+         * RequestContext.create(orm.em, next); - is not working in every case
+         * Check how it behaves in koa
+         */
+        const rqContent = new RequestContext(em.fork(true, true));
+        RequestContext.currentRequestContext = () => rqContent;
+        next();
+    });
 
     // attach GraphQl server
     apolloServer.applyMiddleware({ app, cors: false });

@@ -3,7 +3,7 @@ import { Entity, IdentifiedReference, ManyToOne, Property } from 'mikro-orm';
 
 import { BaseEntity } from '../BaseEntity';
 import { User } from '../user/User';
-import { Location } from './Location';
+import { Location } from '../common/Location';
 
 
 @ObjectType()

@@ -52,6 +52,9 @@ export class TestDatabaseManager {
             email: generator.email(),
             password: generator.string({ length: 8 }),
             isEmailAddressConfirmed: false,
+            hidden: false,
+            profileDescription: null,
+            location: null,
             ...partialUserData,
         };
 

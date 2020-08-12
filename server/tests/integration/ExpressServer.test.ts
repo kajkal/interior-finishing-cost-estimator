@@ -6,7 +6,7 @@ import { Response } from 'express';
 import { Container } from 'typedi';
 import { ApolloServer } from 'apollo-server-express';
 
-import { MockRequestContext } from '../__mocks__/libraries/mikro-orm';
+import { MockEntityManager, MockRequestContext } from '../__mocks__/libraries/mikro-orm';
 import { MockLogger } from '../__mocks__/utils/logger';
 
 import { AuthServiceSpy } from '../__utils__/spies/services/auth/AuthServiceSpy';
@@ -22,7 +22,8 @@ describe('ExpressServer', () => {
     let serverUnderTest: Server;
 
     beforeEach(async () => {
-        MockRequestContext.setupMocks();
+        MockEntityManager.fork.mockClear();
+        MockRequestContext.mockClear();
         MockLogger.setupMocks();
         AuthServiceSpy.setupSpies();
 

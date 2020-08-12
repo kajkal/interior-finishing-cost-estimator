@@ -39,7 +39,7 @@ describe('PasswordResetResolver', () => {
             }
         `;
 
-        it('should send email with password reset instructions when user email address is confirmed', async (done) => {
+        it('should send email with password reset instructions when user email address is confirmed', async () => {
             const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: true });
             const response = await testUtils.postGraphQL({
                 query: sendPasswordResetInstructionsMutation,
@@ -52,7 +52,11 @@ describe('PasswordResetResolver', () => {
 
             // verify if 'Password reset instructions' email was send
             expect(EmailServiceSpy.sendPasswordResetInstructionsEmail).toHaveBeenCalledTimes(1);
-            expect(EmailServiceSpy.sendPasswordResetInstructionsEmail).toHaveBeenCalledWith(user);
+            expect(EmailServiceSpy.sendPasswordResetInstructionsEmail).toHaveBeenCalledWith(expect.objectContaining({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            }));
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -64,10 +68,9 @@ describe('PasswordResetResolver', () => {
                     sendPasswordResetInstructions: true,
                 },
             });
-            done();
         });
 
-        it('should log error when user email address is not confirmed', async (done) => {
+        it('should log error when user email address is not confirmed', async () => {
             const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: false });
             const response = await testUtils.postGraphQL({
                 query: sendPasswordResetInstructionsMutation,
@@ -99,10 +102,9 @@ describe('PasswordResetResolver', () => {
                     sendPasswordResetInstructions: true,
                 },
             });
-            done();
         });
 
-        it('should log error when user with given email address is not registered', async (done) => {
+        it('should log error when user with given email address is not registered', async () => {
             const response = await testUtils.postGraphQL({
                 query: sendPasswordResetInstructionsMutation,
                 variables: { email: 'not.registered@domain.com' },
@@ -133,7 +135,6 @@ describe('PasswordResetResolver', () => {
                     sendPasswordResetInstructions: true,
                 },
             });
-            done();
         });
 
     });
@@ -150,9 +151,8 @@ describe('PasswordResetResolver', () => {
             return Container.get(PasswordResetService).generatePasswordResetToken(userData);
         }
 
-        it('should change user password if token is valid', async (done) => {
+        it('should change user password if token is valid', async () => {
             const user = await testUtils.db.populateWithUser();
-            const initialEncryptedPassword = user.password;
             const passwordResetFormData: PasswordResetFormData = {
                 token: createSamplePasswordResetToken(user),
                 password: generator.string({ length: 8 }),
@@ -172,8 +172,9 @@ describe('PasswordResetResolver', () => {
 
             // verify if user' password was updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+            const updatedUser = UserRepositorySpy.persistAndFlush.mock.calls[0][0] as User;
             expect(user.unencryptedPassword).not.toBe(passwordResetFormData.password);
-            expect(initialEncryptedPassword).not.toBe(user.password);
+            expect(user.password).not.toBe(updatedUser.password);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -185,10 +186,9 @@ describe('PasswordResetResolver', () => {
                     resetPassword: true,
                 },
             });
-            done();
         });
 
-        it('should return error if token is expired', async (done) => {
+        it('should return error if token is expired', async () => {
             const user = await testUtils.db.populateWithUser();
             jest.spyOn(Date, 'now').mockReturnValue(1592334600000); // 2020-06-16 19:10:00 <- creation time
             const passwordResetFormData: PasswordResetFormData = {
@@ -226,10 +226,9 @@ describe('PasswordResetResolver', () => {
                 ],
             });
             jest.spyOn(Date, 'now').mockRestore();
-            done();
         });
 
-        it('should return error if token is invalid', async (done) => {
+        it('should return error if token is invalid', async () => {
             const passwordResetFormData: PasswordResetFormData = {
                 token: sign({ id: 'sample id' }, 'WRONG_PRIVATE_KEY'),
                 password: generator.string({ length: 8 }),
@@ -260,7 +259,6 @@ describe('PasswordResetResolver', () => {
                     }),
                 ],
             });
-            done();
         });
 
     });

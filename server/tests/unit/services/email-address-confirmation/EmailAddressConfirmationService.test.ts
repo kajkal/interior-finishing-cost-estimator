@@ -37,7 +37,7 @@ describe('EmailAddressConfirmationService class', () => {
         const confirmationUrl = serviceUnderTest.generateEmailAddressConfirmationUrl(userData);
 
         // then
-        expect(confirmationUrl).toBe('http://localhost:3005/confirm-email-address?token=TOKEN_TEST_VALUE');
+        expect(confirmationUrl).toBe('http://localhost:3005/signup/confirm-email-address?token=TOKEN_TEST_VALUE');
         expect(serviceUnderTest.generateEmailAddressConfirmationToken).toHaveBeenCalledTimes(1);
         expect(serviceUnderTest.generateEmailAddressConfirmationToken).toHaveBeenCalledWith(userData);
     });

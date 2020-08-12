@@ -10,6 +10,7 @@ import { ProjectResolver } from '../resolvers/project/ProjectResolver';
 import { RegisterResolver } from '../resolvers/user/RegisterResolver';
 import { OfferResolver } from '../resolvers/offer/OfferResolver';
 import { LoginResolver } from '../resolvers/user/LoginResolver';
+import { ProfileResolver } from '../resolvers/user/ProfileResolver';
 import { authChecker } from '../utils/authChecker';
 
 
@@ -24,6 +25,7 @@ export async function createApolloServer(): Promise<ApolloServer> {
                 ProductResolver,
                 ProjectResolver,
                 OfferResolver,
+                ProfileResolver,
             ],
             authChecker,
             container: Container,

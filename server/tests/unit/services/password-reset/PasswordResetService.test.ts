@@ -37,7 +37,7 @@ describe('PasswordResetService class', () => {
         const confirmationUrl = serviceUnderTest.generatePasswordResetUrl(userData);
 
         // then
-        expect(confirmationUrl).toBe('http://localhost:3005/reset-password?token=TOKEN_TEST_VALUE');
+        expect(confirmationUrl).toBe('http://localhost:3005/login/reset-password?token=TOKEN_TEST_VALUE');
         expect(serviceUnderTest.generatePasswordResetToken).toHaveBeenCalledTimes(1);
         expect(serviceUnderTest.generatePasswordResetToken).toHaveBeenCalledWith(userData);
     });

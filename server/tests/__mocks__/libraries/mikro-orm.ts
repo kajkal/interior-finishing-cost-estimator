@@ -1,20 +1,13 @@
 import { Container } from 'typedi';
 
 
-export const MockEntityManager = 'ENTITY_MANAGER_TEST_VALUE';
+export class MockEntityManager {
+    static fork = jest.fn();
+}
+
 Container.set(MockEntityManager, MockEntityManager);
 
-export class MockRequestContext {
-
-    static create: jest.MockedFunction<() => undefined>;
-
-    static setupMocks() {
-        this.create = jest.fn().mockImplementation((em, next) => {
-            next();
-        });
-    }
-
-}
+export const MockRequestContext = jest.fn();
 
 jest.mock('mikro-orm', () => ({
     EntityManager: MockEntityManager,
