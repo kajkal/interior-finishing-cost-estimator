@@ -12,13 +12,12 @@ import { Location } from '../common/Location';
 @Entity({ tableName: 'users' })
 export class User extends BaseEntity {
 
-    @Field()
-    @Property()
-    name!: string;
 
-    @Field({ description: 'Unique user slug. Used in URLs' })
-    @Property({ unique: true })
-    slug!: string;
+    /**
+     * --------------------------------------------------
+     * Settings/Meta
+     * --------------------------------------------------
+     */
 
     @Field()
     @Property({ unique: true })
@@ -26,6 +25,12 @@ export class User extends BaseEntity {
 
     @Property()
     password!: string;
+
+    /**
+     * Indicates whether the user has confirmed that the given email address is his.
+     */
+    @Property()
+    isEmailAddressConfirmed: boolean = false;
 
     /**
      * Indicates whether the user has publicly available profile.
@@ -37,22 +42,17 @@ export class User extends BaseEntity {
 
     /**
      * --------------------------------------------------
-     * Meta
-     * --------------------------------------------------
-     */
-
-    /**
-     * Indicates whether the user has confirmed that the given email address is his.
-     */
-    @Property()
-    isEmailAddressConfirmed: boolean = false;
-
-
-    /**
-     * --------------------------------------------------
      * Profile
      * --------------------------------------------------
      */
+
+    @Field()
+    @Property()
+    name!: string;
+
+    @Field({ description: 'Unique user slug. Used in URLs' })
+    @Property({ unique: true })
+    slug!: string;
 
     @Property()
     profileDescription?: string | null;

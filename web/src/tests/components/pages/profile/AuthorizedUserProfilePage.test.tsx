@@ -83,6 +83,7 @@ describe('AuthorizedUserProfilePage component', () => {
             open: true,
             withExistingAvatar: false,
             profileData: {
+                name: 'Sample Name',
                 avatar: null,
                 description: emptyEditorValue,
                 location: null,

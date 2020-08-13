@@ -34,10 +34,10 @@ export type QueryProfileArgs = {
 
 export type User = {
   __typename?: 'User';
+  email: Scalars['String'];
   name: Scalars['String'];
   /** Unique user slug. Used in URLs */
   slug: Scalars['String'];
-  email: Scalars['String'];
   products: Array<Product>;
   productCount: Scalars['Int'];
   /** User' all projects. */
@@ -226,6 +226,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationUpdateProfileArgs = {
+  name?: Maybe<Scalars['String']>;
   avatar?: Maybe<Scalars['Upload']>;
   removeCurrentAvatar?: Maybe<Scalars['Boolean']>;
   description?: Maybe<Scalars['String']>;
@@ -503,6 +504,7 @@ export type UserProfileDataFragment = (
 );
 
 export type UpdateProfileMutationVariables = Exact<{
+  name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   location?: Maybe<LocationFormData>;
   avatar?: Maybe<Scalars['Upload']>;
@@ -1090,8 +1092,8 @@ export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQ
 export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
 export type ProjectDetailsQueryResult = ApolloReactCommon.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
 export const UpdateProfileDocument = gql`
-    mutation UpdateProfile($description: String, $location: LocationFormData, $avatar: Upload, $removeCurrentAvatar: Boolean) {
-  updateProfile(description: $description, location: $location, avatar: $avatar, removeCurrentAvatar: $removeCurrentAvatar) {
+    mutation UpdateProfile($name: String, $description: String, $location: LocationFormData, $avatar: Upload, $removeCurrentAvatar: Boolean) {
+  updateProfile(name: $name, description: $description, location: $location, avatar: $avatar, removeCurrentAvatar: $removeCurrentAvatar) {
     ...UserProfileData
   }
 }
@@ -1110,6 +1112,7 @@ export const UpdateProfileDocument = gql`
  * @example
  * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
  *   variables: {
+ *      name: // value for 'name'
  *      description: // value for 'description'
  *      location: // value for 'location'
  *      avatar: // value for 'avatar'

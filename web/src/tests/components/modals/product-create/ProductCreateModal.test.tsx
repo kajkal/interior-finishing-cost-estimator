@@ -219,7 +219,7 @@ describe('ProductCreateModal component', () => {
                     ...sampleUser,
                     products: [ { __ref: createdProductCacheRecordKey } ], // <- product list with new product ref
                 },
-                'ROOT_MUTATION': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
             });
         });
 

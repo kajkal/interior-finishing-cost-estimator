@@ -1,10 +1,12 @@
 mutation UpdateProfile(
+    $name: String
     $description: String
     $location: LocationFormData
     $avatar: Upload
     $removeCurrentAvatar: Boolean
 ) {
     updateProfile(
+        name: $name
         description: $description
         location: $location
         avatar: $avatar

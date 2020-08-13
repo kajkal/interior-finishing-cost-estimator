@@ -8,6 +8,7 @@ import { mapLocationToLocationOption } from './locationMapper';
 
 export function mapProfileToProfileUpdateFormData(profile: UserProfileDataFragment, t: TFunction): ProfileUpdateFormData {
     return {
+        name: profile.name,
         avatar: profile.avatar ? new File([], t('user.currentAvatar'), { type: 'image/png' }) : null,
         description: profile.description ? JSON.parse(profile.description) : emptyEditorValue,
         location: mapLocationToLocationOption(profile.location || null),

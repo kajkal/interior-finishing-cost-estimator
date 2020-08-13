@@ -62,7 +62,7 @@ export class ProfileResolver {
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Profile)
-    async updateProfile(@Args() { avatar, removeCurrentAvatar, description, location }: ProfileUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Profile> {
+    async updateProfile(@Args() { name: newName, avatar, removeCurrentAvatar, description, location }: ProfileUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Profile> {
         const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
         const [ currentAvatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
         let newAvatar: ResourceData | undefined = currentAvatar;
@@ -84,6 +84,11 @@ export class ProfileResolver {
                 userId: user.id,
                 directory: 'public',
             });
+        }
+
+        if (newName && (user.name !== newName)) {
+            user.name = newName;
+            user.slug = await this.userRepository.generateUniqueSlug(newName);
         }
 
         user.profileDescription = description;

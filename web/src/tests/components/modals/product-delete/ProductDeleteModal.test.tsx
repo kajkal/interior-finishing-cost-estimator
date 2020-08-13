@@ -145,7 +145,7 @@ describe('ProductDeleteModal component', () => {
                     ...sampleUser,
                     products: [], // <- products list without deleted product
                 },
-                'ROOT_MUTATION': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
             });
         });
 

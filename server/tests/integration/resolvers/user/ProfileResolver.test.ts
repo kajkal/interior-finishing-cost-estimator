@@ -209,12 +209,14 @@ describe('ProfileResolver', () => {
 
         const updateProfileMutation = `
             mutation UpdateProfile(
+              $name: String
               $description: String
               $location: LocationFormData
               $avatar: Upload
               $removeCurrentAvatar: Boolean
             ) {
               updateProfile(
+                name: $name
                 description: $description
                 location: $location
                 avatar: $avatar
@@ -266,6 +268,7 @@ describe('ProfileResolver', () => {
                 resolverSpy: jest.spyOn(ProfileResolver.prototype, 'updateProfile'),
                 query: updateProfileMutation,
                 validFormData: {
+                    name: 'valid name',
                     description: '[{"sample":"rich text description"}]',
                     location: {
                         placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
@@ -279,6 +282,18 @@ describe('ProfileResolver', () => {
 
             it('should return error when user is not authenticated', async () => {
                 await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate user name input', async () => {
+                // should be optional
+                await send.withAuth({ name: null }).expectValidationSuccess();
+                await send.withAuth({ name: undefined }).expectValidationSuccess();
+                // should accept valid
+                await send.withAuth({ name: 'a'.repeat(3) }).expectValidationSuccess();
+                await send.withAuth({ name: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
+                await send.withAuth({ name: 'a'.repeat(256) }).expectValidationError('name');
             });
 
             it('should validate profile description', async () => {
@@ -351,6 +366,9 @@ describe('ProfileResolver', () => {
                 variables: formData,
             }).set('Authorization', getAuthHeader(user));
 
+            // verify if new slug was not generated
+            expect(UserRepositorySpy.generateUniqueSlug).toHaveBeenCalledTimes(0);
+
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
@@ -368,6 +386,39 @@ describe('ProfileResolver', () => {
                 },
             });
         });
+
+        it('should change user name and user slug', async () => {
+            StorageServiceSpy.getResources.mockImplementation(userWithoutAvatarImplementation);
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProfileUpdateFormData = {
+                name: 'new user name - new user slug',
+            };
+            const response = await testUtils.postGraphQL({
+                query: updateProfileMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if new slug was generated
+            expect(UserRepositorySpy.generateUniqueSlug).toHaveBeenCalledTimes(1);
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    updateProfile: {
+                        userSlug: 'new-user-name-new-user-slug',
+                        name: 'new user name - new user slug',
+                        description: null,
+                        location: null,
+                        avatar: null,
+                    },
+                },
+            });
+        });
+
 
         it('should upload new avatar', async () => {
             StorageServiceSpy.getResources.mockImplementation(userWithoutAvatarImplementation);

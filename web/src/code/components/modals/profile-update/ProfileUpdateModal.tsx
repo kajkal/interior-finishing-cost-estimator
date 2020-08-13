@@ -13,6 +13,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
+import { MeDocument, MeQuery, ProfileDocument, ProfileQuery, UserDetailedDataFragment, useUpdateProfileMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { FormikRichTextEditor } from '../../common/form-fields/ritch-text-editor/FormikRichTextEditor';
 import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
@@ -21,11 +22,13 @@ import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigati
 import { FormikDropzoneArea } from '../../common/form-fields/dropzone/FormikDropzoneArea';
 import { isSlateDocumentNotEmpty } from '../../../utils/validation/richTestEditorSchema';
 import { ProfileUpdateFormData, profileUpdateModalAtom } from './profileUpdateModalAtom';
+import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { emptyEditorValue } from '../../common/form-fields/ritch-text-editor/options';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { LocationOption } from '../../common/form-fields/location/LocationField';
-import { useUpdateProfileMutation } from '../../../../graphql/generated-types';
+import { FormikTextField } from '../../common/form-fields/FormikTextField';
+import { createNameSchema } from '../../../utils/validation/nameSchema';
 import { ResponsiveModalProps } from '../ResponsiveModalProps';
 
 
@@ -59,6 +62,7 @@ export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
 
             <Formik<ProfileUpdateFormData>
                 initialValues={{
+                    name: profileData?.name || '',
                     avatar: profileData?.avatar || null,
                     description: profileData?.description || emptyEditorValue,
                     location: profileData?.location || null,
@@ -73,10 +77,19 @@ export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                             <DialogContent>
                                 <Form className='profile-update-form'>
 
+                                    <FormikTextField
+                                        name='name'
+                                        type='text'
+                                        label={t('form.name.label')}
+                                        aria-label={t('form.name.ariaLabel')}
+                                        autoComplete='name'
+                                        fullWidth
+                                        autoFocus
+                                    />
+
                                     <FormikDropzoneArea
                                         name='avatar'
                                         label={t('form.avatar.label')}
-                                        autoFocus
                                     />
 
                                     <FormikRichTextEditor
@@ -118,7 +131,8 @@ export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
 
 
 function areValuesEqInitialValues(values: ProfileUpdateFormData, initialValues: ProfileUpdateFormData): boolean {
-    return (values.avatar === initialValues.avatar)
+    return (values.name === initialValues.name)
+        && (values.avatar === initialValues.avatar)
         && (values.description === initialValues.description)
         && (values.location?.place_id === initialValues.location?.place_id);
 }
@@ -129,6 +143,7 @@ function areValuesEqInitialValues(values: ProfileUpdateFormData, initialValues: 
  */
 function useProfileUpdateFormValidationSchema(t: TFunction) {
     return React.useMemo(() => Yup.object<ProfileUpdateFormData>({
+        name: createNameSchema(t),
         avatar: Yup.mixed<File>().defined(),
         description: Yup.mixed<SlateDocument>(),
         location: Yup.mixed<LocationOption>().defined(),
@@ -140,13 +155,15 @@ function useProfileUpdateFormValidationSchema(t: TFunction) {
  * Submit handler
  */
 function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistingAvatar?: boolean) {
+    const userCachedData = useCurrentUserCachedData();
     const [ updateProfileMutation, { loading } ] = useUpdateProfileMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<ProfileUpdateFormData>['onSubmit']>(async ({ avatar, description, location }) => {
+    return React.useCallback<FormikConfig<ProfileUpdateFormData>['onSubmit']>(async ({ name, avatar, description, location }) => {
         try {
             await updateProfileMutation({
                 variables: {
+                    name: (name !== userCachedData?.name) ? name : null,
                     avatar: (avatar?.size === 0) ? null : avatar,
                     removeCurrentAvatar: Boolean((withExistingAvatar && !avatar)),
                     description: isSlateDocumentNotEmpty(description) ? JSON.stringify(description) : null,
@@ -161,6 +178,43 @@ function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistin
                                 avatar: () => updatedProfile.avatar,
                             },
                         });
+
+                        // when user name (and slug) change major cache update is necessary
+                        const userPrevData = userCachedData as UserDetailedDataFragment;
+                        if (updatedProfile.userSlug !== userPrevData.slug) {
+
+                            // write new profile query result to cache
+                            cache.writeQuery<ProfileQuery>({
+                                broadcast: false,
+                                query: ProfileDocument,
+                                variables: { userSlug: updatedProfile.userSlug },
+                                data: { profile: updatedProfile },
+                            });
+
+                            // clear profile data with old slug (otherwise old profile cache record cannot be removed by cache.gc())
+                            cache.writeQuery<ProfileQuery>({
+                                broadcast: false,
+                                query: ProfileDocument,
+                                variables: { userSlug: userPrevData.slug },
+                                data: { profile: null! },
+                            });
+
+                            // update current user record (here also link with old user cache record is cut)
+                            cache.writeQuery<MeQuery>({
+                                broadcast: false,
+                                query: MeDocument,
+                                data: {
+                                    me: {
+                                        ...userPrevData,
+                                        name: updatedProfile.name,
+                                        slug: updatedProfile.userSlug,
+                                    },
+                                },
+                            });
+
+                            // remove redundant User and Profile cache records
+                            cache.gc();
+                        }
                     }
                 },
             });
@@ -168,7 +222,7 @@ function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistin
         } catch (error) {
             ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, withExistingAvatar, updateProfileMutation ]);
+    }, [ onModalClose, withExistingAvatar, userCachedData, updateProfileMutation ]);
 }
 
 

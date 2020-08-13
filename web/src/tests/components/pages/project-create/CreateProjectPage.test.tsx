@@ -107,7 +107,7 @@ describe('CreateProjectPage component', () => {
                     ...sampleUser,
                     projects: [ { __ref: newProjectCacheKey } ], // <- project lists updated with created project ref
                 },
-                'ROOT_MUTATION': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
             });
         });
 

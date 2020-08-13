@@ -219,8 +219,8 @@ describe('ProjectUpdateModal component', () => {
                     [ updatedProjectDetailsCacheRecordKey ]: { __ref: updatedProjectCacheRecordKey }, // <- updated project details query result
                     projects: [ { __ref: updatedProjectCacheRecordKey } ], // <- projects list with updated ref
                 },
-                'ROOT_MUTATION': expect.any(Object),
-                'ROOT_QUERY': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
+                ROOT_QUERY: expect.any(Object),
             });
 
             // verify if navigation occurred

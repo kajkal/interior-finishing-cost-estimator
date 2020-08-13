@@ -153,7 +153,7 @@ describe('ProjectDeleteModal component', () => {
                     // <- removed project details query result
                     projects: [], // <- projects list without deleted project
                 },
-                'ROOT_MUTATION': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
             });
 
             // verify if navigation occurred

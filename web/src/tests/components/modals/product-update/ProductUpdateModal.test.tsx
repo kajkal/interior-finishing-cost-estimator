@@ -246,7 +246,7 @@ describe('ProductUpdateModal component', () => {
                     ...sampleUser,
                     products: [ { __ref: productCacheRecordKey } ], // <- no changes here
                 },
-                'ROOT_MUTATION': expect.any(Object),
+                ROOT_MUTATION: expect.any(Object),
             });
         });
 

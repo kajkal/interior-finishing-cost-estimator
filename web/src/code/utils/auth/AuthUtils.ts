@@ -15,6 +15,7 @@ export class AuthUtils {
         'ConfirmEmailAddress',
         'SendPasswordResetInstructions',
         'ResetPassword',
+        'Profile',
     ]);
     private static readonly REFRESH_TOKEN_URL = `${process.env.REACT_APP_SERVER_URL}/refresh_token`;
 

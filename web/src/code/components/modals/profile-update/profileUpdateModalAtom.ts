@@ -4,6 +4,7 @@ import { LocationOption } from '../../common/form-fields/location/LocationField'
 
 
 export interface ProfileUpdateFormData {
+    name: string;
     avatar: File | null;
     description: SlateDocument;
     location: LocationOption | null;

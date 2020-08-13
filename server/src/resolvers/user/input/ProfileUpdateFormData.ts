@@ -8,6 +8,10 @@ import { LocationFormData } from '../../common/input/LocationFormData';
 @ArgsType()
 export class ProfileUpdateFormData {
 
+    @Field(() => String, { nullable: true, description: 'If new name is not defined old one stays unchanged.' })
+    @Length(3, 255)
+    name?: string | null;
+
     @Field(() => GraphQLUpload, {
         nullable: true,
         description: 'New avatar will replace existing one, missing new avatar will leave current avatar as it is. Use {removeCurrentAvatar} flag to remove current avatar.',
