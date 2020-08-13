@@ -29,6 +29,7 @@ export class User extends BaseEntity {
     /**
      * Indicates whether the user has confirmed that the given email address is his.
      */
+    @Field({ nullable: true })
     @Property()
     isEmailAddressConfirmed: boolean = false;
 
