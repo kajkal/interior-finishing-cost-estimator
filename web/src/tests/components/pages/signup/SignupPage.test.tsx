@@ -148,8 +148,8 @@ describe('SignupPage component', () => {
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
                 await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
-                    .expectError('', 't:form.password.validation.passwordsNotMatch')
-                    .expectError('not equal', 't:form.password.validation.passwordsNotMatch')
+                    .expectError('', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
+                    .expectError('not equal', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
                     .expectNoError(passwordValue);
             });
 

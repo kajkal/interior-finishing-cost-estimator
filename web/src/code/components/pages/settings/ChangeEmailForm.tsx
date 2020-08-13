@@ -79,7 +79,6 @@ export function ChangeEmailForm({ currentEmail, isCurrentEmailAddressConfirmed }
 
                         <FormikSubmitButton
                             className={classes.submit}
-                            disabled={isCurrentEmail}
                             variant='outlined'
                             fullWidth
                         >

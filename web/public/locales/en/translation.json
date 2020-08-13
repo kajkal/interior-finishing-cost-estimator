@@ -57,10 +57,6 @@
     "resetPassword": "Reset password",
     "expiredPasswordResetToken": "This link has expired at {{date}}",
     "invalidPasswordResetToken": "Incorrect password reset token",
-    "passwordLabel": "New password",
-    "passwordAriaLabel": "Create a secure password",
-    "passwordConfirmationLabel": "Confirm new password",
-    "passwordConfirmationAriaLabel": "Confirm your new password",
     "passwordResetSuccess": "Your password has been reset!"
   },
   "notFoundPage": {
@@ -75,7 +71,10 @@
       "emailNotConfirmed": "This email address is not yet confirmed. Check your inbox for instructions how to confirm your email address.",
       "changeEmail": "Change email",
       "emailChangeSuccessTitle": "Email successfully changed",
-      "emailChangeSuccessDescription": "An email has been send to <1>{{email}}</1>. In that message you will find instructions on how to confirm your new email."
+      "emailChangeSuccessDescription": "An email has been send to <1>{{email}}</1>. In that message you will find instructions on how to confirm your new email.",
+      "changePassword": "Change password",
+      "incorrectCurrentPassword": "Incorrect password",
+      "passwordChangeSuccess": "Password changed successfully"
     },
     "updateProfileModal": {
       "title": "Edit profile"
@@ -196,9 +195,23 @@
       "validation": {
         "required": "Password is required",
         "tooShort": "Password is too short",
-        "tooLong": "Password is too long",
+        "tooLong": "Password is too long"
+      }
+    },
+    "newPassword": {
+      "label": "New password",
+      "ariaLabel": "Create a secure password"
+    },
+    "newPasswordConfirmation": {
+      "label": "Confirm new password",
+      "ariaLabel": "Confirm your new password",
+      "validation": {
         "passwordsNotMatch": "Passwords do not match"
       }
+    },
+    "currentPassword": {
+      "label": "Current password",
+      "ariaLabel": "Enter your current password"
     },
     "email": {
       "label": "Email address",

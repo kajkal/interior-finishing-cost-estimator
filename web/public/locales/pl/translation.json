@@ -57,10 +57,6 @@
     "resetPassword": "Resetowanie hasła",
     "expiredPasswordResetToken": "Ten link wygasł {{date}}",
     "invalidPasswordResetToken": "Nieprawidłowy token resetowania hasła",
-    "passwordLabel": "Nowe hasło",
-    "passwordAriaLabel": "Stwórz bezpieczne hasło",
-    "passwordConfirmationLabel": "Potwierdź nowe hasło",
-    "passwordConfirmationAriaLabel": "Potwierdź swoje nowe hasło",
     "passwordResetSuccess": "Twoje hasło zostało zresetowane!"
   },
   "notFoundPage": {
@@ -75,7 +71,10 @@
       "emailNotConfirmed": "Ten adres email nie został jeszcze potwierdzony. Sprawdź swoją skrzynkę pocztową w celu uzyskania instrukcji jak potwierdzić swój adres email.",
       "changeEmail": "Zmień adres email",
       "emailChangeSuccessTitle": "Adres email został zmieniony",
-      "emailChangeSuccessDescription": "Na adres <1>{{email}}</1> został wysłany email z instrukcją jak aktywować twój nowy adres email."
+      "emailChangeSuccessDescription": "Na adres <1>{{email}}</1> został wysłany email z instrukcją jak aktywować twój nowy adres email.",
+      "changePassword": "Zmień hasło",
+      "incorrectCurrentPassword": "Niepoprawne hasło",
+      "passwordChangeSuccess": "Hasło zostało zmienione"
     },
     "updateProfileModal": {
       "title": "Edytuj profil"
@@ -196,9 +195,23 @@
       "validation": {
         "required": "Hasło jest wymagane",
         "tooShort": "Wprowadzone hasło jest za krótkie",
-        "tooLong": "Wprowadzone hasło jest za długie",
+        "tooLong": "Wprowadzone hasło jest za długie"
+      }
+    },
+    "newPassword": {
+      "label": "Nowe hasło",
+      "ariaLabel": "Stwórz bezpieczne hasło"
+    },
+    "newPasswordConfirmation": {
+      "label": "Potwierdź nowe hasło",
+      "ariaLabel": "Potwierdź swoje nowe hasło",
+      "validation": {
         "passwordsNotMatch": "Wprowadzone hasła nie są takie same"
       }
+    },
+    "currentPassword": {
+      "label": "Aktualne hasło",
+      "ariaLabel": "Wprowadź swoje aktualne hasło"
     },
     "email": {
       "label": "Adres email",

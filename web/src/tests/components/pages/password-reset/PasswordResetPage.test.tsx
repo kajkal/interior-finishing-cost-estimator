@@ -49,10 +49,10 @@ describe('PasswordResetPage component', () => {
 
     class ViewUnderTest {
         static get passwordInput() {
-            return screen.getByLabelText('t:passwordResetPage.passwordLabel', { selector: 'input' });
+            return screen.getByLabelText('t:form.newPassword.label', { selector: 'input' });
         }
         static get passwordConfirmationInput() {
-            return screen.getByLabelText('t:passwordResetPage.passwordConfirmationLabel', { selector: 'input' });
+            return screen.getByLabelText('t:form.newPasswordConfirmation.label', { selector: 'input' });
         }
         static get submitButton() {
             return screen.getByRole('button', { name: 't:passwordResetPage.resetPassword' });
@@ -177,8 +177,8 @@ describe('PasswordResetPage component', () => {
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
                 await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
-                    .expectError('', 't:form.password.validation.passwordsNotMatch')
-                    .expectError('not equal', 't:form.password.validation.passwordsNotMatch')
+                    .expectError('', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
+                    .expectError('not equal', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
                     .expectNoError(passwordValue);
             });
 

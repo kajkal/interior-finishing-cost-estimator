@@ -49,17 +49,17 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
                     <input type='hidden' name='token' value={values.token} />
 
                     <FormikPasswordField
-                        aria-label={t('passwordResetPage.passwordAriaLabel')}
+                        aria-label={t('form.newPassword.ariaLabel')}
                         name='password'
-                        label={t('passwordResetPage.passwordLabel')}
+                        label={t('form.newPassword.label')}
                         autoComplete='new-password'
                         fullWidth
                     />
 
                     <FormikPasswordField
-                        aria-label={t('passwordResetPage.passwordConfirmationAriaLabel')}
+                        aria-label={t('form.newPasswordConfirmation.ariaLabel')}
                         name='passwordConfirmation'
-                        label={t('passwordResetPage.passwordConfirmationLabel')}
+                        label={t('form.newPasswordConfirmation.label')}
                         autoComplete='new-password'
                         fullWidth
                     />
