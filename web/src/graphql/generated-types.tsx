@@ -35,6 +35,7 @@ export type QueryProfileArgs = {
 export type User = {
   __typename?: 'User';
   email: Scalars['String'];
+  isEmailAddressConfirmed?: Maybe<Scalars['Boolean']>;
   name: Scalars['String'];
   /** Unique user slug. Used in URLs */
   slug: Scalars['String'];
@@ -140,6 +141,9 @@ export type Mutation = {
   /** Invalidates user session. */
   logout: Scalars['Boolean'];
   updateProfile: Profile;
+  changeEmail: Scalars['Boolean'];
+  changePassword: Scalars['Boolean'];
+  changeProfileSettings: Scalars['Boolean'];
 };
 
 
@@ -231,6 +235,22 @@ export type MutationUpdateProfileArgs = {
   removeCurrentAvatar?: Maybe<Scalars['Boolean']>;
   description?: Maybe<Scalars['String']>;
   location?: Maybe<LocationFormData>;
+};
+
+
+export type MutationChangeEmailArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationChangePasswordArgs = {
+  currentPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+};
+
+
+export type MutationChangeProfileSettingsArgs = {
+  hidden: Scalars['Boolean'];
 };
 
 export type CurrencyAmountFormData = {
@@ -481,7 +501,7 @@ export type ProjectDetailsQuery = (
 
 export type UserDetailedDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'name' | 'slug' | 'email' | 'avatar' | 'productCount'>
+  & Pick<User, 'name' | 'slug' | 'email' | 'isEmailAddressConfirmed' | 'avatar' | 'productCount'>
   & { products: Array<(
     { __typename?: 'Product' }
     & ProductDataFragment
@@ -501,6 +521,37 @@ export type UserProfileDataFragment = (
     { __typename?: 'Location' }
     & Pick<Location, 'placeId' | 'main' | 'secondary'>
   )> }
+);
+
+export type ChangeEmailMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type ChangeEmailMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeEmail'>
+);
+
+export type ChangePasswordMutationVariables = Exact<{
+  currentPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changePassword'>
+);
+
+export type ChangeProfileSettingsMutationVariables = Exact<{
+  hidden: Scalars['Boolean'];
+}>;
+
+
+export type ChangeProfileSettingsMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeProfileSettings'>
 );
 
 export type UpdateProfileMutationVariables = Exact<{
@@ -584,6 +635,7 @@ export const UserDetailedDataFragmentDoc = gql`
   name
   slug
   email
+  isEmailAddressConfirmed
   avatar
   products {
     ...ProductData
@@ -1091,6 +1143,94 @@ export function useProjectDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQu
 export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQuery>;
 export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
 export type ProjectDetailsQueryResult = ApolloReactCommon.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
+export const ChangeEmailDocument = gql`
+    mutation ChangeEmail($email: String!) {
+  changeEmail(email: $email)
+}
+    `;
+
+/**
+ * __useChangeEmailMutation__
+ *
+ * To run a mutation, you first call `useChangeEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeEmailMutation, { data, loading, error }] = useChangeEmailMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useChangeEmailMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeEmailMutation, ChangeEmailMutationVariables>) {
+        return ApolloReactHooks.useMutation<ChangeEmailMutation, ChangeEmailMutationVariables>(ChangeEmailDocument, baseOptions);
+      }
+export type ChangeEmailMutationHookResult = ReturnType<typeof useChangeEmailMutation>;
+export type ChangeEmailMutationResult = ApolloReactCommon.MutationResult<ChangeEmailMutation>;
+export type ChangeEmailMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangeEmailMutation, ChangeEmailMutationVariables>;
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
+  changePassword(currentPassword: $currentPassword, newPassword: $newPassword)
+}
+    `;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
+ *   variables: {
+ *      currentPassword: // value for 'currentPassword'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return ApolloReactHooks.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = ApolloReactCommon.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const ChangeProfileSettingsDocument = gql`
+    mutation ChangeProfileSettings($hidden: Boolean!) {
+  changeProfileSettings(hidden: $hidden)
+}
+    `;
+
+/**
+ * __useChangeProfileSettingsMutation__
+ *
+ * To run a mutation, you first call `useChangeProfileSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeProfileSettingsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeProfileSettingsMutation, { data, loading, error }] = useChangeProfileSettingsMutation({
+ *   variables: {
+ *      hidden: // value for 'hidden'
+ *   },
+ * });
+ */
+export function useChangeProfileSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>) {
+        return ApolloReactHooks.useMutation<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>(ChangeProfileSettingsDocument, baseOptions);
+      }
+export type ChangeProfileSettingsMutationHookResult = ReturnType<typeof useChangeProfileSettingsMutation>;
+export type ChangeProfileSettingsMutationResult = ApolloReactCommon.MutationResult<ChangeProfileSettingsMutation>;
+export type ChangeProfileSettingsMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>;
 export const UpdateProfileDocument = gql`
     mutation UpdateProfile($name: String, $description: String, $location: LocationFormData, $avatar: Upload, $removeCurrentAvatar: Boolean) {
   updateProfile(name: $name, description: $description, location: $location, avatar: $avatar, removeCurrentAvatar: $removeCurrentAvatar) {

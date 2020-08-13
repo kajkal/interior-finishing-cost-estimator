@@ -20,7 +20,7 @@ import { projectFileUploadModalAtom } from '../../../modals/project-file-upload/
 import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
 import { ConsciousFileIcon } from '../../../common/icons/ConsciousFileIcon';
 import { UploadFileIcon } from '../../../common/icons/UploadFileIcon';
-import { Section } from './Section';
+import { Section } from '../../../common/section/Section';
 
 
 export interface FileSectionProps {

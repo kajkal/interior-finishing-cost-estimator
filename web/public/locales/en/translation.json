@@ -70,6 +70,13 @@
     "updateProfile": "Edit your profile",
     "userNotFoundError": "User not found",
     "currentAvatar": "Your current profile picture",
+    "settings": {
+      "emailConfirmed": "This email address is already confirmed",
+      "emailNotConfirmed": "This email address is not yet confirmed. Check your inbox for instructions how to confirm your email address.",
+      "changeEmail": "Change email",
+      "emailChangeSuccessTitle": "Email successfully changed",
+      "emailChangeSuccessDescription": "An email has been send to <1>{{email}}</1>. In that message you will find instructions on how to confirm your new email."
+    },
     "updateProfileModal": {
       "title": "Edit profile"
     }

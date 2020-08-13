@@ -1,0 +1,3 @@
+mutation ChangeProfileSettings($hidden: Boolean!) {
+    changeProfileSettings(hidden: $hidden)
+}

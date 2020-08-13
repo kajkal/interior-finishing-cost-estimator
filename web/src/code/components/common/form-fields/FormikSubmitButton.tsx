@@ -19,7 +19,6 @@ export function FormikSubmitButton({ children, disabled, danger, ...rest }: Form
     const { isSubmitting } = useFormikContext();
     return (
         <Button
-            {...rest}
             disabled={disabled || isSubmitting}
             type={rest.type || 'submit'}
             variant='contained'
@@ -27,6 +26,7 @@ export function FormikSubmitButton({ children, disabled, danger, ...rest }: Form
             className={clsx(rest.className, {
                 [ classes.danger ]: danger,
             })}
+            {...rest}
         >
             {isSubmitting ? <CircularProgress color='inherit' size='26px' /> : children}
         </Button>

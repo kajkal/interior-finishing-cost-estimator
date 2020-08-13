@@ -70,6 +70,13 @@
     "updateProfile": "Edytuj swój profil",
     "userNotFoundError": "Użytkownik nie znaleziony",
     "currentAvatar": "Twoje obecne zdjęcie profilowe",
+    "settings": {
+      "emailConfirmed": "Ten adres email został już potwierdzony",
+      "emailNotConfirmed": "Ten adres email nie został jeszcze potwierdzony. Sprawdź swoją skrzynkę pocztową w celu uzyskania instrukcji jak potwierdzić swój adres email.",
+      "changeEmail": "Zmień adres email",
+      "emailChangeSuccessTitle": "Adres email został zmieniony",
+      "emailChangeSuccessDescription": "Na adres <1>{{email}}</1> został wysłany email z instrukcją jak aktywować twój nowy adres email."
+    },
     "updateProfileModal": {
       "title": "Edytuj profil"
     }

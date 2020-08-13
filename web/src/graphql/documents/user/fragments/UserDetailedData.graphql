@@ -2,6 +2,7 @@ fragment UserDetailedData on User {
     name
     slug
     email
+    isEmailAddressConfirmed
     avatar
     products {
         ...ProductData

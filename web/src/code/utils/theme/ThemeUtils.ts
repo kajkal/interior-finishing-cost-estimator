@@ -110,41 +110,6 @@ export class ThemeUtils {
                     marginRight: theme.spacing(1.5),
                 },
             },
-            // MuiAccordion: {
-            //     root: {
-            //         backgroundColor: 'unset',
-            //         boxShadow: 'unset',
-            //         '&:before': {
-            //             display: 'none',
-            //         },
-            //         '&$expanded': {
-            //             margin: 0,
-            //         },
-            //     },
-            // },
-            // MuiAccordionSummary: {
-            //     root: {
-            //         padding: theme.spacing(0, 2, 0, 0),
-            //         '&$focused': {
-            //             backgroundColor: 'transparent',
-            //             textDecoration: 'underline',
-            //         },
-            //     },
-            //     content: {
-            //         alignItems: 'center',
-            //         '&$expanded': {
-            //             margin: '20px 0',
-            //         },
-            //     },
-            // },
-            // MuiAccordionDetails: {
-            //     root: {
-            //         padding: theme.spacing(1, 1, 2),
-            //         [ theme.breakpoints.up('sm') ]: {
-            //             padding: theme.spacing(1, 2, 2, 4.5),
-            //         },
-            //     },
-            // },
             MuiDialogContent: {
                 root: {
                     paddingBottom: theme.spacing(3),
