@@ -11,6 +11,7 @@ import { usePageLinearProgressRevealer } from '../../common/progress-indicators/
 import { profileUpdateModalAtom } from '../../modals/profile-update/profileUpdateModalAtom';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { mapProfileToProfileUpdateFormData } from '../../../utils/mappers/profileMapper';
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { useProfileQuery } from '../../../../graphql/generated-types';
 import { PageActions } from '../../common/page/PageActions';
 import { PageHeader } from '../../common/page/PageHeader';
@@ -37,29 +38,30 @@ export function AuthorizedUserProfilePage(): React.ReactElement {
     };
 
     return (
-        <Container maxWidth='md'>
+        <PageEnterTransition in={Boolean(profileData)}>
+            <Container maxWidth='md'>
 
-            <PageHeader>
-                <PageTitle>
-                    {profileData?.profile.name}
-                </PageTitle>
-                <PageActions>
-                    <Tooltip title={profileData ? t('user.updateProfile')! : ''}>
-                        <IconButton
-                            disabled={!profileData}
-                            onClick={handleProfileUpdateModalOpen}
-                            aria-label={t('user.updateProfile')}
-                        >
-                            <EditIcon />
-                        </IconButton>
-                    </Tooltip>
-                </PageActions>
-            </PageHeader>
+                <PageHeader>
+                    <PageTitle>
+                        {profileData?.profile.name}
+                    </PageTitle>
+                    <PageActions>
+                        <Tooltip title={t('user.updateProfile')!}>
+                            <IconButton
+                                onClick={handleProfileUpdateModalOpen}
+                                aria-label={t('user.updateProfile')}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </PageActions>
+                </PageHeader>
 
-            {(profileData?.profile) && (
-                <UserProfile profile={profileData.profile} />
-            )}
+                {(profileData?.profile) && (
+                    <UserProfile profile={profileData.profile} />
+                )}
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }

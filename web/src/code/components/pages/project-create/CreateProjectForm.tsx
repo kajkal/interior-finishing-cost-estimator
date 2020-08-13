@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import * as Yup from 'yup';
 import { TFunction } from 'i18next';
 import { useNavigate } from 'react-router';
@@ -20,15 +19,11 @@ import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { nav } from '../../../config/nav';
 
 
-export interface CreateProjectFormProps {
-    formClassName: string;
-}
-
 interface CreateProjectFormData extends Omit<MutationCreateProjectArgs, 'location'> {
     location: LocationOption | null;
 }
 
-export function CreateProjectForm({ formClassName }: CreateProjectFormProps): React.ReactElement {
+export function CreateProjectForm(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const userData = useCurrentUserCachedData();
@@ -44,7 +39,7 @@ export function CreateProjectForm({ formClassName }: CreateProjectFormProps): Re
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form className={clsx('create-project-form', formClassName)}>
+            <Form>
 
                 <FormikTextField
                     aria-label={t('form.projectName.ariaLabel')}

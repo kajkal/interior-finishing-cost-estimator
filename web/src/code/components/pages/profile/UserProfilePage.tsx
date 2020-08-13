@@ -5,6 +5,7 @@ import Container from '@material-ui/core/Container';
 
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { useProfileQuery } from '../../../../graphql/generated-types';
 import { useToast } from '../../providers/toast/useToast';
 import { PageHeader } from '../../common/page/PageHeader';
@@ -28,18 +29,20 @@ export function UserProfilePage(): React.ReactElement {
     }
 
     return (
-        <Container maxWidth='md'>
+        <PageEnterTransition in={Boolean(data?.profile)}>
+            <Container maxWidth='md'>
 
-            <PageHeader>
-                <PageTitle>
-                    {data?.profile.name}
-                </PageTitle>
-            </PageHeader>
+                <PageHeader>
+                    <PageTitle>
+                        {data?.profile.name}
+                    </PageTitle>
+                </PageHeader>
 
-            {(data?.profile) && (
-                <UserProfile profile={data.profile} />
-            )}
+                {(data?.profile) && (
+                    <UserProfile profile={data.profile} />
+                )}
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }

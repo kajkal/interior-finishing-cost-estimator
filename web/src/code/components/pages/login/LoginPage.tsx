@@ -3,13 +3,14 @@ import { Location, PartialPath } from 'history';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
+import { PageHeader } from '../../common/page/PageHeader';
+import { PageTitle } from '../../common/page/PageTitle';
 import { LoginForm } from './LoginForm';
 import { nav } from '../../../config/nav';
 
@@ -28,7 +29,6 @@ function useRequestedLocation(): PartialPath | undefined {
 }
 
 export function LoginPage(): React.ReactElement {
-    const classes = useStyles();
     const { t } = useTranslation();
     const requestedLocation = useRequestedLocation();
     const isUserLoggedIn = Boolean(useCurrentUserCachedData());
@@ -38,33 +38,31 @@ export function LoginPage(): React.ReactElement {
     }
 
     return (
-        <Container maxWidth='xs'>
+        <PageEnterTransition>
+            <Container maxWidth='xs'>
 
-            <Typography component='h1' variant='h5'>
-                {t('loginPage.logIn')}
-            </Typography>
+                <PageHeader>
+                    <PageTitle>
+                        {t('loginPage.logIn')}
+                    </PageTitle>
+                </PageHeader>
 
-            <LoginForm formClassName={classes.form} />
+                <LoginForm />
 
-            <Grid container>
-                <Grid item xs>
-                    <MuiLink to={nav.forgotPassword()} variant='body2' component={Link}>
-                        {t('loginPage.forgotPasswordLink')}
-                    </MuiLink>
+                <Grid container>
+                    <Grid item xs>
+                        <MuiLink to={nav.forgotPassword()} variant='body2' component={Link}>
+                            {t('loginPage.forgotPasswordLink')}
+                        </MuiLink>
+                    </Grid>
+                    <Grid item>
+                        <MuiLink to={nav.signup()} variant='body2' component={Link}>
+                            {t('loginPage.signUpLink')}
+                        </MuiLink>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <MuiLink to={nav.signup()} variant='body2' component={Link}>
-                        {t('loginPage.signUpLink')}
-                    </MuiLink>
-                </Grid>
-            </Grid>
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }
-
-const useStyles = makeStyles((theme) => ({
-    form: {
-        marginTop: theme.spacing(1),
-    },
-}));

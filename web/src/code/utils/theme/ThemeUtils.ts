@@ -118,7 +118,7 @@ export class ThemeUtils {
             MuiContainer: {
                 maxWidthXs: {
                     [ theme.breakpoints.up('xs') ]: {
-                        maxWidth: 500,
+                        maxWidth: 520,
                     },
                 },
             },

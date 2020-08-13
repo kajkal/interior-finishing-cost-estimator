@@ -75,7 +75,7 @@ export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                     return (
                         <>
                             <DialogContent>
-                                <Form className='profile-update-form'>
+                                <Form>
 
                                     <FormikTextField
                                         name='name'

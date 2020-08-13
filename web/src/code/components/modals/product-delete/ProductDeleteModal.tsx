@@ -60,7 +60,7 @@ export function ProductDeleteModal(): React.ReactElement {
                                 {t('product.deleteModal.firstLine')}
                             </Typography>
 
-                            <Form className='delete-product-form'>
+                            <Form>
                                 <input type='hidden' name='productId' value={values.productId} />
                             </Form>
 

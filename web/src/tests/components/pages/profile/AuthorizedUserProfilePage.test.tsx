@@ -71,11 +71,7 @@ describe('AuthorizedUserProfilePage component', () => {
     it('should render update profile button', async () => {
         renderInMockContext({ mockResponses: [ mockResponseGenerator.success() ] });
 
-        // until data loaded - update button should be disabled
-        expect(ViewUnderTest.updateProfileButton).toBeVisible();
-        expect(ViewUnderTest.updateProfileButton).toBeDisabled();
-
-        await waitFor(() => expect(ViewUnderTest.updateProfileButton).toBeEnabled());
+        await waitFor(() => expect(ViewUnderTest.updateProfileButton).toBeVisible());
 
         userEvent.click(ViewUnderTest.updateProfileButton);
 

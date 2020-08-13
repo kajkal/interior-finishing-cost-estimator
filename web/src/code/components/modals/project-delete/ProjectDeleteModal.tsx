@@ -64,7 +64,7 @@ export function ProjectDeleteModal(): React.ReactElement {
                                 {t('project.deleteModal.secondLine')}
                             </Typography>
 
-                            <Form className='delete-project-form'>
+                            <Form>
                                 <input type='hidden' name='projectSlug' value={values.projectSlug} />
                             </Form>
 

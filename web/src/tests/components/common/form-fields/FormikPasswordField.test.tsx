@@ -14,11 +14,9 @@ describe('FormikPasswordField component', () => {
                 initialValues={{ password: '' }}
                 onSubmit={jest.fn()}
             >
-                {() => (
-                    <Form>
-                        <FormikPasswordField name='password' label='Password' />
-                    </Form>
-                )}
+                <Form>
+                    <FormikPasswordField name='password' label='Password' />
+                </Form>
             </Formik>,
         );
     }

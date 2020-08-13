@@ -12,11 +12,9 @@ describe('FormikTextField component', () => {
             initialValues={{ title: '' }}
             onSubmit={jest.fn()}
         >
-            {() => (
-                <Form>
-                    {children}
-                </Form>
-            )}
+            <Form>
+                {children}
+            </Form>
         </Formik>
     );
 

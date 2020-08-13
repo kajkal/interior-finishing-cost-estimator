@@ -79,7 +79,7 @@ export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                     return (
                         <>
                             <DialogContent>
-                                <Form className='product-update-form'>
+                                <Form>
 
                                     <input type='hidden' name='productId' value={values.productId} />
 

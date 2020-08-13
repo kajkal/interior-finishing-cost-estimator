@@ -87,12 +87,10 @@ describe('FormikLocationField component', () => {
                 })}
                 onSubmit={mockHandleSubmit}
             >
-                {() => (
-                    <Form>
-                        <FormikLocationField name='location' label='Location' />
-                        <button type='submit' data-testid='submit-button' />
-                    </Form>
-                )}
+                <Form>
+                    <FormikLocationField name='location' label='Location' />
+                    <button type='submit' data-testid='submit-button' />
+                </Form>
             </Formik>,
         );
     }

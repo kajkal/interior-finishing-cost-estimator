@@ -34,7 +34,7 @@ export function PasswordResetRequestForm({ onSuccess }: PasswordResetRequestForm
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form className='password-reset-request-form'>
+            <Form>
 
                 <FormikTextField
                     aria-label={t('form.email.ariaLabel')}

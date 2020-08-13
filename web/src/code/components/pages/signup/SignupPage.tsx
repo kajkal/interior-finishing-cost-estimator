@@ -2,19 +2,19 @@ import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
+import { PageHeader } from '../../common/page/PageHeader';
+import { PageTitle } from '../../common/page/PageTitle';
 import { SignupForm } from './SignupForm';
 import { nav } from '../../../config/nav';
 
 
 export function SignupPage(): React.ReactElement {
-    const classes = useStyles();
     const { t } = useTranslation();
     const isUserLoggedIn = Boolean(useCurrentUserCachedData());
 
@@ -23,28 +23,26 @@ export function SignupPage(): React.ReactElement {
     }
 
     return (
-        <Container maxWidth='xs'>
+        <PageEnterTransition>
+            <Container maxWidth='xs'>
 
-            <Typography component='h1' variant='h5'>
-                {t('signupPage.signUp')}
-            </Typography>
+                <PageHeader>
+                    <PageTitle>
+                        {t('signupPage.signUp')}
+                    </PageTitle>
+                </PageHeader>
 
-            <SignupForm formClassName={classes.form} />
+                <SignupForm />
 
-            <Grid container direction='row-reverse'>
-                <Grid item>
-                    <MuiLink to={nav.login()} variant='body2' component={Link}>
-                        {t('signupPage.logInLink')}
-                    </MuiLink>
+                <Grid container direction='row-reverse'>
+                    <Grid item>
+                        <MuiLink to={nav.login()} variant='body2' component={Link}>
+                            {t('signupPage.logInLink')}
+                        </MuiLink>
+                    </Grid>
                 </Grid>
-            </Grid>
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }
-
-const useStyles = makeStyles((theme) => ({
-    form: {
-        marginTop: theme.spacing(1),
-    },
-}));

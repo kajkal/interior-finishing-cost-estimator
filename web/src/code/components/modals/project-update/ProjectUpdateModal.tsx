@@ -72,7 +72,7 @@ export function ProjectUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
                     return (
                         <>
                             <DialogContent>
-                                <Form className='update-project-form'>
+                                <Form>
 
                                     <input type='hidden' name='projectSlug' value={values.projectSlug} />
 

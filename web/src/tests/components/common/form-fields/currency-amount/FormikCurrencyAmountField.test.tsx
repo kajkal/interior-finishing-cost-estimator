@@ -43,12 +43,10 @@ describe('FormikCurrencyAmountField component', () => {
                 })}
                 onSubmit={mockHandleSubmit}
             >
-                {() => (
-                    <Form>
-                        {children}
-                        <button type='submit' data-testid='submit-button' />
-                    </Form>
-                )}
+                <Form>
+                    {children}
+                    <button type='submit' data-testid='submit-button' />
+                </Form>
             </Formik>
         );
     }

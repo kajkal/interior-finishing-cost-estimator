@@ -26,6 +26,7 @@ import { productsFiltersAtom, ProductsFiltersAtomValue } from './filters/product
 import { productCreateModalAtom } from '../../modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom } from '../../modals/product-delete/productDeleteModalAtom';
 import { isTagExclusivelySelected, productFilter } from './filters/productsFiltersUtils';
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { ProductFilterSearch } from './filters/ProductFilterSearch';
 import { formatAmount } from '../../../config/supportedCurrencies';
 import { ProductFilterDate } from './filters/ProductFilterDate';
@@ -52,63 +53,65 @@ export function ProductsPage(): React.ReactElement {
     };
 
     return (
-        <Container maxWidth='lg'>
+        <PageEnterTransition>
+            <Container maxWidth='lg'>
 
-            <PageHeader>
-                <PageTitle>
-                    {t('product.products')}
-                </PageTitle>
-                <PageActions>
-                    <Tooltip title={t('product.addProduct')!}>
-                        <IconButton onClick={handleProductCreateModalOpen} aria-label={t('product.addProduct')}>
-                            <AddIcon />
-                        </IconButton>
-                    </Tooltip>
-                </PageActions>
-            </PageHeader>
+                <PageHeader>
+                    <PageTitle>
+                        {t('product.products')}
+                    </PageTitle>
+                    <PageActions>
+                        <Tooltip title={t('product.addProduct')!}>
+                            <IconButton onClick={handleProductCreateModalOpen} aria-label={t('product.addProduct')}>
+                                <AddIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </PageActions>
+                </PageHeader>
 
-            <div className={classes.filtersContainer} role='group' aria-label={t('product.filters.productFilters')}>
+                <div className={classes.filtersContainer} role='group' aria-label={t('product.filters.productFilters')}>
 
-                <ProductFilterSearch
-                    searchPhrase={filters.searchPhrase}
-                    setFilters={setFilters}
-                    className={classes.searchField}
-                />
+                    <ProductFilterSearch
+                        searchPhrase={filters.searchPhrase}
+                        setFilters={setFilters}
+                        className={classes.searchField}
+                    />
 
-                <ProductFilterDate
-                    date={filters.fromDate}
-                    relatedField='fromDate'
-                    productsDatesStatistics={dates()}
-                    setFilters={setFilters}
-                    className={classes.afterDateField}
-                />
+                    <ProductFilterDate
+                        date={filters.fromDate}
+                        relatedField='fromDate'
+                        productsDatesStatistics={dates()}
+                        setFilters={setFilters}
+                        className={classes.afterDateField}
+                    />
 
-                <ProductFilterDate
-                    date={filters.toDate}
-                    relatedField='toDate'
-                    productsDatesStatistics={dates()}
-                    setFilters={setFilters}
-                    className={classes.beforeDateField}
-                />
+                    <ProductFilterDate
+                        date={filters.toDate}
+                        relatedField='toDate'
+                        productsDatesStatistics={dates()}
+                        setFilters={setFilters}
+                        className={classes.beforeDateField}
+                    />
 
-                <ProductFilterTags
-                    tags={tags()}
-                    selectedTags={filters.selectedTags}
-                    setFilters={setFilters}
-                    className={classes.tagsField}
-                />
+                    <ProductFilterTags
+                        tags={tags()}
+                        selectedTags={filters.selectedTags}
+                        setFilters={setFilters}
+                        className={classes.tagsField}
+                    />
 
-            </div>
+                </div>
 
-            <div>
-                {
-                    filteredProducts.map((product) => (
-                        <ProductListItem key={product.id} product={product} selectedTags={filters.selectedTags} />
-                    ))
-                }
-            </div>
+                <div>
+                    {
+                        filteredProducts.map((product) => (
+                            <ProductListItem key={product.id} product={product} selectedTags={filters.selectedTags} />
+                        ))
+                    }
+                </div>
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }
 
@@ -117,15 +120,18 @@ export interface ProductListItemProps {
     selectedTags: ProductsFiltersAtomValue['selectedTags'];
 }
 
+const productExpansionStateMemory = new WeakMap<Product, boolean>();
+
 export function ProductListItem({ product, selectedTags }: ProductListItemProps): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
-    const [ expanded, setExpanded ] = React.useState(false);
+    const [ expanded, setExpanded ] = React.useState(Boolean(productExpansionStateMemory.get(product)));
     const setDeleteModalState = useSetRecoilState(productDeleteModalAtom);
     const setUpdateModalState = useSetRecoilState(productUpdateModalAtom);
 
     const handleToggle = () => {
         setExpanded(!expanded);
+        productExpansionStateMemory.set(product, !expanded);
     };
 
     const handleDelete = () => {

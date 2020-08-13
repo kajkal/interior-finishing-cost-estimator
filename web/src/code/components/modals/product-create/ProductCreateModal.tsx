@@ -84,7 +84,7 @@ export function ProductCreateModal({ isMobile }: ResponsiveModalProps): React.Re
                 {({ submitForm }) => (
                     <>
                         <DialogContent>
-                            <Form className='product-create-form'>
+                            <Form>
 
                                 <FormikTextField
                                     name='name'

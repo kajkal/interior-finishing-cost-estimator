@@ -8,8 +8,11 @@ import Container from '@material-ui/core/Container';
 import MuiLink from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { PasswordResetRequestForm } from './PasswordResetRequestForm';
 import { nav } from '../../../config/nav';
+import { PageHeader } from '../../common/page/PageHeader';
+import { PageTitle } from '../../common/page/PageTitle';
 
 
 export function PasswordResetRequestPage(): React.ReactElement {
@@ -18,46 +21,49 @@ export function PasswordResetRequestPage(): React.ReactElement {
     const [ recipientEmail, setRecipientEmail ] = React.useState('');
 
     return (
-        <Container maxWidth='xs'>
-            <Typography component='h1' variant='h5' className={classes.header}>
-                {t('passwordResetPage.resetPassword')}
-            </Typography>
-            {
-                (recipientEmail)
-                    ? (
-                        <Typography variant='subtitle1' className={classes.subtitle}>
-                            <Trans i18nKey='passwordResetPage.sendResetInstructionsSuccess'>
-                                {' '}<MuiLink component='span'>{{ email: recipientEmail }}</MuiLink>{' '}
-                            </Trans>
-                        </Typography>
-                    )
-                    : (
-                        <>
-                            <Typography variant='subtitle1' className={classes.subtitle}>
-                                {t('passwordResetPage.sendResetInstructionsDescription')}
-                            </Typography>
+        <PageEnterTransition>
+            <Container maxWidth='xs'>
 
-                            <PasswordResetRequestForm onSuccess={setRecipientEmail} />
-                        </>
-                    )
-            }
-            <Grid container direction='row-reverse'>
-                <Grid item>
-                    <MuiLink to={nav.login()} variant='body2' component={Link}>
-                        {t('passwordResetPage.logInLink')}
-                    </MuiLink>
+                <PageHeader>
+                    <PageTitle>
+                        {t('passwordResetPage.resetPassword')}
+                    </PageTitle>
+                </PageHeader>
+
+                {
+                    (recipientEmail)
+                        ? (
+                            <Typography variant='subtitle1' className={classes.subtitle}>
+                                <Trans i18nKey='passwordResetPage.sendResetInstructionsSuccess'>
+                                    {' '}<MuiLink component='span'>{{ email: recipientEmail }}</MuiLink>{' '}
+                                </Trans>
+                            </Typography>
+                        )
+                        : (
+                            <>
+                                <Typography variant='subtitle1' className={classes.subtitle}>
+                                    {t('passwordResetPage.sendResetInstructionsDescription')}
+                                </Typography>
+
+                                <PasswordResetRequestForm onSuccess={setRecipientEmail} />
+                            </>
+                        )
+                }
+                <Grid container direction='row-reverse'>
+                    <Grid item>
+                        <MuiLink to={nav.login()} variant='body2' component={Link}>
+                            {t('passwordResetPage.logInLink')}
+                        </MuiLink>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }
 
 const useStyles = makeStyles((theme) => ({
-    header: {
-        marginBottom: theme.spacing(1),
-    },
     subtitle: {
-        marginTop: theme.spacing(3),
+        marginTop: theme.spacing(2),
         marginBottom: theme.spacing(1),
     },
 }));

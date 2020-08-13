@@ -38,12 +38,10 @@ describe('FormikTagsField component', () => {
                 })}
                 onSubmit={mockHandleSubmit}
             >
-                {() => (
-                    <Form>
-                        <FormikTagsField name='tags' label='Tags' definedTagOptions={definedTagOptions} />
-                        <button type='submit' data-testid='submit-button' />
-                    </Form>
-                )}
+                <Form>
+                    <FormikTagsField name='tags' label='Tags' definedTagOptions={definedTagOptions} />
+                    <button type='submit' data-testid='submit-button' />
+                </Form>
             </Formik>,
         );
     }

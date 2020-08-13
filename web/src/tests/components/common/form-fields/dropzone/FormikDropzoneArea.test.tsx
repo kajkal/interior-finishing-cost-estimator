@@ -25,19 +25,17 @@ describe('FormikDropzoneArea component', () => {
                 })}
                 onSubmit={config.onSubmit || jest.fn()}
             >
-                {() => (
-                    <Form>
-                        <FormikDropzoneArea
-                            name='file'
-                            label='Drag and drop some files here, or click to select files'
-                            accept='image/*'
-                            autoFocus={config.autoFocus}
-                        />
-                        <button type='submit'>
-                            {'Upload file'}
-                        </button>
-                    </Form>
-                )}
+                <Form>
+                    <FormikDropzoneArea
+                        name='file'
+                        label='Drag and drop some files here, or click to select files'
+                        accept='image/*'
+                        autoFocus={config.autoFocus}
+                    />
+                    <button type='submit'>
+                        {'Upload file'}
+                    </button>
+                </Form>
             </Formik>,
         );
     }
@@ -58,7 +56,7 @@ describe('FormikDropzoneArea component', () => {
 
     it('should handle valid file successfully', async () => {
         const handleSubmit = jest.fn();
-        renderInFormikContext({onSubmit: handleSubmit});
+        renderInFormikContext({ onSubmit: handleSubmit });
 
         // verify if initially no errors are visible
         expect(ViewUnderTest.dropzone).toHaveDescription('');

@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import * as Yup from 'yup';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -19,13 +18,9 @@ import { SessionChannel } from '../../../utils/communication/SessionChannel';
 import { useToast } from '../../providers/toast/useToast';
 
 
-export interface LoginFormProps {
-    formClassName: string;
-}
-
 type LoginFormData = MutationLoginArgs;
 
-export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement {
+export function LoginForm(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const validationSchema = useLoginFormValidationSchema(t);
@@ -40,7 +35,7 @@ export function LoginForm({ formClassName }: LoginFormProps): React.ReactElement
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form className={clsx('login-form', formClassName)}>
+            <Form>
 
                 <FormikTextField
                     aria-label={t('form.email.ariaLabel')}

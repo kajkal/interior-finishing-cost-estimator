@@ -62,7 +62,7 @@ export function ProjectFileUploadModal({ isMobile }: ResponsiveModalProps): Reac
                 {({ values, submitForm }) => (
                     <>
                         <DialogContent>
-                            <Form className='project-file-upload-form'>
+                            <Form>
 
                                 <input type='hidden' name='projectSlug' value={values.projectSlug} />
 

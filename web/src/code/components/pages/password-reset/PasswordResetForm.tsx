@@ -44,7 +44,7 @@ export function PasswordResetForm({ passwordResetToken }: PasswordResetFormProps
             onSubmit={handleSubmit}
         >
             {({ values }) => (
-                <Form className='password-reset-form'>
+                <Form>
 
                     <input type='hidden' name='token' value={values.token} />
 

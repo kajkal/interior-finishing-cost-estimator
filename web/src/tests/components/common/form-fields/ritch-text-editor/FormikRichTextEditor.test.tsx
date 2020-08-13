@@ -34,16 +34,14 @@ describe('FormikRichTextEditor component', () => {
                 })}
                 onSubmit={config.onSubmit || jest.fn()}
             >
-                {() => (
-                    <Form>
-                        <FormikRichTextEditor
-                            name='content'
-                            label='Content'
-                            autoFocus={config.autoFocus}
-                        />
-                        <button type='submit' data-testid='submit-button' />
-                    </Form>
-                )}
+                <Form>
+                    <FormikRichTextEditor
+                        name='content'
+                        label='Content'
+                        autoFocus={config.autoFocus}
+                    />
+                    <button type='submit' data-testid='submit-button' />
+                </Form>
             </Formik>,
         );
     }

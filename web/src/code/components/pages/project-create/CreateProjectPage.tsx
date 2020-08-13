@@ -1,33 +1,30 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
+import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { CreateProjectForm } from './CreateProjectForm';
+import { PageHeader } from '../../common/page/PageHeader';
+import { PageTitle } from '../../common/page/PageTitle';
 
 
 export function CreateProjectPage(): React.ReactElement {
-    const classes = useStyles();
     const { t } = useTranslation();
 
     return (
-        <Container maxWidth='xs'>
+        <PageEnterTransition>
+            <Container maxWidth='xs'>
 
-            <Typography component='h1' variant='h5'>
-                {t('common.createProject')}
-            </Typography>
+                <PageHeader>
+                    <PageTitle>
+                        {t('common.createProject')}
+                    </PageTitle>
+                </PageHeader>
 
-            <CreateProjectForm formClassName={classes.form} />
+                <CreateProjectForm />
 
-        </Container>
+            </Container>
+        </PageEnterTransition>
     );
 }
-
-
-const useStyles = makeStyles((theme) => ({
-    form: {
-        marginTop: theme.spacing(1),
-    },
-}));
