@@ -16,7 +16,7 @@ export const mockUseTranslation = jest.fn().mockReturnValue({
 });
 
 export const MockTrans = jest.fn().mockImplementation(({ i18nKey }) => (
-    <div data-testid='MockTrans' data-i18n={i18nKey} />
+    <span data-testid='MockTrans' data-i18n={i18nKey} />
 ));
 
 jest.mock('react-i18next', () => ({

@@ -22,7 +22,10 @@ export function AuthorizedUserProfilePage(): React.ReactElement {
     const { t } = useTranslation();
     const userData = useCurrentUserCachedData();
     const setProfileUpdateModalState = useSetRecoilState(profileUpdateModalAtom);
-    const { data: profileData, loading } = useProfileQuery({ variables: { userSlug: userData?.slug! } });
+    const { data: profileData, loading } = useProfileQuery({
+        variables: { userSlug: userData?.slug! },
+        context: { forceAuth: true },
+    });
     usePageLinearProgressRevealer(loading);
 
     const handleProfileUpdateModalOpen = () => {

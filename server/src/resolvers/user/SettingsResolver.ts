@@ -64,7 +64,7 @@ export class SettingsResolver {
     async changeProfileSettings(@Args() { hidden }: ChangeProfileSettingsFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
         const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
 
-        if (user.isEmailAddressConfirmed !== hidden) {
+        if (user.hidden !== hidden) {
             user.hidden = hidden;
             await this.userRepository.persistAndFlush(user);
         }

@@ -13,7 +13,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
-import { ChangeEmailMutationVariables, useChangeEmailMutation } from '../../../../graphql/generated-types';
+import { ChangeEmailMutationVariables, useChangeEmailMutation, UserDetailedDataFragment } from '../../../../graphql/generated-types';
 import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ToastContentProps } from '../../providers/toast/interfaces/ToastContentProps';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
@@ -23,29 +23,25 @@ import { createEmailSchema } from '../../../utils/validation/emailSchema';
 import { useToast } from '../../providers/toast/useToast';
 
 
-export interface ChangeEmailFormProps {
-    currentEmail: string;
-    isCurrentEmailAddressConfirmed?: boolean;
-}
-
 type ChangeEmailFormData = ChangeEmailMutationVariables;
 
-export function ChangeEmailForm({ currentEmail, isCurrentEmailAddressConfirmed }: ChangeEmailFormProps): React.ReactElement {
+export function ChangeEmailForm(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
+    const userCachedData = useCurrentUserCachedData();
     const validationSchema = useChangeEmailFormValidationSchema(t);
-    const handleSubmit = useChangeEmailFormSubmitHandler(t);
+    const handleSubmit = useChangeEmailFormSubmitHandler(t, userCachedData);
 
     return (
         <Formik<ChangeEmailFormData>
             initialValues={{
-                email: currentEmail,
+                email: userCachedData?.email || '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
             {({ values }) => {
-                const isCurrentEmail = (values.email === currentEmail) || undefined;
+                const isCurrentEmail = (values.email === userCachedData?.email) || undefined;
                 return (
                     <Form>
 
@@ -58,7 +54,7 @@ export function ChangeEmailForm({ currentEmail, isCurrentEmailAddressConfirmed }
                                 endAdornment: isCurrentEmail && (
                                     <InputAdornment position='end'>
                                         {
-                                            (isCurrentEmailAddressConfirmed)
+                                            (userCachedData?.isEmailAddressConfirmed)
                                                 ? (
                                                     <Tooltip title={t('user.settings.emailConfirmed')!}>
                                                         <CheckCircleIcon className={classes.emailConfirmedIcon} />
@@ -80,6 +76,7 @@ export function ChangeEmailForm({ currentEmail, isCurrentEmailAddressConfirmed }
                         <FormikSubmitButton
                             className={classes.submit}
                             variant='outlined'
+                            disabled={isCurrentEmail}
                             fullWidth
                         >
                             {t('user.settings.changeEmail')}
@@ -106,9 +103,8 @@ function useChangeEmailFormValidationSchema(t: TFunction) {
 /**
  * Submit handler
  */
-function useChangeEmailFormSubmitHandler(t: TFunction) {
+function useChangeEmailFormSubmitHandler(t: TFunction, userCachedData?: UserDetailedDataFragment) {
     const { successToast } = useToast();
-    const userCachedData = useCurrentUserCachedData();
     const [ changeEmailMutation, { loading } ] = useChangeEmailMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -144,7 +140,7 @@ function useChangeEmailFormSubmitHandler(t: TFunction) {
                 })
                 .verifyIfAllErrorsAreHandled();
         }
-    }, [ t, successToast, changeEmailMutation, userCachedData ]);
+    }, [ t, userCachedData, successToast, changeEmailMutation ]);
 }
 
 

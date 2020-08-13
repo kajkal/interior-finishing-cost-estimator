@@ -3,6 +3,7 @@ fragment UserDetailedData on User {
     slug
     email
     isEmailAddressConfirmed
+    hidden
     avatar
     products {
         ...ProductData

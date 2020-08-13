@@ -74,7 +74,11 @@
       "emailChangeSuccessDescription": "An email has been send to <1>{{email}}</1>. In that message you will find instructions on how to confirm your new email.",
       "changePassword": "Change password",
       "incorrectCurrentPassword": "Incorrect password",
-      "passwordChangeSuccess": "Password changed successfully"
+      "passwordChangeSuccess": "Password changed successfully",
+      "changeProfileSettings": "Change profile settings",
+      "profileModeDescription": "If you want <1>your profile</1> to be invisible to other users, turn on the 'private profile' mode",
+      "profileModeLabel": "Private profile",
+      "profileSettingsChangeSuccess": "Profile settings changed successfully"
     },
     "updateProfileModal": {
       "title": "Edit profile"

@@ -89,6 +89,22 @@ describe('initApolloClient function', () => {
             expect(context).toEqual({});
         });
 
+        it('should add auth header for public operations where auth is forced', async () => {
+            accessTokenVar('ACCESS_TOKEN_FROM_CACHE');
+            AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(false);
+            AuthUtilsSpiesManager.verifyAccessToken.mockImplementation((token) => token);
+
+            const prepareOperationContextFn = getPrepareOperationContextFunction();
+            const context = await prepareOperationContextFn(sampleOperation, { forceAuth: true });
+
+            // verify if operation context was added
+            expect(context).toEqual({
+                headers: {
+                    authorization: 'Bearer ACCESS_TOKEN_FROM_CACHE',
+                },
+            });
+        });
+
         it('should use valid access token from memory', async () => {
             accessTokenVar('ACCESS_TOKEN_FROM_CACHE');
             AuthUtilsSpiesManager.isProtectedOperation.mockReturnValue(true);

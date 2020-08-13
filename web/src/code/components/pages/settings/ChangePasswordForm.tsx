@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { ChangePasswordMutationVariables, useChangePasswordMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
+import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikPasswordField } from '../../common/form-fields/FormikPasswordField';
 import { isEqualTo } from '../../../utils/validation/customAssertingTestFunctions';
@@ -17,18 +18,21 @@ import { useToast } from '../../providers/toast/useToast';
 
 
 interface ChangePasswordFormData extends ChangePasswordMutationVariables {
+    email: string;
     newPasswordConfirmation: string;
 }
 
 export function ChangePasswordForm(): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
+    const userCachedData = useCurrentUserCachedData();
     const validationSchema = useChangePasswordFormValidationSchema(t);
     const handleSubmit = useChangePasswordFormSubmitHandler(t);
 
     return (
         <Formik<ChangePasswordFormData>
             initialValues={{
+                email: userCachedData?.email || '',
                 currentPassword: '',
                 newPassword: '',
                 newPasswordConfirmation: '',
@@ -36,41 +40,53 @@ export function ChangePasswordForm(): React.ReactElement {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
         >
-            <Form>
+            {({ values }) => (
+                <Form>
 
-                <FormikPasswordField
-                    name='currentPassword'
-                    autoComplete='password'
-                    label={t('form.currentPassword.label')}
-                    aria-label={t('form.currentPassword.ariaLabel')}
-                    fullWidth
-                />
+                    {/* for password managers */}
+                    <input
+                        type='email'
+                        name='email'
+                        autoComplete='email'
+                        value={values.email}
+                        readOnly
+                        className={classes.hiddenEmailFieldForSakeOfAccessibility}
+                    />
 
-                <FormikPasswordField
-                    name='newPassword'
-                    autoComplete='new-password'
-                    label={t('form.newPassword.label')}
-                    aria-label={t('form.newPassword.ariaLabel')}
-                    fullWidth
-                />
+                    <FormikPasswordField
+                        name='currentPassword'
+                        autoComplete='current-password'
+                        label={t('form.currentPassword.label')}
+                        aria-label={t('form.currentPassword.ariaLabel')}
+                        fullWidth
+                    />
 
-                <FormikPasswordField
-                    name='newPasswordConfirmation'
-                    autoComplete='new-password'
-                    label={t('form.newPasswordConfirmation.label')}
-                    aria-label={t('form.newPasswordConfirmation.ariaLabel')}
-                    fullWidth
-                />
+                    <FormikPasswordField
+                        name='newPassword'
+                        autoComplete='new-password'
+                        label={t('form.newPassword.label')}
+                        aria-label={t('form.newPassword.ariaLabel')}
+                        fullWidth
+                    />
 
-                <FormikSubmitButton
-                    className={classes.submit}
-                    variant='outlined'
-                    fullWidth
-                >
-                    {t('user.settings.changePassword')}
-                </FormikSubmitButton>
+                    <FormikPasswordField
+                        name='newPasswordConfirmation'
+                        autoComplete='new-password'
+                        label={t('form.newPasswordConfirmation.label')}
+                        aria-label={t('form.newPasswordConfirmation.ariaLabel')}
+                        fullWidth
+                    />
 
-            </Form>
+                    <FormikSubmitButton
+                        className={classes.submit}
+                        variant='outlined'
+                        fullWidth
+                    >
+                        {t('user.settings.changePassword')}
+                    </FormikSubmitButton>
+
+                </Form>
+            )}
         </Formik>
     );
 }
@@ -81,6 +97,7 @@ export function ChangePasswordForm(): React.ReactElement {
  */
 function useChangePasswordFormValidationSchema(t: TFunction) {
     return React.useMemo(() => Yup.object<ChangePasswordFormData>({
+        email: Yup.string().required(),
         currentPassword: createPasswordSchema(t),
         newPassword: createPasswordSchema(t),
         newPasswordConfirmation: Yup.string()
@@ -97,7 +114,7 @@ function useChangePasswordFormSubmitHandler(t: TFunction) {
     const [ changePasswordMutation, { loading } ] = useChangePasswordMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<ChangePasswordFormData>['onSubmit']>(async ({ newPasswordConfirmation, ...values }, { setFieldError, resetForm }) => {
+    return React.useCallback<FormikConfig<ChangePasswordFormData>['onSubmit']>(async ({ email, newPasswordConfirmation, ...values }, { setFieldError, resetForm }) => {
         try {
             await changePasswordMutation({ variables: values });
             successToast(({ t }) => t('user.settings.passwordChangeSuccess'));
@@ -117,5 +134,8 @@ const useStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    hiddenEmailFieldForSakeOfAccessibility: {
+        display: 'none',
+    }
 }));
 

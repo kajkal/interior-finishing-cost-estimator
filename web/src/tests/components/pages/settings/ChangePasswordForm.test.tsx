@@ -1,14 +1,27 @@
 import React from 'react';
+import { GraphQLError } from 'graphql';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { ChangePasswordForm } from '../../../../code/components/pages/settings/ChangePasswordForm';
-import { ChangePasswordDocument, ChangePasswordMutation, ChangePasswordMutationVariables } from '../../../../graphql/generated-types';
+
+import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { GraphQLError } from 'graphql';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+
+import { ChangePasswordDocument, ChangePasswordMutation, ChangePasswordMutationVariables, User } from '../../../../graphql/generated-types';
+import { ChangePasswordForm } from '../../../../code/components/pages/settings/ChangePasswordForm';
 
 
 describe('ChangePasswordForm component', () => {
+
+    const sampleUser: Partial<User> = {
+        __typename: 'User',
+        slug: 'sample-user',
+        email: 'current-email@domain.com',
+    };
+
+    beforeEach(() => {
+        mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
+    });
 
     function renderInMockContext(mocks?: ContextMocks) {
         return render(
@@ -35,7 +48,7 @@ describe('ChangePasswordForm component', () => {
             await TextFieldController.from(ViewUnderTest.currentPasswordInput).type(data.currentPassword);
             await TextFieldController.from(ViewUnderTest.newPasswordInput).type(data.newPassword);
             await TextFieldController.from(ViewUnderTest.newPasswordConfirmationInput).type(data.newPassword);
-            userEvent.click(this.submitButton);
+            userEvent.click(ViewUnderTest.submitButton);
         }
     }
 

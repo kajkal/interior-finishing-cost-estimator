@@ -74,7 +74,11 @@
       "emailChangeSuccessDescription": "Na adres <1>{{email}}</1> został wysłany email z instrukcją jak aktywować twój nowy adres email.",
       "changePassword": "Zmień hasło",
       "incorrectCurrentPassword": "Niepoprawne hasło",
-      "passwordChangeSuccess": "Hasło zostało zmienione"
+      "passwordChangeSuccess": "Hasło zostało zmienione",
+      "changeProfileSettings": "Zmień ustawienia profilu",
+      "profileModeDescription": "Jeśli chcesz aby <1>Twój profil</1> był niewidoczny dla innych użytkowników, włącz tryb prywatnego profilu.",
+      "profileModeLabel": "Prywatny profil",
+      "profileSettingsChangeSuccess": "Ustawienia profilu zostały zmienione"
     },
     "updateProfileModal": {
       "title": "Edytuj profil"

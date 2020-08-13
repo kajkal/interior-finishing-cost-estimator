@@ -36,6 +36,7 @@ export type User = {
   __typename?: 'User';
   email: Scalars['String'];
   isEmailAddressConfirmed?: Maybe<Scalars['Boolean']>;
+  hidden?: Maybe<Scalars['Boolean']>;
   name: Scalars['String'];
   /** Unique user slug. Used in URLs */
   slug: Scalars['String'];
@@ -501,7 +502,7 @@ export type ProjectDetailsQuery = (
 
 export type UserDetailedDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'name' | 'slug' | 'email' | 'isEmailAddressConfirmed' | 'avatar' | 'productCount'>
+  & Pick<User, 'name' | 'slug' | 'email' | 'isEmailAddressConfirmed' | 'hidden' | 'avatar' | 'productCount'>
   & { products: Array<(
     { __typename?: 'Product' }
     & ProductDataFragment
@@ -636,6 +637,7 @@ export const UserDetailedDataFragmentDoc = gql`
   slug
   email
   isEmailAddressConfirmed
+  hidden
   avatar
   products {
     ...ProductData

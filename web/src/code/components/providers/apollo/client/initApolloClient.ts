@@ -22,21 +22,23 @@ export function initApolloClient(): ApolloClient<unknown> {
              * @throws will throw an error if cannot acquire valid access token (user is no longer authenticated).
              * Error thrown here could later be found in GraphQL operation result (error.networkError).
              */
-            setContext(async (operation) => {
+            setContext(async (operation, prevContext) => {
+                const { headers = {}, forceAuth } = prevContext;
                 console.log('%cprepareOperation', 'color: deepskyblue;', operation.operationName);
 
-                if (AuthUtils.isProtectedOperation(operation.operationName)) {
+                if (AuthUtils.isProtectedOperation(operation.operationName) || forceAuth) {
                     const validAccessToken = AuthUtils.verifyAccessToken(accessTokenVar()) || await AuthUtils.refreshAccessToken();
                     accessTokenVar(validAccessToken);
 
                     return {
                         headers: {
                             authorization: `Bearer ${validAccessToken}`,
+                            ...headers,
                         },
                     };
                 }
 
-                return {};
+                return headers;
             }),
 
             createUploadLink({

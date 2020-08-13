@@ -25,13 +25,10 @@ describe('ChangeEmailForm component', () => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
     });
 
-    function renderInMockContext(mocks?: ContextMocks, user = sampleUser) {
+    function renderInMockContext(mocks?: ContextMocks) {
         return render(
             <MockContextProvider mocks={mocks}>
-                <ChangeEmailForm
-                    currentEmail={user.email!}
-                    isCurrentEmailAddressConfirmed={user.isEmailAddressConfirmed!}
-                />
+                <ChangeEmailForm />
             </MockContextProvider>,
         );
     }
@@ -52,7 +49,7 @@ describe('ChangeEmailForm component', () => {
         }
         static async fillAndSubmitForm(data: ChangeEmailMutationVariables) {
             await TextFieldController.from(ViewUnderTest.emailInput).type(data.email);
-            userEvent.click(this.submitButton);
+            userEvent.click(ViewUnderTest.submitButton);
         }
     }
 

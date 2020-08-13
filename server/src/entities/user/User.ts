@@ -37,6 +37,7 @@ export class User extends BaseEntity {
      * Indicates whether the user has publicly available profile.
      * When hidden is set to true - user' profile become private - not accessible for any other user.
      */
+    @Field({ nullable: true })
     @Property()
     hidden: boolean = false;
 
