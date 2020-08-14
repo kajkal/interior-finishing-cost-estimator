@@ -10,6 +10,10 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import SettingsIcon from '@material-ui/icons/Settings';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 import { ConditionalTooltip } from '../../common/data-display/ConditionalTooltip';
 import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
@@ -32,9 +36,9 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userNam
     const { t } = useTranslation();
     const { expanded, onListTrigger } = useCollapsibleList(false, isSideNavOpen, onSideNavToggle);
     const accountOptions = React.useMemo(() => [
-        { to: nav.profile(), label: t('common.profile') },
-        { to: nav.settings(), label: t('common.settings') },
-        { to: nav.logout(), label: t('common.logout') },
+        { to: nav.profile(), Icon: AssignmentIndIcon, label: t('common.profile') },
+        { to: nav.settings(), Icon: SettingsIcon, label: t('common.settings') },
+        { to: nav.logout(), Icon: MeetingRoomIcon, label: t('common.logout') },
     ], [ t ]);
 
     return (
@@ -75,7 +79,7 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userNam
             <Collapse in={expanded} timeout='auto'>
                 <List component='div' disablePadding dense>
                     {
-                        accountOptions.map(({ to, label }) => (
+                        accountOptions.map(({ to, Icon, label }) => (
                             <ListItemNavLink
                                 key={to}
                                 to={to}
@@ -83,6 +87,9 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userNam
                                 aria-label={label}
                                 end
                             >
+                                <ListItemIcon>
+                                    <Icon/>
+                                </ListItemIcon>
                                 <ListItemText
                                     primary={label}
                                     className={clsx(listItemStyles.listItemText, {
