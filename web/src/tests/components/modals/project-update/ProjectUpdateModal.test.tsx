@@ -7,7 +7,7 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
@@ -126,7 +126,7 @@ describe('ProjectUpdateModal component', () => {
         userEvent.click(ViewUnderTest.cancelButton);
 
         // verify if modal is again not visible
-        await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
+        await waitForElementToBeRemoved(ViewUnderTest.modal);
     });
 
     describe('project update form', () => {
@@ -142,6 +142,8 @@ describe('ProjectUpdateModal component', () => {
                             placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
                             main: 'Kraków',
                             secondary: 'Poland',
+                            lat: 50,
+                            lng: 20,
                         },
                     } as UpdateProjectMutationVariables,
                 },
@@ -156,6 +158,8 @@ describe('ProjectUpdateModal component', () => {
                                 placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
                                 main: 'Kraków',
                                 secondary: 'Poland',
+                                lat: 50,
+                                lng: 20,
                             },
                             files: [],
                         },
@@ -204,7 +208,7 @@ describe('ProjectUpdateModal component', () => {
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if modal was closed
-            await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
+            await waitForElementToBeRemoved(ViewUnderTest.modal);
 
             // verify updated cache
             const updatedProject = mockResponse.result.data.updateProject;

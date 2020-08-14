@@ -7,5 +7,7 @@ fragment UserProfileData on Profile {
         placeId
         main
         secondary
+        lat
+        lng
     }
 }

@@ -1,4 +1,4 @@
-import { Field, InputType } from 'type-graphql';
+import { Field, Float, InputType } from 'type-graphql';
 import { IsNotEmpty } from 'class-validator';
 
 
@@ -16,5 +16,11 @@ export class LocationFormData {
     @Field()
     @IsNotEmpty()
     secondary!: string;
+
+    @Field(() => Float, { nullable: true })
+    lat?: number | null;
+
+    @Field(() => Float, { nullable: true })
+    lng?: number | null;
 
 }

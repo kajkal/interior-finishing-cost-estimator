@@ -90,6 +90,8 @@ export type Location = {
   placeId: Scalars['String'];
   main: Scalars['String'];
   secondary: Scalars['String'];
+  lat?: Maybe<Scalars['Float']>;
+  lng?: Maybe<Scalars['Float']>;
 };
 
 /** Wrapper for resource file data. */
@@ -263,6 +265,8 @@ export type LocationFormData = {
   placeId: Scalars['String'];
   main: Scalars['String'];
   secondary: Scalars['String'];
+  lat?: Maybe<Scalars['Float']>;
+  lng?: Maybe<Scalars['Float']>;
 };
 
 
@@ -410,7 +414,7 @@ export type ProjectDetailedDataFragment = (
   { __typename?: 'Project' }
   & { location?: Maybe<(
     { __typename?: 'Location' }
-    & Pick<Location, 'placeId' | 'main' | 'secondary'>
+    & Pick<Location, 'placeId' | 'main' | 'secondary' | 'lat' | 'lng'>
   )>, files: Array<(
     { __typename?: 'ResourceData' }
     & Pick<ResourceData, 'url' | 'name' | 'description'>
@@ -520,7 +524,7 @@ export type UserProfileDataFragment = (
   & Pick<Profile, 'userSlug' | 'name' | 'avatar' | 'description'>
   & { location?: Maybe<(
     { __typename?: 'Location' }
-    & Pick<Location, 'placeId' | 'main' | 'secondary'>
+    & Pick<Location, 'placeId' | 'main' | 'secondary' | 'lat' | 'lng'>
   )> }
 );
 
@@ -609,6 +613,8 @@ export const ProjectDetailedDataFragmentDoc = gql`
     placeId
     main
     secondary
+    lat
+    lng
   }
   files {
     url
@@ -662,6 +668,8 @@ export const UserProfileDataFragmentDoc = gql`
     placeId
     main
     secondary
+    lat
+    lng
   }
 }
     `;

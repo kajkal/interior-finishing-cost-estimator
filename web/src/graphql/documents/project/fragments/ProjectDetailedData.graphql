@@ -4,6 +4,8 @@ fragment ProjectDetailedData on Project {
         placeId
         main
         secondary
+        lat
+        lng
     }
     files {
         url

@@ -12,7 +12,7 @@ import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import { extendedUserEvent } from '../../../../__utils__/extendedUserEvent';
 
-import * as useLazyAutocompleteServiceModule from '../../../../../code/components/common/form-fields/location/useLazyAutocompleteService';
+import * as useLazyAutocompleteServiceModule from '../../../../../code/utils/google-maps/useLazyAutocompleteService';
 import { FormikLocationField } from '../../../../../code/components/common/form-fields/location/FormikLocationField';
 import { LocationOption } from '../../../../../code/components/common/form-fields/location/LocationField';
 

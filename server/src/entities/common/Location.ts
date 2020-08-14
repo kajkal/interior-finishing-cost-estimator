@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Float, ObjectType } from 'type-graphql';
 import { Property } from 'mikro-orm';
 
 
@@ -18,5 +18,13 @@ export class Location {
     @Field()
     @Property()
     secondary!: string;
+
+    @Field(() => Float, { nullable: true })
+    @Property()
+    lat?: number | null;
+
+    @Field(() => Float, { nullable: true })
+    @Property()
+    lng?: number | null;
 
 }

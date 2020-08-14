@@ -167,7 +167,7 @@ function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistin
                     avatar: (avatar?.size === 0) ? null : avatar,
                     removeCurrentAvatar: Boolean((withExistingAvatar && !avatar)),
                     description: isSlateDocumentNotEmpty(description) ? JSON.stringify(description) : null,
-                    location: mapLocationOptionToLocationFormData(location),
+                    location: await mapLocationOptionToLocationFormData(location),
                 },
                 update: (cache, { data }) => {
                     const updatedProfile = data?.updateProfile;

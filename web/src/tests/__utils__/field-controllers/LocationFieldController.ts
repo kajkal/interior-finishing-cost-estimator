@@ -1,7 +1,8 @@
 import userEvent from '@testing-library/user-event';
 import { fireEvent, getAllByRole, screen } from '@testing-library/react';
 
-import * as useLazyAutocompleteServiceModule from '../../../code/components/common/form-fields/location/useLazyAutocompleteService';
+import * as useLazyAutocompleteServiceModule from '../../../code/utils/google-maps/useLazyAutocompleteService';
+import * as useLazyGeocoderModule from '../../../code/utils/google-maps/useLazyGeocoder';
 import { mapLocationToLocationOption } from '../../../code/utils/mappers/locationMapper';
 import { AbstractFieldController } from './AbstractFieldController';
 import { Location } from '../../../graphql/generated-types';
@@ -10,6 +11,7 @@ import { flushPromises } from '../extendedUserEvent';
 
 let mockGetPlacePredictions: jest.Mock;
 let useLazyAutocompleteServiceSpy: jest.SpiedFunction<typeof useLazyAutocompleteServiceModule.useLazyAutocompleteService>;
+let mockGeocodePlace: jest.SpiedFunction<typeof useLazyGeocoderModule.geocodePlace>;
 
 beforeEach(() => {
     mockGetPlacePredictions?.mockRestore();
@@ -21,6 +23,10 @@ beforeEach(() => {
     useLazyAutocompleteServiceSpy?.mockRestore();
     useLazyAutocompleteServiceSpy = jest.spyOn(useLazyAutocompleteServiceModule, 'useLazyAutocompleteService');
     useLazyAutocompleteServiceSpy.mockReturnValue({ getPlacePredictions: mockGetPlacePredictions as any });
+
+    mockGeocodePlace?.mockRestore();
+    mockGeocodePlace = jest.spyOn(useLazyGeocoderModule, 'geocodePlace');
+    mockGeocodePlace.mockResolvedValue([]);
 });
 
 export class LocationFieldController extends AbstractFieldController {
@@ -43,6 +49,19 @@ export class LocationFieldController extends AbstractFieldController {
             if (location) {
                 mockGetPlacePredictions.mockImplementation((_request, callback) => {
                     callback([ mapLocationToLocationOption(location) ]);
+                });
+                mockGeocodePlace.mockImplementation(async ({ placeId }) => {
+                    if (placeId === location.placeId) {
+                        return [ {
+                            geometry: {
+                                location: {
+                                    lat: () => location.lat,
+                                    lng: () => location.lng,
+                                },
+                            },
+                        } ] as google.maps.GeocoderResult[];
+                    }
+                    return [];
                 });
 
                 await userEvent.type(inputElement, location.main);

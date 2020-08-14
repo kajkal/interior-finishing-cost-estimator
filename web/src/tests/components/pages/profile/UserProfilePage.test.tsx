@@ -1,7 +1,7 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
 import { Route, Routes } from 'react-router';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { muteConsole } from '../../../__utils__/muteConsole';
@@ -36,6 +36,8 @@ describe('UserProfilePage component', () => {
                             placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
                             main: 'Kraków',
                             secondary: 'Poland',
+                            lat: null,
+                            lng: null,
                         },
                     },
                 } as ProfileQuery,

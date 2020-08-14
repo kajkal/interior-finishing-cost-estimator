@@ -10,7 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
-import { useLazyAutocompleteService } from './useLazyAutocompleteService';
+import { useLazyAutocompleteService } from '../../../../utils/google-maps/useLazyAutocompleteService';
 
 
 /**
@@ -24,14 +24,21 @@ export interface LocationOption {
         secondary_text: google.maps.places.AutocompleteStructuredFormatting['secondary_text'];
         main_text_matched_substrings: google.maps.places.AutocompleteStructuredFormatting['main_text_matched_substrings'];
     };
+    // defined only for objects mapped from Location object from server:
+    lat?: number;
+    lng?: number;
 }
 
 export interface LocationFieldProps extends Omit<FilledTextFieldProps, 'variant' | 'onChange' | 'value'> {
     value: LocationOption | null;
     onChange: (value: LocationOption | null) => void;
+    /**
+     * @see google.maps.places.AutocompletionRequest.types
+     */
+    types?: string[];
 }
 
-export function LocationField({ id, value, onChange, disabled, ...rest }: LocationFieldProps): React.ReactElement {
+export function LocationField({ id, value, onChange, disabled, types, ...rest }: LocationFieldProps): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
     const [ inputValue, setInputValue ] = React.useState('');
@@ -48,7 +55,7 @@ export function LocationField({ id, value, onChange, disabled, ...rest }: Locati
             return undefined;
         }
 
-        getPlacePredictions({ input: inputValue }, (results) => {
+        getPlacePredictions({ input: inputValue, types }, (results) => {
             const newOptions = (value) ? [ value ] : [];
             setOptions([ ...newOptions, ...results ]);
         });
@@ -56,7 +63,7 @@ export function LocationField({ id, value, onChange, disabled, ...rest }: Locati
         return () => {
             getPlacePredictions.cancel();
         };
-    }, [ value, inputValue, getPlacePredictions ]);
+    }, [ value, inputValue, types, getPlacePredictions ]);
 
     return (
         <FormControl fullWidth margin='normal'>
@@ -84,6 +91,7 @@ export function LocationField({ id, value, onChange, disabled, ...rest }: Locati
 
                 options={options}
                 filterSelectedOptions
+                getOptionSelected={isOptionSelected}
                 getOptionLabel={getOptionLabel}
                 renderOption={optionRenderer}
 
@@ -106,6 +114,10 @@ export function LocationField({ id, value, onChange, disabled, ...rest }: Locati
 
 function getOptionLabel(option: LocationOption): string {
     return option.description;
+}
+
+function isOptionSelected(option: LocationOption, value: LocationOption) {
+    return option.place_id === value.place_id;
 }
 
 

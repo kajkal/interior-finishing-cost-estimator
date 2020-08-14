@@ -94,7 +94,7 @@ function useLoginFormSubmitHandler(userSlug: string | undefined) {
             const { data } = await createProjectMutation({
                 variables: {
                     ...values,
-                    location: mapLocationOptionToLocationFormData(location),
+                    location: await mapLocationOptionToLocationFormData(location),
                 },
                 update: (cache, { data }) => {
                     const createdProject = data?.createProject;

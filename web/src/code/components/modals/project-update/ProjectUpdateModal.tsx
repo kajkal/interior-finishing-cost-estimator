@@ -152,7 +152,7 @@ function useProjectUpdateFormSubmitHandler(onModalClose: () => void) {
             await updateProjectMutation({
                 variables: {
                     ...values,
-                    location: mapLocationOptionToLocationFormData(location),
+                    location: await mapLocationOptionToLocationFormData(location),
                 },
                 update: (cache, { data }) => {
                     const updatedProject = data?.updateProject;
