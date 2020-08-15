@@ -26,13 +26,7 @@ export function useProductsFilter(productsToFilter: Product[], filters: Products
             }
 
             // filter by tags
-            if ((selectedTags !== 'ALL') && (!product.tags?.some((tag) => selectedTags.has(tag)))) {
-                if (!product.tags?.some((tag) => selectedTags.has(tag))) {
-                    return false;
-                }
-            }
-
-            return true;
+            return (selectedTags === 'ALL') || product.tags?.some((tag) => selectedTags.has(tag));
         });
     }, [ productsToFilter, filters ]);
 }

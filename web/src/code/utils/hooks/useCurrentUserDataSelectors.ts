@@ -4,7 +4,7 @@ import { MeQuery, Product } from '../../../graphql/generated-types';
 
 export interface Option {
     name: string;
-    occurrenceCount: number;
+    occurrenceCount?: number;
 }
 
 export interface ProductsDatesStatistics {

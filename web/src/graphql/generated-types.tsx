@@ -22,7 +22,7 @@ export type Query = {
   /** Returns data of the currently authenticated user. */
   me: User;
   projects: Array<Project>;
-  products: Array<Inquiry>;
+  allInquiries: Array<Inquiry>;
   /** Returns user', publicly available, profile data */
   profile: Profile;
 };
@@ -106,8 +106,13 @@ export type ResourceData = {
 export type Inquiry = {
   __typename?: 'Inquiry';
   id: Scalars['ID'];
-  name: Scalars['String'];
+  title: Scalars['String'];
+  /** Serialized description */
+  description: Scalars['String'];
+  location: Location;
   category: Category;
+  createdAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export enum Category {
@@ -237,6 +242,14 @@ export type MutationConfirmEmailAddressArgs = {
 };
 
 
+export type MutationCreateInquiryArgs = {
+  title: Scalars['String'];
+  description: Scalars['String'];
+  location: LocationFormData;
+  category: Category;
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -362,6 +375,42 @@ export type SendPasswordResetInstructionsMutationVariables = Exact<{
 export type SendPasswordResetInstructionsMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendPasswordResetInstructions'>
+);
+
+export type InquiryDataFragment = (
+  { __typename?: 'Inquiry' }
+  & Pick<Inquiry, 'id' | 'title' | 'description' | 'category'>
+  & { location: (
+    { __typename?: 'Location' }
+    & Pick<Location, 'placeId' | 'main' | 'secondary' | 'lat' | 'lng'>
+  ) }
+);
+
+export type CreateInquiryMutationVariables = Exact<{
+  title: Scalars['String'];
+  description: Scalars['String'];
+  location: LocationFormData;
+  category: Category;
+}>;
+
+
+export type CreateInquiryMutation = (
+  { __typename?: 'Mutation' }
+  & { createInquiry: (
+    { __typename?: 'Inquiry' }
+    & InquiryDataFragment
+  ) }
+);
+
+export type InquiriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InquiriesQuery = (
+  { __typename?: 'Query' }
+  & { allInquiries: Array<(
+    { __typename?: 'Inquiry' }
+    & InquiryDataFragment
+  )> }
 );
 
 export type ProductDataFragment = (
@@ -526,7 +575,7 @@ export type UserDetailedDataFragment = (
     & ProjectBasicDataFragment
   )>, inquiries: Array<(
     { __typename?: 'Inquiry' }
-    & Pick<Inquiry, 'name'>
+    & Pick<Inquiry, 'id'>
   )> }
 );
 
@@ -611,6 +660,21 @@ export type ProfileQuery = (
   ) }
 );
 
+export const InquiryDataFragmentDoc = gql`
+    fragment InquiryData on Inquiry {
+  id
+  title
+  description
+  location {
+    placeId
+    main
+    secondary
+    lat
+    lng
+  }
+  category
+}
+    `;
 export const ProjectBasicDataFragmentDoc = gql`
     fragment ProjectBasicData on Project {
   slug
@@ -664,7 +728,7 @@ export const UserDetailedDataFragmentDoc = gql`
     ...ProjectBasicData
   }
   inquiries {
-    name
+    id
   }
 }
     ${ProductDataFragmentDoc}
@@ -871,6 +935,72 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export const CreateInquiryDocument = gql`
+    mutation CreateInquiry($title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
+  createInquiry(title: $title, description: $description, location: $location, category: $category) {
+    ...InquiryData
+  }
+}
+    ${InquiryDataFragmentDoc}`;
+
+/**
+ * __useCreateInquiryMutation__
+ *
+ * To run a mutation, you first call `useCreateInquiryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateInquiryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createInquiryMutation, { data, loading, error }] = useCreateInquiryMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      description: // value for 'description'
+ *      location: // value for 'location'
+ *      category: // value for 'category'
+ *   },
+ * });
+ */
+export function useCreateInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateInquiryMutation, CreateInquiryMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateInquiryMutation, CreateInquiryMutationVariables>(CreateInquiryDocument, baseOptions);
+      }
+export type CreateInquiryMutationHookResult = ReturnType<typeof useCreateInquiryMutation>;
+export type CreateInquiryMutationResult = ApolloReactCommon.MutationResult<CreateInquiryMutation>;
+export type CreateInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateInquiryMutation, CreateInquiryMutationVariables>;
+export const InquiriesDocument = gql`
+    query Inquiries {
+  allInquiries {
+    ...InquiryData
+  }
+}
+    ${InquiryDataFragmentDoc}`;
+
+/**
+ * __useInquiriesQuery__
+ *
+ * To run a query within a React component, call `useInquiriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useInquiriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useInquiriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useInquiriesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
+        return ApolloReactHooks.useQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
+      }
+export function useInquiriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
+        }
+export type InquiriesQueryHookResult = ReturnType<typeof useInquiriesQuery>;
+export type InquiriesLazyQueryHookResult = ReturnType<typeof useInquiriesLazyQuery>;
+export type InquiriesQueryResult = ApolloReactCommon.QueryResult<InquiriesQuery, InquiriesQueryVariables>;
 export const CreateProductDocument = gql`
     mutation CreateProduct($name: String!, $description: String!, $price: CurrencyAmountFormData, $tags: [String!]) {
   createProduct(name: $name, description: $description, price: $price, tags: $tags) {

@@ -2,6 +2,9 @@ import React from 'react';
 import { SetterOrUpdater } from 'recoil/dist';
 import { useTranslation } from 'react-i18next';
 
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+
 import { Option } from '../../../../utils/hooks/useCurrentUserDataSelectors';
 import { SelectedOptions } from '../../../../utils/filters/filtersUtils';
 import { FilterOptions } from '../../../common/filters/FilterOptions';
@@ -17,6 +20,7 @@ export interface ProductFilterTagsProps {
 
 export const ProductFilterTags = React.memo(
     function ProductFilterTags({ tags, selectedTags, setFilters, className }: ProductFilterTagsProps): React.ReactElement {
+        const classes = useStyles();
         const { t } = useTranslation();
 
         return (
@@ -29,8 +33,29 @@ export const ProductFilterTags = React.memo(
                 groupClassName={className}
                 groupAriaLabel={t('product.filters.tagsAriaLabel')}
                 selectAllOptionsChipLabel={t('product.filters.selectAllTags')}
-                optionChipAriaLabel={(tagName) => t('product.filters.toggleTag', { tagName })}
+                optionChipAriaLabel={({ name: tagName }) => t('product.filters.toggleTag', { tagName })}
+                renderOptionChipLabel={({ name: tagName, occurrenceCount }) => (
+                    <>
+                        <Typography variant='inherit'>
+                            {tagName}
+                        </Typography>
+                        <Typography
+                            variant='inherit'
+                            color='textSecondary'
+                            className={classes.occurrenceCount}
+                        >
+                            {`(${occurrenceCount})`}
+                        </Typography>
+                    </>
+                )}
             />
         );
     },
 );
+
+const useStyles = makeStyles({
+    occurrenceCount: {
+        marginLeft: 4,
+    },
+});
+

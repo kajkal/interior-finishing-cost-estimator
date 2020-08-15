@@ -1,0 +1,13 @@
+fragment InquiryData on Inquiry {
+    id
+    title
+    description
+    location {
+        placeId
+        main
+        secondary
+        lat
+        lng
+    }
+    category
+}

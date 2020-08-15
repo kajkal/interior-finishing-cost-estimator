@@ -72,10 +72,9 @@ export class LocationFieldController extends AbstractFieldController {
                 userEvent.click(options[ 0 ]);
 
                 expect(inputElement).toHaveValue(`${location.main}, ${location.secondary}`);
-
-                fireEvent.blur(inputElement);
-                await flushPromises();
             }
+            fireEvent.blur(inputElement);
+            await flushPromises();
             return inputElement;
         }) as LocationFieldController;
     }

@@ -137,6 +137,8 @@
     "productNotFoundError": "Product no longer exists"
   },
   "inquiry": {
+    "inquiries": "Inquiries",
+    "addInquiry": "Add inquiry",
     "categories": {
       "electrical":  "Electrical",
       "piping": "Piping",
@@ -144,6 +146,9 @@
       "carpentry": "Carpentry",
       "installation":  "Installation",
       "designing": "Designing"
+    },
+    "createModal": {
+      "title": "Define new inquiry"
     }
   },
   "form": {
@@ -253,7 +258,10 @@
       "ariaLabel": "Enter your profile description"
     },
     "location": {
-      "label": "Location"
+      "label": "Location",
+      "validation": {
+        "required": "Location is required"
+      }
     },
     "projectName": {
       "label": "Project name",
@@ -305,6 +313,29 @@
     },
     "productTags": {
       "label": "Tags"
+    },
+    "inquiryTitle": {
+      "label": "Title",
+      "ariaLabel": "Enter inquiry title",
+      "validation": {
+        "required": "Inquiry title is required",
+        "tooShort": "Inquiry title is too short",
+        "tooLong": "Inquiry title is too long"
+      }
+    },
+    "inquiryDescription": {
+      "label": "Description",
+      "ariaLabel": "Enter inquiry description",
+      "validation": {
+        "required": "Inquiry description is required"
+      }
+    },
+    "inquiryCategory": {
+      "label": "Category",
+      "ariaLabel": "Enter inquiry category",
+      "validation": {
+        "required": "Inquiry category is required"
+      }
     }
   },
   "error": {

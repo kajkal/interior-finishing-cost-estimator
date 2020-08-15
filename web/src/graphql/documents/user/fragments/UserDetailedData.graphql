@@ -13,6 +13,6 @@ fragment UserDetailedData on User {
        ...ProjectBasicData
     }
     inquiries {
-        name
+        id
     }
 }

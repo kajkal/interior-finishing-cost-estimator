@@ -1,0 +1,15 @@
+mutation CreateInquiry(
+    $title: String!
+    $description: String!
+    $location: LocationFormData!
+    $category: Category!
+) {
+    createInquiry(
+        title: $title
+        description: $description
+        location: $location
+        category: $category
+    ) {
+        ...InquiryData
+    }
+}

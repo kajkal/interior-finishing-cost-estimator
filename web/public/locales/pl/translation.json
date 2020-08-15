@@ -137,6 +137,8 @@
     "productNotFoundError": "Produkt już nie istnieje"
   },
   "inquiry": {
+    "inquiries": "Zapytania o wycenę",
+    "addInquiry": "Dodaj zapytanie o wycenę",
     "categories": {
       "electrical": "Elektryka",
       "piping": "Hudraulika",
@@ -144,6 +146,9 @@
       "carpentry": "Meble i zabudowa",
       "installation": "Montaż",
       "designing": "Projektowanie"
+    },
+    "createModal": {
+      "title": "Utwórz zapytanie o wycenę"
     }
   },
   "form": {
@@ -253,7 +258,10 @@
       "ariaLabel": "Wprowadź opis swojego profilu"
     },
     "location": {
-      "label": "Miejscowość"
+      "label": "Miejscowość",
+      "validation": {
+        "required": "Miejscowość jest wymagana"
+      }
     },
     "projectName": {
       "label": "Nazwa projektu",
@@ -305,6 +313,29 @@
     },
     "productTags": {
       "label": "Tagi"
+    },
+    "inquiryTitle": {
+      "label": "Tytuł",
+      "ariaLabel": "Wprowadź tytuł zapytania",
+      "validation": {
+        "required": "Tytuł zapytania jest wymagany",
+        "tooShort": "Wprowadzona tytuł zapytania jest za krótki",
+        "tooLong": "Wprowadzona tytuł zapytania jest za długi"
+      }
+    },
+    "inquiryDescription": {
+      "label": "Opis",
+      "ariaLabel": "Wprowadź opis zapytania",
+      "validation": {
+        "required": "Opis zapytania jest wymagany"
+      }
+    },
+    "inquiryCategory": {
+      "label": "Kategoria",
+      "ariaLabel": "Wprowadź kategorię zapytania",
+      "validation": {
+        "required": "Kategoria zapytania jest wymagana"
+      }
     }
   },
   "error": {

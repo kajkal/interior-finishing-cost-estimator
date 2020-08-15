@@ -6,6 +6,7 @@ import parse from 'autosuggest-highlight/parse';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteRenderOptionState } from '@material-ui/lab/Autocomplete';
+import FormControl from '@material-ui/core/FormControl';
 
 import { categoryTranslationKeyMap, supportedCategories } from '../../../../config/supportedCategories';
 import { Category } from '../../../../../graphql/generated-types';
@@ -33,36 +34,38 @@ export const CategoryField = React.memo(
         ), [ t ]);
 
         return (
-            <Autocomplete<CategoryOption, false, false, false>
-                classes={{
-                    paper: classes.paper,
-                }}
+            <FormControl fullWidth margin='normal'>
+                <Autocomplete<CategoryOption, false, false, false>
+                    classes={{
+                        paper: classes.paper,
+                    }}
 
-                id={id}
-                handleHomeEndKeys
-                openOnFocus
-                clearText={t('form.common.tags.clear')}
+                    id={id}
+                    handleHomeEndKeys
+                    openOnFocus
+                    clearText={t('form.common.tags.clear')}
 
-                disabled={disabled}
-                value={value}
-                onChange={(event, newValue) => {
-                    onChange(newValue);
-                }}
+                    disabled={disabled}
+                    value={value}
+                    onChange={(event, newValue) => {
+                        onChange(newValue);
+                    }}
 
-                options={definedCategoryOptions}
-                getOptionSelected={isOptionSelected}
-                getOptionLabel={getOptionLabel}
-                renderOption={optionRenderer}
+                    options={definedCategoryOptions}
+                    getOptionSelected={isOptionSelected}
+                    getOptionLabel={getOptionLabel}
+                    renderOption={optionRenderer}
 
-                renderInput={({ InputProps, ...params }) => (
-                    <TextField
-                        {...rest}
-                        {...params}
-                        variant='filled'
-                        InputProps={{ ...InputProps, disableUnderline: true }}
-                    />
-                )}
-            />
+                    renderInput={({ InputProps, ...params }) => (
+                        <TextField
+                            {...rest}
+                            {...params}
+                            variant='filled'
+                            InputProps={{ ...InputProps, disableUnderline: true }}
+                        />
+                    )}
+                />
+            </FormControl>
         );
     },
 );

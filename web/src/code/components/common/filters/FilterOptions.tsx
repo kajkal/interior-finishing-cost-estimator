@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import Chip from '@material-ui/core/Chip';
 
@@ -9,17 +8,22 @@ import { areAllOptionsSelected, isOptionExclusivelySelected, isOptionSelected, S
 import { Option } from '../../../utils/hooks/useCurrentUserDataSelectors';
 
 
-export interface FilterOptionsProps {
-    options: Option[];
+export interface OptionBase {
+    name: string;
+}
+
+export interface FilterOptionsProps<OptionType extends OptionBase> {
+    options: OptionType[];
     selectedOptions: SelectedOptions;
     onChange: (value: SelectedOptions) => void;
     groupClassName?: string;
     groupAriaLabel?: string;
     selectAllOptionsChipLabel?: string;
-    optionChipAriaLabel?: (optionName: string) => string;
+    optionChipAriaLabel?: (option: OptionType) => string;
+    renderOptionChipLabel: (option: OptionType) => React.ReactNode
 }
 
-export function FilterOptions(props: FilterOptionsProps): React.ReactElement {
+export function FilterOptions<OptionType extends OptionBase>(props: FilterOptionsProps<OptionType>): React.ReactElement {
     const {
         options,
         selectedOptions,
@@ -28,6 +32,7 @@ export function FilterOptions(props: FilterOptionsProps): React.ReactElement {
         groupAriaLabel,
         selectAllOptionsChipLabel,
         optionChipAriaLabel,
+        renderOptionChipLabel,
     } = props;
     const classes = useStyles();
 
@@ -49,35 +54,22 @@ export function FilterOptions(props: FilterOptionsProps): React.ReactElement {
                 onClick={() => onChange(areAllOptionsSelected(selectedOptions) ? new Set() : 'ALL')}
             />
             {
-                options.map(({ name: optionName, occurrenceCount }) => (
+                options.map((option) => (
                     <Chip
-                        key={optionName}
-                        label={(
-                            <>
-                                <Typography variant='inherit'>
-                                    {optionName}
-                                </Typography>
-                                <Typography
-                                    variant='inherit'
-                                    color='textSecondary'
-                                    className={classes.occurrenceCount}
-                                >
-                                    {`(${occurrenceCount})`}
-                                </Typography>
-                            </>
-                        )}
+                        key={option.name}
+                        label={renderOptionChipLabel(option)}
 
-                        color={isOptionSelected(selectedOptions, optionName) ? 'primary' : 'default'}
+                        color={isOptionSelected(selectedOptions, option.name) ? 'primary' : 'default'}
                         className={classes.optionChip}
                         variant='outlined'
                         size='small'
                         clickable
 
                         role='checkbox'
-                        aria-checked={isOptionSelected(selectedOptions, optionName)}
-                        aria-label={optionChipAriaLabel?.(optionName)}
+                        aria-checked={isOptionSelected(selectedOptions, option.name)}
+                        aria-label={optionChipAriaLabel?.(option)}
 
-                        onClick={() => onChange(toggleOption(options, selectedOptions, optionName))}
+                        onClick={() => onChange(toggleOption(options, selectedOptions, option.name))}
                     />
                 ))
             }
@@ -112,9 +104,6 @@ const useStyles = makeStyles({
     optionChip: {
         marginTop: 3,
         marginRight: 3,
-    },
-    occurrenceCount: {
-        marginLeft: 4,
     },
 });
 

@@ -18,6 +18,8 @@ describe('Modals component', () => {
         mockComponent('/code/components/modals/product-create/ProductCreateModal');
         mockComponent('/code/components/modals/product-update/ProductUpdateModal');
         mockComponent('/code/components/modals/product-delete/ProductDeleteModal');
+
+        mockComponent('/code/components/modals/inquiry-create/InquiryCreateModal');
     });
 
     it('should render all registered modals', () => {
@@ -31,6 +33,8 @@ describe('Modals component', () => {
         expect(screen.getByTestId('mock-ProductCreateModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProductUpdateModal')).toBeVisible();
         expect(screen.getByTestId('mock-ProductDeleteModal')).toBeVisible();
+
+        expect(screen.getByTestId('mock-InquiryCreateModal')).toBeVisible();
     });
 
 });

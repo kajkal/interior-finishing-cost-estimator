@@ -4,7 +4,7 @@ import parse from 'autosuggest-highlight/parse';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, { AutocompleteProps } from '@material-ui/lab/Autocomplete';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
@@ -25,20 +25,20 @@ export interface LocationOption {
         main_text_matched_substrings: google.maps.places.AutocompleteStructuredFormatting['main_text_matched_substrings'];
     };
     // defined only for objects mapped from Location object from server:
-    lat?: number;
-    lng?: number;
+    latLng?: google.maps.LatLngLiteral | null;
 }
 
-export interface LocationFieldProps extends Omit<FilledTextFieldProps, 'variant' | 'onChange' | 'value'> {
+export interface LocationFieldProps extends Omit<FilledTextFieldProps, 'variant' | 'onChange' | 'value' | 'classes'> {
     value: LocationOption | null;
     onChange: (value: LocationOption | null) => void;
     /**
      * @see google.maps.places.AutocompletionRequest.types
      */
     types?: string[];
+    autocompleteClasses?: AutocompleteProps<LocationOption, false, false, false>['classes'];
 }
 
-export function LocationField({ id, value, onChange, disabled, types, ...rest }: LocationFieldProps): React.ReactElement {
+export function LocationField({ id, value, onChange, disabled, types, className, autocompleteClasses, ...rest }: LocationFieldProps): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
     const [ inputValue, setInputValue ] = React.useState('');
@@ -66,10 +66,11 @@ export function LocationField({ id, value, onChange, disabled, types, ...rest }:
     }, [ value, inputValue, types, getPlacePredictions ]);
 
     return (
-        <FormControl fullWidth margin='normal'>
+        <FormControl fullWidth margin='normal' className={className}>
             <Autocomplete<LocationOption, false, false, false>
                 classes={{
                     paper: classes.paper,
+                    ...autocompleteClasses,
                 }}
 
                 id={id}
