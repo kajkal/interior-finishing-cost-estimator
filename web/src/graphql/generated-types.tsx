@@ -22,7 +22,7 @@ export type Query = {
   /** Returns data of the currently authenticated user. */
   me: User;
   projects: Array<Project>;
-  products: Array<Offer>;
+  products: Array<Inquiry>;
   /** Returns user', publicly available, profile data */
   profile: Profile;
 };
@@ -46,7 +46,8 @@ export type User = {
   projects: Array<Project>;
   /** User project with given project id. */
   project?: Maybe<Project>;
-  offers: Array<Offer>;
+  /** Inquiries opened by user */
+  inquiries: Array<Inquiry>;
   /** User' avatar url */
   avatar?: Maybe<Scalars['String']>;
 };
@@ -102,11 +103,21 @@ export type ResourceData = {
   description?: Maybe<Scalars['String']>;
 };
 
-export type Offer = {
-  __typename?: 'Offer';
+export type Inquiry = {
+  __typename?: 'Inquiry';
   id: Scalars['ID'];
   name: Scalars['String'];
+  category: Category;
 };
+
+export enum Category {
+  ELECTRICAL = 'ELECTRICAL',
+  PIPING = 'PIPING',
+  INTERIOR_FINISHING = 'INTERIOR_FINISHING',
+  CARPENTRY = 'CARPENTRY',
+  INSTALLATION = 'INSTALLATION',
+  DESIGNING = 'DESIGNING'
+}
 
 export type Profile = {
   __typename?: 'Profile';
@@ -136,9 +147,9 @@ export type Mutation = {
   register: InitialData;
   /** Registration second step - confirms that the user is owner of the provided email address. */
   confirmEmailAddress: Scalars['Boolean'];
-  createOffer: Offer;
-  updateOffer: Offer;
-  deleteOffer: Scalars['Boolean'];
+  createInquiry: Inquiry;
+  updateInquiry: Inquiry;
+  deleteInquiry: Scalars['Boolean'];
   /** Authenticates user. */
   login: InitialData;
   /** Invalidates user session. */
@@ -513,9 +524,9 @@ export type UserDetailedDataFragment = (
   )>, projects: Array<(
     { __typename?: 'Project' }
     & ProjectBasicDataFragment
-  )>, offers: Array<(
-    { __typename?: 'Offer' }
-    & Pick<Offer, 'name'>
+  )>, inquiries: Array<(
+    { __typename?: 'Inquiry' }
+    & Pick<Inquiry, 'name'>
   )> }
 );
 
@@ -652,7 +663,7 @@ export const UserDetailedDataFragmentDoc = gql`
   projects {
     ...ProjectBasicData
   }
-  offers {
+  inquiries {
     name
   }
 }

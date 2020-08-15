@@ -15,3 +15,5 @@ generates:
       withComponent: false
       withHooks: true
       withMutationFn: false
+      namingConvention:
+        enumValues: upper-case#upperCase

@@ -12,7 +12,7 @@ fragment UserDetailedData on User {
     projects {
        ...ProjectBasicData
     }
-    offers {
+    inquiries {
         name
     }
 }

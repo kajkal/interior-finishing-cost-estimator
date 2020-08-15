@@ -136,6 +136,16 @@
     },
     "productNotFoundError": "Produkt już nie istnieje"
   },
+  "inquiry": {
+    "categories": {
+      "electrical": "Elektryka",
+      "piping": "Hudraulika",
+      "interiorFinishing": "Wykończenie wnętrz",
+      "carpentry": "Meble i zabudowa",
+      "installation": "Montaż",
+      "designing": "Projektowanie"
+    }
+  },
   "form": {
     "common": {
       "cancel": "Anuluj",

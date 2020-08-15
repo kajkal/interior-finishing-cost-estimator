@@ -136,6 +136,16 @@
     },
     "productNotFoundError": "Product no longer exists"
   },
+  "inquiry": {
+    "categories": {
+      "electrical":  "Electrical",
+      "piping": "Piping",
+      "interiorFinishing":  "Interior finishing",
+      "carpentry": "Carpentry",
+      "installation":  "Installation",
+      "designing": "Designing"
+    }
+  },
   "form": {
     "common": {
       "cancel": "Cancel",
