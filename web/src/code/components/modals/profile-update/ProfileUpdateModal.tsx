@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 import { SlateDocument } from '@udecode/slate-plugins';
 
-import { makeStyles } from '@material-ui/core/styles';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -33,7 +32,6 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 
 
 export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
-    const classes = useStyles();
     const { t } = useTranslation();
     const [ { open, withExistingAvatar, profileData }, setModalState ] = useRecoilState(profileUpdateModalAtom);
 
@@ -53,7 +51,6 @@ export function ProfileUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
             open={open}
             onClose={handleModalClose}
             aria-labelledby={titleId}
-            classes={{ paperWidthSm: classes.paperWidthSmPlus }}
             fullWidth
         >
             <DialogTitle id={titleId}>
@@ -224,11 +221,3 @@ function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistin
         }
     }, [ onModalClose, withExistingAvatar, userCachedData, updateProfileMutation ]);
 }
-
-
-const useStyles = makeStyles((theme) => ({
-    paperWidthSmPlus: {
-        // for editor toolbar icons to be in one line at least on desktop
-        maxWidth: theme.breakpoints.values.sm + 80,
-    },
-}));

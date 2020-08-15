@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikConfig } from 'formik';
 import { SlateDocument } from '@udecode/slate-plugins';
 
-import { makeStyles } from '@material-ui/core/styles';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -32,7 +31,6 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 
 
 export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
-    const classes = useStyles();
     const { t } = useTranslation();
     const [ { tags } ] = useCurrentUserDataSelectors();
     const [ { open, productData }, setModalState ] = useRecoilState(productUpdateModalAtom);
@@ -53,7 +51,6 @@ export function ProductUpdateModal({ isMobile }: ResponsiveModalProps): React.Re
             open={open}
             onClose={handleModalClose}
             aria-labelledby={titleId}
-            classes={{ paperWidthSm: classes.paperWidthSmPlus }}
             fullWidth
         >
             <DialogTitle id={titleId}>
@@ -206,10 +203,3 @@ function useProductUpdateFormSubmitHandler(onModalClose: () => void) {
 function isValidCurrencyAmountFormData(price: CurrencyAmount): price is CurrencyAmountFormData {
     return price.amount !== undefined;
 }
-
-const useStyles = makeStyles((theme) => ({
-    paperWidthSmPlus: {
-        // for editor toolbar icons to be in one line at least on desktop
-        maxWidth: theme.breakpoints.values.sm + 80,
-    },
-}));
