@@ -7,7 +7,7 @@ import { UserRepository } from '../../repositories/UserRepository';
 import { ElementSlug } from '../common/input/ElementSlug';
 import { Product } from '../../entities/product/Product';
 import { Project } from '../../entities/project/Project';
-import { Offer } from '../../entities/offer/Offer';
+import { Inquiry } from '../../entities/inquiry/Inquiry';
 import { logAccess } from '../../utils/logAccess';
 import { User } from '../../entities/user/User';
 
@@ -48,9 +48,9 @@ export class UserResolver {
         return project;
     }
 
-    @FieldResolver(() => [ Offer ])
-    async offers(@Root() user: User) {
-        return await user.offers.loadItems();
+    @FieldResolver(() => [ Inquiry ], { description: 'Inquiries opened by user' })
+    async inquiries(@Root() user: User) {
+        return await user.inquiries.loadItems();
     }
 
     @FieldResolver(() => String, { nullable: true, description: 'User\' avatar url' })

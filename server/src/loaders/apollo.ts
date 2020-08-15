@@ -8,7 +8,7 @@ import { UserResolver } from '../resolvers/user/UserResolver';
 import { ProductResolver } from '../resolvers/product/ProductResolver';
 import { ProjectResolver } from '../resolvers/project/ProjectResolver';
 import { RegisterResolver } from '../resolvers/user/RegisterResolver';
-import { OfferResolver } from '../resolvers/offer/OfferResolver';
+import { InquiryResolver } from '../resolvers/inquiry/InquiryResolver';
 import { LoginResolver } from '../resolvers/user/LoginResolver';
 import { ProfileResolver } from '../resolvers/user/ProfileResolver';
 import { SettingsResolver } from '../resolvers/user/SettingsResolver';
@@ -25,7 +25,7 @@ export async function createApolloServer(): Promise<ApolloServer> {
                 PasswordResetResolver,
                 ProductResolver,
                 ProjectResolver,
-                OfferResolver,
+                InquiryResolver,
                 ProfileResolver,
                 SettingsResolver,
             ],

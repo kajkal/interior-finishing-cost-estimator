@@ -33,7 +33,7 @@ describe('UserResolver', () => {
                 projects {
                   name
                 }
-                offers {
+                inquiries {
                   name
                 }
               }
@@ -72,7 +72,7 @@ describe('UserResolver', () => {
                             { name: product2.name },
                         ],
                         projects: [],
-                        offers: [],
+                        inquiries: [],
                     },
                 },
             });

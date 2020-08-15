@@ -2,44 +2,44 @@ import { Inject, Service } from 'typedi';
 import { ApolloError } from 'apollo-server-express';
 import { Authorized, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 
-import { OfferRepository } from '../../repositories/OfferRepository';
+import { InquiryRepository } from '../../repositories/InquiryRepository';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
+import { Inquiry } from '../../entities/inquiry/Inquiry';
 import { logAccess } from '../../utils/logAccess';
-import { Offer } from '../../entities/offer/Offer';
 
 
 @Service()
-@Resolver(() => Offer)
-export class OfferResolver {
+@Resolver(() => Inquiry)
+export class InquiryResolver {
 
     @Inject()
-    private readonly offerRepository!: OfferRepository;
+    private readonly inquiryRepository!: InquiryRepository;
 
     @Authorized()
     @UseMiddleware(logAccess)
-    @Query(() => [ Offer ])
-    async products(@Ctx() context: AuthorizedContext): Promise<Offer[]> {
-        return this.offerRepository.findAll();
+    @Query(() => [ Inquiry ])
+    async products(@Ctx() context: AuthorizedContext): Promise<Inquiry[]> {
+        return this.inquiryRepository.findAll();
     }
 
     @Authorized()
     @UseMiddleware(logAccess)
-    @Mutation(() => Offer)
-    async createOffer(@Ctx() context: AuthorizedContext): Promise<Offer> {
+    @Mutation(() => Inquiry)
+    async createInquiry(@Ctx() context: AuthorizedContext): Promise<Inquiry> {
         throw new ApolloError('not yet implemented');
     }
 
     @Authorized()
     @UseMiddleware(logAccess)
-    @Mutation(() => Offer)
-    async updateOffer(@Ctx() context: AuthorizedContext): Promise<Offer> {
+    @Mutation(() => Inquiry)
+    async updateInquiry(@Ctx() context: AuthorizedContext): Promise<Inquiry> {
         throw new ApolloError('not yet implemented');
     }
 
     @Authorized()
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
-    async deleteOffer(@Ctx() context: AuthorizedContext): Promise<Boolean> {
+    async deleteInquiry(@Ctx() context: AuthorizedContext): Promise<Boolean> {
         throw new ApolloError('not yet implemented');
     }
 

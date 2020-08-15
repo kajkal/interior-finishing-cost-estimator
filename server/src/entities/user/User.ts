@@ -4,7 +4,7 @@ import { Collection, Entity, OneToMany, Property } from 'mikro-orm';
 import { BaseEntity } from '../BaseEntity';
 import { Product } from '../product/Product';
 import { Project } from '../project/Project';
-import { Offer } from '../offer/Offer';
+import { Inquiry } from '../inquiry/Inquiry';
 import { Location } from '../common/Location';
 
 
@@ -82,9 +82,9 @@ export class User extends BaseEntity {
     projects = new Collection<Project>(this);
 
     /**
-     * @see UserResolver#offers
+     * @see UserResolver#inquiries
      */
-    @OneToMany(() => Offer, 'user')
-    offers = new Collection<Offer>(this);
+    @OneToMany(() => Inquiry, 'user')
+    inquiries = new Collection<Inquiry>(this);
 
 }

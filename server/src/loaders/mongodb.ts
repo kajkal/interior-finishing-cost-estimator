@@ -7,11 +7,11 @@ import { BaseEntity } from '../entities/BaseEntity';
 import { User } from '../entities/user/User';
 import { Product } from '../entities/product/Product';
 import { Project } from '../entities/project/Project';
-import { Offer } from '../entities/offer/Offer';
+import { Inquiry } from '../entities/inquiry/Inquiry';
 import { UserRepository } from '../repositories/UserRepository';
 import { ProductRepository } from '../repositories/ProductRepository';
 import { ProjectRepository } from '../repositories/ProjectRepository';
-import { OfferRepository } from '../repositories/OfferRepository';
+import { InquiryRepository } from '../repositories/InquiryRepository';
 
 
 export async function connectToDatabase(): Promise<MikroORM> {
@@ -24,7 +24,7 @@ export async function connectToDatabase(): Promise<MikroORM> {
                 User,
                 Product,
                 Project,
-                Offer,
+                Inquiry,
             ],
             // ensureIndexes: true,
             // debug: true,
@@ -35,7 +35,7 @@ export async function connectToDatabase(): Promise<MikroORM> {
         Container.set(UserRepository, orm.em.getRepository(User));
         Container.set(ProductRepository, orm.em.getRepository(Product));
         Container.set(ProjectRepository, orm.em.getRepository(Project));
-        Container.set(OfferRepository, orm.em.getRepository(Offer));
+        Container.set(InquiryRepository, orm.em.getRepository(Inquiry));
 
         logger.info('Successfully connected to the database.');
         return orm;

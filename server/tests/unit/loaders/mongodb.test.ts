@@ -8,7 +8,7 @@ import { BaseEntity } from '../../../src/entities/BaseEntity';
 import { User } from '../../../src/entities/user/User';
 import { Product } from '../../../src/entities/product/Product';
 import { Project } from '../../../src/entities/project/Project';
-import { Offer } from '../../../src/entities/offer/Offer';
+import { Inquiry } from '../../../src/entities/inquiry/Inquiry';
 
 
 describe('mongodb loader', () => {
@@ -42,7 +42,7 @@ describe('mongodb loader', () => {
                 User,
                 Product,
                 Project,
-                Offer,
+                Inquiry,
             ],
             // ensureIndexes: true,
         }));

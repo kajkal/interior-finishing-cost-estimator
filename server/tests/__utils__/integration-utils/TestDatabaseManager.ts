@@ -44,7 +44,7 @@ export class TestDatabaseManager {
     /**
      * User
      */
-    async populateWithUser(partialUserData?: Partial<Omit<User, 'products' | 'projects' | 'offers'>>): Promise<User & { unencryptedPassword: string }> {
+    async populateWithUser(partialUserData?: Partial<Omit<User, 'products' | 'projects' | 'inquiries'>>): Promise<User & { unencryptedPassword: string }> {
         const name = generator.name();
         const userData = {
             name,
