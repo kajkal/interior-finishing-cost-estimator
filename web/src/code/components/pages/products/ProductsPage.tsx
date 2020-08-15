@@ -20,23 +20,24 @@ import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 
 import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../modals/product-update/productUpdateModalAtom';
+import { isOptionExclusivelySelected, SelectedOptions } from '../../../utils/filters/filtersUtils';
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
 import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
-import { productsFiltersAtom, ProductsFiltersAtomValue } from './filters/productsFiltersAtom';
 import { productCreateModalAtom } from '../../modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom } from '../../modals/product-delete/productDeleteModalAtom';
-import { isTagExclusivelySelected, productFilter } from './filters/productsFiltersUtils';
 import { PageEnterTransition } from '../../common/page/PageEnterTransition';
+import { productsFiltersAtom } from './filters/productsFiltersAtom';
 import { ProductFilterSearch } from './filters/ProductFilterSearch';
 import { formatAmount } from '../../../config/supportedCurrencies';
 import { ProductFilterDate } from './filters/ProductFilterDate';
 import { ProductFilterTags } from './filters/ProductFilterTags';
+import { useProductsFilter } from './filters/useProductsFilter';
 import { Product } from '../../../../graphql/generated-types';
+import { ThemeType } from '../../../utils/theme/ThemeUtils';
 import { PageActions } from '../../common/page/PageActions';
 import { ExpandIcon } from '../../common/icons/ExpandIcon';
 import { PageHeader } from '../../common/page/PageHeader';
 import { PageTitle } from '../../common/page/PageTitle';
-import { ThemeType } from '../../../utils/theme/ThemeUtils';
 
 
 export function ProductsPage(): React.ReactElement {
@@ -46,7 +47,7 @@ export function ProductsPage(): React.ReactElement {
     const setProductCreateModalModalState = useSetRecoilState(productCreateModalAtom);
     const [ { tags, dates }, userCachedData ] = useCurrentUserDataSelectors();
     const products = userCachedData?.products;
-    const filteredProducts = React.useMemo(() => productFilter(products || [], filters), [ products, filters ]);
+    const filteredProducts = useProductsFilter(products || [], filters);
 
     const handleProductCreateModalOpen = () => {
         setProductCreateModalModalState({ open: true });
@@ -117,7 +118,7 @@ export function ProductsPage(): React.ReactElement {
 
 export interface ProductListItemProps {
     product: Product;
-    selectedTags: ProductsFiltersAtomValue['selectedTags'];
+    selectedTags: SelectedOptions;
 }
 
 const productExpansionStateMemory = new WeakMap<Product, boolean>();
@@ -213,7 +214,7 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
                             label={tag}
                             size='small'
                             variant='outlined'
-                            color={isTagExclusivelySelected(selectedTags, tag) ? 'primary' : 'default'}
+                            color={isOptionExclusivelySelected(selectedTags, tag) ? 'primary' : 'default'}
                             className={classes.productTag}
                         />
                     ))}

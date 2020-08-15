@@ -2,7 +2,7 @@ import { useCurrentUserCachedData } from './useCurrentUserCachedData';
 import { MeQuery, Product } from '../../../graphql/generated-types';
 
 
-export interface Tag {
+export interface Option {
     name: string;
     occurrenceCount: number;
 }
@@ -17,7 +17,7 @@ export interface CurrentUserDataSelectors {
     /**
      * User' products tags
      */
-    tags: () => Tag[];
+    tags: () => Option[];
 
     /**
      * Products dates related statistics
@@ -34,7 +34,7 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
     const products = userData?.products;
 
     const tagsSelector = () => {
-        const valueFromMemory: Tag[] | undefined = tagsMemory.get(products!);
+        const valueFromMemory: Option[] | undefined = tagsMemory.get(products!);
         if (products && products.length && !valueFromMemory) {
             const tagNameOccurrenceCountMap = products.reduce((map, { tags }) => {
                 tags?.forEach((tag) => {
@@ -67,5 +67,5 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
     return [ { tags: tagsSelector, dates: datesSelector }, userData ];
 }
 
-const tagsMemory = new WeakMap<Product[], Tag[]>();
+const tagsMemory = new WeakMap<Product[], Option[]>();
 const datesMemory = new WeakMap<Product[], ProductsDatesStatistics>();

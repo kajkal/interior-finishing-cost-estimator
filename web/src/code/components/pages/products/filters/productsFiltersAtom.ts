@@ -1,9 +1,11 @@
 import { DateTime } from 'luxon';
 import { atom } from 'recoil/dist';
 
+import { SelectedOptions } from '../../../../utils/filters/filtersUtils';
+
 
 export interface ProductsFiltersAtomValue {
-    selectedTags: 'ALL' | Set<string>;
+    selectedTags: SelectedOptions;
     searchPhrase: string,
     fromDate: DateTime | null,
     toDate: DateTime | null,
