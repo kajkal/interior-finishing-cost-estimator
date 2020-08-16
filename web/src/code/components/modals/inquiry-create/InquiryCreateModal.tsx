@@ -74,7 +74,7 @@ export function InquiryCreateModal({ isMobile }: ResponsiveModalProps): React.Re
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
-                {({ values, errors, submitForm }) => (
+                {({ submitForm }) => (
                     <>
                         <DialogContent>
                             <Form>
@@ -104,7 +104,6 @@ export function InquiryCreateModal({ isMobile }: ResponsiveModalProps): React.Re
                                 />
 
                             </Form>
-
                         </DialogContent>
 
                         <DialogActions>

@@ -57,7 +57,7 @@ export function LocationField({ id, value, onChange, disabled, types, className,
 
         getPlacePredictions({ input: inputValue, types }, (results) => {
             const newOptions = (value) ? [ value ] : [];
-            setOptions([ ...newOptions, ...results ]);
+            setOptions([ ...newOptions, ...results.filter(({place_id}) => place_id !== value?.place_id) ]);
         });
 
         return () => {
@@ -85,13 +85,11 @@ export function LocationField({ id, value, onChange, disabled, types, className,
                     setOptions(newValue ? [ newValue, ...options ] : options);
                     onChange(newValue);
                 }}
-                includeInputInList
                 onInputChange={(event, newInputValue) => {
                     setInputValue(newInputValue);
                 }}
 
                 options={options}
-                filterSelectedOptions
                 getOptionSelected={isOptionSelected}
                 getOptionLabel={getOptionLabel}
                 renderOption={optionRenderer}

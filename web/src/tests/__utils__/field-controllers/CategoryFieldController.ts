@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, getByTitle, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { mockTFunction } from '../../__mocks__/libraries/react-i18next';
@@ -13,6 +13,17 @@ export class CategoryFieldController extends AbstractFieldController {
 
     static from(inputElement: HTMLElement): CategoryFieldController {
         return this.resolve(inputElement) as CategoryFieldController;
+    }
+
+    clearCategory(): CategoryFieldController {
+        return this.then(async (inputElement: HTMLElement) => {
+            userEvent.click(inputElement);
+            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.tags.clear'));
+
+            fireEvent.blur(inputElement);
+            await flushPromises();
+            return inputElement;
+        }) as CategoryFieldController;
     }
 
     selectCategory(category: string) {

@@ -126,8 +126,15 @@ export class ThemeUtils {
                 paperWidthSm: {
                     // for editor toolbar icons to be in one line at least on desktop
                     maxWidth: 680,
-                }
-            }
+                },
+            },
+            MuiChip: {
+                clickable: {
+                    '&:active': {
+                        boxShadow: 'none',
+                    },
+                },
+            },
         };
 
         return theme;

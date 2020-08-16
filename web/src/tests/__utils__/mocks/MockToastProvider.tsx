@@ -15,7 +15,7 @@ export function MockToastProvider(): React.ReactElement | null {
                 className={severity}
                 data-disableautohide={autoHideDuration === null}
             >
-                <Toast t={mockTFunction as unknown as TFunction} />
+                <Toast t={mockTFunction as TFunction} />
             </div>
         )
         : null;

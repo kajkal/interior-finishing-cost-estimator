@@ -20,6 +20,7 @@ describe('Modals component', () => {
         mockComponent('/code/components/modals/product-delete/ProductDeleteModal');
 
         mockComponent('/code/components/modals/inquiry-create/InquiryCreateModal');
+        mockComponent('/code/components/modals/inquiry-update/InquiryUpdateModal');
         mockComponent('/code/components/modals/inquiry-delete/InquiryDeleteModal');
     });
 
@@ -36,6 +37,7 @@ describe('Modals component', () => {
         expect(screen.getByTestId('mock-ProductDeleteModal')).toBeVisible();
 
         expect(screen.getByTestId('mock-InquiryCreateModal')).toBeVisible();
+        expect(screen.getByTestId('mock-InquiryUpdateModal')).toBeVisible();
         expect(screen.getByTestId('mock-InquiryDeleteModal')).toBeVisible();
     });
 

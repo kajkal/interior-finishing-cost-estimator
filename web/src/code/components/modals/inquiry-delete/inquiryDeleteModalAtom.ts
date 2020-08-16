@@ -7,6 +7,9 @@ export interface InquiryDeleteModalAtomValue {
     inquiryData?: Pick<Inquiry, 'id' | 'title'>;
 }
 
+/**
+ * @see InquiryDeleteModal - controlled modal
+ */
 export const inquiryDeleteModalAtom = atom<InquiryDeleteModalAtomValue>({
     key: 'inquiryDeleteModalAtom',
     default: {

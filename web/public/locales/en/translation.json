@@ -151,6 +151,9 @@
     "createModal": {
       "title": "Define new inquiry"
     },
+    "updateModal": {
+      "title": "Edit inquiry"
+    },
     "deleteModal": {
       "title": "Delete inquiry '{{inquiryTitle}}'",
       "firstLine": "Are you sure you want to permanently delete this inquiry?"

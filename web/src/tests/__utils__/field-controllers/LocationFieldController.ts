@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { fireEvent, getAllByRole, screen } from '@testing-library/react';
+import { fireEvent, getAllByRole, getByTitle, screen } from '@testing-library/react';
 
 import * as useLazyAutocompleteServiceModule from '../../../code/utils/google-maps/useLazyAutocompleteService';
 import * as useLazyGeocoderModule from '../../../code/utils/google-maps/useLazyGeocoder';
@@ -37,7 +37,7 @@ export class LocationFieldController extends AbstractFieldController {
 
     clearLocation(): LocationFieldController {
         return this.then(async (inputElement: HTMLElement) => {
-            userEvent.click(screen.getByTitle('t:form.common.tags.clear'));
+            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.tags.clear'));
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;

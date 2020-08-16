@@ -151,6 +151,9 @@
     "createModal": {
       "title": "Utwórz zapytanie o wycenę"
     },
+    "updateModal": {
+      "title": "Edytuj zapytanie"
+    },
     "deleteModal": {
       "title": "Usuń zapytanie '{{inquiryTitle}}'",
       "firstLine": "Czy na pewno chcesz permanentnie usunąć to zapytanie?"
