@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, from, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloLink, from, InMemoryCache, Reference } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/link-context';
 
@@ -64,6 +64,15 @@ export function initApolloClient(): ApolloClient<unknown> {
 export function initApolloCache() {
     return new InMemoryCache({
         typePolicies: {
+            Query: {
+                fields: {
+                    allInquiries: {
+                        merge(existing: Reference[] = [], incoming: Reference[]) {
+                            return incoming;
+                        },
+                    },
+                },
+            },
             User: {
                 keyFields: [ 'slug' ],
             },

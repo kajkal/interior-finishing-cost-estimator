@@ -165,7 +165,7 @@ function InquiryCreateFormSubmitHandler(onModalClose: () => void) {
                     location: await mapLocationOptionToLocationFormData(location!),
                     category: category?.id!,
                 },
-                update: (cache, {data}) => {
+                update: (cache, { data }) => {
                     const createdInquiry = data?.createInquiry;
                     if (createdInquiry) {
                         const inquiriesResult = cache.readQuery<InquiriesQuery>({ query: InquiriesDocument });
@@ -174,13 +174,13 @@ function InquiryCreateFormSubmitHandler(onModalClose: () => void) {
                             query: InquiriesDocument,
                             data: {
                                 allInquiries: [
+                                    createdInquiry,
                                     ...inquiriesResult?.allInquiries || [],
-                                    createdInquiry
                                 ],
                             },
                         });
                     }
-                }
+                },
             });
             onModalClose();
         } catch (error) {

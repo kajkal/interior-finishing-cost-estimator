@@ -151,6 +151,10 @@
     "createModal": {
       "title": "Utwórz zapytanie o wycenę"
     },
+    "deleteModal": {
+      "title": "Usuń zapytanie '{{inquiryTitle}}'",
+      "firstLine": "Czy na pewno chcesz permanentnie usunąć to zapytanie?"
+    },
     "filters": {
       "inquiryFilters": "Filtry zapytań",
       "searchPlaceholder": "Szukaj....",
@@ -161,9 +165,9 @@
       "selectAllCategories": "Wybierz wszystkie kategorie",
       "toggleCategory": "Przełącz kategorię '{{categoryName}}'",
       "typesAriaLabel": "Szukaj zapytań po ich typie",
-      "myInquiries": "Moje zapytania!",
+      "myInquiries": "Moje!",
       "myInquiriesAriaLabel": "Przełącz moje zapytania",
-      "bookmarkedInquiries": "Oznaczone zapytania",
+      "bookmarkedInquiries": "Oznaczone",
       "bookmarkedInquiriesAriaLabel": "Przełącz oznaczone zapytania"
     },
     "inquiryNotFoundError": "Zapytanie już nie istnieje"

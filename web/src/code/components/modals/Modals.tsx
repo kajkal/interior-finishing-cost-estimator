@@ -9,6 +9,7 @@ import { ProductUpdateModal } from './product-update/ProductUpdateModal';
 import { ProductDeleteModal } from './product-delete/ProductDeleteModal';
 import { ProfileUpdateModal } from './profile-update/ProfileUpdateModal';
 import { InquiryCreateModal } from './inquiry-create/InquiryCreateModal';
+import { InquiryDeleteModal } from './inquiry-delete/InquiryDeleteModal';
 
 
 export function Modals(): React.ReactElement {
@@ -23,6 +24,7 @@ export function Modals(): React.ReactElement {
             <ProductDeleteModal />
             <ProfileUpdateModal isMobile={isMobile} />
             <InquiryCreateModal isMobile={isMobile} />
+            <InquiryDeleteModal />
         </>
     );
 }

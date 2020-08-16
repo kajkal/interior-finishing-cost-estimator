@@ -184,7 +184,7 @@ function useProductCreateFormSubmitHandler(onModalClose: () => void, userSlug: s
                         id: cache.identify({ __typename: 'User', slug: userSlug }),
                         fields: {
                             products: (existingProductRefs: Reference[] = [], { toReference }) => (
-                                [ ...existingProductRefs, toReference(createdProduct) ]
+                                [ toReference(createdProduct), ...existingProductRefs ]
                             ),
                         },
                     });

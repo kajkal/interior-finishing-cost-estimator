@@ -151,6 +151,10 @@
     "createModal": {
       "title": "Define new inquiry"
     },
+    "deleteModal": {
+      "title": "Delete inquiry '{{inquiryTitle}}'",
+      "firstLine": "Are you sure you want to permanently delete this inquiry?"
+    },
     "filters": {
       "inquiryFilters": "Inquiries filters",
       "searchPlaceholder": "Search....",

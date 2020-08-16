@@ -1,0 +1,17 @@
+mutation UpdateInquiry(
+    $inquiryId: String!
+    $title: String!
+    $description: String!
+    $location: LocationFormData!
+    $category: Category!
+) {
+    updateInquiry(
+        inquiryId: $inquiryId
+        title: $title
+        description: $description
+        location: $location
+        category: $category
+    ) {
+        ...InquiryData
+    }
+}

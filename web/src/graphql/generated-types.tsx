@@ -446,6 +446,33 @@ export type CreateInquiryMutation = (
   ) }
 );
 
+export type DeleteInquiryMutationVariables = Exact<{
+  inquiryId: Scalars['String'];
+}>;
+
+
+export type DeleteInquiryMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteInquiry'>
+);
+
+export type UpdateInquiryMutationVariables = Exact<{
+  inquiryId: Scalars['String'];
+  title: Scalars['String'];
+  description: Scalars['String'];
+  location: LocationFormData;
+  category: Category;
+}>;
+
+
+export type UpdateInquiryMutation = (
+  { __typename?: 'Mutation' }
+  & { updateInquiry: (
+    { __typename?: 'Inquiry' }
+    & InquiryDataFragment
+  ) }
+);
+
 export type InquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1050,6 +1077,70 @@ export function useCreateInquiryMutation(baseOptions?: ApolloReactHooks.Mutation
 export type CreateInquiryMutationHookResult = ReturnType<typeof useCreateInquiryMutation>;
 export type CreateInquiryMutationResult = ApolloReactCommon.MutationResult<CreateInquiryMutation>;
 export type CreateInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateInquiryMutation, CreateInquiryMutationVariables>;
+export const DeleteInquiryDocument = gql`
+    mutation DeleteInquiry($inquiryId: String!) {
+  deleteInquiry(inquiryId: $inquiryId)
+}
+    `;
+
+/**
+ * __useDeleteInquiryMutation__
+ *
+ * To run a mutation, you first call `useDeleteInquiryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteInquiryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteInquiryMutation, { data, loading, error }] = useDeleteInquiryMutation({
+ *   variables: {
+ *      inquiryId: // value for 'inquiryId'
+ *   },
+ * });
+ */
+export function useDeleteInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteInquiryMutation, DeleteInquiryMutationVariables>(DeleteInquiryDocument, baseOptions);
+      }
+export type DeleteInquiryMutationHookResult = ReturnType<typeof useDeleteInquiryMutation>;
+export type DeleteInquiryMutationResult = ApolloReactCommon.MutationResult<DeleteInquiryMutation>;
+export type DeleteInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>;
+export const UpdateInquiryDocument = gql`
+    mutation UpdateInquiry($inquiryId: String!, $title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
+  updateInquiry(inquiryId: $inquiryId, title: $title, description: $description, location: $location, category: $category) {
+    ...InquiryData
+  }
+}
+    ${InquiryDataFragmentDoc}`;
+
+/**
+ * __useUpdateInquiryMutation__
+ *
+ * To run a mutation, you first call `useUpdateInquiryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateInquiryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateInquiryMutation, { data, loading, error }] = useUpdateInquiryMutation({
+ *   variables: {
+ *      inquiryId: // value for 'inquiryId'
+ *      title: // value for 'title'
+ *      description: // value for 'description'
+ *      location: // value for 'location'
+ *      category: // value for 'category'
+ *   },
+ * });
+ */
+export function useUpdateInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateInquiryMutation, UpdateInquiryMutationVariables>(UpdateInquiryDocument, baseOptions);
+      }
+export type UpdateInquiryMutationHookResult = ReturnType<typeof useUpdateInquiryMutation>;
+export type UpdateInquiryMutationResult = ApolloReactCommon.MutationResult<UpdateInquiryMutation>;
+export type UpdateInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>;
 export const InquiriesDocument = gql`
     query Inquiries {
   allInquiries {

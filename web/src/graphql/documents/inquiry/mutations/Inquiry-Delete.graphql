@@ -1,0 +1,3 @@
+mutation DeleteInquiry($inquiryId: String!) {
+    deleteInquiry(inquiryId: $inquiryId)
+}

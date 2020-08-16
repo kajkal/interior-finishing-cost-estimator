@@ -1,4 +1,4 @@
-import { wrap } from 'mikro-orm';
+import { QueryOrder, wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
 import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
@@ -55,7 +55,10 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Query(() => [ Inquiry ])
     async allInquiries(@Ctx() context: AuthorizedContext): Promise<Inquiry[]> {
-        return this.inquiryRepository.findAll();
+        return this.inquiryRepository.findAll({
+            populate: [ 'user' ],
+            orderBy: { createdAt: QueryOrder.DESC },
+        });
     }
 
     @Authorized()

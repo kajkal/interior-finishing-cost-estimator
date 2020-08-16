@@ -1,5 +1,6 @@
+import { QueryOrder } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
-import { Args, Authorized, Ctx, FieldResolver, Int, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, FieldResolver, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { StorageService } from '../../services/storage/StorageService';
@@ -25,15 +26,17 @@ export class UserResolver {
 
     @FieldResolver(() => [ Product ])
     async products(@Root() user: User) {
-        const products = await user.products.init();
+        const products = await user.products.init({
+            orderBy: { createdAt: QueryOrder.DESC },
+        });
         return products.getItems();
     }
 
-    @FieldResolver(() => Int)
-    async productCount(@Root() user: User) {
-        await user.products.init();
-        return user.products.count();
-    }
+    // @FieldResolver(() => Int)
+    // async productCount(@Root() user: User) {
+    //     await user.products.init();
+    //     return user.products.count();
+    // }
 
     @FieldResolver(() => [ Project ], { description: 'User\' all projects.' })
     async projects(@Root() user: User) {
