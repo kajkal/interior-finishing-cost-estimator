@@ -4,6 +4,7 @@ import { ForbiddenError, UserInputError } from 'apollo-server-express';
 import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { InquirySetBookmarkFormData } from './input/InquirySetBookmarkFormData';
+import { InquiryRemoveQuoteFormData } from './input/InquiryRemoveQuoteFormData';
 import { InquiryAddQuoteFormData } from './input/InquiryAddQuoteFormData';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { InquiryRepository } from '../../repositories/InquiryRepository';
@@ -131,6 +132,22 @@ export class InquiryResolver {
                 date: new Date(),
                 price,
             } ];
+            await this.inquiryRepository.persistAndFlush(inquiry);
+            return this.getInquiryPriceQuotes(inquiry.quotes);
+        }
+
+        throw new UserInputError('INQUIRY_NOT_FOUND');
+    }
+
+    @Authorized()
+    @UseMiddleware(logAccess)
+    @Mutation(() => [ PriceQuote ])
+    async removeQuote(@Args() { inquiryId, quoteDate }: InquiryRemoveQuoteFormData, @Ctx() context: AuthorizedContext): Promise<PriceQuote[]> {
+        const inquiry = await this.inquiryRepository.findOne({ id: inquiryId });
+
+        if (inquiry) {
+            const quotes = inquiry.quotes || [];
+            inquiry.quotes = quotes.filter(({ author, date }) => (author !== context.jwtPayload.sub) || (date.getTime() !== quoteDate.getTime()));
             await this.inquiryRepository.persistAndFlush(inquiry);
             return this.getInquiryPriceQuotes(inquiry.quotes);
         }

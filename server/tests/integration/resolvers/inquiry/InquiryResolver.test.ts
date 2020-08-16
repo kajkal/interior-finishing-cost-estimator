@@ -10,6 +10,7 @@ import { getAuthHeader } from '../../../__utils__/integration-utils/authUtils';
 import { generator } from '../../../__utils__/generator';
 
 import { InquirySetBookmarkFormData } from '../../../../src/resolvers/inquiry/input/InquirySetBookmarkFormData';
+import { InquiryRemoveQuoteFormData } from '../../../../src/resolvers/inquiry/input/InquiryRemoveQuoteFormData';
 import { InquiryAddQuoteFormData } from '../../../../src/resolvers/inquiry/input/InquiryAddQuoteFormData';
 import { InquiryCreateFormData } from '../../../../src/resolvers/inquiry/input/InquiryCreateFormData';
 import { InquiryUpdateFormData } from '../../../../src/resolvers/inquiry/input/InquiryUpdateFormData';
@@ -691,11 +692,11 @@ describe('InquiryResolver', () => {
             // verify if inquiry object was updated and saved in db
             expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
             expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
-                quotes: [{
+                quotes: [ {
                     author: user.id,
                     date: expect.any(Date),
                     price: { currency: 'PLN', amount: 4.5 },
-                }],
+                } ],
             }));
 
             // verify if access was logged
@@ -705,7 +706,7 @@ describe('InquiryResolver', () => {
             // verify mutation response
             expect(response.body).toEqual({
                 data: {
-                    addQuote: [{
+                    addQuote: [ {
                         author: {
                             userSlug: user.slug,
                             name: user.name,
@@ -713,7 +714,7 @@ describe('InquiryResolver', () => {
                         },
                         date: expect.any(String),
                         price: { currency: 'PLN', amount: 4.5 },
-                    }],
+                    } ],
                 },
             });
         });
@@ -726,6 +727,109 @@ describe('InquiryResolver', () => {
             };
             const response = await testUtils.postGraphQL({
                 query: addQuoteMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectInquiryNotFoundError(response);
+        });
+
+    });
+
+    describe('remove quote mutation', () => {
+
+        const removeQuoteMutation = `
+            mutation RemoveQuote($inquiryId: String!, $quoteDate: DateTime!) {
+              removeQuote(inquiryId: $inquiryId, quoteDate: $quoteDate) {
+                author {
+                  userSlug
+                  name
+                  avatar
+                }
+                date
+                price {
+                  currency
+                  amount
+                }
+              }
+            }
+        `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<InquiryRemoveQuoteFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(InquiryResolver.prototype, 'removeQuote'),
+                query: removeQuoteMutation,
+                validFormData: {
+                    inquiryId: '5f09e24646904045d48e5598',
+                    quoteDate: new Date(),
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate inquiry id', async () => {
+                // should accept valid
+                await send.withAuth({ inquiryId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                await send.withAuth({ inquiryId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ inquiryId: '' }).expectValidationError('inquiryId');
+                await send.withAuth({ inquiryId: 'invalid-id' }).expectValidationError('inquiryId');
+            });
+
+            it('should validate quote date', async () => {
+                // should accept valid
+                await send.withAuth({ quoteDate: new Date() }).expectValidationSuccess();
+                await send.withAuth({ quoteDate: '2020-08-16T21:00:00.000Z' as any }).expectValidationSuccess();
+            });
+
+        });
+
+        it('should remove quote', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const inquiry = await testUtils.db.populateWithInquiry(user.id, {
+                quotes: [ {
+                    author: user.id,
+                    date: new Date(Date.parse('2020-08-16T23:00:00.000Z')),
+                    price: { currency: 'PLN', amount: 4.5 },
+                } ],
+            });
+            const formData: InquiryRemoveQuoteFormData = {
+                inquiryId: inquiry.id,
+                quoteDate: '2020-08-16T23:00:00.000Z' as any,
+            };
+            const response = await testUtils.postGraphQL({
+                query: removeQuoteMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if inquiry object was updated and saved in db
+            expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+            expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
+                quotes: [],
+            }));
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    removeQuote: [],
+                },
+            });
+        });
+
+        it('should return error when inquiry is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: InquiryRemoveQuoteFormData = {
+                inquiryId: '5f09e24646904045d48e5598',
+                quoteDate: new Date(),
+            };
+            const response = await testUtils.postGraphQL({
+                query: removeQuoteMutation,
                 variables: formData,
             }).set('Authorization', getAuthHeader(user));
             expectInquiryNotFoundError(response);
@@ -811,7 +915,7 @@ describe('InquiryResolver', () => {
             const inquiryOwner = await testUtils.db.populateWithUser();
             const inquiry = await testUtils.db.populateWithInquiry(inquiryOwner.id);
             const user = await testUtils.db.populateWithUser({
-                bookmarkedInquiries: [inquiry.id],
+                bookmarkedInquiries: [ inquiry.id ],
             });
             const formData: InquirySetBookmarkFormData = {
                 inquiryId: inquiry.id,
