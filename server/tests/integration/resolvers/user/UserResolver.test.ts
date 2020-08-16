@@ -68,8 +68,8 @@ describe('UserResolver', () => {
                         name: user.name,
                         email: user.email,
                         products: [
-                            { name: product1.name },
                             { name: product2.name },
+                            { name: product1.name },
                         ],
                         projects: [],
                         inquiries: [],

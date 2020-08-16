@@ -5,6 +5,7 @@ import { Location } from '../common/Location';
 import { BaseEntity } from '../BaseEntity';
 import { Category } from './Category';
 import { User } from '../user/User';
+import { Quote } from './Quote';
 
 
 @ObjectType()
@@ -32,5 +33,11 @@ export class Inquiry extends BaseEntity {
     @Field(() => Category)
     @Property()
     category!: Category;
+
+    /**
+     * @see InquiryResolver#quotes
+     */
+    @Property()
+    quotes?: Quote[] | null
 
 }

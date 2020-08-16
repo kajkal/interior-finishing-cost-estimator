@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 
 
-@ObjectType({ description: 'Wrapper for resource file data.' })
+@ObjectType()
 export class Author {
 
     @Field()

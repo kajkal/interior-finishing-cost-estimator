@@ -10,6 +10,7 @@ import { getAuthHeader } from '../../../__utils__/integration-utils/authUtils';
 import { generator } from '../../../__utils__/generator';
 
 import { InquirySetBookmarkFormData } from '../../../../src/resolvers/inquiry/input/InquirySetBookmarkFormData';
+import { InquiryAddQuoteFormData } from '../../../../src/resolvers/inquiry/input/InquiryAddQuoteFormData';
 import { InquiryCreateFormData } from '../../../../src/resolvers/inquiry/input/InquiryCreateFormData';
 import { InquiryUpdateFormData } from '../../../../src/resolvers/inquiry/input/InquiryUpdateFormData';
 import { InquiryDeleteFormData } from '../../../../src/resolvers/inquiry/input/InquiryDeleteFormData';
@@ -86,6 +87,18 @@ describe('InquiryResolver', () => {
                   name
                   avatar
                 }
+                quotes {
+                  author {
+                    userSlug
+                    name
+                    avatar
+                  }
+                  date
+                  price {
+                    currency
+                    amount
+                  }
+                }
                 createdAt
                 updatedAt
               }
@@ -111,7 +124,13 @@ describe('InquiryResolver', () => {
             const userA = await testUtils.db.populateWithUser();
             const inquiryA = await testUtils.db.populateWithInquiry(userA.id);
             const userB = await testUtils.db.populateWithUser();
-            const inquiryB = await testUtils.db.populateWithInquiry(userB.id);
+            const inquiryB = await testUtils.db.populateWithInquiry(userB.id, {
+                quotes: [ {
+                    author: userA.id,
+                    date: new Date(Date.parse('2020-08-16T21:00:00.000Z')),
+                    price: { currency: 'PLN', amount: 4.5 },
+                } ],
+            });
 
             StorageServiceSpy.getResources.mockImplementation((userId: string, directory: string, prefix?: string) => (
                 (userId === userA.id)
@@ -135,26 +154,6 @@ describe('InquiryResolver', () => {
                     allInquiries: [
                         {
                             author: {
-                                avatar: `url:${userA.id}/public/avatar_sample.png`,
-                                name: userA.name,
-                                userSlug: userA.slug,
-                            },
-                            id: inquiryA.id,
-                            title: inquiryA.title,
-                            description: inquiryA.description,
-                            location: {
-                                lat: inquiryA.location.lat,
-                                lng: inquiryA.location.lng,
-                                main: inquiryA.location.main,
-                                placeId: inquiryA.location.placeId,
-                                secondary: inquiryA.location.secondary,
-                            },
-                            category: inquiryA.category,
-                            createdAt: inquiryA.createdAt.toISOString(),
-                            updatedAt: null,
-                        },
-                        {
-                            author: {
                                 avatar: null,
                                 name: userB.name,
                                 userSlug: userB.slug,
@@ -170,7 +169,37 @@ describe('InquiryResolver', () => {
                                 secondary: inquiryB.location.secondary,
                             },
                             category: inquiryB.category,
+                            quotes: [ {
+                                author: {
+                                    userSlug: userA.slug,
+                                    name: userA.name,
+                                    avatar: `url:${userA.id}/public/avatar_sample.png`,
+                                },
+                                date: '2020-08-16T21:00:00.000Z',
+                                price: { currency: 'PLN', amount: 4.5 },
+                            } ],
                             createdAt: inquiryB.createdAt.toISOString(),
+                            updatedAt: null,
+                        },
+                        {
+                            author: {
+                                avatar: `url:${userA.id}/public/avatar_sample.png`,
+                                name: userA.name,
+                                userSlug: userA.slug,
+                            },
+                            id: inquiryA.id,
+                            title: inquiryA.title,
+                            description: inquiryA.description,
+                            location: {
+                                lat: inquiryA.location.lat,
+                                lng: inquiryA.location.lng,
+                                main: inquiryA.location.main,
+                                placeId: inquiryA.location.placeId,
+                                secondary: inquiryA.location.secondary,
+                            },
+                            category: inquiryA.category,
+                            quotes: [],
+                            createdAt: inquiryA.createdAt.toISOString(),
                             updatedAt: null,
                         },
                     ],
@@ -584,6 +613,119 @@ describe('InquiryResolver', () => {
             };
             const response = await testUtils.postGraphQL({
                 query: deleteInquiryMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectInquiryNotFoundError(response);
+        });
+
+    });
+
+    describe('add quote mutation', () => {
+
+        const addQuoteMutation = `
+            mutation AddQuote($inquiryId: String!, $price: CurrencyAmountFormData!) {
+              addQuote(inquiryId: $inquiryId, price: $price) {
+                author {
+                  userSlug
+                  name
+                  avatar
+                }
+                date
+                price {
+                  currency
+                  amount
+                }
+              }
+            }
+        `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<InquiryAddQuoteFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(InquiryResolver.prototype, 'addQuote'),
+                query: addQuoteMutation,
+                validFormData: {
+                    inquiryId: '5f09e24646904045d48e5598',
+                    price: { currency: 'PLN', amount: 4.5 },
+                },
+            });
+
+            it('should return error when user is not authenticated', async () => {
+                await send.withoutAuth().expectNotAuthorizedError();
+            });
+
+            it('should validate inquiry id', async () => {
+                // should accept valid
+                await send.withAuth({ inquiryId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                await send.withAuth({ inquiryId: '5f09e24646904045d48e5598' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ inquiryId: '' }).expectValidationError('inquiryId');
+                await send.withAuth({ inquiryId: 'invalid-id' }).expectValidationError('inquiryId');
+            });
+
+            it('should validate quote price', async () => {
+                // should accept valid
+                await send.withAuth({ price: { currency: 'EUR', amount: 0 } }).expectValidationSuccess();
+                await send.withAuth({ price: { currency: 'PLN', amount: 1e6 } }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ price: { currency: '$', amount: 0 } }).expectValidationError('price');
+                await send.withAuth({ price: { currency: 'EUR', amount: -1 } }).expectValidationError('price');
+                await send.withAuth({ price: { currency: 'EUR', amount: 1e6 + 1 } }).expectValidationError('price');
+            });
+
+        });
+
+        it('should add quote', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const inquiry = await testUtils.db.populateWithInquiry(user.id);
+            const formData: InquiryAddQuoteFormData = {
+                inquiryId: inquiry.id,
+                price: { currency: 'PLN', amount: 4.5 },
+            };
+            const response = await testUtils.postGraphQL({
+                query: addQuoteMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if inquiry object was updated and saved in db
+            expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
+            expect(InquiryRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
+                quotes: [{
+                    author: user.id,
+                    date: expect.any(Date),
+                    price: { currency: 'PLN', amount: 4.5 },
+                }],
+            }));
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    addQuote: [{
+                        author: {
+                            userSlug: user.slug,
+                            name: user.name,
+                            avatar: null,
+                        },
+                        date: expect.any(String),
+                        price: { currency: 'PLN', amount: 4.5 },
+                    }],
+                },
+            });
+        });
+
+        it('should return error when inquiry is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: InquiryAddQuoteFormData = {
+                inquiryId: '5f09e24646904045d48e5598',
+                price: { currency: 'PLN', amount: 4.5 },
+            };
+            const response = await testUtils.postGraphQL({
+                query: addQuoteMutation,
                 variables: formData,
             }).set('Authorization', getAuthHeader(user));
             expectInquiryNotFoundError(response);

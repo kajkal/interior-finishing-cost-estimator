@@ -4,6 +4,7 @@ import { ForbiddenError, UserInputError } from 'apollo-server-express';
 import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { InquirySetBookmarkFormData } from './input/InquirySetBookmarkFormData';
+import { InquiryAddQuoteFormData } from './input/InquiryAddQuoteFormData';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
 import { InquiryRepository } from '../../repositories/InquiryRepository';
 import { StorageService } from '../../services/storage/StorageService';
@@ -12,7 +13,9 @@ import { InquiryDeleteFormData } from './input/InquiryDeleteFormData';
 import { InquiryUpdateFormData } from './input/InquiryUpdateFormData';
 import { UserRepository } from '../../repositories/UserRepository';
 import { Inquiry } from '../../entities/inquiry/Inquiry';
+import { Quote } from '../../entities/inquiry/Quote';
 import { logAccess } from '../../utils/logAccess';
+import { PriceQuote } from './output/PriceQuote';
 import { Author } from './output/Author';
 
 
@@ -49,6 +52,11 @@ export class InquiryResolver {
             name: author.name,
             avatar: avatar?.url,
         };
+    }
+
+    @FieldResolver(() => [ PriceQuote ], { nullable: true })
+    async quotes(@Root() inquiry: Inquiry): Promise<PriceQuote[]> {
+        return this.getInquiryPriceQuotes(inquiry.quotes || []);
     }
 
 
@@ -112,6 +120,26 @@ export class InquiryResolver {
 
     @Authorized()
     @UseMiddleware(logAccess)
+    @Mutation(() => [ PriceQuote ])
+    async addQuote(@Args() { inquiryId, price }: InquiryAddQuoteFormData, @Ctx() context: AuthorizedContext): Promise<PriceQuote[]> {
+        const inquiry = await this.inquiryRepository.findOne({ id: inquiryId });
+
+        if (inquiry) {
+            const quotes = inquiry.quotes || [];
+            inquiry.quotes = [ ...quotes, {
+                author: context.jwtPayload.sub,
+                date: new Date(),
+                price,
+            } ];
+            await this.inquiryRepository.persistAndFlush(inquiry);
+            return this.getInquiryPriceQuotes(inquiry.quotes);
+        }
+
+        throw new UserInputError('INQUIRY_NOT_FOUND');
+    }
+
+    @Authorized()
+    @UseMiddleware(logAccess)
     @Mutation(() => [ String ])
     async bookmarkInquiry(@Args() { inquiryId, bookmark }: InquirySetBookmarkFormData, @Ctx() context: AuthorizedContext): Promise<string[]> {
         const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
@@ -134,6 +162,24 @@ export class InquiryResolver {
         }
 
         throw new UserInputError('INQUIRY_NOT_FOUND');
+    }
+
+    private async getInquiryPriceQuotes(quotes: Quote[]): Promise<PriceQuote[]> {
+        const authorIds = new Set(quotes.map(({ author }) => author));
+        const users = await this.userRepository.find({ id: { $in: [ ...authorIds ] } });
+        const userIdAuthorMap = new Map<string, Author>();
+        await Promise.all(users.map(async (user) => {
+            const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
+            userIdAuthorMap.set(user.id, {
+                userSlug: user.slug,
+                name: user.name,
+                avatar: avatar?.url,
+            });
+        }));
+        return quotes.map((quote) => ({
+            ...quote,
+            author: userIdAuthorMap.get(quote.author)!,
+        }));
     }
 
 }
