@@ -1,12 +1,11 @@
 import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Avatar from '@material-ui/core/Avatar';
-import Chip from '@material-ui/core/Chip';
 
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
-import { Location, UserProfileDataFragment } from '../../../../graphql/generated-types';
+import { UserProfileDataFragment } from '../../../../graphql/generated-types';
+import { LocationChip } from '../../common/misc/LocationChip';
 
 
 export interface UserProfileProps {
@@ -43,27 +42,6 @@ export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
             )}
 
         </div>
-    );
-}
-
-
-export interface LocationChipProps {
-    location: Location;
-    className: string;
-}
-
-export function LocationChip({ location, className }: LocationChipProps): React.ReactElement {
-    const label = `${location.main}, ${location.secondary}`;
-    return (
-        <Chip
-            icon={<LocationOnIcon />}
-            label={label}
-            component='a'
-            className={className}
-            href={`https://www.google.com/maps/place/?q=place_id:${location.placeId}`}
-            clickable
-            variant='outlined'
-        />
     );
 }
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { DateTime } from 'luxon';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState, useSetRecoilState } from 'recoil/dist';
 
@@ -14,7 +13,6 @@ import Container from '@material-ui/core/Container';
 import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
-import HistoryIcon from '@material-ui/icons/History';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
@@ -32,6 +30,7 @@ import { formatAmount } from '../../../config/supportedCurrencies';
 import { ProductFilterDate } from './filters/ProductFilterDate';
 import { ProductFilterTags } from './filters/ProductFilterTags';
 import { useProductsFilter } from './filters/useProductsFilter';
+import { HistoryButton } from '../../common/misc/HistoryButton';
 import { Product } from '../../../../graphql/generated-types';
 import { ThemeType } from '../../../utils/theme/ThemeUtils';
 import { PageActions } from '../../common/page/PageActions';
@@ -125,7 +124,7 @@ const productExpansionStateMemory = new WeakMap<Product, boolean>();
 
 export function ProductListItem({ product, selectedTags }: ProductListItemProps): React.ReactElement {
     const classes = useStyles();
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [ expanded, setExpanded ] = React.useState(Boolean(productExpansionStateMemory.get(product)));
     const setDeleteModalState = useSetRecoilState(productDeleteModalAtom);
     const setUpdateModalState = useSetRecoilState(productUpdateModalAtom);
@@ -151,27 +150,6 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
             productData: mapProductToProductUpdateFormData(product),
         });
     };
-
-    const historyTooltip = (
-        <div className={classes.datesContainer}>
-            <Typography variant='caption'>
-                {t('product.created')}
-            </Typography>
-            <Typography variant='caption'>
-                {DateTime.fromISO(product.createdAt).setLocale(i18n.language).toLocaleString(DateTime.DATETIME_MED)}
-            </Typography>
-            {product.updatedAt && (
-                <>
-                    <Typography variant='caption'>
-                        {t('product.updated')}
-                    </Typography>
-                    <Typography variant='caption'>
-                        {DateTime.fromISO(product.updatedAt).setLocale(i18n.language).toLocaleString(DateTime.DATETIME_MED)}
-                    </Typography>
-                </>
-            )}
-        </div>
-    );
 
     return (
         <Accordion
@@ -227,11 +205,12 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
             </AccordionDetails>
 
             <AccordionActions>
-                <Tooltip title={historyTooltip}>
-                    <IconButton size='small' className={classes.historyButton} aria-label={t('product.productHistory')}>
-                        <HistoryIcon />
-                    </IconButton>
-                </Tooltip>
+                <HistoryButton
+                    createdAt={product.createdAt}
+                    updatedAt={product.updatedAt}
+                    ariaLabel={t('product.productHistory')}
+                    className={classes.historyButton}
+                />
                 <Button variant='outlined' size='small' onClick={handleDelete} startIcon={<DeleteIcon />}>
                     {t('form.common.delete')}
                 </Button>
@@ -350,11 +329,5 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     historyButton: {
         marginRight: 'auto',
-    },
-    datesContainer: {
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr',
-        gridColumnGap: theme.spacing(1),
-        columnGap: theme.spacing(1),
     },
 }));

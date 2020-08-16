@@ -1,0 +1,3 @@
+mutation BookmarkInquiry($inquiryId: String!, $bookmark: Boolean!) {
+    bookmarkInquiry(inquiryId: $inquiryId, bookmark: $bookmark)
+}

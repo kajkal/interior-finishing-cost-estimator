@@ -26,7 +26,10 @@
     "productsAriaLabel": "Zobacz swoje produkty",
 
     "inquiries": "Zapytania",
-    "inquiriesAriaLabel": "Zobacz zapytania"
+    "inquiriesAriaLabel": "Zobacz zapytania",
+
+    "created": "Utworzono",
+    "updated": "Zmodyfikowano"
   },
   "loginPage": {
     "logIn": "Zaloguj się",
@@ -111,8 +114,6 @@
     "products": "Produkty",
     "addProduct": "Dodaj produkt",
     "productHistory": "Historia produktu",
-    "created": "Utworzono",
-    "updated": "Zmodyfikowano",
     "createModal": {
       "title": "Zdefiniuj produkt"
     },
@@ -149,7 +150,23 @@
     },
     "createModal": {
       "title": "Utwórz zapytanie o wycenę"
-    }
+    },
+    "filters": {
+      "inquiryFilters": "Filtry zapytań",
+      "searchPlaceholder": "Szukaj....",
+      "searchAriaLabel": "Szukaj zapytania po nazwie",
+      "locationPlaceholder": "Miejscowość",
+      "locationAriaLabel": "Szukaj zapytań w okolicy",
+      "categoriesAriaLabel": "Szukaj zapytań po kategori",
+      "selectAllCategories": "Wybierz wszystkie kategorie",
+      "toggleCategory": "Przełącz kategorię '{{categoryName}}'",
+      "typesAriaLabel": "Szukaj zapytań po ich typie",
+      "myInquiries": "Moje zapytania!",
+      "myInquiriesAriaLabel": "Przełącz moje zapytania",
+      "bookmarkedInquiries": "Oznaczone zapytania",
+      "bookmarkedInquiriesAriaLabel": "Przełącz oznaczone zapytania"
+    },
+    "inquiryNotFoundError": "Zapytanie już nie istnieje"
   },
   "form": {
     "common": {

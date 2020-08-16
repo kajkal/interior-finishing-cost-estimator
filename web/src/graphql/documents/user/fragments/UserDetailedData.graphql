@@ -8,11 +8,11 @@ fragment UserDetailedData on User {
     products {
         ...ProductData
     }
-    productCount
     projects {
        ...ProjectBasicData
     }
     inquiries {
         id
     }
+    bookmarkedInquiries
 }

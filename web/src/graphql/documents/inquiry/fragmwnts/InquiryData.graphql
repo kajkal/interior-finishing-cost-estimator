@@ -10,4 +10,11 @@ fragment InquiryData on Inquiry {
         lng
     }
     category
+    author {
+        userSlug
+        name
+        avatar
+    }
+    createdAt
+    updatedAt
 }

@@ -40,8 +40,8 @@ export type User = {
   name: Scalars['String'];
   /** Unique user slug. Used in URLs */
   slug: Scalars['String'];
+  bookmarkedInquiries: Array<Scalars['String']>;
   products: Array<Product>;
-  productCount: Scalars['Int'];
   /** User' all projects. */
   projects: Array<Project>;
   /** User project with given project id. */
@@ -113,6 +113,7 @@ export type Inquiry = {
   category: Category;
   createdAt: Scalars['DateTime'];
   updatedAt?: Maybe<Scalars['DateTime']>;
+  author: Author;
 };
 
 export enum Category {
@@ -123,6 +124,14 @@ export enum Category {
   INSTALLATION = 'INSTALLATION',
   DESIGNING = 'DESIGNING'
 }
+
+/** Wrapper for resource file data. */
+export type Author = {
+  __typename?: 'Author';
+  userSlug: Scalars['String'];
+  name: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
+};
 
 export type Profile = {
   __typename?: 'Profile';
@@ -155,6 +164,7 @@ export type Mutation = {
   createInquiry: Inquiry;
   updateInquiry: Inquiry;
   deleteInquiry: Scalars['Boolean'];
+  bookmarkInquiry: Array<Scalars['String']>;
   /** Authenticates user. */
   login: InitialData;
   /** Invalidates user session. */
@@ -247,6 +257,26 @@ export type MutationCreateInquiryArgs = {
   description: Scalars['String'];
   location: LocationFormData;
   category: Category;
+};
+
+
+export type MutationUpdateInquiryArgs = {
+  title: Scalars['String'];
+  description: Scalars['String'];
+  location: LocationFormData;
+  category: Category;
+  inquiryId: Scalars['String'];
+};
+
+
+export type MutationDeleteInquiryArgs = {
+  inquiryId: Scalars['String'];
+};
+
+
+export type MutationBookmarkInquiryArgs = {
+  inquiryId: Scalars['String'];
+  bookmark: Scalars['Boolean'];
 };
 
 
@@ -379,11 +409,25 @@ export type SendPasswordResetInstructionsMutation = (
 
 export type InquiryDataFragment = (
   { __typename?: 'Inquiry' }
-  & Pick<Inquiry, 'id' | 'title' | 'description' | 'category'>
+  & Pick<Inquiry, 'id' | 'title' | 'description' | 'category' | 'createdAt' | 'updatedAt'>
   & { location: (
     { __typename?: 'Location' }
     & Pick<Location, 'placeId' | 'main' | 'secondary' | 'lat' | 'lng'>
+  ), author: (
+    { __typename?: 'Author' }
+    & Pick<Author, 'userSlug' | 'name' | 'avatar'>
   ) }
+);
+
+export type BookmarkInquiryMutationVariables = Exact<{
+  inquiryId: Scalars['String'];
+  bookmark: Scalars['Boolean'];
+}>;
+
+
+export type BookmarkInquiryMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'bookmarkInquiry'>
 );
 
 export type CreateInquiryMutationVariables = Exact<{
@@ -566,7 +610,7 @@ export type ProjectDetailsQuery = (
 
 export type UserDetailedDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'name' | 'slug' | 'email' | 'isEmailAddressConfirmed' | 'hidden' | 'avatar' | 'productCount'>
+  & Pick<User, 'name' | 'slug' | 'email' | 'isEmailAddressConfirmed' | 'hidden' | 'avatar' | 'bookmarkedInquiries'>
   & { products: Array<(
     { __typename?: 'Product' }
     & ProductDataFragment
@@ -673,6 +717,13 @@ export const InquiryDataFragmentDoc = gql`
     lng
   }
   category
+  author {
+    userSlug
+    name
+    avatar
+  }
+  createdAt
+  updatedAt
 }
     `;
 export const ProjectBasicDataFragmentDoc = gql`
@@ -723,13 +774,13 @@ export const UserDetailedDataFragmentDoc = gql`
   products {
     ...ProductData
   }
-  productCount
   projects {
     ...ProjectBasicData
   }
   inquiries {
     id
   }
+  bookmarkedInquiries
 }
     ${ProductDataFragmentDoc}
 ${ProjectBasicDataFragmentDoc}`;
@@ -935,6 +986,36 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export const BookmarkInquiryDocument = gql`
+    mutation BookmarkInquiry($inquiryId: String!, $bookmark: Boolean!) {
+  bookmarkInquiry(inquiryId: $inquiryId, bookmark: $bookmark)
+}
+    `;
+
+/**
+ * __useBookmarkInquiryMutation__
+ *
+ * To run a mutation, you first call `useBookmarkInquiryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBookmarkInquiryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bookmarkInquiryMutation, { data, loading, error }] = useBookmarkInquiryMutation({
+ *   variables: {
+ *      inquiryId: // value for 'inquiryId'
+ *      bookmark: // value for 'bookmark'
+ *   },
+ * });
+ */
+export function useBookmarkInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>) {
+        return ApolloReactHooks.useMutation<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>(BookmarkInquiryDocument, baseOptions);
+      }
+export type BookmarkInquiryMutationHookResult = ReturnType<typeof useBookmarkInquiryMutation>;
+export type BookmarkInquiryMutationResult = ApolloReactCommon.MutationResult<BookmarkInquiryMutation>;
+export type BookmarkInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>;
 export const CreateInquiryDocument = gql`
     mutation CreateInquiry($title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
   createInquiry(title: $title, description: $description, location: $location, category: $category) {

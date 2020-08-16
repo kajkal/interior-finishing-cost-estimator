@@ -26,7 +26,10 @@
     "productsAriaLabel": "View your products",
 
     "inquiries": "Inquiries",
-    "inquiriesAriaLabel": "View inquiries"
+    "inquiriesAriaLabel": "View inquiries",
+
+    "created": "Created",
+    "updated": "Updated"
   },
   "loginPage": {
     "logIn": "Log in",
@@ -111,8 +114,6 @@
     "products": "Products",
     "addProduct": "Add product",
     "productHistory": "Product history",
-    "created": "Created",
-    "updated": "Updated",
     "createModal": {
       "title": "Define new product"
     },
@@ -149,7 +150,23 @@
     },
     "createModal": {
       "title": "Define new inquiry"
-    }
+    },
+    "filters": {
+      "inquiryFilters": "Inquiries filters",
+      "searchPlaceholder": "Search....",
+      "searchAriaLabel": "Search inquiries by name",
+      "locationPlaceholder": "Location",
+      "locationAriaLabel": "Search inquiries in your area",
+      "categoriesAriaLabel": "Search inquiries by category",
+      "selectAllCategories": "Select all categories",
+      "toggleCategory": "Toggle category '{{categoryName}}'",
+      "typesAriaLabel": "Search inquiries by type",
+      "myInquiries": "My inquiries!",
+      "myInquiriesAriaLabel": "Toggle my inquiries",
+      "bookmarkedInquiries": "Bookmarked inquiries",
+      "bookmarkedInquiriesAriaLabel": "Toggle bookmarked inquiries"
+    },
+    "inquiryNotFoundError": "Zapytanie już nie istnieje"
   },
   "form": {
     "common": {
