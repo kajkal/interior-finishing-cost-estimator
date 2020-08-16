@@ -252,6 +252,21 @@ describe('ApolloContextProvider component', () => {
             expect(toast).toHaveTextContent('t:product.productNotFoundError');
         });
 
+        it('should globally handle {INQUIRY_NOT_FOUND} GraphQL errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: undefined,
+                graphQLErrors: [ new GraphQLError('INQUIRY_NOT_FOUND') ],
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:inquiry.inquiryNotFoundError');
+        });
+
     });
 
     describe('session state synchronization', () => {

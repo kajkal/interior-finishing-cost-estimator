@@ -75,6 +75,9 @@ export function ApolloContextProvider({ children }: ApolloContextProviderProps):
             ErrorHandler.handleGraphQlError(graphQLErrors, 'PRODUCT_NOT_FOUND', () => {
                 errorToast(({ t }) => t('product.productNotFoundError'));
             });
+            ErrorHandler.handleGraphQlError(graphQLErrors, 'INQUIRY_NOT_FOUND', () => {
+                errorToast(({ t }) => t('inquiry.inquiryNotFoundError'));
+            });
         }).concat(client.link));
 
     }, [ client, errorToast ]);
