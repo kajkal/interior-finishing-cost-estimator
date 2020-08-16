@@ -79,6 +79,8 @@ describe('ProductResolver', () => {
                   amount
                 }
                 tags
+                createdAt
+                updatedAt
               }
             }
         `;
@@ -175,6 +177,8 @@ describe('ProductResolver', () => {
                         description: formData.description,
                         price: formData.price,
                         tags: formData.tags,
+                        createdAt: expect.any(String),
+                        updatedAt: null,
                     },
                 },
             });
@@ -208,6 +212,8 @@ describe('ProductResolver', () => {
                         description: formData.description,
                         price: null,
                         tags: null,
+                        createdAt: expect.any(String),
+                        updatedAt: null,
                     },
                 },
             });
@@ -358,6 +364,40 @@ describe('ProductResolver', () => {
                     },
                 },
             });
+        });
+
+        it('should return error when user is not a product owner', async () => {
+            const productOwner = await testUtils.db.populateWithUser();
+            const productToUpdate = await testUtils.db.populateWithProduct(productOwner.id);
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProductUpdateFormData = {
+                productId: productToUpdate.id,
+                name: generator.word({ length: 5 }),
+                description: productToUpdate.description,
+                price: null,
+                tags: null,
+            };
+            const response = await testUtils.postGraphQL({
+                query: updateProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectUserIsNotProductOwnerError(response);
+        });
+
+        it('should return error when product is not found', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const formData: ProductUpdateFormData = {
+                productId: '5f09e24646904045d48e5598',
+                name: generator.word(),
+                description: `[{"sample":"${generator.sentence()}"}]`,
+                price: null,
+                tags: null,
+            };
+            const response = await testUtils.postGraphQL({
+                query: updateProductMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+            expectProductNotFoundError(response);
         });
 
     });

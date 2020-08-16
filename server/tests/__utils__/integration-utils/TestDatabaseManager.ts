@@ -6,6 +6,7 @@ import { generateSlugBase } from '../../../src/utils/generateUniqueSlug';
 import { connectToDatabase } from '../../../src/loaders/mongodb';
 import { Product } from '../../../src/entities/product/Product';
 import { Project } from '../../../src/entities/project/Project';
+import { Inquiry } from '../../../src/entities/inquiry/Inquiry';
 import { User } from '../../../src/entities/user/User';
 import { generator } from '../generator';
 
@@ -72,7 +73,7 @@ export class TestDatabaseManager {
     async populateWithProduct(userId: string, partialProductData?: Partial<Omit<Product, 'user'>>): Promise<Product> {
         const productData = {
             user: userId,
-            name: generator.word(),
+            name: generator.word({ length: 5 }),
             description: `[{"sample":"${generator.sentence()}"}]`,
             ...partialProductData,
         };
@@ -102,6 +103,27 @@ export class TestDatabaseManager {
         await this.orm.em.persistAndFlush(project);
 
         return project;
+    }
+
+
+    /**
+     * Inquiry
+     */
+    async populateWithInquiry(userId: string, partialInquiryData?: Partial<Omit<Inquiry, 'user'>>): Promise<Inquiry> {
+        const inquiryData = {
+            user: userId,
+            title: generator.sentence({ words: 5 }),
+            description: `[{"sample":"${generator.sentence()}"}]`,
+            location: generator.location(),
+            category: generator.inquiryCategory(),
+            ...partialInquiryData,
+        };
+
+        const inquiry = new Inquiry();
+        wrap(inquiry).assign(inquiryData, { em: this.orm.em });
+        await this.orm.em.persistAndFlush(inquiry);
+
+        return inquiry;
     }
 
 }

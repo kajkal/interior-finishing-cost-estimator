@@ -87,4 +87,15 @@ export class User extends BaseEntity {
     @OneToMany(() => Inquiry, 'user')
     inquiries = new Collection<Inquiry>(this);
 
+
+    /**
+     * --------------------------------------------------
+     * Other
+     * --------------------------------------------------
+     */
+
+    @Field(() => [ String ])
+    @Property()
+    bookmarkedInquiries: string[] = [];
+
 }

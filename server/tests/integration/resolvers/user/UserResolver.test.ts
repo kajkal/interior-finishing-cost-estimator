@@ -34,7 +34,7 @@ describe('UserResolver', () => {
                   name
                 }
                 inquiries {
-                  name
+                  id
                 }
               }
             }
