@@ -16,9 +16,22 @@ export interface HistoryButtonProps {
     className?: string;
 }
 
-export function HistoryButton({createdAt, updatedAt, ariaLabel, className}: HistoryButtonProps): React.ReactElement {
+export function HistoryButton({ createdAt, updatedAt, ariaLabel, className }: HistoryButtonProps): React.ReactElement {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
+    const [ open, setOpen ] = React.useState(false);
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleToggle = () => {
+        setOpen((prev) => !prev);
+    };
 
     const historyTooltip = (
         <div className={classes.datesContainer}>
@@ -42,8 +55,8 @@ export function HistoryButton({createdAt, updatedAt, ariaLabel, className}: Hist
     );
 
     return (
-        <Tooltip title={historyTooltip}>
-            <IconButton size='small' className={className} aria-label={ariaLabel}>
+        <Tooltip title={historyTooltip} open={open} onClose={handleClose} onOpen={handleOpen} interactive>
+            <IconButton size='small' className={className} aria-label={ariaLabel} onClick={handleToggle}>
                 <HistoryIcon />
             </IconButton>
         </Tooltip>

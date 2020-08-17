@@ -285,54 +285,21 @@ describe('ProfileUpdateModal component', () => {
             });
         });
 
-        it('should update cache when user name changes', async () => {
+        it('should reload page when user name changes', async () => {
+            const { location } = window;
+            delete window.location;
+            window.location = { ...location, reload: jest.fn() };
+
             const cache = initApolloTestCache();
             const mockResponse = mockResponseGenerator.successWithNameChange();
             renderInMockContext(sampleProfile, { mockResponses: [ mockResponse ], apolloCache: cache });
-
-            const userCacheRecordKey = cache.identify(sampleUser)!;
-            const profileCacheRecordKey = cache.identify(sampleProfile)!;
-
-            // verify initial cache records
-            expect(cache.extract()).toEqual({
-                [ profileCacheRecordKey ]: sampleProfile,
-                [ userCacheRecordKey ]: sampleUser,
-                ROOT_QUERY: {
-                    __typename: 'Query',
-                    [ `profile({"userSlug":"${sampleUser.slug}"})` ]: { __ref: cache.identify(sampleProfile) },
-                },
-            });
-
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if modal was closed
             await waitForElementToBeRemoved(ViewUnderTest.modal);
 
-            // verify updated cache
-            const updatedProfile = mockResponse.result.data.updateProfile;
-            const updatedProfileCacheRecordKey = cache.identify(updatedProfile)!;
-            const updateUserCacheRecordKey = cache.identify({ __typename: 'User', slug: updatedProfile.userSlug })!;
-
-            expect(updatedProfileCacheRecordKey).not.toBe(profileCacheRecordKey);
-            expect(userCacheRecordKey).not.toBe(updateUserCacheRecordKey);
-
-            expect(cache.extract()).toEqual({
-                // <- removed old profile record
-                [ updatedProfileCacheRecordKey ]: updatedProfile, // <- new/updated profile record
-                // <- removed old user record
-                [ updateUserCacheRecordKey ]: { // <- updated user record
-                    ...sampleUser,
-                    name: updatedProfile.name,
-                    slug: updatedProfile.userSlug,
-                },
-                ROOT_QUERY: {
-                    __typename: 'Query',
-                    me: { __ref: updateUserCacheRecordKey }, // <- updated me query result
-                    [ `profile({"userSlug":"${sampleUser.slug}"})` ]: null, // <- cleared old profile data
-                    [ `profile({"userSlug":"${updatedProfile.userSlug}"})` ]: { __ref: cache.identify(updatedProfile) }, // <- updated profile query result data
-                },
-                ROOT_MUTATION: expect.any(Object),
-            });
+            // verify if page was reloaded
+            expect(window.location.reload).toHaveBeenCalledTimes(1);
         });
 
         it('should remove current profile picture', async () => {

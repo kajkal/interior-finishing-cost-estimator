@@ -12,7 +12,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { MeDocument, MeQuery, ProfileDocument, ProfileQuery, UserDetailedDataFragment, useUpdateProfileMutation } from '../../../../graphql/generated-types';
+import { useUpdateProfileMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { FormikRichTextEditor } from '../../common/form-fields/ritch-text-editor/FormikRichTextEditor';
 import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
@@ -177,40 +177,13 @@ function useProfileUpdateFormSubmitHandler(onModalClose: () => void, withExistin
                         });
 
                         // when user name (and slug) change major cache update is necessary
-                        const userPrevData = userCachedData as UserDetailedDataFragment;
-                        if (updatedProfile.userSlug !== userPrevData.slug) {
-
-                            // write new profile query result to cache
-                            cache.writeQuery<ProfileQuery>({
-                                broadcast: false,
-                                query: ProfileDocument,
-                                variables: { userSlug: updatedProfile.userSlug },
-                                data: { profile: updatedProfile },
-                            });
-
-                            // clear profile data with old slug (otherwise old profile cache record cannot be removed by cache.gc())
-                            cache.writeQuery<ProfileQuery>({
-                                broadcast: false,
-                                query: ProfileDocument,
-                                variables: { userSlug: userPrevData.slug },
-                                data: { profile: null! },
-                            });
-
-                            // update current user record (here also link with old user cache record is cut)
-                            cache.writeQuery<MeQuery>({
-                                broadcast: false,
-                                query: MeDocument,
-                                data: {
-                                    me: {
-                                        ...userPrevData,
-                                        name: updatedProfile.name,
-                                        slug: updatedProfile.userSlug,
-                                    },
-                                },
-                            });
-
-                            // remove redundant User and Profile cache records
-                            cache.gc();
+                        if (updatedProfile.userSlug !== userCachedData?.slug) {
+                            /**
+                             * Because of data which relay on user slug - cache update
+                             * in this scenario is complicated and very error prone.
+                             * Because of that full page reload is scheduled after all microtasks are settled.
+                             */
+                            setTimeout(() => window.location.reload(), 0);
                         }
                     }
                 },

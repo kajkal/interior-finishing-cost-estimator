@@ -20,7 +20,7 @@ export function LocationChip({ location, labelSuffix, ...rest }: LocationChipPro
             label={label}
 
             component='a'
-            href={`https://www.google.com/maps/place/?q=place_id:${location.placeId}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}&query_place_id=${location.placeId}`}
             rel='noreferrer'
             target='_blank'
 

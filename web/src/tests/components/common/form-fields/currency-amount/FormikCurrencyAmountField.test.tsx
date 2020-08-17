@@ -141,6 +141,7 @@ describe('FormikCurrencyAmountField component', () => {
         await ViewUnderTest.selectCurrency('LYD');
         await extendedUserEvent.paste(ViewUnderTest.amountInput, '1.1111');
         expect(ViewUnderTest.amountInput).toHaveValue('1.111');
+        await flushPromises();
     });
 
 });

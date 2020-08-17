@@ -113,6 +113,7 @@
   "product": {
     "products": "Produkty",
     "addProduct": "Dodaj produkt",
+    "descriptionSectionTitle": "Opis",
     "productHistory": "Historia produktu",
     "createModal": {
       "title": "Zdefiniuj produkt"
@@ -140,6 +141,14 @@
   "inquiry": {
     "inquiries": "Zapytania o wycenę",
     "addInquiry": "Dodaj zapytanie o wycenę",
+    "descriptionSectionTitle": "Opis",
+    "quotesSectionTitle": "Oferty",
+    "noOffers": "Brak ofert",
+    "addQuote": "Dodaj ofertę",
+    "removeQuote": "Usuń ofertę",
+    "inquiryHistory": "Historia zapytania",
+    "addBookmark": "Oznacz",
+    "removeBookmark": "Usuń oznaczenie",
     "categories": {
       "electrical": "Elektryka",
       "piping": "Hudraulika",
@@ -157,6 +166,9 @@
     "deleteModal": {
       "title": "Usuń zapytanie '{{inquiryTitle}}'",
       "firstLine": "Czy na pewno chcesz permanentnie usunąć to zapytanie?"
+    },
+    "addQuoteModal": {
+      "title": "Zaproponuj wycenę"
     },
     "filters": {
       "inquiryFilters": "Filtry zapytań",
@@ -359,6 +371,14 @@
       "ariaLabel": "Wprowadź kategorię zapytania",
       "validation": {
         "required": "Kategoria zapytania jest wymagana"
+      }
+    },
+    "inquiryPriceQuote": {
+      "label": "Oferta",
+      "ariaLabel": "Wprowadź wartość oferty",
+      "validation": {
+        "required": "Zaproponowanie oferty jest wymagane",
+        "tooHigh": "Wprowadzona wartość oferty jest za wysoka"
       }
     }
   },

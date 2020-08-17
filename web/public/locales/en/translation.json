@@ -113,6 +113,7 @@
   "product": {
     "products": "Products",
     "addProduct": "Add product",
+    "descriptionSectionTitle": "Description",
     "productHistory": "Product history",
     "createModal": {
       "title": "Define new product"
@@ -140,6 +141,14 @@
   "inquiry": {
     "inquiries": "Inquiries",
     "addInquiry": "Add inquiry",
+    "descriptionSectionTitle": "Description",
+    "quotesSectionTitle": "Quotes",
+    "noOffers": "No offers",
+    "addQuote": "Add quote",
+    "removeQuote": "Remove quote",
+    "inquiryHistory": "Inquiry history",
+    "addBookmark": "Bookmark",
+    "removeBookmark": "Remove bookmark",
     "categories": {
       "electrical":  "Electrical",
       "piping": "Piping",
@@ -157,6 +166,9 @@
     "deleteModal": {
       "title": "Delete inquiry '{{inquiryTitle}}'",
       "firstLine": "Are you sure you want to permanently delete this inquiry?"
+    },
+    "addQuoteModal": {
+      "title": "Add quote"
     },
     "filters": {
       "inquiryFilters": "Inquiries filters",
@@ -359,6 +371,14 @@
       "ariaLabel": "Enter inquiry category",
       "validation": {
         "required": "Inquiry category is required"
+      }
+    },
+    "inquiryPriceQuote": {
+      "label": "Offer",
+      "ariaLabel": "Enter offer value",
+      "validation": {
+        "required": "Offer value is required",
+        "tooHigh": "Offer value is too high"
       }
     }
   },

@@ -114,6 +114,7 @@ export type Inquiry = {
   createdAt: Scalars['DateTime'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   author: Author;
+  quotes?: Maybe<Array<PriceQuote>>;
 };
 
 export enum Category {
@@ -125,12 +126,18 @@ export enum Category {
   DESIGNING = 'DESIGNING'
 }
 
-/** Wrapper for resource file data. */
 export type Author = {
   __typename?: 'Author';
   userSlug: Scalars['String'];
   name: Scalars['String'];
   avatar?: Maybe<Scalars['String']>;
+};
+
+export type PriceQuote = {
+  __typename?: 'PriceQuote';
+  author: Author;
+  date: Scalars['DateTime'];
+  price: CurrencyAmount;
 };
 
 export type Profile = {
@@ -164,6 +171,8 @@ export type Mutation = {
   createInquiry: Inquiry;
   updateInquiry: Inquiry;
   deleteInquiry: Scalars['Boolean'];
+  addQuote: Array<PriceQuote>;
+  removeQuote: Array<PriceQuote>;
   bookmarkInquiry: Array<Scalars['String']>;
   /** Authenticates user. */
   login: InitialData;
@@ -271,6 +280,18 @@ export type MutationUpdateInquiryArgs = {
 
 export type MutationDeleteInquiryArgs = {
   inquiryId: Scalars['String'];
+};
+
+
+export type MutationAddQuoteArgs = {
+  inquiryId: Scalars['String'];
+  price: CurrencyAmountFormData;
+};
+
+
+export type MutationRemoveQuoteArgs = {
+  inquiryId: Scalars['String'];
+  quoteDate: Scalars['DateTime'];
 };
 
 
@@ -416,7 +437,36 @@ export type InquiryDataFragment = (
   ), author: (
     { __typename?: 'Author' }
     & Pick<Author, 'userSlug' | 'name' | 'avatar'>
+  ), quotes?: Maybe<Array<(
+    { __typename?: 'PriceQuote' }
+    & PriceQuoteDataFragment
+  )>> }
+);
+
+export type PriceQuoteDataFragment = (
+  { __typename?: 'PriceQuote' }
+  & Pick<PriceQuote, 'date'>
+  & { author: (
+    { __typename?: 'Author' }
+    & Pick<Author, 'userSlug' | 'name' | 'avatar'>
+  ), price: (
+    { __typename?: 'CurrencyAmount' }
+    & Pick<CurrencyAmount, 'currency' | 'amount'>
   ) }
+);
+
+export type AddQuoteMutationVariables = Exact<{
+  inquiryId: Scalars['String'];
+  price: CurrencyAmountFormData;
+}>;
+
+
+export type AddQuoteMutation = (
+  { __typename?: 'Mutation' }
+  & { addQuote: Array<(
+    { __typename?: 'PriceQuote' }
+    & PriceQuoteDataFragment
+  )> }
 );
 
 export type BookmarkInquiryMutationVariables = Exact<{
@@ -454,6 +504,20 @@ export type DeleteInquiryMutationVariables = Exact<{
 export type DeleteInquiryMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteInquiry'>
+);
+
+export type RemoveQuoteMutationVariables = Exact<{
+  inquiryId: Scalars['String'];
+  quoteDate: Scalars['DateTime'];
+}>;
+
+
+export type RemoveQuoteMutation = (
+  { __typename?: 'Mutation' }
+  & { removeQuote: Array<(
+    { __typename?: 'PriceQuote' }
+    & PriceQuoteDataFragment
+  )> }
 );
 
 export type UpdateInquiryMutationVariables = Exact<{
@@ -731,6 +795,20 @@ export type ProfileQuery = (
   ) }
 );
 
+export const PriceQuoteDataFragmentDoc = gql`
+    fragment PriceQuoteData on PriceQuote {
+  author {
+    userSlug
+    name
+    avatar
+  }
+  date
+  price {
+    currency
+    amount
+  }
+}
+    `;
 export const InquiryDataFragmentDoc = gql`
     fragment InquiryData on Inquiry {
   id
@@ -749,10 +827,13 @@ export const InquiryDataFragmentDoc = gql`
     name
     avatar
   }
+  quotes {
+    ...PriceQuoteData
+  }
   createdAt
   updatedAt
 }
-    `;
+    ${PriceQuoteDataFragmentDoc}`;
 export const ProjectBasicDataFragmentDoc = gql`
     fragment ProjectBasicData on Project {
   slug
@@ -1013,6 +1094,38 @@ export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloRea
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
 export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export const AddQuoteDocument = gql`
+    mutation AddQuote($inquiryId: String!, $price: CurrencyAmountFormData!) {
+  addQuote(inquiryId: $inquiryId, price: $price) {
+    ...PriceQuoteData
+  }
+}
+    ${PriceQuoteDataFragmentDoc}`;
+
+/**
+ * __useAddQuoteMutation__
+ *
+ * To run a mutation, you first call `useAddQuoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddQuoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addQuoteMutation, { data, loading, error }] = useAddQuoteMutation({
+ *   variables: {
+ *      inquiryId: // value for 'inquiryId'
+ *      price: // value for 'price'
+ *   },
+ * });
+ */
+export function useAddQuoteMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddQuoteMutation, AddQuoteMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddQuoteMutation, AddQuoteMutationVariables>(AddQuoteDocument, baseOptions);
+      }
+export type AddQuoteMutationHookResult = ReturnType<typeof useAddQuoteMutation>;
+export type AddQuoteMutationResult = ApolloReactCommon.MutationResult<AddQuoteMutation>;
+export type AddQuoteMutationOptions = ApolloReactCommon.BaseMutationOptions<AddQuoteMutation, AddQuoteMutationVariables>;
 export const BookmarkInquiryDocument = gql`
     mutation BookmarkInquiry($inquiryId: String!, $bookmark: Boolean!) {
   bookmarkInquiry(inquiryId: $inquiryId, bookmark: $bookmark)
@@ -1106,6 +1219,38 @@ export function useDeleteInquiryMutation(baseOptions?: ApolloReactHooks.Mutation
 export type DeleteInquiryMutationHookResult = ReturnType<typeof useDeleteInquiryMutation>;
 export type DeleteInquiryMutationResult = ApolloReactCommon.MutationResult<DeleteInquiryMutation>;
 export type DeleteInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>;
+export const RemoveQuoteDocument = gql`
+    mutation RemoveQuote($inquiryId: String!, $quoteDate: DateTime!) {
+  removeQuote(inquiryId: $inquiryId, quoteDate: $quoteDate) {
+    ...PriceQuoteData
+  }
+}
+    ${PriceQuoteDataFragmentDoc}`;
+
+/**
+ * __useRemoveQuoteMutation__
+ *
+ * To run a mutation, you first call `useRemoveQuoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveQuoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeQuoteMutation, { data, loading, error }] = useRemoveQuoteMutation({
+ *   variables: {
+ *      inquiryId: // value for 'inquiryId'
+ *      quoteDate: // value for 'quoteDate'
+ *   },
+ * });
+ */
+export function useRemoveQuoteMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>) {
+        return ApolloReactHooks.useMutation<RemoveQuoteMutation, RemoveQuoteMutationVariables>(RemoveQuoteDocument, baseOptions);
+      }
+export type RemoveQuoteMutationHookResult = ReturnType<typeof useRemoveQuoteMutation>;
+export type RemoveQuoteMutationResult = ApolloReactCommon.MutationResult<RemoveQuoteMutation>;
+export type RemoveQuoteMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>;
 export const UpdateInquiryDocument = gql`
     mutation UpdateInquiry($inquiryId: String!, $title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
   updateInquiry(inquiryId: $inquiryId, title: $title, description: $description, location: $location, category: $category) {

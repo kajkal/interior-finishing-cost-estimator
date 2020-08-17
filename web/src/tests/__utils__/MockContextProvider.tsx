@@ -1,9 +1,10 @@
 import React from 'react';
 import { InitialEntry } from 'history';
 import { ApolloCache } from '@apollo/client';
-import { RecoilRoot, RecoilRootProps } from 'recoil/dist';
+import { RecoilRoot, RecoilRootProps, useRecoilValue } from 'recoil/dist';
 import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 
+import { pageProgressAtom } from '../../code/components/atoms/page-progress/pageProgressAtom';
 import { MockToastProvider } from './mocks/MockToastProvider';
 import { MockRouter } from './context-providers/MockRouter';
 
@@ -27,8 +28,14 @@ export function MockContextProvider({ children, mocks }: MockContextProviderProp
                 <MockRouter initialEntries={mocks?.initialEntries}>
                     {children}
                     <MockToastProvider />
+                    <PageLinearProgressDisplay />
                 </MockRouter>
             </MockedProvider>
         </RecoilRoot>
     );
+}
+
+function PageLinearProgressDisplay() {
+    const loading = useRecoilValue(pageProgressAtom);
+    return loading ? <div data-testid='page-progress' /> : null;
 }

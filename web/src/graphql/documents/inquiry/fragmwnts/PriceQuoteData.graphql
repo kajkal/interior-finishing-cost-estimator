@@ -1,0 +1,12 @@
+fragment PriceQuoteData on PriceQuote {
+    author {
+        userSlug
+        name
+        avatar
+    }
+    date
+    price {
+        currency
+        amount
+    }
+}

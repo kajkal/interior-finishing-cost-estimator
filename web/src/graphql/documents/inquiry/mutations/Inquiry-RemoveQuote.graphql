@@ -1,0 +1,5 @@
+mutation RemoveQuote($inquiryId: String!, $quoteDate: DateTime!) {
+    removeQuote(inquiryId: $inquiryId, quoteDate: $quoteDate) {
+        ...PriceQuoteData
+    }
+}

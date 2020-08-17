@@ -1,7 +1,7 @@
 import React from 'react';
 import { GraphQLError } from 'graphql';
 import { Route, Routes } from 'react-router';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { muteConsole } from '../../../__utils__/muteConsole';
@@ -36,8 +36,8 @@ describe('UserProfilePage component', () => {
                             placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
                             main: 'Kraków',
                             secondary: 'Poland',
-                            lat: null,
-                            lng: null,
+                            lat: 50,
+                            lng: 20,
                         },
                     },
                 } as ProfileQuery,
@@ -86,7 +86,7 @@ describe('UserProfilePage component', () => {
 
         // verify location link
         expect(ViewUnderTest.locationLink).toBeVisible();
-        expect(ViewUnderTest.locationLink).toHaveAttribute('href', 'https://www.google.com/maps/place/?q=place_id:ChIJ0RhONcBEFkcRv4pHdrW2a7Q');
+        expect(ViewUnderTest.locationLink).toHaveAttribute('href', 'https://www.google.com/maps/search/?api=1&query=50,20&query_place_id=ChIJ0RhONcBEFkcRv4pHdrW2a7Q');
     });
 
     it('should display not found page when user profile data is not accessible', async () => {

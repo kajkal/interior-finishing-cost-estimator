@@ -15,6 +15,9 @@ fragment InquiryData on Inquiry {
         name
         avatar
     }
+    quotes {
+        ...PriceQuoteData
+    }
     createdAt
     updatedAt
 }

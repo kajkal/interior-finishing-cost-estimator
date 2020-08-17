@@ -33,6 +33,7 @@ describe('InquiryDeleteModal component', () => {
             name: '',
             avatar: null,
         },
+        quotes: null,
         createdAt: '',
         updatedAt: null,
     };

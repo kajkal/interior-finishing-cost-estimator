@@ -10,12 +10,13 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Accordion from '@material-ui/core/Accordion';
 import Container from '@material-ui/core/Container';
-import Tooltip from '@material-ui/core/Tooltip';
-import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Tooltip from '@material-ui/core/Tooltip';
+import Divider from '@material-ui/core/Divider';
 import EditIcon from '@material-ui/icons/Edit';
+import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import Chip from '@material-ui/core/Chip';
 
 import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../modals/product-update/productUpdateModalAtom';
 import { isOptionExclusivelySelected, SelectedOptions } from '../../../utils/filters/filtersUtils';
@@ -23,10 +24,10 @@ import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/Ri
 import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
 import { productCreateModalAtom } from '../../modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom } from '../../modals/product-delete/productDeleteModalAtom';
+import { FormattedCurrencyAmount } from '../../common/misc/FormattedCurrencyAmount';
 import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { productsFiltersAtom } from './filters/productsFiltersAtom';
 import { ProductFilterSearch } from './filters/ProductFilterSearch';
-import { formatAmount } from '../../../config/supportedCurrencies';
 import { ProductFilterDate } from './filters/ProductFilterDate';
 import { ProductFilterTags } from './filters/ProductFilterTags';
 import { useProductsFilter } from './filters/useProductsFilter';
@@ -173,14 +174,10 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
                 </Typography>
 
                 {(product.price) && (
-                    <div className={classes.productPrice}>
-                        <Typography>
-                            {formatAmount(product.price)}
-                        </Typography>
-                        <Typography className={classes.productPriceCurrency} variant='caption'>
-                            {product.price.currency}
-                        </Typography>
-                    </div>
+                    <FormattedCurrencyAmount
+                        currencyAmount={product.price}
+                        className={classes.productPrice}
+                    />
                 )}
 
                 <ExpandIcon className={classes.expandIcon} expanded={expanded} />
@@ -201,7 +198,13 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
             </AccordionSummary>
 
             <AccordionDetails classes={{ root: classes.AccordionDetailsRoot }}>
-                <RichTextPreviewer value={product.description} />
+                <Divider className={classes.dividerDescriptionTop} />
+                <Typography variant='body2' gutterBottom color='textSecondary'>
+                    {t('product.descriptionSectionTitle')}
+                </Typography>
+                <RichTextPreviewer value={product.description} className={classes.section} />
+
+                <Divider className={classes.dividerActionsTop} />
             </AccordionDetails>
 
             <AccordionActions>
@@ -286,6 +289,18 @@ const useStyles = makeStyles((theme: Theme) => ({
                 ? lighten(theme.palette.text.disabled, 0.2)
                 : darken(theme.palette.text.disabled, 0.2),
             borderRadius: theme.shape.borderRadius,
+            '& $productName': {
+                fontSize: '1.2rem',
+                marginBottom: theme.spacing(1.5),
+                [ theme.breakpoints.up('sm') ]: {
+                    marginLeft: theme.spacing(1),
+                },
+            },
+            '& $section': {
+                [ theme.breakpoints.up('sm') ]: {
+                    margin: theme.spacing(0, 1),
+                },
+            },
         },
         '&:before': {
             display: 'none',
@@ -302,15 +317,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     productName: {
         gridArea: 'name',
+        marginBottom: theme.spacing(0.5),
+        transition: theme.transitions.create(['font-size', 'margin'], {
+            duration: theme.transitions.duration.shortest,
+        }),
     },
     productPrice: {
         gridArea: 'price',
         marginLeft: 'auto',
-        display: 'flex',
-    },
-    productPriceCurrency: {
-        verticalAlign: 'super',
-        marginLeft: 5,
     },
     expandIcon: {
         gridArea: 'icon',
@@ -329,5 +343,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     historyButton: {
         marginRight: 'auto',
+    },
+    section: {
+        transition: theme.transitions.create(['margin'], {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    dividerDescriptionTop: {
+        margin: theme.spacing(0, -1, 1, -1),
+    },
+    dividerActionsTop: {
+        margin: theme.spacing(2, -1, 0, -1),
     },
 }));

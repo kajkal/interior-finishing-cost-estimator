@@ -1,0 +1,5 @@
+mutation AddQuote($inquiryId: String!, $price: CurrencyAmountFormData!) {
+    addQuote(inquiryId: $inquiryId, price: $price) {
+        ...PriceQuoteData
+    }
+}
