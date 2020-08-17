@@ -259,4 +259,25 @@ describe('FormikRichTextEditor component', () => {
         userEvent.click(screen.getByRole('checkbox'));
     });
 
+    it('should render image node', () => {
+        const mockIntersectionObserver = {
+            observe: jest.fn(),
+            unobserve: jest.fn(),
+            disconnect: jest.fn(),
+        }
+        window.IntersectionObserver = jest.fn().mockImplementation(() => mockIntersectionObserver);
+
+        renderInFormikContext({
+            node: [ {
+                children: [{
+                    type: 'img',
+                    url: 'sample-image-url',
+                    children: [ { text: '' } ],
+                }
+                ],
+            } ],
+        });
+        expect(screen.getByRole('img')).toBeVisible();
+    });
+
 });

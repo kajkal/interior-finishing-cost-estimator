@@ -1,7 +1,7 @@
 import React from 'react';
 import { createEditor } from 'slate';
 import { Slate, withReact } from 'slate-react';
-import { EditablePlugins, pipe, SlateDocument } from '@udecode/slate-plugins';
+import { EditablePlugins, pipe, SlateDocument, withInlineVoid } from '@udecode/slate-plugins';
 
 import { plugins } from './options';
 
@@ -12,7 +12,7 @@ export interface RichTextPreviewerProps {
 }
 
 export function RichTextPreviewer({ value, className }: RichTextPreviewerProps): React.ReactElement {
-    const editor = React.useMemo(() => pipe(createEditor(), withReact), []);
+    const editor = React.useMemo(() => pipe(createEditor(), withReact, withInlineVoid({ plugins })), []);
     const parsedValue = React.useMemo<SlateDocument>(() => JSON.parse(value), [ value ]);
 
     return (

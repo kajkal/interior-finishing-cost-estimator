@@ -1,13 +1,14 @@
 import { Range } from 'slate';
 import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
-import { BoldPlugin, DEFAULTS_BOLD, DEFAULTS_IMAGE, DEFAULTS_ITALIC, DEFAULTS_LIST, DEFAULTS_STRIKETHROUGH, DEFAULTS_SUBSUPSCRIPT, DEFAULTS_UNDERLINE, ELEMENT_H1, ELEMENT_H2, ELEMENT_PARAGRAPH, ELEMENT_TODO_LI, ExitBreakPlugin, HeadingPlugin, ImagePlugin, isBlockAboveEmpty, isSelectionAtBlockStart, ItalicPlugin, LinkPlugin, ListPlugin, ParagraphPlugin, ResetBlockTypePlugin, SlateDocument, SlatePlugin, SoftBreakPlugin, StrikethroughPlugin, SubscriptPlugin, SuperscriptPlugin, TodoListPlugin, UnderlinePlugin, withDeserializeHTML, withImageUpload, withInlineVoid, withLink, withToggleType, withTrailingNode, withTransforms } from '@udecode/slate-plugins';
+import { BoldPlugin, DEFAULTS_BOLD, DEFAULTS_ITALIC, DEFAULTS_LIST, DEFAULTS_STRIKETHROUGH, DEFAULTS_SUBSUPSCRIPT, DEFAULTS_UNDERLINE, ELEMENT_H1, ELEMENT_H2, ELEMENT_IMAGE, ELEMENT_PARAGRAPH, ELEMENT_TODO_LI, ExitBreakPlugin, HeadingPlugin, ImagePlugin, isBlockAboveEmpty, isSelectionAtBlockStart, ItalicPlugin, LinkPlugin, ListPlugin, ParagraphPlugin, ResetBlockTypePlugin, SlateDocument, SlatePlugin, SoftBreakPlugin, StrikethroughPlugin, SubscriptPlugin, SuperscriptPlugin, TodoListPlugin, UnderlinePlugin, withDeserializeHTML, withImageUpload, withInlineVoid, withLink, withToggleType, withTrailingNode, withTransforms } from '@udecode/slate-plugins';
 
 import { ParagraphElement } from './elements/ParagraphElement';
 import { SubtitleElement } from './elements/SubtitleElement';
 import { TodoListElement } from './elements/TodoListElement';
 import { TitleElement } from './elements/TitleElement';
 import { LinkElement } from './elements/LinkElement';
+import { ImageElement } from './elements/ImageElement';
 
 
 export const options = {
@@ -30,7 +31,13 @@ export const options = {
     link: {
         link: { component: LinkElement },
     },
-    image: DEFAULTS_IMAGE,
+    image: {
+        img: {
+            component: ImageElement,
+            type: ELEMENT_IMAGE,
+            rootProps: {},
+        },
+    },
 };
 
 export const plugins: SlatePlugin[] = [
