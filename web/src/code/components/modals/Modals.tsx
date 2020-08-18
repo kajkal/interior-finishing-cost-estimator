@@ -11,6 +11,7 @@ import { ProfileUpdateModal } from './profile-update/ProfileUpdateModal';
 import { InquiryCreateModal } from './inquiry-create/InquiryCreateModal';
 import { InquiryDeleteModal } from './inquiry-delete/InquiryDeleteModal';
 import { InquiryUpdateModal } from './inquiry-update/InquiryUpdateModal';
+import { InquiryAddQuoteModal } from './inquiry-add-quote/InquiryAddQuoteModal';
 
 
 export function Modals(): React.ReactElement {
@@ -27,6 +28,7 @@ export function Modals(): React.ReactElement {
             <InquiryCreateModal isMobile={isMobile} />
             <InquiryDeleteModal />
             <InquiryUpdateModal isMobile={isMobile} />
+            <InquiryAddQuoteModal isMobile={isMobile} />
         </>
     );
 }

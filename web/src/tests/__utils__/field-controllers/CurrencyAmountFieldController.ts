@@ -1,4 +1,4 @@
-import { getByText, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, getByText, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { supportedCurrencies } from '../../../code/config/supportedCurrencies';
@@ -15,6 +15,7 @@ export class CurrencyAmountFieldController extends AbstractFieldController {
     pasteAmount(value: string): CurrencyAmountFieldController {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.paste(inputElement, value);
+            fireEvent.blur(inputElement);
             return inputElement;
         }) as CurrencyAmountFieldController;
     }
