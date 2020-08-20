@@ -12,7 +12,7 @@ fragment UserDetailedData on User {
        ...ProjectBasicData
     }
     inquiries {
-        id
+        ...InquiryData
     }
     bookmarkedInquiries
 }

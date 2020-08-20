@@ -70,7 +70,7 @@
     "userNotFoundError": "Użytkownik nie znaleziony",
     "currentAvatar": "Twoje obecne zdjęcie profilowe",
     "settings": {
-      "emailConfirmed": "Ten adres email został już potwierdzony",
+      "emailConfirmed": "Ten adres email został potwierdzony",
       "emailNotConfirmed": "Ten adres email nie został jeszcze potwierdzony. Sprawdź swoją skrzynkę pocztową w celu uzyskania instrukcji jak potwierdzić swój adres email.",
       "changeEmail": "Zmień adres email",
       "emailChangeSuccessTitle": "Adres email został zmieniony",
@@ -83,6 +83,7 @@
       "profileModeLabel": "Prywatny profil",
       "profileSettingsChangeSuccess": "Ustawienia profilu zostały zmienione"
     },
+    "emptyProfileMessage": "Cześć jestem {{name}} i nie zaktualizowałem jeszcze swojego profilu!",
     "updateProfileModal": {
       "title": "Edytuj profil"
     }
@@ -112,6 +113,8 @@
   },
   "product": {
     "products": "Produkty",
+    "noProducts": "Twoja lista produktów jest pusta. Nowy produkt możesz dodać klikając ikonę plusa powyżej.",
+    "noProductsMatch": "Nie znaleziono produktów spełniających zdefiniowane kryteria wyszukiwania.",
     "addProduct": "Dodaj produkt",
     "descriptionSectionTitle": "Opis",
     "productHistory": "Historia produktu",
@@ -140,6 +143,7 @@
   },
   "inquiry": {
     "inquiries": "Zapytania o wycenę",
+    "noInquiriesMatch": "Nie znaleziono zapytań spełniających zdefiniowane kryteria wyszukiwania.",
     "addInquiry": "Dodaj zapytanie o wycenę",
     "descriptionSectionTitle": "Opis",
     "quotesSectionTitle": "Oferty",

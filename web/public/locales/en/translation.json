@@ -70,7 +70,7 @@
     "userNotFoundError": "User not found",
     "currentAvatar": "Your current profile picture",
     "settings": {
-      "emailConfirmed": "This email address is already confirmed",
+      "emailConfirmed": "This email address is confirmed",
       "emailNotConfirmed": "This email address is not yet confirmed. Check your inbox for instructions how to confirm your email address.",
       "changeEmail": "Change email",
       "emailChangeSuccessTitle": "Email successfully changed",
@@ -83,6 +83,7 @@
       "profileModeLabel": "Private profile",
       "profileSettingsChangeSuccess": "Profile settings changed successfully"
     },
+    "emptyProfileMessage": "Hello, I'm {{name}} and I haven't updated my profile yet!",
     "updateProfileModal": {
       "title": "Edit profile"
     }
@@ -112,6 +113,8 @@
   },
   "product": {
     "products": "Products",
+    "noProducts": "Your product list is empty. You could define new product by clicking plus icon above.",
+    "noProductsMatch": "No products matching your search criteria were found.",
     "addProduct": "Add product",
     "descriptionSectionTitle": "Description",
     "productHistory": "Product history",
@@ -140,6 +143,7 @@
   },
   "inquiry": {
     "inquiries": "Inquiries",
+    "noInquiriesMatch": "No inquiries matching your search criteria were found.",
     "addInquiry": "Add inquiry",
     "descriptionSectionTitle": "Description",
     "quotesSectionTitle": "Quotes",

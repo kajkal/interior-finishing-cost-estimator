@@ -49,6 +49,9 @@ export function ProductsPage(): React.ReactElement {
     const products = userCachedData?.products;
     const filteredProducts = useProductsFilter(products || [], filters);
 
+    const noProducts = !products?.length;
+    const noProductsMatch = !noProducts && !filteredProducts.length;
+
     const handleProductCreateModalOpen = () => {
         setProductCreateModalModalState({ open: true });
     };
@@ -104,11 +107,23 @@ export function ProductsPage(): React.ReactElement {
                 </div>
 
                 <div>
-                    {
-                        filteredProducts.map((product) => (
-                            <ProductListItem key={product.id} product={product} selectedTags={filters.selectedTags} />
-                        ))
-                    }
+                    {(noProducts) && (
+                        <Typography>
+                            {t('product.noProducts')}
+                        </Typography>
+                    )}
+                    {(noProductsMatch) && (
+                        <Typography>
+                            {t('product.noProductsMatch')}
+                        </Typography>
+                    )}
+                    {filteredProducts.map((product) => (
+                        <ProductListItem
+                            key={product.id}
+                            product={product}
+                            selectedTags={filters.selectedTags}
+                        />
+                    ))}
                 </div>
 
             </Container>

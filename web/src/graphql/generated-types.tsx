@@ -710,7 +710,7 @@ export type UserDetailedDataFragment = (
     & ProjectBasicDataFragment
   )>, inquiries: Array<(
     { __typename?: 'Inquiry' }
-    & Pick<Inquiry, 'id'>
+    & InquiryDataFragment
   )> }
 );
 
@@ -795,6 +795,43 @@ export type ProfileQuery = (
   ) }
 );
 
+export const ProjectBasicDataFragmentDoc = gql`
+    fragment ProjectBasicData on Project {
+  slug
+  name
+}
+    `;
+export const ProjectDetailedDataFragmentDoc = gql`
+    fragment ProjectDetailedData on Project {
+  ...ProjectBasicData
+  location {
+    placeId
+    main
+    secondary
+    lat
+    lng
+  }
+  files {
+    url
+    name
+    description
+  }
+}
+    ${ProjectBasicDataFragmentDoc}`;
+export const ProductDataFragmentDoc = gql`
+    fragment ProductData on Product {
+  id
+  name
+  tags
+  description
+  price {
+    currency
+    amount
+  }
+  createdAt
+  updatedAt
+}
+    `;
 export const PriceQuoteDataFragmentDoc = gql`
     fragment PriceQuoteData on PriceQuote {
   author {
@@ -834,43 +871,6 @@ export const InquiryDataFragmentDoc = gql`
   updatedAt
 }
     ${PriceQuoteDataFragmentDoc}`;
-export const ProjectBasicDataFragmentDoc = gql`
-    fragment ProjectBasicData on Project {
-  slug
-  name
-}
-    `;
-export const ProjectDetailedDataFragmentDoc = gql`
-    fragment ProjectDetailedData on Project {
-  ...ProjectBasicData
-  location {
-    placeId
-    main
-    secondary
-    lat
-    lng
-  }
-  files {
-    url
-    name
-    description
-  }
-}
-    ${ProjectBasicDataFragmentDoc}`;
-export const ProductDataFragmentDoc = gql`
-    fragment ProductData on Product {
-  id
-  name
-  tags
-  description
-  price {
-    currency
-    amount
-  }
-  createdAt
-  updatedAt
-}
-    `;
 export const UserDetailedDataFragmentDoc = gql`
     fragment UserDetailedData on User {
   name
@@ -886,12 +886,13 @@ export const UserDetailedDataFragmentDoc = gql`
     ...ProjectBasicData
   }
   inquiries {
-    id
+    ...InquiryData
   }
   bookmarkedInquiries
 }
     ${ProductDataFragmentDoc}
-${ProjectBasicDataFragmentDoc}`;
+${ProjectBasicDataFragmentDoc}
+${InquiryDataFragmentDoc}`;
 export const UserProfileDataFragmentDoc = gql`
     fragment UserProfileData on Profile {
   userSlug

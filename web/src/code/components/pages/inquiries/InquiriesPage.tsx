@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useRecoilState, useSetRecoilState } from 'recoil/dist';
 
 import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
 import Container from '@material-ui/core/Container';
 import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
@@ -35,6 +36,9 @@ export function InquiriesPage(): React.ReactElement {
     const inquiries = data?.allInquiries;
     const userData = useCurrentUserCachedData();
     const filteredInquiries = useInquiriesFilter(inquiries || [], filters, userData);
+
+    const noInquiries = !inquiries?.length;
+    const noInquiriesMatch = !noInquiries && !filteredInquiries.length;
 
     const handleInquiryCreateModalOpen = () => {
         setInquiryCreateModalModalState({ open: true });
@@ -90,6 +94,11 @@ export function InquiriesPage(): React.ReactElement {
                 </div>
 
                 <div>
+                    {(noInquiriesMatch) && (
+                        <Typography>
+                            {t('inquiry.noInquiriesMatch')}
+                        </Typography>
+                    )}
                     {filteredInquiries?.map(({ inquiry, distance }) => (
                         <InquiryListItem
                             key={inquiry.id}

@@ -7,6 +7,10 @@ import { InquiriesFiltersAtomValue } from './inquiriesFiltersAtom';
 
 export interface InquiryWithDistance {
     inquiry: Inquiry;
+    /**
+     * When location filter is specified - distance (in km) is calculated
+     * from selected location to inquiry location.
+     */
     distance?: number;
 }
 

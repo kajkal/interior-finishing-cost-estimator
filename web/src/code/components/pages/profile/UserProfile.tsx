@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
@@ -14,6 +16,7 @@ export interface UserProfileProps {
 
 export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
     const classes = useStyles();
+    const { t } = useTranslation();
 
     return (
         <div className={classes.profile}>
@@ -27,6 +30,11 @@ export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
                 />
             </div>
 
+            {!profile.description && (
+                <Typography className={classes.description}>
+                    {t('user.emptyProfileMessage', { name: profile.name })}
+                </Typography>
+            )}
             {profile.description && (
                 <RichTextPreviewer
                     value={profile.description}
