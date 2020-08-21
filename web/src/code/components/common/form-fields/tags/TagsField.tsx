@@ -41,7 +41,6 @@ export const TagsField = React.memo(
                 <Autocomplete<TagOption, true, false, true>
                     classes={{
                         inputRoot: (value.length) ? classes.inputWithTags : undefined,
-                        paper: classes.paper,
                     }}
 
                     id={id}
@@ -162,10 +161,5 @@ function optionRenderer(option: TagOption, { inputValue }: AutocompleteRenderOpt
 const useStyles = makeStyles({
     inputWithTags: {
         padding: [ [ 28, 39, 5, 8 ], '!important' ] as unknown as number,
-    },
-    paper: {
-        // in order to cover input borders
-        width: 'calc(100% + 2px)',
-        marginLeft: -1,
     },
 });

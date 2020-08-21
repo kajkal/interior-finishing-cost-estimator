@@ -3,7 +3,7 @@ import { SetterOrUpdater } from 'recoil/dist';
 import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
-import BookmarkIcon from '@material-ui/icons/Bookmark';
+import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import FaceIcon from '@material-ui/icons/Face';
 import Chip from '@material-ui/core/Chip';
 
@@ -29,7 +29,7 @@ export function InquiryFilterType({ selectedType, setFilters, className }: Inqui
             type: 'BOOKMARKED',
             label: t('inquiry.filters.bookmarkedInquiries'),
             ariaLabel: t('inquiry.filters.bookmarkedInquiriesAriaLabel'),
-            Icon: BookmarkIcon,
+            Icon: BookmarksIcon,
         },
     ] as const;
 

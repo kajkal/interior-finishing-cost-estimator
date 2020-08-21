@@ -9,7 +9,7 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import AddIcon from '@material-ui/icons/Add';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
 
 import { ConditionalTooltip } from '../../common/data-display/ConditionalTooltip';
 import { useSideNavListItemStyles } from '../styles/useSideNavListItemStyles';
@@ -71,7 +71,7 @@ export function ProjectsCollapsibleList({ isSideNavOpen, onSideNavToggle, projec
                     >
 
                         <ListItemIcon>
-                            <AddIcon fontSize='small' />
+                            <NoteAddIcon />
                         </ListItemIcon>
 
                         <ListItemText

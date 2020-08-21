@@ -88,7 +88,7 @@ export function AccountCollapsibleList({ isSideNavOpen, onSideNavToggle, userNam
                                 end
                             >
                                 <ListItemIcon>
-                                    <Icon/>
+                                    <Icon />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={label}

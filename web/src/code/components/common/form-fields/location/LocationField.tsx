@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import parse from 'autosuggest-highlight/parse';
 
-import { makeStyles } from '@material-ui/core/styles';
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteProps } from '@material-ui/lab/Autocomplete';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
@@ -39,7 +38,6 @@ export interface LocationFieldProps extends Omit<FilledTextFieldProps, 'variant'
 }
 
 export function LocationField({ id, value, onChange, disabled, types, className, autocompleteClasses, ...rest }: LocationFieldProps): React.ReactElement {
-    const classes = useStyles();
     const { t, i18n } = useTranslation();
     const [ inputValue, setInputValue ] = React.useState('');
     const [ options, setOptions ] = React.useState<LocationOption[]>([]);
@@ -68,10 +66,7 @@ export function LocationField({ id, value, onChange, disabled, types, className,
     return (
         <FormControl fullWidth margin='normal' className={className}>
             <Autocomplete<LocationOption, false, false, false>
-                classes={{
-                    paper: classes.paper,
-                    ...autocompleteClasses,
-                }}
+                classes={autocompleteClasses}
 
                 id={id}
                 autoComplete
@@ -132,9 +127,9 @@ function optionRenderer(option: LocationOption): React.ReactNode {
     );
 
     return (
-        <Grid container alignItems='center'>
+        <Grid container alignItems='center' spacing={2}>
             <Grid item>
-                <LocationOnIcon color='primary' style={{ marginRight: 16 }} />
+                <LocationOnIcon color='primary' />
             </Grid>
             <Grid item xs>
                 {parts.map((part, index) => (
@@ -149,12 +144,3 @@ function optionRenderer(option: LocationOption): React.ReactNode {
         </Grid>
     );
 }
-
-
-const useStyles = makeStyles({
-    paper: {
-        // in order to cover input borders
-        width: 'calc(100% + 2px)',
-        marginLeft: -1,
-    },
-});

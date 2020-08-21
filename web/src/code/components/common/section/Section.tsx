@@ -17,15 +17,21 @@ export interface SectionProps {
     defaultExpanded?: boolean;
 }
 
-export function Section({ children, title, id, className, defaultExpanded }: SectionProps): React.ReactElement {
+const sectionExpansionStateMemory = new Map<string, boolean>();
+
+export function Section({ children, title, id, className, defaultExpanded = sectionExpansionStateMemory.get(id) }: SectionProps): React.ReactElement {
     const classes = useStyles();
     const [ expanded, setExpanded ] = React.useState(Boolean(defaultExpanded));
-    const handleAccordionToggle = () => setExpanded((expanded) => !expanded);
+
+    const handleToggle = () => {
+        setExpanded(!expanded);
+        sectionExpansionStateMemory.set(id, !expanded);
+    };
 
     return (
         <Accordion
             expanded={expanded}
-            onChange={handleAccordionToggle}
+            onChange={handleToggle}
             classes={{
                 root: classes.MuiAccordionRoot,
                 expanded: classes.MuiAccordionExpanded,

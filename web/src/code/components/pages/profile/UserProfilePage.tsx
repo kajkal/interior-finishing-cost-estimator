@@ -7,7 +7,6 @@ import { usePageLinearProgressRevealer } from '../../common/progress-indicators/
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { PageEnterTransition } from '../../common/page/PageEnterTransition';
 import { useProfileQuery } from '../../../../graphql/generated-types';
-import { useToast } from '../../providers/toast/useToast';
 import { PageHeader } from '../../common/page/PageHeader';
 import { PageTitle } from '../../common/page/PageTitle';
 import { PageNotFound } from '../not-found/PageNotFound';
@@ -16,13 +15,12 @@ import { UserProfile } from './UserProfile';
 
 export function UserProfilePage(): React.ReactElement {
     const { userSlug } = useParams();
-    const { errorToast } = useToast();
     const { data, error, loading } = useProfileQuery({ variables: { userSlug } });
     usePageLinearProgressRevealer(loading);
 
     React.useEffect(() => {
         error && ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
-    }, [ error, errorToast ]);
+    }, [ error ]);
 
     if (error) {
         return <PageNotFound />;

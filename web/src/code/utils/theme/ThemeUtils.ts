@@ -1,10 +1,17 @@
 import { createMuiTheme, responsiveFontSizes, Theme } from '@material-ui/core/styles';
+import { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
+import { StyleRules } from '@material-ui/core/styles/withStyles';
+import { Overrides } from '@material-ui/core/styles/overrides';
 import pink from '@material-ui/core/colors/pink';
 
 
 export enum ThemeType {
     light = 'light',
     dark = 'dark',
+}
+
+interface ExtendedOverrides extends Overrides {
+    MuiAutocomplete?: Partial<StyleRules<AutocompleteClassKey>>;
 }
 
 /**
@@ -135,7 +142,14 @@ export class ThemeUtils {
                     },
                 },
             },
-        };
+            MuiAutocomplete: {
+                paper: {
+                    // in order to cover other inputs left/right borders
+                    width: 'calc(100% + 2px)',
+                    marginLeft: -1,
+                },
+            },
+        } as ExtendedOverrides;
 
         return theme;
     }

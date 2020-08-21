@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 
-import { makeStyles } from '@material-ui/core/styles';
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteRenderOptionState } from '@material-ui/lab/Autocomplete';
 import FormControl from '@material-ui/core/FormControl';
@@ -24,7 +23,6 @@ export interface CategoryFieldProps extends Omit<FilledTextFieldProps, 'variant'
 
 export const CategoryField = React.memo(
     function CategoryField({ id, value, onChange, disabled, ...rest }: CategoryFieldProps): React.ReactElement {
-        const classes = useStyles();
         const { t } = useTranslation();
         const definedCategoryOptions = React.useMemo(() => (
             supportedCategories.map((category) => ({
@@ -36,14 +34,13 @@ export const CategoryField = React.memo(
         return (
             <FormControl fullWidth margin='normal'>
                 <Autocomplete<CategoryOption, false, false, false>
-                    classes={{
-                        paper: classes.paper,
-                    }}
 
                     id={id}
                     handleHomeEndKeys
                     openOnFocus
+                    autoSelect
                     clearText={t('form.common.tags.clear')}
+                    noOptionsText={t('form.common.noOption')}
 
                     disabled={disabled}
                     value={value}
@@ -102,12 +99,3 @@ function optionRenderer(option: CategoryOption, { inputValue }: AutocompleteRend
         </div>
     );
 }
-
-
-const useStyles = makeStyles({
-    paper: {
-        // in order to cover input borders
-        width: 'calc(100% + 2px)',
-        marginLeft: -1,
-    },
-});

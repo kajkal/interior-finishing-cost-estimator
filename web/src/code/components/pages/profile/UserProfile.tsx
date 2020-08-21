@@ -19,46 +19,45 @@ export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
     const { t } = useTranslation();
 
     return (
-        <div className={classes.profile}>
-
-            <div className={classes.avatarContainer}>
-                <Avatar
-                    variant='rounded'
-                    alt={profile.name}
-                    src={profile.avatar || undefined}
-                    className={classes.avatar}
-                />
-            </div>
-
-            {!profile.description && (
-                <Typography className={classes.description}>
-                    {t('user.emptyProfileMessage', { name: profile.name })}
-                </Typography>
-            )}
-            {profile.description && (
-                <RichTextPreviewer
-                    value={profile.description}
-                    className={classes.description}
-                />
-            )}
-
+        <>
             {profile.location && (
-                <LocationChip
-                    location={profile.location}
-                    className={classes.location}
-                />
+                <LocationChip location={profile.location} />
             )}
 
-        </div>
+            <div className={classes.profile}>
+
+                <div className={classes.avatarContainer}>
+                    <Avatar
+                        variant='rounded'
+                        alt={profile.name}
+                        src={profile.avatar || undefined}
+                        className={classes.avatar}
+                    />
+                </div>
+
+                {!profile.description && (
+                    <Typography className={classes.description}>
+                        {t('user.emptyProfileMessage', { name: profile.name })}
+                    </Typography>
+                )}
+                {profile.description && (
+                    <RichTextPreviewer
+                        value={profile.description}
+                        className={classes.description}
+                    />
+                )}
+
+            </div>
+        </>
     );
 }
 
 const useStyles = makeStyles((theme) => ({
     profile: {
+        marginTop: theme.spacing(3),
         display: 'grid',
         gridTemplateColumns: '1fr',
         gridTemplateAreas: `
-            'location'
             'avatar'
             'description'
         `,
@@ -66,16 +65,12 @@ const useStyles = makeStyles((theme) => ({
         gap: theme.spacing(2),
 
         [ theme.breakpoints.up('sm') ]: {
+            marginTop: theme.spacing(8),
             gridTemplateColumns: '1fr 4fr',
             gridTemplateAreas: `
-                'location location'
                 'avatar description'
             `,
         },
-    },
-    location: {
-        gridArea: 'location',
-        justifySelf: 'flex-start',
     },
     avatarContainer: {
         gridArea: 'avatar',
