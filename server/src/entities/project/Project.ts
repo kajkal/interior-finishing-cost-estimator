@@ -1,9 +1,10 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Entity, IdentifiedReference, ManyToOne, Property } from 'mikro-orm';
 
+import { Location } from '../common/Location';
 import { BaseEntity } from '../BaseEntity';
 import { User } from '../user/User';
-import { Location } from '../common/Location';
+import { Room } from './Room';
 
 
 @ObjectType()
@@ -24,5 +25,9 @@ export class Project extends BaseEntity {
     @Field(() => Location, { nullable: true })
     @Property()
     location?: Location | null;
+
+    @Field(() => [ Room ], { nullable: true })
+    @Property()
+    rooms?: Room[] | null;
 
 }

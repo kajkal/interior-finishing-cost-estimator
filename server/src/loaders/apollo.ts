@@ -12,6 +12,7 @@ import { InquiryResolver } from '../resolvers/inquiry/InquiryResolver';
 import { LoginResolver } from '../resolvers/user/LoginResolver';
 import { ProfileResolver } from '../resolvers/user/ProfileResolver';
 import { SettingsResolver } from '../resolvers/user/SettingsResolver';
+import { RoomResolver } from '../resolvers/project/RoomResolver';
 import { authChecker } from '../utils/authChecker';
 
 
@@ -25,6 +26,7 @@ export async function createApolloServer(): Promise<ApolloServer> {
                 PasswordResetResolver,
                 ProductResolver,
                 ProjectResolver,
+                RoomResolver,
                 InquiryResolver,
                 ProfileResolver,
                 SettingsResolver,

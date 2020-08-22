@@ -388,7 +388,7 @@ describe('ProductResolver', () => {
             const user = await testUtils.db.populateWithUser();
             const formData: ProductUpdateFormData = {
                 productId: '5f09e24646904045d48e5598',
-                name: generator.word(),
+                name: generator.word({ length: 5 }),
                 description: `[{"sample":"${generator.sentence()}"}]`,
                 price: null,
                 tags: null,
