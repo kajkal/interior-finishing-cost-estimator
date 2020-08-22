@@ -164,15 +164,13 @@ export class InquiryResolver {
 
         if (inquiry) {
             if (inquiry.user.id !== user.id) {
-                const bookmarkedInquiries = new Set(user.bookmarkedInquiries);
                 if (bookmark) {
-                    bookmarkedInquiries.add(inquiry.id);
+                    user.bookmarkedInquiries.add(inquiry);
                 } else {
-                    bookmarkedInquiries.delete(inquiry.id);
+                    user.bookmarkedInquiries.remove(inquiry);
                 }
-                user.bookmarkedInquiries = [ ...bookmarkedInquiries ];
                 await this.userRepository.persistAndFlush(user);
-                return user.bookmarkedInquiries;
+                return user.bookmarkedInquiries.getIdentifiers();
             }
 
             throw new UserInputError('CANNOT_BOOKMARK_OWN_INQUIRY');

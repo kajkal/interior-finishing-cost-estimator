@@ -38,6 +38,6 @@ export class Inquiry extends BaseEntity {
      * @see InquiryResolver#quotes
      */
     @Property()
-    quotes?: Quote[] | null
+    quotes?: Quote[] | null;
 
 }

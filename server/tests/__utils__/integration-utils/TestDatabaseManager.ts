@@ -11,6 +11,10 @@ import { User } from '../../../src/entities/user/User';
 import { generator } from '../generator';
 
 
+export interface UserData extends Omit<User, 'products' | 'projects' | 'inquiries' | 'bookmarkedInquiries'> {
+    bookmarkedInquiries: string[];
+}
+
 /**
  * Class with helper functions created for integration tests
  */
@@ -45,7 +49,7 @@ export class TestDatabaseManager {
     /**
      * User
      */
-    async populateWithUser(partialUserData?: Partial<Omit<User, 'products' | 'projects' | 'inquiries'>>): Promise<User & { unencryptedPassword: string }> {
+    async populateWithUser(partialUserData?: Partial<UserData>): Promise<User & { unencryptedPassword: string }> {
         const name = generator.name();
         const userData = {
             name,

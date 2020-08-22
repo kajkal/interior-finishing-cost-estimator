@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Collection, Entity, OneToMany, Property } from 'mikro-orm';
+import { Collection, Entity, ManyToMany, OneToMany, Property } from 'mikro-orm';
 
 import { BaseEntity } from '../BaseEntity';
 import { Product } from '../product/Product';
@@ -87,15 +87,11 @@ export class User extends BaseEntity {
     @OneToMany(() => Inquiry, 'user')
     inquiries = new Collection<Inquiry>(this);
 
-
     /**
-     * --------------------------------------------------
-     * Other
-     * --------------------------------------------------
+     * @see UserResolver#bookmarkedInquiries
+     * @see InquiryResolver#bookmarkInquiry
      */
-
-    @Field(() => [ String ])
-    @Property()
-    bookmarkedInquiries: string[] = [];
+    @ManyToMany(() => Inquiry)
+    bookmarkedInquiries = new Collection<Inquiry>(this);
 
 }

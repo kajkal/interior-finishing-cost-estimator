@@ -38,6 +38,12 @@ export class UserResolver {
     //     return user.products.count();
     // }
 
+    @FieldResolver(() => String, { nullable: true, description: 'User\' avatar url' })
+    async avatar(@Root() user: User): Promise<string | null> {
+        const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
+        return avatar?.url || null;
+    }
+
     @FieldResolver(() => [ Project ], { description: 'User\' all projects.' })
     async projects(@Root() user: User) {
         const projects = await user.projects.init();
@@ -56,10 +62,9 @@ export class UserResolver {
         return await user.inquiries.loadItems();
     }
 
-    @FieldResolver(() => String, { nullable: true, description: 'User\' avatar url' })
-    async avatar(@Root() user: User): Promise<string | null> {
-        const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
-        return avatar?.url || null;
+    @FieldResolver(() => [ String ], { description: 'Identifiers of bookmarked inquiries' })
+    async bookmarkedInquiries(@Root() user: User) {
+        return user.bookmarkedInquiries.getIdentifiers();
     }
 
 

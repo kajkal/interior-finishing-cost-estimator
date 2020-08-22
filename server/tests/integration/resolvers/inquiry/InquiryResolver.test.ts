@@ -17,6 +17,7 @@ import { InquiryUpdateFormData } from '../../../../src/resolvers/inquiry/input/I
 import { InquiryDeleteFormData } from '../../../../src/resolvers/inquiry/input/InquiryDeleteFormData';
 import { InquiryResolver } from '../../../../src/resolvers/inquiry/InquiryResolver';
 import { Category } from '../../../../src/entities/inquiry/Category';
+import { User } from '../../../../src/entities/user/User';
 
 
 describe('InquiryResolver', () => {
@@ -895,9 +896,8 @@ describe('InquiryResolver', () => {
 
             // verify if user was updated and saved in db
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
-                bookmarkedInquiries: [ inquiry.id ],
-            }));
+            const updatedUserData = UserRepositorySpy.persistAndFlush.mock.calls[ 0 ][ 0 ] as User;
+            expect(updatedUserData.bookmarkedInquiries.getIdentifiers()).toEqual([ inquiry.id ]);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
@@ -928,9 +928,8 @@ describe('InquiryResolver', () => {
 
             // verify if user was updated and saved in db
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
-                bookmarkedInquiries: [],
-            }));
+            const updatedUserData = UserRepositorySpy.persistAndFlush.mock.calls[ 0 ][ 0 ] as User;
+            expect(updatedUserData.bookmarkedInquiries.getIdentifiers()).toEqual([]);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
