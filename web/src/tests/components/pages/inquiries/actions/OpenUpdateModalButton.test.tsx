@@ -60,10 +60,7 @@ describe('OpenUpdateModalButton component', () => {
                         secondary_text: 'Country',
                     },
                 },
-                category: {
-                    id: 'DESIGNING',
-                    label: 't:inquiry.categories.designing',
-                },
+                category: 'DESIGNING',
             },
         });
     });

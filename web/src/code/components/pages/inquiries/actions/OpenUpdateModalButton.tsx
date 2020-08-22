@@ -21,7 +21,7 @@ export function OpenUpdateModalButton({ inquiry, ...rest }: OpenUpdateModalButto
     const handleUpdate = () => {
         modalState({
             open: true,
-            inquiryData: mapInquiryToInquiryUpdateFormData(inquiry, t),
+            inquiryData: mapInquiryToInquiryUpdateFormData(inquiry),
         });
     };
 

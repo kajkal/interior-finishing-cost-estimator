@@ -11,15 +11,14 @@ import userEvent from '@testing-library/user-event';
 import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 
 import { FormikCategoryField } from '../../../../../code/components/common/form-fields/category/FormikCategoryField';
-import { CategoryOption } from '../../../../../code/components/common/form-fields/category/CategoryField';
 import { supportedCategories } from '../../../../../code/config/supportedCategories';
 
 
 jest.mock('../../../../../code/config/supportedCategories', () => ({
-    categoryTranslationKeyMap: {
-        PIPING: 'categories.piping',
-        CARPENTRY: 'categories.carpentry',
-        DESIGNING: 'categories.designing',
+    categoryConfigMap: {
+        PIPING: { tKey: 'categories.piping' },
+        CARPENTRY: { tKey: 'categories.carpentry' },
+        DESIGNING: { tKey: 'categories.designing' },
     },
     supportedCategories: [ 'PIPING', 'CARPENTRY', 'DESIGNING' ],
 }));
@@ -33,10 +32,9 @@ describe('FormikCategoriesField component', () => {
                     category: null,
                 }}
                 validationSchema={Yup.object({
-                    category: Yup.object<CategoryOption>({
-                        id: Yup.string().oneOf(supportedCategories).defined(),
-                        label: Yup.string().defined(),
-                    }).nullable().required('category is required'),
+                    category: Yup.mixed().oneOf([ ...supportedCategories, null ])
+                        .nullable()
+                        .required('category is required'),
                 })}
                 onSubmit={mockHandleSubmit}
             >
@@ -84,10 +82,7 @@ describe('FormikCategoriesField component', () => {
 
         await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
         expect(handleSubmit).toHaveBeenCalledWith({
-            category: {
-                id: 'DESIGNING',
-                label: 't:categories.designing',
-            },
+            category: 'DESIGNING',
         }, expect.any(Object));
     });
 

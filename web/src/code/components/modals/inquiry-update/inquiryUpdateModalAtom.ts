@@ -2,7 +2,7 @@ import { atom } from 'recoil/dist';
 import { SlateDocument } from '@udecode/slate-plugins';
 
 import { LocationOption } from '../../common/form-fields/location/LocationField';
-import { CategoryOption } from '../../common/form-fields/category/CategoryField';
+import { Category } from '../../../../graphql/generated-types';
 
 
 export interface InquiryUpdateFormData {
@@ -10,7 +10,7 @@ export interface InquiryUpdateFormData {
     title: string;
     description: SlateDocument;
     location: LocationOption | null;
-    category: CategoryOption | null;
+    category: Category | null;
 }
 
 /**

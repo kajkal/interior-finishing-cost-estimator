@@ -5,12 +5,10 @@
  */
 
 import React from 'react';
-import { TFunction } from 'i18next';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { mockTFunction } from '../../../__mocks__/libraries/react-i18next';
 import { CategoryFieldController } from '../../../__utils__/field-controllers/CategoryFieldController';
 import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
@@ -58,7 +56,7 @@ describe('InquiryUpdateModal component', () => {
                     data-testid='open-modal-button'
                     onClick={() => setModalState({
                         open: true,
-                        inquiryData: mapInquiryToInquiryUpdateFormData(sampleInquiry, mockTFunction as TFunction),
+                        inquiryData: mapInquiryToInquiryUpdateFormData(sampleInquiry),
                     })}
                 />
             );

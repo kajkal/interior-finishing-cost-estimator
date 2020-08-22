@@ -1,8 +1,9 @@
 import React from 'react';
 import { useField, useFormikContext } from 'formik';
 
-import { CategoryField, CategoryFieldProps, CategoryOption } from './CategoryField';
+import { CategoryField, CategoryFieldProps } from './CategoryField';
 import { LabelWithOptionalIndicator } from '../LabelWithOptionalIndicator';
+import { Category } from '../../../../../graphql/generated-types';
 
 
 export interface FormikCategoryFieldProps extends Pick<CategoryFieldProps, 'id' | 'label' | 'disabled' | 'helperText'> {
@@ -12,10 +13,10 @@ export interface FormikCategoryFieldProps extends Pick<CategoryFieldProps, 'id' 
 
 export function FormikCategoryField({ name, label, optional, ...rest }: FormikCategoryFieldProps): React.ReactElement {
     const { isSubmitting } = useFormikContext();
-    const [ { onChange, ...field }, meta ] = useField<CategoryOption | null>(name);
-    const errorMessage = meta.touched ? parseCategoryError(meta.error) : undefined;
+    const [ { onChange, ...field }, meta ] = useField<Category | null>(name);
+    const errorMessage = meta.touched ? meta.error : undefined;
 
-    const handleChange = React.useCallback((value: CategoryOption | null) => {
+    const handleChange = React.useCallback((value: Category | null) => {
         onChange({ target: { name: name, value } });
     }, [ name, onChange ]);
 
@@ -36,10 +37,4 @@ export function FormikCategoryField({ name, label, optional, ...rest }: FormikCa
             helperText={errorMessage || rest.helperText}
         />
     );
-}
-
-type CategoryError = Partial<Record<keyof CategoryOption, string>>;
-
-function parseCategoryError(error?: CategoryError | string | undefined): string | undefined {
-    if (error) return (typeof error === 'string') ? error : error.id;
 }

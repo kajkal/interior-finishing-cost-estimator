@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { mockTFunction } from '../../__mocks__/libraries/react-i18next';
 
-import { categoryTranslationKeyMap, supportedCategories } from '../../../code/config/supportedCategories';
+import { categoryConfigMap, supportedCategories } from '../../../code/config/supportedCategories';
 import { AbstractFieldController } from './AbstractFieldController';
 import { Category } from '../../../graphql/generated-types';
 import { flushPromises } from '../extendedUserEvent';
@@ -32,7 +32,7 @@ export class CategoryFieldController extends AbstractFieldController {
                 throw new Error(`Invalid category: '${category}' is not one of the supported categories: [${supportedCategories.join(', ')}]`);
             }
 
-            const categoryLabel = mockTFunction(categoryTranslationKeyMap[ category as Category ]);
+            const categoryLabel = mockTFunction(categoryConfigMap[ category as Category ].tKey);
             userEvent.click(inputElement);
             userEvent.click(screen.getByText(categoryLabel));
 

@@ -24,7 +24,6 @@ import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHan
 import { emptyEditorValue } from '../../common/form-fields/ritch-text-editor/options';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { LocationOption } from '../../common/form-fields/location/LocationField';
-import { CategoryOption } from '../../common/form-fields/category/CategoryField';
 import { useUpdateInquiryMutation } from '../../../../graphql/generated-types';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { supportedCategories } from '../../../config/supportedCategories';
@@ -131,7 +130,7 @@ function areValuesEqInitialValues(values: InquiryUpdateFormData, initialValues: 
         && (values.title === initialValues.title)
         && (values.description === initialValues.description)
         && (values.location?.place_id === initialValues.location?.place_id)
-        && (values.category?.id === initialValues.category?.id);
+        && (values.category === initialValues.category);
 }
 
 
@@ -153,10 +152,9 @@ function useInquiryUpdateFormValidationSchema(t: TFunction) {
 
         location: Yup.mixed<LocationOption>().required(t('form.location.validation.required')),
 
-        category: Yup.object<CategoryOption>({
-            id: Yup.string().oneOf(supportedCategories).defined(),
-            label: Yup.string().defined(),
-        }).nullable().required(t('form.inquiryCategory.validation.required')),
+        category: Yup.mixed().oneOf([ ...supportedCategories, null ])
+            .nullable()
+            .required(t('form.inquiryCategory.validation.required')),
 
     }).defined(), [ t ]);
 }
@@ -176,7 +174,7 @@ function useInquiryUpdateFormSubmitHandler(onModalClose: () => void) {
                     ...rest,
                     description: JSON.stringify(description),
                     location: await mapLocationOptionToLocationFormData(location!),
-                    category: category?.id!,
+                    category: category!,
                 },
             });
             onModalClose();

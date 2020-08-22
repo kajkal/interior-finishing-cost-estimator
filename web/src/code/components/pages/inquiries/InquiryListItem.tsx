@@ -12,11 +12,11 @@ import Divider from '@material-ui/core/Divider';
 import Chip from '@material-ui/core/Chip';
 
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
-import { categoryTranslationKeyMap } from '../../../config/supportedCategories';
 import { OpenAddQuoteModalButton } from './actions/OpenAddQuoteModalButton';
 import { InquiryDataFragment } from '../../../../graphql/generated-types';
 import { OpenDeleteModalButton } from './actions/OpenDeleteModalButton';
 import { OpenUpdateModalButton } from './actions/OpenUpdateModalButton';
+import { categoryConfigMap } from '../../../config/supportedCategories';
 import { ToggleBookmarkButton } from './actions/ToggleBookmarkButton';
 import { HistoryButton } from '../../common/misc/HistoryButton';
 import { LocationChip } from '../../common/misc/LocationChip';
@@ -71,7 +71,7 @@ export function InquiryListItem({ inquiry, distance, isOwned, isBookmarked, user
 
                 <div className={classes.inquiryChips}>
                     <Chip
-                        label={t(categoryTranslationKeyMap[ inquiry.category ])}
+                        label={t(categoryConfigMap[ inquiry.category ].tKey)}
                         icon={<CategoryIcon />}
                         size='small'
                         variant='outlined'
@@ -192,7 +192,7 @@ const useStyles = makeStyles((theme) => ({
     inquiryTitle: {
         gridArea: 'title',
         marginBottom: theme.spacing(0.5),
-        transition: theme.transitions.create(['font-size', 'margin'], {
+        transition: theme.transitions.create([ 'font-size', 'margin' ], {
             duration: theme.transitions.duration.shortest,
         }),
     },
@@ -215,7 +215,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: 'auto',
     },
     section: {
-        transition: theme.transitions.create(['margin'], {
+        transition: theme.transitions.create([ 'margin' ], {
             duration: theme.transitions.duration.shortest,
         }),
     },

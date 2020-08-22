@@ -12,7 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { InquiriesDocument, InquiriesQuery, useCreateInquiryMutation } from '../../../../graphql/generated-types';
+import { Category, InquiriesDocument, InquiriesQuery, useCreateInquiryMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { FormikRichTextEditor } from '../../common/form-fields/ritch-text-editor/FormikRichTextEditor';
 import { FormikLocationField } from '../../common/form-fields/location/FormikLocationField';
@@ -24,7 +24,6 @@ import { emptyEditorValue } from '../../common/form-fields/ritch-text-editor/opt
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { LocationOption } from '../../common/form-fields/location/LocationField';
-import { CategoryOption } from '../../common/form-fields/category/CategoryField';
 import { FormikTextField } from '../../common/form-fields/FormikTextField';
 import { supportedCategories } from '../../../config/supportedCategories';
 import { inquiryCreateModalAtom } from './inquiryCreateModalAtom';
@@ -35,7 +34,7 @@ type InquiryCreateFormData = {
     title: string;
     description: SlateDocument;
     location: LocationOption | null;
-    category: CategoryOption | null;
+    category: Category | null;
 };
 
 export function InquiryCreateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
@@ -139,10 +138,9 @@ function InquiryCreateFormValidationSchema(t: TFunction) {
 
         location: Yup.mixed<LocationOption>().required(t('form.location.validation.required')),
 
-        category: Yup.object<CategoryOption>({
-            id: Yup.string().oneOf(supportedCategories).defined(),
-            label: Yup.string().defined(),
-        }).nullable().required(t('form.inquiryCategory.validation.required')),
+        category: Yup.mixed().oneOf([ ...supportedCategories, null ])
+            .nullable()
+            .required(t('form.inquiryCategory.validation.required')),
 
     }).defined(), [ t ]);
 }
@@ -162,7 +160,7 @@ function InquiryCreateFormSubmitHandler(onModalClose: () => void) {
                     title,
                     description: JSON.stringify(description),
                     location: await mapLocationOptionToLocationFormData(location!),
-                    category: category?.id!,
+                    category: category!,
                 },
                 update: (cache, { data }) => {
                     const createdInquiry = data?.createInquiry;

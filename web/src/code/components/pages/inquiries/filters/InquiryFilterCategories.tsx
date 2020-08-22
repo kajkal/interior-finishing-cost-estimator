@@ -2,7 +2,7 @@ import React from 'react';
 import { SetterOrUpdater } from 'recoil/dist';
 import { useTranslation } from 'react-i18next';
 
-import { categoryTranslationKeyMap, supportedCategories } from '../../../../config/supportedCategories';
+import { categoryConfigMap, supportedCategories } from '../../../../config/supportedCategories';
 import { Option } from '../../../../utils/hooks/useCurrentUserDataSelectors';
 import { SelectedOptions } from '../../../../utils/filters/filtersUtils';
 import { FilterOptions } from '../../../common/filters/FilterOptions';
@@ -31,8 +31,8 @@ export const InquiryFilterCategories = React.memo(
                 groupClassName={className}
                 groupAriaLabel={t('inquiry.filters.categoriesAriaLabel')}
                 selectAllOptionsChipLabel={t('inquiry.filters.selectAllCategories')}
-                optionChipAriaLabel={({ name }) => t('inquiry.filters.toggleCategory', { categoryName: t(categoryTranslationKeyMap[ name as Category ]) })}
-                renderOptionChipLabel={({ name }) => t(categoryTranslationKeyMap[ name as Category ])}
+                optionChipAriaLabel={({ name }) => t('inquiry.filters.toggleCategory', { categoryName: t(categoryConfigMap[ name as Category ].tKey) })}
+                renderOptionChipLabel={({ name }) => t(categoryConfigMap[ name as Category ].tKey)}
             />
         );
     },

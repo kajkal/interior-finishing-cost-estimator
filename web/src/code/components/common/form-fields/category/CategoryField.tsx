@@ -4,36 +4,25 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 
 import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
-import Autocomplete, { AutocompleteRenderOptionState } from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import FormControl from '@material-ui/core/FormControl';
 
-import { categoryTranslationKeyMap, supportedCategories } from '../../../../config/supportedCategories';
+import { categoryConfigMap, supportedCategories } from '../../../../config/supportedCategories';
 import { Category } from '../../../../../graphql/generated-types';
 
 
-export interface CategoryOption {
-    id: Category;
-    label: string;
-}
-
 export interface CategoryFieldProps extends Omit<FilledTextFieldProps, 'variant' | 'onChange' | 'value'> {
-    value: CategoryOption | null;
-    onChange: (value: CategoryOption | null) => void;
+    value: Category | null;
+    onChange: (value: Category | null) => void;
 }
 
 export const CategoryField = React.memo(
     function CategoryField({ id, value, onChange, disabled, ...rest }: CategoryFieldProps): React.ReactElement {
         const { t } = useTranslation();
-        const definedCategoryOptions = React.useMemo(() => (
-            supportedCategories.map((category) => ({
-                id: category,
-                label: t(categoryTranslationKeyMap[ category ]),
-            }))
-        ), [ t ]);
 
         return (
             <FormControl fullWidth margin='normal'>
-                <Autocomplete<CategoryOption, false, false, false>
+                <Autocomplete<Category, false, false, false>
 
                     id={id}
                     handleHomeEndKeys
@@ -48,10 +37,23 @@ export const CategoryField = React.memo(
                         onChange(newValue);
                     }}
 
-                    options={definedCategoryOptions}
-                    getOptionSelected={isOptionSelected}
-                    getOptionLabel={getOptionLabel}
-                    renderOption={optionRenderer}
+                    options={supportedCategories}
+                    getOptionLabel={(option) => t(categoryConfigMap[ option ].tKey)}
+                    renderOption={(option, { inputValue }) => {
+                        const optionLabel = t(categoryConfigMap[ option ].tKey);
+                        const matches = match(optionLabel, inputValue);
+                        const parts = parse(optionLabel, matches);
+
+                        return (
+                            <div>
+                                {parts.map((part, index) => (
+                                    <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                                        {part.text}
+                                    </span>
+                                ))}
+                            </div>
+                        );
+                    }}
 
                     renderInput={({ InputProps, ...params }) => (
                         <TextField
@@ -66,36 +68,3 @@ export const CategoryField = React.memo(
         );
     },
 );
-
-/**
- * Utils
- */
-
-function getOptionLabel(option: CategoryOption): string {
-    return option.label;
-}
-
-function isOptionSelected(option: CategoryOption, value: CategoryOption) {
-    return option.id === value.id;
-}
-
-
-/**
- * Renderers
- */
-
-function optionRenderer(option: CategoryOption, { inputValue }: AutocompleteRenderOptionState): React.ReactNode {
-    const optionLabel = getOptionLabel(option);
-    const matches = match(optionLabel, inputValue);
-    const parts = parse(optionLabel, matches);
-
-    return (
-        <div>
-            {parts.map((part, index) => (
-                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                    {part.text}
-                </span>
-            ))}
-        </div>
-    );
-}

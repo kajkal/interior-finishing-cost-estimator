@@ -8,10 +8,10 @@ import { InquiriesFiltersAtomValue } from '../../../../../code/components/pages/
 
 
 jest.mock('../../../../../code/config/supportedCategories', () => ({
-    categoryTranslationKeyMap: {
-        PIPING: 'categories.piping',
-        CARPENTRY: 'categories.carpentry',
-        DESIGNING: 'categories.designing',
+    categoryConfigMap: {
+        PIPING: { tKey: 'categories.piping' },
+        CARPENTRY: { tKey: 'categories.carpentry' },
+        DESIGNING: { tKey: 'categories.designing' },
     },
     supportedCategories: [ 'PIPING', 'CARPENTRY', 'DESIGNING' ],
 }));
