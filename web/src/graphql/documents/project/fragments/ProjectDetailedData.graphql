@@ -12,4 +12,7 @@ fragment ProjectDetailedData on Project {
         name
         description
     }
+    rooms {
+        ...RoomData
+    }
 }

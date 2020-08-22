@@ -1,4 +1,3 @@
-import React from 'react';
 import { loadGoogleMapsScript } from './loadGoogleMapsScript';
 
 
@@ -24,22 +23,4 @@ export async function geocodePlace(request: google.maps.GeocoderRequest): Promis
             resolve([]);
         }
     });
-}
-
-
-export function useLazyGeocoder(initialLanguage?: string) {
-    const [ service, setService ] = React.useState<google.maps.Geocoder | null>(null);
-
-    React.useEffect(() => {
-        let active = true;
-        void async function initialize() {
-            const ready = await loadGoogleMapsScript(initialLanguage);
-            ready && active && setService(getGeocoder());
-        }();
-        return () => {
-            active = false;
-        };
-    }, [ initialLanguage, setService ]);
-
-    return { geocodePlace: React.useMemo(() => geocodePlace, [ service ]) };
 }

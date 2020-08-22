@@ -1,0 +1,23 @@
+mutation CreateRoom(
+    $projectSlug: String!
+    $type: RoomType!
+    $name: String!
+    $floor: Float
+    $wall: Float
+    $ceiling: Float
+    $productIds: [String!]
+    $inquiryIds: [String!]
+) {
+    createRoom(
+        projectSlug: $projectSlug
+        type: $type
+        name: $name
+        floor: $floor
+        wall: $wall
+        ceiling: $ceiling
+        productIds: $productIds
+        inquiryIds: $inquiryIds
+    ) {
+        ...RoomData
+    }
+}

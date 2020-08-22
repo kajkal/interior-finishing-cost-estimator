@@ -1,0 +1,10 @@
+fragment RoomData on Room {
+    id
+    type
+    name
+    floor
+    wall
+    ceiling
+    productIds
+    inquiryIds
+}

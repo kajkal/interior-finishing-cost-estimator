@@ -1,0 +1,3 @@
+mutation DeleteRoom($projectSlug: String!, $roomId: String!) {
+    deleteRoom(projectSlug: $projectSlug, roomId: $roomId)
+}

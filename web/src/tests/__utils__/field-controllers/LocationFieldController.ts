@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 import { fireEvent, getAllByRole, getByTitle, screen } from '@testing-library/react';
 
 import * as useLazyAutocompleteServiceModule from '../../../code/utils/google-maps/useLazyAutocompleteService';
-import * as useLazyGeocoderModule from '../../../code/utils/google-maps/useLazyGeocoder';
+import * as useLazyGeocoderModule from '../../../code/utils/google-maps/lazyGeocoder';
 import { mapLocationToLocationOption } from '../../../code/utils/mappers/locationMapper';
 import { AbstractFieldController } from './AbstractFieldController';
 import { Location } from '../../../graphql/generated-types';

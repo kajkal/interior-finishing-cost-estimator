@@ -1,6 +1,6 @@
 import { LocationOption } from '../../components/common/form-fields/location/LocationField';
 import { Location, LocationFormData } from '../../../graphql/generated-types';
-import { geocodePlace } from '../google-maps/useLazyGeocoder';
+import { geocodePlace } from '../google-maps/lazyGeocoder';
 
 
 export function mapLocationToLocationOption<T extends Location | null>(location: T): T extends Location ? LocationOption : null {

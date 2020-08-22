@@ -40,16 +40,17 @@ export type User = {
   name: Scalars['String'];
   /** Unique user slug. Used in URLs */
   slug: Scalars['String'];
-  bookmarkedInquiries: Array<Scalars['String']>;
   products: Array<Product>;
+  /** User' avatar url */
+  avatar?: Maybe<Scalars['String']>;
   /** User' all projects. */
   projects: Array<Project>;
   /** User project with given project id. */
   project?: Maybe<Project>;
   /** Inquiries opened by user */
   inquiries: Array<Inquiry>;
-  /** User' avatar url */
-  avatar?: Maybe<Scalars['String']>;
+  /** Identifiers of bookmarked inquiries */
+  bookmarkedInquiries: Array<Scalars['String']>;
 };
 
 
@@ -82,6 +83,7 @@ export type Project = {
   slug: Scalars['String'];
   name: Scalars['String'];
   location?: Maybe<Location>;
+  rooms?: Maybe<Array<Room>>;
   files: Array<ResourceData>;
 };
 
@@ -93,6 +95,22 @@ export type Location = {
   secondary: Scalars['String'];
   lat?: Maybe<Scalars['Float']>;
   lng?: Maybe<Scalars['Float']>;
+};
+
+export type Room = {
+  __typename?: 'Room';
+  id: Scalars['ID'];
+  type: RoomType;
+  /** Custom room name */
+  name: Scalars['String'];
+  /** Floor area in square metres */
+  floor?: Maybe<Scalars['Float']>;
+  /** Wall area in square metres */
+  wall?: Maybe<Scalars['Float']>;
+  /** Ceiling area in square metres */
+  ceiling?: Maybe<Scalars['Float']>;
+  productIds?: Maybe<Array<Scalars['String']>>;
+  inquiryIds?: Maybe<Array<Scalars['String']>>;
 };
 
 export enum RoomType {
@@ -196,6 +214,9 @@ export type Mutation = {
   changeEmail: Scalars['Boolean'];
   changePassword: Scalars['Boolean'];
   changeProfileSettings: Scalars['Boolean'];
+  createRoom: Room;
+  updateRoom: Room;
+  deleteRoom: Scalars['Boolean'];
 };
 
 
@@ -343,6 +364,37 @@ export type MutationChangePasswordArgs = {
 
 export type MutationChangeProfileSettingsArgs = {
   hidden: Scalars['Boolean'];
+};
+
+
+export type MutationCreateRoomArgs = {
+  projectSlug: Scalars['String'];
+  type: RoomType;
+  name: Scalars['String'];
+  floor?: Maybe<Scalars['Float']>;
+  wall?: Maybe<Scalars['Float']>;
+  ceiling?: Maybe<Scalars['Float']>;
+  productIds?: Maybe<Array<Scalars['String']>>;
+  inquiryIds?: Maybe<Array<Scalars['String']>>;
+};
+
+
+export type MutationUpdateRoomArgs = {
+  projectSlug: Scalars['String'];
+  type: RoomType;
+  name: Scalars['String'];
+  floor?: Maybe<Scalars['Float']>;
+  wall?: Maybe<Scalars['Float']>;
+  ceiling?: Maybe<Scalars['Float']>;
+  productIds?: Maybe<Array<Scalars['String']>>;
+  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  roomId: Scalars['String'];
+};
+
+
+export type MutationDeleteRoomArgs = {
+  projectSlug: Scalars['String'];
+  roomId: Scalars['String'];
 };
 
 export type CurrencyAmountFormData = {
@@ -627,8 +679,16 @@ export type ProjectDetailedDataFragment = (
   )>, files: Array<(
     { __typename?: 'ResourceData' }
     & Pick<ResourceData, 'url' | 'name' | 'description'>
-  )> }
+  )>, rooms?: Maybe<Array<(
+    { __typename?: 'Room' }
+    & RoomDataFragment
+  )>> }
   & ProjectBasicDataFragment
+);
+
+export type RoomDataFragment = (
+  { __typename?: 'Room' }
+  & Pick<Room, 'id' | 'type' | 'name' | 'floor' | 'wall' | 'ceiling' | 'productIds' | 'inquiryIds'>
 );
 
 export type CreateProjectMutationVariables = Exact<{
@@ -693,6 +753,58 @@ export type UploadProjectFileMutation = (
   & { uploadProjectFile: (
     { __typename?: 'ResourceData' }
     & Pick<ResourceData, 'url' | 'name' | 'description'>
+  ) }
+);
+
+export type CreateRoomMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+  type: RoomType;
+  name: Scalars['String'];
+  floor?: Maybe<Scalars['Float']>;
+  wall?: Maybe<Scalars['Float']>;
+  ceiling?: Maybe<Scalars['Float']>;
+  productIds?: Maybe<Array<Scalars['String']>>;
+  inquiryIds?: Maybe<Array<Scalars['String']>>;
+}>;
+
+
+export type CreateRoomMutation = (
+  { __typename?: 'Mutation' }
+  & { createRoom: (
+    { __typename?: 'Room' }
+    & RoomDataFragment
+  ) }
+);
+
+export type DeleteRoomMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+  roomId: Scalars['String'];
+}>;
+
+
+export type DeleteRoomMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteRoom'>
+);
+
+export type UpdateRoomMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+  roomId: Scalars['String'];
+  type: RoomType;
+  name: Scalars['String'];
+  floor?: Maybe<Scalars['Float']>;
+  wall?: Maybe<Scalars['Float']>;
+  ceiling?: Maybe<Scalars['Float']>;
+  productIds?: Maybe<Array<Scalars['String']>>;
+  inquiryIds?: Maybe<Array<Scalars['String']>>;
+}>;
+
+
+export type UpdateRoomMutation = (
+  { __typename?: 'Mutation' }
+  & { updateRoom: (
+    { __typename?: 'Room' }
+    & RoomDataFragment
   ) }
 );
 
@@ -815,6 +927,18 @@ export const ProjectBasicDataFragmentDoc = gql`
   name
 }
     `;
+export const RoomDataFragmentDoc = gql`
+    fragment RoomData on Room {
+  id
+  type
+  name
+  floor
+  wall
+  ceiling
+  productIds
+  inquiryIds
+}
+    `;
 export const ProjectDetailedDataFragmentDoc = gql`
     fragment ProjectDetailedData on Project {
   ...ProjectBasicData
@@ -830,8 +954,12 @@ export const ProjectDetailedDataFragmentDoc = gql`
     name
     description
   }
+  rooms {
+    ...RoomData
+  }
 }
-    ${ProjectBasicDataFragmentDoc}`;
+    ${ProjectBasicDataFragmentDoc}
+${RoomDataFragmentDoc}`;
 export const ProductDataFragmentDoc = gql`
     fragment ProductData on Product {
   id
@@ -1590,6 +1718,113 @@ export function useUploadProjectFileMutation(baseOptions?: ApolloReactHooks.Muta
 export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadProjectFileMutation>;
 export type UploadProjectFileMutationResult = ApolloReactCommon.MutationResult<UploadProjectFileMutation>;
 export type UploadProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
+export const CreateRoomDocument = gql`
+    mutation CreateRoom($projectSlug: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $productIds: [String!], $inquiryIds: [String!]) {
+  createRoom(projectSlug: $projectSlug, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, productIds: $productIds, inquiryIds: $inquiryIds) {
+    ...RoomData
+  }
+}
+    ${RoomDataFragmentDoc}`;
+
+/**
+ * __useCreateRoomMutation__
+ *
+ * To run a mutation, you first call `useCreateRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRoomMutation, { data, loading, error }] = useCreateRoomMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *      type: // value for 'type'
+ *      name: // value for 'name'
+ *      floor: // value for 'floor'
+ *      wall: // value for 'wall'
+ *      ceiling: // value for 'ceiling'
+ *      productIds: // value for 'productIds'
+ *      inquiryIds: // value for 'inquiryIds'
+ *   },
+ * });
+ */
+export function useCreateRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateRoomMutation, CreateRoomMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateRoomMutation, CreateRoomMutationVariables>(CreateRoomDocument, baseOptions);
+      }
+export type CreateRoomMutationHookResult = ReturnType<typeof useCreateRoomMutation>;
+export type CreateRoomMutationResult = ApolloReactCommon.MutationResult<CreateRoomMutation>;
+export type CreateRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateRoomMutation, CreateRoomMutationVariables>;
+export const DeleteRoomDocument = gql`
+    mutation DeleteRoom($projectSlug: String!, $roomId: String!) {
+  deleteRoom(projectSlug: $projectSlug, roomId: $roomId)
+}
+    `;
+
+/**
+ * __useDeleteRoomMutation__
+ *
+ * To run a mutation, you first call `useDeleteRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteRoomMutation, { data, loading, error }] = useDeleteRoomMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *      roomId: // value for 'roomId'
+ *   },
+ * });
+ */
+export function useDeleteRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteRoomMutation, DeleteRoomMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteRoomMutation, DeleteRoomMutationVariables>(DeleteRoomDocument, baseOptions);
+      }
+export type DeleteRoomMutationHookResult = ReturnType<typeof useDeleteRoomMutation>;
+export type DeleteRoomMutationResult = ApolloReactCommon.MutationResult<DeleteRoomMutation>;
+export type DeleteRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteRoomMutation, DeleteRoomMutationVariables>;
+export const UpdateRoomDocument = gql`
+    mutation UpdateRoom($projectSlug: String!, $roomId: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $productIds: [String!], $inquiryIds: [String!]) {
+  updateRoom(projectSlug: $projectSlug, roomId: $roomId, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, productIds: $productIds, inquiryIds: $inquiryIds) {
+    ...RoomData
+  }
+}
+    ${RoomDataFragmentDoc}`;
+
+/**
+ * __useUpdateRoomMutation__
+ *
+ * To run a mutation, you first call `useUpdateRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRoomMutation, { data, loading, error }] = useUpdateRoomMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *      roomId: // value for 'roomId'
+ *      type: // value for 'type'
+ *      name: // value for 'name'
+ *      floor: // value for 'floor'
+ *      wall: // value for 'wall'
+ *      ceiling: // value for 'ceiling'
+ *      productIds: // value for 'productIds'
+ *      inquiryIds: // value for 'inquiryIds'
+ *   },
+ * });
+ */
+export function useUpdateRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateRoomMutation, UpdateRoomMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateRoomMutation, UpdateRoomMutationVariables>(UpdateRoomDocument, baseOptions);
+      }
+export type UpdateRoomMutationHookResult = ReturnType<typeof useUpdateRoomMutation>;
+export type UpdateRoomMutationResult = ApolloReactCommon.MutationResult<UpdateRoomMutation>;
+export type UpdateRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateRoomMutation, UpdateRoomMutationVariables>;
 export const ProjectDetailsDocument = gql`
     query ProjectDetails($slug: String!) {
   me {
