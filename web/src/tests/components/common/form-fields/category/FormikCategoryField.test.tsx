@@ -23,7 +23,7 @@ jest.mock('../../../../../code/config/supportedCategories', () => ({
     supportedCategories: [ 'PIPING', 'CARPENTRY', 'DESIGNING' ],
 }));
 
-describe('FormikCategoriesField component', () => {
+describe('FormikCategoryField component', () => {
 
     function renderInFormikContext(mockHandleSubmit = jest.fn()): RenderResult {
         return render(
@@ -86,7 +86,7 @@ describe('FormikCategoriesField component', () => {
         }, expect.any(Object));
     });
 
-    it('should parse and display error in case of failed category validation', async () => {
+    it('should display error in case of failed category validation', async () => {
         renderInFormikContext();
 
         // verify when category is missing

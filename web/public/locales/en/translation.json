@@ -109,6 +109,19 @@
       "firstLine": "Deleting this project will also remove all associated data including uploaded files.",
       "secondLine": "Are you sure you want to permanently delete this project?"
     },
+    "roomType": {
+      "balcony": "Balcony",
+      "bathroom": "Bathroom",
+      "bedroom": "Bedroom",
+      "closet": "Closet",
+      "garage": "Garage",
+      "kidsRoom": "Kids room",
+      "kitchen": "Kitchen",
+      "laundry": "Laundry",
+      "livingRoom": "Living room",
+      "office": "Office",
+      "other": "Other"
+    },
     "projectNotFoundError": "Project no longer exists"
   },
   "product": {

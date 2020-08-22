@@ -109,6 +109,19 @@
       "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
       "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?"
     },
+    "roomType": {
+      "balcony": "Balkon",
+      "bathroom": "Łazienka",
+      "bedroom": "Sypialnia",
+      "closet": "Schowek",
+      "garage": "Garaż",
+      "kidsRoom": "Pokój dziecięcy",
+      "kitchen": "Kuchnia",
+      "laundry": "Pralnia",
+      "livingRoom": "Salon",
+      "office": "Gabinet",
+      "other": "Inne"
+    },
     "projectNotFoundError": "Projekt już nie istnieje"
   },
   "product": {
