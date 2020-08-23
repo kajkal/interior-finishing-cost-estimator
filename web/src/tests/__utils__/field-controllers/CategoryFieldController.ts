@@ -18,7 +18,7 @@ export class CategoryFieldController extends AbstractFieldController {
     clearCategory(): CategoryFieldController {
         return this.then(async (inputElement: HTMLElement) => {
             userEvent.click(inputElement);
-            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.tags.clear'));
+            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.clear'));
 
             fireEvent.blur(inputElement);
             await flushPromises();

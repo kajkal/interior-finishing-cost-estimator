@@ -122,6 +122,9 @@
       "office": "Office",
       "other": "Other"
     },
+    "createRoomModal": {
+      "title": "Define new room"
+    },
     "projectNotFoundError": "Project no longer exists"
   },
   "product": {
@@ -212,6 +215,9 @@
       "update": "Edit",
       "delete": "Delete",
       "optional": "Optional",
+      "open": "Open",
+      "close": "Close",
+      "clear": "Clear",
       "noOption": "No option",
       "dropzone": {
         "validation": {
@@ -254,7 +260,6 @@
       "tags": {
         "addTag": "Add tag \"{{tagName}}\"",
         "newTag": "New tag",
-        "clear": "Clear",
         "validation": {
           "tooLong": "Tag name is too long"
         }
@@ -339,6 +344,43 @@
       "ariaLabel": "Enter file description",
       "validation": {
         "tooLong": "Description is too long"
+      }
+    },
+    "roomType": {
+      "label": "Type",
+      "ariaLabel": "Enter room type",
+      "validation": {
+        "required": "Room type is required"
+      }
+    },
+    "roomName": {
+      "label": "Name",
+      "ariaLabel": "Enter room name",
+      "validation": {
+        "required": "Room name is required",
+        "tooShort": "Room name is too short",
+        "tooLong": "Room name is too long"
+      }
+    },
+    "roomFloorArea": {
+      "label": "Floor",
+      "ariaLabel": "Enter room floor surface area",
+      "validation": {
+        "tooHigh": "Floor surface area is too high"
+      }
+    },
+    "roomWallsArea": {
+      "label": "Walls",
+      "ariaLabel": "Enter room walls surface area",
+      "validation": {
+        "tooHigh": "Walls surface area is too high"
+      }
+    },
+    "roomCeilingArea": {
+      "label": "Ceiling",
+      "ariaLabel": "Enter room ceiling surface area",
+      "validation": {
+        "tooHigh": "Ceiling surface area is too high"
       }
     },
     "productName": {

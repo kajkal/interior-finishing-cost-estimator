@@ -37,7 +37,7 @@ export class LocationFieldController extends AbstractFieldController {
 
     clearLocation(): LocationFieldController {
         return this.then(async (inputElement: HTMLElement) => {
-            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.tags.clear'));
+            userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.clear'));
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;

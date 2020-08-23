@@ -29,7 +29,9 @@ export const RoomTypeField = React.memo(
                     handleHomeEndKeys
                     openOnFocus
                     autoSelect
-                    clearText={t('form.common.tags.clear')}
+                    openText={t('form.common.open')}
+                    closeText={t('form.common.close')}
+                    clearText={t('form.common.clear')}
                     noOptionsText={t('form.common.noOption')}
 
                     disabled={disabled}
@@ -49,7 +51,7 @@ export const RoomTypeField = React.memo(
                         return (
                             <Grid container alignItems='center' spacing={2}>
                                 <Grid item>
-                                    <Icon fontSize='large' />
+                                    <Icon fontSize='large' aria-hidden />
                                 </Grid>
                                 <Grid item xs>
                                     {parts.map((part, index) => (

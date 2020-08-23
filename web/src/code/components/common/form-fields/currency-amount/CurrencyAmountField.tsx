@@ -33,6 +33,7 @@ export function CurrencyAmountField({ value, onChange, currencies, ...rest }: Cu
         allowNegative: false,
         decimalScale: supportedCurrenciesInfoMap.get(value.currency)?.decimalPlaces ?? 2,
         fixedDecimalScale: true,
+        allowedDecimalSeparators: [ '.', ',' ],
     };
 
     return (

@@ -19,7 +19,6 @@ import { usePageLinearProgressRevealer } from '../../common/progress-indicators/
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
 import { CurrencyAmount } from '../../common/form-fields/currency-amount/CurrencyAmountField';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
-import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { inquiryAddQuoteModalAtom } from './inquiryAddQuoteModalAtom';
@@ -33,7 +32,6 @@ interface InquiryAddQuoteFormData extends Pick<AddQuoteMutationVariables, 'inqui
 export function InquiryAddQuoteModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
-    const userData = useCurrentUserCachedData();
     const [ { open, inquiryData }, setModalState ] = useRecoilState(inquiryAddQuoteModalAtom);
 
     const handleModalClose = React.useCallback(() => {
@@ -41,7 +39,7 @@ export function InquiryAddQuoteModal({ isMobile }: ResponsiveModalProps): React.
     }, [ setModalState ]);
 
     const validationSchema = useInquiryAddQuoteFormValidationSchema(t);
-    const handleSubmit = useInquiryAddQuoteFormSubmitHandler(handleModalClose, userData?.slug);
+    const handleSubmit = useInquiryAddQuoteFormSubmitHandler(handleModalClose);
 
     useModalNavigationBlocker(handleModalClose, open);
     const titleId = 'inquiry-add-quote-modal-title';
@@ -135,7 +133,7 @@ function useInquiryAddQuoteFormValidationSchema(t: TFunction) {
 /**
  * Submit handler
  */
-function useInquiryAddQuoteFormSubmitHandler(onModalClose: () => void, userSlug: string | undefined) {
+function useInquiryAddQuoteFormSubmitHandler(onModalClose: () => void) {
     const [ addQuoteMutation, { loading } ] = useAddQuoteMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -157,7 +155,7 @@ function useInquiryAddQuoteFormSubmitHandler(onModalClose: () => void, userSlug:
         } catch (error) {
             ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, userSlug, addQuoteMutation ]);
+    }, [ onModalClose, addQuoteMutation ]);
 }
 
 

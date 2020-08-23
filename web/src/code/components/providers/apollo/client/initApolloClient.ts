@@ -82,6 +82,9 @@ export function initApolloCache() {
             Profile: {
                 keyFields: [ 'userSlug' ],
             },
+            Room: {
+                keyFields: false,
+            }
         },
     });
 }

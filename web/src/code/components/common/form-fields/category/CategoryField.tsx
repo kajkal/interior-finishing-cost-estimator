@@ -28,7 +28,9 @@ export const CategoryField = React.memo(
                     handleHomeEndKeys
                     openOnFocus
                     autoSelect
-                    clearText={t('form.common.tags.clear')}
+                    openText={t('form.common.open')}
+                    closeText={t('form.common.close')}
+                    clearText={t('form.common.clear')}
                     noOptionsText={t('form.common.noOption')}
 
                     disabled={disabled}

@@ -6,12 +6,12 @@ import { LabelWithOptionalIndicator } from '../LabelWithOptionalIndicator';
 import { supportedCurrencies } from '../../../../config/supportedCurrencies';
 
 
-export interface FormikTextFieldProps extends Omit<CurrencyAmountFieldProps, 'variant' | 'onChange' | 'value' | 'currencies'> {
+export interface FormikCurrencyAmountFieldProps extends Omit<CurrencyAmountFieldProps, 'variant' | 'onChange' | 'value' | 'currencies'> {
     name: string;
     optional?: boolean;
 }
 
-export function FormikCurrencyAmountField({ name, label, optional, ...rest }: FormikTextFieldProps): React.ReactElement {
+export function FormikCurrencyAmountField({ name, label, optional, ...rest }: FormikCurrencyAmountFieldProps): React.ReactElement {
     const { isSubmitting } = useFormikContext();
     const [ field, meta, { setValue } ] = useField<CurrencyAmount>(name);
     const errorMessage = meta.touched ? parseCurrencyAmountError(meta.error) : undefined;

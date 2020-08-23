@@ -1,0 +1,1 @@
+export const AVERAGE_CEILING_HEIGHT = 2.5;

@@ -24,7 +24,7 @@ export function ImageElement({ attributes, element: { url }, children, className
                         [ classes.selected ]: selected,
                     })}
                     src={inView ? url : undefined}
-                    alt='lazy loading image'
+                    alt='loading...'
                     loading='lazy'
                 />
             </div>

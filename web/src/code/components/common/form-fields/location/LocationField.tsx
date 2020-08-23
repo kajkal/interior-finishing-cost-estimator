@@ -71,7 +71,9 @@ export function LocationField({ id, value, onChange, disabled, types, className,
                 id={id}
                 autoComplete
                 handleHomeEndKeys
-                clearText={t('form.common.tags.clear')}
+                openText={t('form.common.open')}
+                closeText={t('form.common.close')}
+                clearText={t('form.common.clear')}
                 noOptionsText={t('form.common.noOption')}
 
                 disabled={disabled}

@@ -3,7 +3,6 @@ import { SetterOrUpdater } from 'recoil/dist';
 import { useTranslation } from 'react-i18next';
 
 import { categoryConfigMap, supportedCategories } from '../../../../config/supportedCategories';
-import { Option } from '../../../../utils/hooks/useCurrentUserDataSelectors';
 import { SelectedOptions } from '../../../../utils/filters/filtersUtils';
 import { FilterOptions } from '../../../common/filters/FilterOptions';
 import { InquiriesFiltersAtomValue } from './inquiriesFiltersAtom';
@@ -19,8 +18,6 @@ export interface InquiryFilterCategoriesProps {
 export const InquiryFilterCategories = React.memo(
     function InquiryFilterCategories({ selectedCategories, setFilters, className }: InquiryFilterCategoriesProps): React.ReactElement {
         const { t } = useTranslation();
-        const categories = React.useMemo<Option[]>(() => supportedCategories.map((name) => ({ name })), [ t ]);
-
         return (
             <FilterOptions
                 options={categories}
@@ -37,3 +34,5 @@ export const InquiryFilterCategories = React.memo(
         );
     },
 );
+
+const categories = supportedCategories.map((name) => ({ name }));

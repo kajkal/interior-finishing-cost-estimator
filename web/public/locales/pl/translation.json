@@ -109,6 +109,9 @@
       "firstLine": "Usunięcie tego projektu spowoduje usunięcie wszystkich powiązanych z tym projektem danych w tym przesłanych plików.",
       "secondLine": "Czy na pewno chcesz permanentnie usunąć ten projekt?"
     },
+    "createRoomModal": {
+      "title": "Zdefiniuj pomieszczenie"
+    },
     "roomType": {
       "balcony": "Balkon",
       "bathroom": "Łazienka",
@@ -212,6 +215,9 @@
       "update": "Edytuj",
       "delete": "Usuń",
       "optional": "Opcjonalne",
+      "open": "Otwórz",
+      "close": "Zamknij",
+      "clear": "Wyczyść",
       "noOption": "Brak wyników",
       "dropzone": {
         "validation": {
@@ -254,7 +260,6 @@
       "tags": {
         "addTag": "Dodaj tag \"{{tagName}}\"",
         "newTag": "Nowy tag",
-        "clear": "Wyczyść",
         "validation": {
           "tooLong": "Wprowadzona nazwa tagu jest za długa"
         }
@@ -339,6 +344,43 @@
       "ariaLabel": "Wprowadź opis pliku",
       "validation": {
         "tooLong": "Opis jest za długi"
+      }
+    },
+    "roomType": {
+      "label": "Typ",
+      "ariaLabel": "Wprowadź typ pomieszczenia",
+      "validation": {
+        "required": "Typ pomieszczenia jest wymagany"
+      }
+    },
+    "roomName": {
+      "label": "Nazwa",
+      "ariaLabel": "Wprowadź nazwę pomieszczenia",
+      "validation": {
+        "required": "Nazwa pomieszczenia jest wymagana",
+        "tooShort": "Wprowadzona nazwa pomieszczenia jest za krótka",
+        "tooLong": "Wprowadzona nazwa pomieszczenia jest za długa"
+      }
+    },
+    "roomFloorArea": {
+      "label": "Podłoga",
+      "ariaLabel": "Wprowadź powierzchnię podłogi",
+      "validation": {
+        "tooHigh": "Wprowadzona powierzchnia jest za duża"
+      }
+    },
+    "roomWallsArea": {
+      "label": "Ściany",
+      "ariaLabel": "Wprowadź powierzchnię ścian",
+      "validation": {
+        "tooHigh": "Wprowadzona powierzchnia ścian jest za duża"
+      }
+    },
+    "roomCeilingArea": {
+      "label": "Sufit",
+      "ariaLabel": "Wprowadź powierzchnię sufitu",
+      "validation": {
+        "tooHigh": "Wprowadzona powierzchnia sufitu jest za duża"
       }
     },
     "productName": {

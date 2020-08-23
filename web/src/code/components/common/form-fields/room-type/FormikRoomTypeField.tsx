@@ -6,7 +6,7 @@ import { RoomTypeField, RoomTypeFieldProps } from './RoomTypeField';
 import { RoomType } from '../../../../../graphql/generated-types';
 
 
-export interface FormikRoomTypeFieldProps extends Pick<RoomTypeFieldProps, 'id' | 'label' | 'disabled' | 'helperText'> {
+export interface FormikRoomTypeFieldProps extends Pick<RoomTypeFieldProps, 'id' | 'label' | 'disabled' | 'helperText' | 'autoFocus'> {
     name: string;
     optional?: boolean;
 }

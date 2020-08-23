@@ -14,7 +14,6 @@ import Button from '@material-ui/core/Button';
 import { InquiriesDocument, InquiriesQuery, MutationDeleteInquiryArgs, useDeleteInquiryMutation } from '../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
-import { useCurrentUserCachedData } from '../../../utils/hooks/useCurrentUserCachedData';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { inquiryDeleteModalAtom } from './inquiryDeleteModalAtom';
@@ -96,7 +95,6 @@ function useInquiryDeleteFormValidationSchema() {
  * Submit handler
  */
 function useInquiryDeleteFormSubmitHandler(onModalClose: () => void) {
-    const userSlug = useCurrentUserCachedData()?.slug;
     const [ deleteInquiryMutation, { loading } ] = useDeleteInquiryMutation();
     usePageLinearProgressRevealer(loading);
 
@@ -126,5 +124,5 @@ function useInquiryDeleteFormSubmitHandler(onModalClose: () => void) {
         } catch (error) {
             ApolloErrorHandler.process(error).verifyIfAllErrorsAreHandled();
         }
-    }, [ onModalClose, userSlug, deleteInquiryMutation ]);
+    }, [ onModalClose, deleteInquiryMutation ]);
 }

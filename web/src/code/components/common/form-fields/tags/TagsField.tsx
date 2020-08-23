@@ -48,7 +48,9 @@ export const TagsField = React.memo(
                     multiple
                     handleHomeEndKeys
                     openOnFocus
-                    clearText={t('form.common.tags.clear')}
+                    openText={t('form.common.open')}
+                    closeText={t('form.common.close')}
+                    clearText={t('form.common.clear')}
 
                     disabled={disabled}
                     value={value}

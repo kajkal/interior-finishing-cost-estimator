@@ -58,7 +58,7 @@ export class TagsFieldController extends AbstractFieldController {
 
     removeAllTags(): TagsFieldController {
         return this.then(async (inputElement: HTMLElement) => {
-            userEvent.click(screen.getByTitle('t:form.common.tags.clear'));
+            userEvent.click(screen.getByTitle('t:form.common.clear'));
             return inputElement;
         }) as TagsFieldController;
     }
