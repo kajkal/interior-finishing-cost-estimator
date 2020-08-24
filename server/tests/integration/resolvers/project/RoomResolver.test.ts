@@ -59,15 +59,15 @@ describe('RoomResolver', () => {
     describe('create room mutation', () => {
 
         const createRoomMutation = `
-            mutation CreateInquiry(
+            mutation CreateRoom(
               $projectSlug: String!
               $type: RoomType!
               $name: String!
               $floor: Float
               $wall: Float
               $ceiling: Float
-              $productIds: [String!]
-              $inquiryIds: [String!]
+              $products: [LinkedProductFormData!]
+              $inquiries: [LinkedInquiryFormData!]
             ) {
               createRoom(
                 projectSlug: $projectSlug
@@ -76,8 +76,8 @@ describe('RoomResolver', () => {
                 floor: $floor
                 wall: $wall
                 ceiling: $ceiling
-                productIds: $productIds
-                inquiryIds: $inquiryIds
+                products: $products
+                inquiries: $inquiries
               ) {
                 id
                 type
@@ -85,8 +85,13 @@ describe('RoomResolver', () => {
                 floor
                 wall
                 ceiling
-                productIds
-                inquiryIds
+                products {
+                  productId
+                  amount
+                }
+                inquiries {
+                  inquiryId
+                }
               }
             }
         `;
@@ -104,8 +109,8 @@ describe('RoomResolver', () => {
                     floor: null,
                     wall: null,
                     ceiling: null,
-                    productIds: null,
-                    inquiryIds: null,
+                    products: null,
+                    inquiries: null,
                 },
             });
 
@@ -176,26 +181,50 @@ describe('RoomResolver', () => {
 
             it('should validate product id list', async () => {
                 // should be optional
-                await send.withAuth({ productIds: null }).expectValidationSuccess();
-                await send.withAuth({ productIds: undefined }).expectValidationSuccess();
+                await send.withAuth({ products: null }).expectValidationSuccess();
+                await send.withAuth({ products: undefined }).expectValidationSuccess();
                 // should accept valid
-                await send.withAuth({ productIds: [] }).expectValidationSuccess();
-                await send.withAuth({ productIds: [ '5f09e24646904045d48e5598' ] }).expectValidationSuccess();
+                await send.withAuth({ products: [] }).expectValidationSuccess();
+                await send.withAuth({
+                    products: [ { productId: '5f09e24646904045d48e5598', amount: 0 } ],
+                }).expectValidationSuccess();
+                await send.withAuth({
+                    products: [ { productId: '5f09e24646904045d48e5598', amount: 1e6 } ],
+                }).expectValidationSuccess();
                 // should reject invalid
-                await send.withAuth({ productIds: [ 'invalid-id' ] }).expectValidationError('productIds');
-                await send.withAuth({ productIds: [ '5f09e24646904045d48e5598', 'invalid-id' ] }).expectValidationError('productIds');
+                await send.withAuth({
+                    products: [ { productId: 'invalid-id', amount: 1 } ],
+                }).expectValidationError('products');
+                await send.withAuth({
+                    products: [
+                        { productId: '5f09e24646904045d48e5598', amount: 1 },
+                        { productId: 'invalid-id', amount: 1 },
+                    ],
+                }).expectValidationError('products');
+                await send.withAuth({
+                    products: [ { productId: '5f09e24646904045d48e5598', amount: -1 } ],
+                }).expectValidationError('products');
+                await send.withAuth({
+                    products: [ { productId: '5f09e24646904045d48e5598', amount: 1e6 + 1 } ],
+                }).expectValidationError('products');
             });
 
             it('should validate inquiry id list', async () => {
                 // should be optional
-                await send.withAuth({ inquiryIds: null }).expectValidationSuccess();
-                await send.withAuth({ inquiryIds: undefined }).expectValidationSuccess();
+                await send.withAuth({ inquiries: null }).expectValidationSuccess();
+                await send.withAuth({ inquiries: undefined }).expectValidationSuccess();
                 // should accept valid
-                await send.withAuth({ inquiryIds: [] }).expectValidationSuccess();
-                await send.withAuth({ inquiryIds: [ '5f09e24646904045d48e5598' ] }).expectValidationSuccess();
+                await send.withAuth({ inquiries: [] }).expectValidationSuccess();
+                await send.withAuth({
+                    inquiries: [ { inquiryId: '5f09e24646904045d48e5598' } ],
+                }).expectValidationSuccess();
                 // should reject invalid
-                await send.withAuth({ inquiryIds: [ 'invalid-id' ] }).expectValidationError('inquiryIds');
-                await send.withAuth({ inquiryIds: [ '5f09e24646904045d48e5598', 'invalid-id' ] }).expectValidationError('inquiryIds');
+                await send.withAuth({
+                    inquiries: [ { inquiryId: 'invalid-id' } ],
+                }).expectValidationError('inquiries');
+                await send.withAuth({
+                    inquiries: [ { inquiryId: '5f09e24646904045d48e5598' }, { inquiryId: 'invalid-id' } ],
+                }).expectValidationError('inquiries');
             });
 
         });
@@ -203,16 +232,16 @@ describe('RoomResolver', () => {
         it('should create room', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id, {
-                rooms: [{
+                rooms: [ {
                     id: 'kitchen',
                     type: RoomType.KITCHEN,
                     name: 'Kitchen',
                     floor: null,
                     wall: null,
                     ceiling: null,
-                    productIds: null,
-                    inquiryIds: null,
-                }],
+                    products: null,
+                    inquiries: null,
+                } ],
             });
             const formData: RoomCreateFormData = {
                 projectSlug: projectToUpdate.slug,
@@ -221,8 +250,6 @@ describe('RoomResolver', () => {
                 floor: 12,
                 wall: 42,
                 ceiling: 12,
-                productIds: [],
-                inquiryIds: [],
             };
             const response = await testUtils.postGraphQL({
                 query: createRoomMutation,
@@ -246,8 +273,8 @@ describe('RoomResolver', () => {
                         floor: 12,
                         wall: 42,
                         ceiling: 12,
-                        productIds: [],
-                        inquiryIds: [],
+                        products: null,
+                        inquiries: null,
                     },
                 },
             });
@@ -264,8 +291,8 @@ describe('RoomResolver', () => {
                 floor: null,
                 wall: null,
                 ceiling: null,
-                productIds: null,
-                inquiryIds: null,
+                products: null,
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: createRoomMutation,
@@ -283,8 +310,8 @@ describe('RoomResolver', () => {
                 floor: null,
                 wall: null,
                 ceiling: null,
-                productIds: null,
-                inquiryIds: null,
+                products: null,
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: createRoomMutation,
@@ -298,7 +325,7 @@ describe('RoomResolver', () => {
     describe('update room mutation', () => {
 
         const updateRoomMutation = `
-            mutation UpdateInquiry(
+            mutation UpdateRoom(
               $projectSlug: String!
               $roomId: String!
               $type: RoomType!
@@ -306,8 +333,8 @@ describe('RoomResolver', () => {
               $floor: Float
               $wall: Float
               $ceiling: Float
-              $productIds: [String!]
-              $inquiryIds: [String!]
+              $products: [LinkedProductFormData!]
+              $inquiries: [LinkedInquiryFormData!]
             ) {
               updateRoom(
                 projectSlug: $projectSlug
@@ -317,8 +344,8 @@ describe('RoomResolver', () => {
                 floor: $floor
                 wall: $wall
                 ceiling: $ceiling
-                productIds: $productIds
-                inquiryIds: $inquiryIds
+                products: $products
+                inquiries: $inquiries
               ) {
                 id
                 type
@@ -326,8 +353,13 @@ describe('RoomResolver', () => {
                 floor
                 wall
                 ceiling
-                productIds
-                inquiryIds
+                products {
+                  productId
+                  amount
+                }
+                inquiries {
+                  inquiryId
+                }
               }
             }
         `;
@@ -346,8 +378,8 @@ describe('RoomResolver', () => {
                     floor: null,
                     wall: null,
                     ceiling: null,
-                    productIds: null,
-                    inquiryIds: null,
+                    products: null,
+                    inquiries: null,
                 },
             });
 
@@ -376,16 +408,16 @@ describe('RoomResolver', () => {
         it('should update room', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id, {
-                rooms: [{
+                rooms: [ {
                     id: 'kitchen',
                     type: RoomType.KITCHEN,
                     name: 'Kitchen',
                     floor: null,
                     wall: null,
                     ceiling: null,
-                    productIds: null,
-                    inquiryIds: null,
-                }],
+                    products: null,
+                    inquiries: null,
+                } ],
             });
             const formData: RoomUpdateFormData = {
                 projectSlug: projectToUpdate.slug,
@@ -395,8 +427,8 @@ describe('RoomResolver', () => {
                 floor: 12,
                 wall: 42,
                 ceiling: 12,
-                productIds: ['5f09e24646904045d48e5598'],
-                inquiryIds: null,
+                products: [ { productId: '5f09e24646904045d48e5598', amount: 1 } ],
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: updateRoomMutation,
@@ -420,8 +452,8 @@ describe('RoomResolver', () => {
                         floor: 12,
                         wall: 42,
                         ceiling: 12,
-                        productIds: ['5f09e24646904045d48e5598'],
-                        inquiryIds: null,
+                        products: [ { productId: '5f09e24646904045d48e5598', amount: 1 } ],
+                        inquiries: null,
                     },
                 },
             });
@@ -439,8 +471,8 @@ describe('RoomResolver', () => {
                 floor: null,
                 wall: null,
                 ceiling: null,
-                productIds: null,
-                inquiryIds: null,
+                products: null,
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: updateRoomMutation,
@@ -459,8 +491,8 @@ describe('RoomResolver', () => {
                 floor: null,
                 wall: null,
                 ceiling: null,
-                productIds: null,
-                inquiryIds: null,
+                products: null,
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: updateRoomMutation,
@@ -480,8 +512,8 @@ describe('RoomResolver', () => {
                 floor: null,
                 wall: null,
                 ceiling: null,
-                productIds: null,
-                inquiryIds: null,
+                products: null,
+                inquiries: null,
             };
             const response = await testUtils.postGraphQL({
                 query: updateRoomMutation,
@@ -554,16 +586,16 @@ describe('RoomResolver', () => {
         it('should delete room', async () => {
             const user = await testUtils.db.populateWithUser();
             const projectToUpdate = await testUtils.db.populateWithProject(user.id, {
-                rooms: [{
+                rooms: [ {
                     id: 'kitchen',
                     type: RoomType.KITCHEN,
                     name: 'Kitchen',
                     floor: null,
                     wall: null,
                     ceiling: null,
-                    productIds: null,
-                    inquiryIds: null,
-                }],
+                    products: null,
+                    inquiries: null,
+                } ],
             });
             const formData: RoomDeleteFormData = {
                 projectSlug: projectToUpdate.slug,

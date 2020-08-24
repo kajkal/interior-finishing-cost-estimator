@@ -1,12 +1,11 @@
 import { Field, Float, ID, ObjectType } from 'type-graphql';
 import { Property } from 'mikro-orm';
 
+import { LinkedProduct } from './LinkedProduct';
+import { LinkedInquiry } from './LinkedInquiry';
 import { RoomType } from './RoomType';
 
 
-/**
- * Estimated price of a job/service - response to a inquiry.
- */
 @ObjectType()
 export class Room {
 
@@ -34,12 +33,12 @@ export class Room {
     @Property()
     ceiling?: number | null;
 
-    @Field(() => [ String ], { nullable: true })
+    @Field(() => [ LinkedProduct ], { nullable: true })
     @Property()
-    productIds?: string[] | null;
+    products?: LinkedProduct[] | null;
 
-    @Field(() => [ String ], { nullable: true })
+    @Field(() => [ LinkedInquiry ], { nullable: true })
     @Property()
-    inquiryIds?: string[] | null;
+    inquiries?: LinkedInquiry[] | null;
 
 }

@@ -1,6 +1,8 @@
 import { ArgsType, Field, Float } from 'type-graphql';
-import { IsMongoId, Length, Max, Min } from 'class-validator';
+import { Length, Max, Min, ValidateNested } from 'class-validator';
 
+import { LinkedInquiryFormData } from './LinkedInquiryFormData';
+import { LinkedProductFormData } from './LinkedProductFormData';
 import { RoomType } from '../../../entities/project/RoomType';
 import { IsSlug } from '../../../decorators/IsSlug';
 
@@ -34,12 +36,12 @@ export class RoomCreateFormData {
     @Min(0)
     ceiling?: number | null;
 
-    @Field(() => [ String ], { nullable: true })
-    @IsMongoId({ each: true })
-    productIds?: string[] | null;
+    @Field(() => [ LinkedProductFormData ], { nullable: true })
+    @ValidateNested()
+    products?: LinkedProductFormData[] | null;
 
-    @Field(() => [ String ], { nullable: true })
-    @IsMongoId({ each: true })
-    inquiryIds?: string[] | null;
+    @Field(() => [ LinkedInquiryFormData ], { nullable: true })
+    @ValidateNested()
+    inquiries?: LinkedInquiryFormData[] | null;
 
 }
