@@ -5,6 +5,11 @@ fragment RoomData on Room {
     floor
     wall
     ceiling
-    productIds
-    inquiryIds
+    products {
+        productId
+        amount
+    }
+    inquiries {
+        inquiryId
+    }
 }

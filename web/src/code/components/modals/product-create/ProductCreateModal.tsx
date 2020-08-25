@@ -18,7 +18,7 @@ import { usePageLinearProgressRevealer } from '../../common/progress-indicators/
 import { CurrencyAmountFormData, useCreateProductMutation } from '../../../../graphql/generated-types';
 import { FormikRichTextEditor } from '../../common/form-fields/ritch-text-editor/FormikRichTextEditor';
 import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
-import { CurrencyAmount } from '../../common/form-fields/currency-amount/CurrencyAmountField';
+import { CurrencyAmount } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { isSlateDocumentNotEmpty } from '../../../utils/validation/richTestEditorSchema';
 import { emptyEditorValue } from '../../common/form-fields/ritch-text-editor/options';

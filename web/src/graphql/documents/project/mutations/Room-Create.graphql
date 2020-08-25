@@ -5,8 +5,8 @@ mutation CreateRoom(
     $floor: Float
     $wall: Float
     $ceiling: Float
-    $productIds: [String!]
-    $inquiryIds: [String!]
+    $products: [LinkedProductFormData!]
+    $inquiries: [LinkedInquiryFormData!]
 ) {
     createRoom(
         projectSlug: $projectSlug
@@ -15,8 +15,8 @@ mutation CreateRoom(
         floor: $floor
         wall: $wall
         ceiling: $ceiling
-        productIds: $productIds
-        inquiryIds: $inquiryIds
+        products: $products
+        inquiries: $inquiries
     ) {
         ...RoomData
     }

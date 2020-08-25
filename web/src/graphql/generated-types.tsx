@@ -109,8 +109,8 @@ export type Room = {
   wall?: Maybe<Scalars['Float']>;
   /** Ceiling area in square metres */
   ceiling?: Maybe<Scalars['Float']>;
-  productIds?: Maybe<Array<Scalars['String']>>;
-  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  products?: Maybe<Array<LinkedProduct>>;
+  inquiries?: Maybe<Array<LinkedInquiry>>;
 };
 
 export enum RoomType {
@@ -126,6 +126,17 @@ export enum RoomType {
   OFFICE = 'OFFICE',
   OTHER = 'OTHER'
 }
+
+export type LinkedProduct = {
+  __typename?: 'LinkedProduct';
+  productId: Scalars['ID'];
+  amount: Scalars['Float'];
+};
+
+export type LinkedInquiry = {
+  __typename?: 'LinkedInquiry';
+  inquiryId: Scalars['ID'];
+};
 
 /** Wrapper for resource file data. */
 export type ResourceData = {
@@ -374,8 +385,8 @@ export type MutationCreateRoomArgs = {
   floor?: Maybe<Scalars['Float']>;
   wall?: Maybe<Scalars['Float']>;
   ceiling?: Maybe<Scalars['Float']>;
-  productIds?: Maybe<Array<Scalars['String']>>;
-  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  products?: Maybe<Array<LinkedProductFormData>>;
+  inquiries?: Maybe<Array<LinkedInquiryFormData>>;
 };
 
 
@@ -386,8 +397,8 @@ export type MutationUpdateRoomArgs = {
   floor?: Maybe<Scalars['Float']>;
   wall?: Maybe<Scalars['Float']>;
   ceiling?: Maybe<Scalars['Float']>;
-  productIds?: Maybe<Array<Scalars['String']>>;
-  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  products?: Maybe<Array<LinkedProductFormData>>;
+  inquiries?: Maybe<Array<LinkedInquiryFormData>>;
   roomId: Scalars['String'];
 };
 
@@ -416,6 +427,15 @@ export type InitialData = {
   __typename?: 'InitialData';
   user: User;
   accessToken: Scalars['String'];
+};
+
+export type LinkedProductFormData = {
+  productId: Scalars['String'];
+  amount: Scalars['Float'];
+};
+
+export type LinkedInquiryFormData = {
+  inquiryId: Scalars['String'];
 };
 
 export type ConfirmEmailAddressMutationVariables = Exact<{
@@ -688,7 +708,14 @@ export type ProjectDetailedDataFragment = (
 
 export type RoomDataFragment = (
   { __typename?: 'Room' }
-  & Pick<Room, 'id' | 'type' | 'name' | 'floor' | 'wall' | 'ceiling' | 'productIds' | 'inquiryIds'>
+  & Pick<Room, 'id' | 'type' | 'name' | 'floor' | 'wall' | 'ceiling'>
+  & { products?: Maybe<Array<(
+    { __typename?: 'LinkedProduct' }
+    & Pick<LinkedProduct, 'productId' | 'amount'>
+  )>>, inquiries?: Maybe<Array<(
+    { __typename?: 'LinkedInquiry' }
+    & Pick<LinkedInquiry, 'inquiryId'>
+  )>> }
 );
 
 export type CreateProjectMutationVariables = Exact<{
@@ -763,8 +790,8 @@ export type CreateRoomMutationVariables = Exact<{
   floor?: Maybe<Scalars['Float']>;
   wall?: Maybe<Scalars['Float']>;
   ceiling?: Maybe<Scalars['Float']>;
-  productIds?: Maybe<Array<Scalars['String']>>;
-  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  products?: Maybe<Array<LinkedProductFormData>>;
+  inquiries?: Maybe<Array<LinkedInquiryFormData>>;
 }>;
 
 
@@ -795,8 +822,8 @@ export type UpdateRoomMutationVariables = Exact<{
   floor?: Maybe<Scalars['Float']>;
   wall?: Maybe<Scalars['Float']>;
   ceiling?: Maybe<Scalars['Float']>;
-  productIds?: Maybe<Array<Scalars['String']>>;
-  inquiryIds?: Maybe<Array<Scalars['String']>>;
+  products?: Maybe<Array<LinkedProductFormData>>;
+  inquiries?: Maybe<Array<LinkedInquiryFormData>>;
 }>;
 
 
@@ -935,8 +962,13 @@ export const RoomDataFragmentDoc = gql`
   floor
   wall
   ceiling
-  productIds
-  inquiryIds
+  products {
+    productId
+    amount
+  }
+  inquiries {
+    inquiryId
+  }
 }
     `;
 export const ProjectDetailedDataFragmentDoc = gql`
@@ -1719,8 +1751,8 @@ export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadPro
 export type UploadProjectFileMutationResult = ApolloReactCommon.MutationResult<UploadProjectFileMutation>;
 export type UploadProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
 export const CreateRoomDocument = gql`
-    mutation CreateRoom($projectSlug: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $productIds: [String!], $inquiryIds: [String!]) {
-  createRoom(projectSlug: $projectSlug, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, productIds: $productIds, inquiryIds: $inquiryIds) {
+    mutation CreateRoom($projectSlug: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $products: [LinkedProductFormData!], $inquiries: [LinkedInquiryFormData!]) {
+  createRoom(projectSlug: $projectSlug, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, products: $products, inquiries: $inquiries) {
     ...RoomData
   }
 }
@@ -1745,8 +1777,8 @@ export const CreateRoomDocument = gql`
  *      floor: // value for 'floor'
  *      wall: // value for 'wall'
  *      ceiling: // value for 'ceiling'
- *      productIds: // value for 'productIds'
- *      inquiryIds: // value for 'inquiryIds'
+ *      products: // value for 'products'
+ *      inquiries: // value for 'inquiries'
  *   },
  * });
  */
@@ -1787,8 +1819,8 @@ export type DeleteRoomMutationHookResult = ReturnType<typeof useDeleteRoomMutati
 export type DeleteRoomMutationResult = ApolloReactCommon.MutationResult<DeleteRoomMutation>;
 export type DeleteRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteRoomMutation, DeleteRoomMutationVariables>;
 export const UpdateRoomDocument = gql`
-    mutation UpdateRoom($projectSlug: String!, $roomId: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $productIds: [String!], $inquiryIds: [String!]) {
-  updateRoom(projectSlug: $projectSlug, roomId: $roomId, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, productIds: $productIds, inquiryIds: $inquiryIds) {
+    mutation UpdateRoom($projectSlug: String!, $roomId: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $products: [LinkedProductFormData!], $inquiries: [LinkedInquiryFormData!]) {
+  updateRoom(projectSlug: $projectSlug, roomId: $roomId, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, products: $products, inquiries: $inquiries) {
     ...RoomData
   }
 }
@@ -1814,8 +1846,8 @@ export const UpdateRoomDocument = gql`
  *      floor: // value for 'floor'
  *      wall: // value for 'wall'
  *      ceiling: // value for 'ceiling'
- *      productIds: // value for 'productIds'
- *      inquiryIds: // value for 'inquiryIds'
+ *      products: // value for 'products'
+ *      inquiries: // value for 'inquiries'
  *   },
  * });
  */

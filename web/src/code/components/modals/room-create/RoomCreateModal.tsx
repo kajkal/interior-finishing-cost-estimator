@@ -11,13 +11,16 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { CreateRoomMutationVariables, Room, RoomType, useCreateRoomMutation } from '../../../../graphql/generated-types';
+import { CreateRoomMutationVariables, LinkedInquiryFormData, ProductDataFragment, Room, RoomType, useCreateRoomMutation } from '../../../../graphql/generated-types';
 import { FormikRoomNameAutocompleteField } from '../../common/form-fields/room/FormikRoomNameAutocompleteField';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
-import { FormikSurfaceAreaField } from '../../common/form-fields/surface-area/FormikSurfaceAreaField';
+import { FormikSurfaceAreaField } from '../../common/form-fields/room/FormikSurfaceAreaField';
+import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
 import { FormikRoomTypeField } from '../../common/form-fields/room-type/FormikRoomTypeField';
+import { FormikProductSelector } from '../../common/form-fields/room/FormikProductSelector';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
+import { ProductAmountOption } from '../../common/form-fields/room/ProductSelector';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
 import { supportedRoomTypes } from '../../../config/supportedRoomTypes';
 import { AVERAGE_CEILING_HEIGHT } from '../../../config/constants';
@@ -25,12 +28,14 @@ import { ResponsiveModalProps } from '../ResponsiveModalProps';
 import { roomCreateModalAtom } from './roomCreateModalAtom';
 
 
-interface RoomCreateFormData extends Omit<CreateRoomMutationVariables, 'type'> {
+interface RoomCreateFormData extends Omit<CreateRoomMutationVariables, 'type' | 'products'> {
     type: RoomType | null;
+    products: ProductAmountOption[];
 }
 
 export function RoomCreateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const { t } = useTranslation();
+    const [ { productAmounts } ] = useCurrentUserDataSelectors();
     const [ { open, projectData }, setModalState ] = useRecoilState(roomCreateModalAtom);
 
     const handleModalClose = React.useCallback(() => {
@@ -63,8 +68,8 @@ export function RoomCreateModal({ isMobile }: ResponsiveModalProps): React.React
                     floor: undefined,
                     wall: undefined,
                     ceiling: undefined,
-                    productIds: [],
-                    inquiryIds: [],
+                    products: [],
+                    inquiries: [],
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -116,6 +121,12 @@ export function RoomCreateModal({ isMobile }: ResponsiveModalProps): React.React
                                     optional
                                 />
 
+                                <FormikProductSelector
+                                    name='products'
+                                    label={t('form.roomProductSelector.label')}
+                                    productOptions={productAmounts()}
+                                />
+
                             </Form>
 
                             {/*<div data-testid={'meta'}>*/}
@@ -162,8 +173,20 @@ function RoomCreateFormValidationSchema(t: TFunction) {
         wall: Yup.number().max(1e5, t('form.roomWallsArea.validation.tooHigh')),
         ceiling: Yup.number().max(1e5, t('form.roomCeilingArea.validation.tooHigh')),
 
-        productIds: Yup.array().of(Yup.string().length(24).required()).defined(),
-        inquiryIds: Yup.array().of(Yup.string().length(24).required()).defined(),
+        products: Yup.array().of(
+            Yup.object<ProductAmountOption>({
+                product: Yup.object<ProductDataFragment>().required(),
+                amount: Yup.number()
+                    .max(1e6, t('form.roomProductSelector.productAmount.validation.tooHigh'))
+                    .required(t('form.roomProductSelector.productAmount.validation.required')),
+            }).required(),
+        ).defined(),
+
+        inquiries: Yup.array().of(
+            Yup.object<LinkedInquiryFormData>({
+                inquiryId: Yup.string().length(24).required(),
+            }).required(),
+        ).defined(),
 
     }).defined(), [ t ]);
 }
@@ -176,15 +199,16 @@ function RoomCreateFormSubmitHandler(onModalClose: () => void) {
     const [ createRoomMutation, { loading } ] = useCreateRoomMutation();
     usePageLinearProgressRevealer(loading);
 
-    return React.useCallback<FormikConfig<RoomCreateFormData>['onSubmit']>(async ({ type, productIds, inquiryIds, ...rest }) => {
-        console.log('SUBMIT', { type, ...rest });
+    return React.useCallback<FormikConfig<RoomCreateFormData>['onSubmit']>(async ({ type, products, inquiries, ...rest }) => {
+        console.log('SUBMIT', { type, products, inquiries, ...rest });
+        const mappedProducts = products.map((option) => ({ productId: option.product.id, amount: option.amount! }));
         try {
             await createRoomMutation({
                 variables: {
                     ...rest,
                     type: type!,
-                    productIds: productIds?.length ? productIds : undefined,
-                    inquiryIds: inquiryIds?.length ? inquiryIds : undefined,
+                    products: mappedProducts.length ? mappedProducts : undefined,
+                    inquiries: inquiries?.length ? inquiries : undefined,
                 },
                 update: (cache, { data }) => {
                     const createdRoom = data?.createRoom;

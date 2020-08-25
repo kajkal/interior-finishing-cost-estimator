@@ -6,8 +6,8 @@ mutation UpdateRoom(
     $floor: Float
     $wall: Float
     $ceiling: Float
-    $productIds: [String!]
-    $inquiryIds: [String!]
+    $products: [LinkedProductFormData!]
+    $inquiries: [LinkedInquiryFormData!]
 ) {
     updateRoom(
         projectSlug: $projectSlug
@@ -17,8 +17,8 @@ mutation UpdateRoom(
         floor: $floor
         wall: $wall
         ceiling: $ceiling
-        productIds: $productIds
-        inquiryIds: $inquiryIds
+        products: $products
+        inquiries: $inquiries
     ) {
         ...RoomData
     }

@@ -383,6 +383,20 @@
         "tooHigh": "Wprowadzona powierzchnia sufitu jest za duża"
       }
     },
+    "roomProductSelector": {
+      "label": "Wybierz produkt",
+      "productAmount": {
+        "placeholder": "Liczba",
+        "endAdornment": "szt.",
+        "validation": {
+          "required": "Liczebność produktu jest wymagana",
+          "tooHigh": "Wprowadzona liczebność produktu jest zbyt wysoka"
+        }
+      },
+      "deleteButton": {
+        "title": "Usuń ten produkt"
+      }
+    },
     "productName": {
       "label": "Nazwa produktu",
       "ariaLabel": "Wprowadź nazwę produktu",

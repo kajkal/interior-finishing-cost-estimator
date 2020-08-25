@@ -17,7 +17,7 @@ import { AddQuoteMutationVariables, CurrencyAmountFormData, useAddQuoteMutation 
 import { FormikCurrencyAmountField } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { RichTextPreviewer } from '../../common/form-fields/ritch-text-editor/RichTextPreviewer';
-import { CurrencyAmount } from '../../common/form-fields/currency-amount/CurrencyAmountField';
+import { CurrencyAmount } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';

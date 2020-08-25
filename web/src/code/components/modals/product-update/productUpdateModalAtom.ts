@@ -1,7 +1,7 @@
 import { atom } from 'recoil/dist';
 import { SlateDocument } from '@udecode/slate-plugins';
 
-import { CurrencyAmount } from '../../common/form-fields/currency-amount/CurrencyAmountField';
+import { CurrencyAmount } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { TagOption } from '../../common/form-fields/tags/TagsField';
 import { Product } from '../../../../graphql/generated-types';
 

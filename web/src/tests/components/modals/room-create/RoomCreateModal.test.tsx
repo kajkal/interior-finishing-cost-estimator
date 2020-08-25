@@ -9,19 +9,36 @@ import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { SurfaceAreaFieldController } from '../../../__utils__/field-controllers/SurfaceAreaFieldController';
+import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
+import { ProductSelectorController } from '../../../__utils__/field-controllers/ProductSelectorController';
 import { RoomTypeFieldController } from '../../../__utils__/field-controllers/RoomTypeFieldController';
+import { NumberFieldController } from '../../../__utils__/field-controllers/NumberFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { flushPromises } from '../../../__utils__/extendedUserEvent';
 
-import { CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Project, RoomType } from '../../../../graphql/generated-types';
+import { CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Product, Project, RoomType, User } from '../../../../graphql/generated-types';
 import { roomCreateModalAtom } from '../../../../code/components/modals/room-create/roomCreateModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { RoomCreateModal } from '../../../../code/components/modals/room-create/RoomCreateModal';
 
 
 describe('RoomCreateModal component', () => {
+
+    const sampleProduct1: Partial<Product> = {
+        id: 'sample-product-1',
+        name: 'Sample product 1',
+        tags: [ 'tag A', 'tag B' ],
+    };
+    const sampleProduct2: Partial<Product> = {
+        id: 'sample-product-2',
+        name: 'Sample product 2',
+        tags: [ 'tag C' ],
+    };
+
+    const sampleUser: Partial<User> = {
+        products: [ sampleProduct1, sampleProduct2 ] as Product[],
+    };
 
     const sampleProject: Partial<Project> = {
         __typename: 'Project',
@@ -31,6 +48,10 @@ describe('RoomCreateModal component', () => {
         files: [],
         rooms: null,
     };
+
+    beforeEach(() => {
+        mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
+    });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
@@ -76,6 +97,9 @@ describe('RoomCreateModal component', () => {
         static get roomCeilingAreaInput() {
             return screen.getByLabelText(/t:form.roomCeilingArea.label/, { selector: 'input' });
         }
+        static get roomProductSelector() {
+            return screen.getByLabelText(/t:form.roomProductSelector.label/, { selector: 'input' });
+        }
         static get cancelButton() {
             return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
@@ -90,9 +114,10 @@ describe('RoomCreateModal component', () => {
 
             await RoomTypeFieldController.from(ViewUnderTest.roomTypeSelect).selectRoomType(data.type);
             await TextFieldController.from(ViewUnderTest.roomNameInput).type(data.name);
-            await SurfaceAreaFieldController.from(ViewUnderTest.roomFloorAreaInput).pasteAmount(`${data.floor || ''}`);
-            await SurfaceAreaFieldController.from(ViewUnderTest.roomWallsAreaInput).pasteAmount(`${data.wall || ''}`);
-            await SurfaceAreaFieldController.from(ViewUnderTest.roomCeilingAreaInput).pasteAmount(`${data.ceiling || ''}`);
+            await NumberFieldController.from(ViewUnderTest.roomFloorAreaInput).pasteAmount(`${data.floor || ''}`);
+            await NumberFieldController.from(ViewUnderTest.roomWallsAreaInput).pasteAmount(`${data.wall || ''}`);
+            await NumberFieldController.from(ViewUnderTest.roomCeilingAreaInput).pasteAmount(`${data.ceiling || ''}`);
+            await ProductSelectorController.from(ViewUnderTest.roomProductSelector).selectProduct(sampleProduct1, 1);
 
             userEvent.click(this.submitButton);
         }
@@ -128,8 +153,8 @@ describe('RoomCreateModal component', () => {
                         floor: 12,
                         wall: 17.5,
                         ceiling: 12,
-                        productIds: undefined,
-                        inquiryIds: undefined,
+                        products: [ { productId: sampleProduct1.id, amount: 1 } ],
+                        inquiries: undefined,
                     } as CreateRoomMutationVariables,
                 },
                 result: {
@@ -142,8 +167,8 @@ describe('RoomCreateModal component', () => {
                             floor: 12,
                             wall: 17.5,
                             ceiling: 12,
-                            productIds: null,
-                            inquiryIds: null,
+                            products: [ { productId: sampleProduct1.id, amount: 1 } ],
+                            inquiries: null,
                         },
                     } as CreateRoomMutation,
                 },
@@ -181,7 +206,7 @@ describe('RoomCreateModal component', () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
 
-                await SurfaceAreaFieldController.from(ViewUnderTest.roomFloorAreaInput)
+                await NumberFieldController.from(ViewUnderTest.roomFloorAreaInput)
                     .pasteAmount('').expectNoError()
                     .pasteAmount('100001').expectError('t:form.roomFloorArea.validation.tooHigh')
                     .pasteAmount('100000').expectNoError();
@@ -191,7 +216,7 @@ describe('RoomCreateModal component', () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
 
-                await SurfaceAreaFieldController.from(ViewUnderTest.roomWallsAreaInput)
+                await NumberFieldController.from(ViewUnderTest.roomWallsAreaInput)
                     .pasteAmount('').expectNoError()
                     .pasteAmount('100001').expectError('t:form.roomWallsArea.validation.tooHigh')
                     .pasteAmount('100000').expectNoError();
@@ -201,10 +226,19 @@ describe('RoomCreateModal component', () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
 
-                await SurfaceAreaFieldController.from(ViewUnderTest.roomCeilingAreaInput)
+                await NumberFieldController.from(ViewUnderTest.roomCeilingAreaInput)
                     .pasteAmount('').expectNoError()
                     .pasteAmount('100001').expectError('t:form.roomCeilingArea.validation.tooHigh')
                     .pasteAmount('100000').expectNoError();
+            });
+
+            it('should validate product amount field value', async () => {
+                renderInMockContext();
+                await ViewUnderTest.openModal();
+
+                await ProductSelectorController.from(ViewUnderTest.roomProductSelector)
+                    .selectProduct(sampleProduct1, 1e6).expectNoError()
+                    .selectProduct(sampleProduct2, 1e6 + 1).expectError('t:form.roomProductSelector.productAmount.validation.tooHigh');
             });
 
         });

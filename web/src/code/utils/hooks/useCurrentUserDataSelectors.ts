@@ -1,5 +1,6 @@
 import { useCurrentUserCachedData } from './useCurrentUserCachedData';
 import { MeQuery, Product } from '../../../graphql/generated-types';
+import { ProductAmountOption } from '../../components/common/form-fields/room/ProductSelector';
 
 
 export interface Option {
@@ -24,6 +25,8 @@ export interface CurrentUserDataSelectors {
      */
     dates: () => ProductsDatesStatistics | undefined;
 
+    productAmounts: () => ProductAmountOption[];
+
 }
 
 /**
@@ -35,7 +38,7 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
 
     const tagsSelector = () => {
         const valueFromMemory: Option[] | undefined = tagsMemory.get(products!);
-        if (products && products.length && !valueFromMemory) {
+        if (products?.length && !valueFromMemory) {
             const tagNameOccurrenceCountMap = products.reduce((map, { tags }) => {
                 tags?.forEach((tag) => {
                     const tagOccurrenceCount = map.get(tag) || 0;
@@ -53,7 +56,7 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
 
     const datesSelector = () => {
         const valueFromMemory: ProductsDatesStatistics | undefined = datesMemory.get(products!);
-        if (products && products.length && !valueFromMemory) {
+        if (products?.length && !valueFromMemory) {
             const dates = products.reduce(({ min, max }, { createdAt }) => ({
                 min: (min.localeCompare(createdAt) < 0) ? min : createdAt,
                 max: (max.localeCompare(createdAt) > 0) ? max : createdAt,
@@ -64,8 +67,19 @@ export function useCurrentUserDataSelectors(): [ CurrentUserDataSelectors, MeQue
         return valueFromMemory;
     }
 
-    return [ { tags: tagsSelector, dates: datesSelector }, userData ];
+    const productAmountsSelector = () => {
+        const valueFromMemory: ProductAmountOption[] | undefined = productAmountsMemory.get(products!);
+        if (products?.length && !valueFromMemory) {
+            const productOptions = products.map((product) => ({ product, amount: 1 }));
+            productAmountsMemory.set(products, productOptions);
+            return productOptions;
+        }
+        return valueFromMemory || [];
+    };
+
+    return [ { tags: tagsSelector, dates: datesSelector, productAmounts: productAmountsSelector }, userData ];
 }
 
 const tagsMemory = new WeakMap<Product[], Option[]>();
 const datesMemory = new WeakMap<Product[], ProductsDatesStatistics>();
+const productAmountsMemory = new WeakMap<Product[], ProductAmountOption[]>();

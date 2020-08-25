@@ -383,6 +383,20 @@
         "tooHigh": "Ceiling surface area is too high"
       }
     },
+    "roomProductSelector": {
+      "label": "Select product",
+      "productAmount": {
+        "placeholder": "Quantity",
+        "endAdornment": "pcs.",
+        "validation": {
+          "required": "Product quantity is required",
+          "tooHigh": "Product quantity is too high"
+        }
+      },
+      "deleteButton": {
+        "title": "Delete this product"
+      }
+    },
     "productName": {
       "label": "Product name",
       "ariaLabel": "Enter product name",
