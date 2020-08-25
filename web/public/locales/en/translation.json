@@ -397,6 +397,12 @@
         "title": "Delete this product"
       }
     },
+    "roomInquirySelector": {
+      "label": "Select inquiry",
+      "deleteButton": {
+        "title": "Delete this inquiry"
+      }
+    },
     "productName": {
       "label": "Product name",
       "ariaLabel": "Enter product name",

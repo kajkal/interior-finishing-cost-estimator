@@ -397,6 +397,12 @@
         "title": "Usuń ten produkt"
       }
     },
+    "roomInquirySelector": {
+      "label": "Wybierz zapytanie",
+      "deleteButton": {
+        "title": "Usuń to zapytanie"
+      }
+    },
     "productName": {
       "label": "Nazwa produktu",
       "ariaLabel": "Wprowadź nazwę produktu",

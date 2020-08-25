@@ -11,13 +11,14 @@ import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-l
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ProductSelectorController } from '../../../__utils__/field-controllers/ProductSelectorController';
+import { InquirySelectorController } from '../../../__utils__/field-controllers/InquirySelectorController';
 import { RoomTypeFieldController } from '../../../__utils__/field-controllers/RoomTypeFieldController';
 import { NumberFieldController } from '../../../__utils__/field-controllers/NumberFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { flushPromises } from '../../../__utils__/extendedUserEvent';
 
-import { CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Product, Project, RoomType, User } from '../../../../graphql/generated-types';
+import { Category, CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Inquiry, Product, Project, RoomType, User } from '../../../../graphql/generated-types';
 import { roomCreateModalAtom } from '../../../../code/components/modals/room-create/roomCreateModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { RoomCreateModal } from '../../../../code/components/modals/room-create/RoomCreateModal';
@@ -35,9 +36,20 @@ describe('RoomCreateModal component', () => {
         name: 'Sample product 2',
         tags: [ 'tag C' ],
     };
+    const sampleInquiry1: Partial<Inquiry> = {
+        id: 'sample-inquiry-1',
+        title: 'Sample inquiry 1',
+        category: Category.DESIGNING,
+    };
+    const sampleInquiry2: Partial<Inquiry> = {
+        id: 'sample-inquiry-2',
+        title: 'Sample inquiry 2',
+        category: Category.ELECTRICAL,
+    };
 
     const sampleUser: Partial<User> = {
         products: [ sampleProduct1, sampleProduct2 ] as Product[],
+        inquiries: [ sampleInquiry1, sampleInquiry2 ] as Inquiry[],
     };
 
     const sampleProject: Partial<Project> = {
@@ -100,6 +112,9 @@ describe('RoomCreateModal component', () => {
         static get roomProductSelector() {
             return screen.getByLabelText(/t:form.roomProductSelector.label/, { selector: 'input' });
         }
+        static get roomInquirySelector() {
+            return screen.getByLabelText(/t:form.roomInquirySelector.label/, { selector: 'input' });
+        }
         static get cancelButton() {
             return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
@@ -118,6 +133,7 @@ describe('RoomCreateModal component', () => {
             await NumberFieldController.from(ViewUnderTest.roomWallsAreaInput).pasteAmount(`${data.wall || ''}`);
             await NumberFieldController.from(ViewUnderTest.roomCeilingAreaInput).pasteAmount(`${data.ceiling || ''}`);
             await ProductSelectorController.from(ViewUnderTest.roomProductSelector).selectProduct(sampleProduct1, 1);
+            await InquirySelectorController.from(ViewUnderTest.roomInquirySelector).selectInquiry(sampleInquiry1);
 
             userEvent.click(this.submitButton);
         }
@@ -154,7 +170,7 @@ describe('RoomCreateModal component', () => {
                         wall: 17.5,
                         ceiling: 12,
                         products: [ { productId: sampleProduct1.id, amount: 1 } ],
-                        inquiries: undefined,
+                        inquiries: [ { inquiryId: sampleInquiry1.id } ],
                     } as CreateRoomMutationVariables,
                 },
                 result: {
@@ -168,7 +184,7 @@ describe('RoomCreateModal component', () => {
                             wall: 17.5,
                             ceiling: 12,
                             products: [ { productId: sampleProduct1.id, amount: 1 } ],
-                            inquiries: null,
+                            inquiries: [ { inquiryId: sampleInquiry1.id } ],
                         },
                     } as CreateRoomMutation,
                 },
@@ -233,6 +249,15 @@ describe('RoomCreateModal component', () => {
             });
 
             it('should validate product amount field value', async () => {
+                renderInMockContext();
+                await ViewUnderTest.openModal();
+
+                await ProductSelectorController.from(ViewUnderTest.roomProductSelector)
+                    .selectProduct(sampleProduct1, 1e6).expectNoError()
+                    .selectProduct(sampleProduct2, 1e6 + 1).expectError('t:form.roomProductSelector.productAmount.validation.tooHigh');
+            });
+
+            it('should validate inquiry field value', async () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
 

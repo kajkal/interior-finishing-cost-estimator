@@ -7,6 +7,9 @@ export interface RoomCreateModalAtomValue {
     projectData?: Pick<Project, 'slug'>;
 }
 
+/**
+ * @see RoomCreateModal - controlled modal
+ */
 export const roomCreateModalAtom = atom<RoomCreateModalAtomValue>({
     key: 'roomCreateModalAtom',
     default: {

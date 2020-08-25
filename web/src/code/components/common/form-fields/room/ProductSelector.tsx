@@ -148,11 +148,15 @@ function optionFilter(options: ProductAmountOption[], { inputValue }: FilterOpti
     const normalizedInputValue = stripDiacritics(inputValue.trim().toLowerCase());
     return options.filter(({ product: { name, tags } }) => {
         const normalizedName = stripDiacritics(name.toLowerCase());
-        return normalizedName.includes(normalizedInputValue) || Boolean(tags?.some((tag) => {
-            const normalizedTag = stripDiacritics(tag.toLowerCase());
-            return normalizedInputValue.includes(normalizedTag);
-        }));
+        return normalizedName.includes(normalizedInputValue)
+            || tags?.some((tag) => isTagAffectsFilter(tag, normalizedInputValue));
     });
+}
+
+function isTagAffectsFilter(tag: string, normalizedInputValue: string) {
+    const normalizedTag = stripDiacritics(tag.toLowerCase());
+    return (normalizedInputValue && normalizedTag.includes(normalizedInputValue))
+        || normalizedInputValue.includes(normalizedTag);
 }
 
 
@@ -180,17 +184,13 @@ function optionRenderer(option: ProductAmountOption, { inputValue }: Autocomplet
                 ))}
             </Typography>
             <div>
-                {option.product.tags?.map((tag) => {
-                    const normalizedTag = stripDiacritics(tag.toLowerCase());
-                    const affectsFilter = normalizedInputValue.includes(normalizedTag);
-                    return (
-                        <TagChip
-                            key={tag}
-                            label={tag}
-                            color={affectsFilter ? 'primary' : 'default'}
-                        />
-                    );
-                })}
+                {option.product.tags?.map((tag) => (
+                    <TagChip
+                        key={tag}
+                        label={tag}
+                        color={isTagAffectsFilter(tag, normalizedInputValue) ? 'primary' : 'default'}
+                    />
+                ))}
             </div>
         </div>
     );
@@ -201,7 +201,7 @@ const useStyles = makeStyles((theme) => ({
     productRow: {
         margin: theme.spacing(0.5, 1, 0),
         display: 'grid',
-        gridTemplateColumns: '1fr 37px',
+        gridTemplateColumns: '1fr 36px',
         gridTemplateAreas: `
             'amount remove'
             'preview preview'
