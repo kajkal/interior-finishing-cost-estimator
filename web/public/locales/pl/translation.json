@@ -115,6 +115,10 @@
     "updateRoomModal": {
       "title": "Edytuj pomieszczenie"
     },
+    "deleteRoomModal": {
+      "title": "Usuń pomieszczenie '{{roomName}}'",
+      "firstLine": "Czy na pewno chcesz permanentnie usunąć to pomieszczenie?"
+    },
     "roomType": {
       "balcony": "Balkon",
       "bathroom": "Łazienka",
