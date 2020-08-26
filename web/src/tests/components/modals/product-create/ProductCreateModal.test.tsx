@@ -221,7 +221,7 @@ describe('ProductCreateModal component', () => {
                 },
                 ROOT_MUTATION: expect.any(Object),
             });
-        });
+        }, 7000);
 
     });
 

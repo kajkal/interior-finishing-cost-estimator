@@ -125,7 +125,11 @@
     "createRoomModal": {
       "title": "Define new room"
     },
-    "projectNotFoundError": "Project no longer exists"
+    "updateRoomModal": {
+      "title": "Edit room"
+    },
+    "projectNotFoundError": "Project no longer exists",
+    "roomNotFoundError": "Room no longer exists"
   },
   "product": {
     "products": "Products",

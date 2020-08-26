@@ -25,6 +25,7 @@ describe('Modals component', () => {
         mockComponent('/code/components/modals/inquiry-add-quote/InquiryAddQuoteModal');
 
         mockComponent('/code/components/modals/room-create/RoomCreateModal');
+        mockComponent('/code/components/modals/room-update/RoomUpdateModal');
     });
 
     it('should render all registered modals', () => {
@@ -45,6 +46,7 @@ describe('Modals component', () => {
         expect(screen.getByTestId('mock-InquiryAddQuoteModal')).toBeVisible();
 
         expect(screen.getByTestId('mock-RoomCreateModal')).toBeVisible();
+        expect(screen.getByTestId('mock-RoomUpdateModal')).toBeVisible();
     });
 
 });

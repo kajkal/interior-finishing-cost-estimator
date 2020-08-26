@@ -11,7 +11,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
-import { CreateRoomMutationVariables, ProductDataFragment, Room, RoomType, useCreateRoomMutation } from '../../../../graphql/generated-types';
+import { ProductDataFragment, Room, useCreateRoomMutation } from '../../../../graphql/generated-types';
 import { FormikRoomNameAutocompleteField } from '../../common/form-fields/room/FormikRoomNameAutocompleteField';
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
 import { FormikSurfaceAreaField } from '../../common/form-fields/room/FormikSurfaceAreaField';
@@ -23,18 +23,12 @@ import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigati
 import { ApolloErrorHandler } from '../../../utils/error-handling/ApolloErrorHandler';
 import { ProductAmountOption } from '../../common/form-fields/room/ProductSelector';
 import { FormikSubmitButton } from '../../common/form-fields/FormikSubmitButton';
+import { RoomCreateFormData, roomCreateModalAtom } from './roomCreateModalAtom';
 import { InquiryOption } from '../../common/form-fields/room/InquirySelector';
 import { supportedRoomTypes } from '../../../config/supportedRoomTypes';
 import { AVERAGE_CEILING_HEIGHT } from '../../../config/constants';
 import { ResponsiveModalProps } from '../ResponsiveModalProps';
-import { roomCreateModalAtom } from './roomCreateModalAtom';
 
-
-interface RoomCreateFormData extends Omit<CreateRoomMutationVariables, 'type' | 'products' | 'inquiries'> {
-    type: RoomType | null;
-    products: ProductAmountOption[];
-    inquiries: InquiryOption[];
-}
 
 export function RoomCreateModal({ isMobile }: ResponsiveModalProps): React.ReactElement {
     const { t } = useTranslation();

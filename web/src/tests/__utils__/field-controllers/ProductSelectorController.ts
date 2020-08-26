@@ -1,5 +1,5 @@
 import { AbstractFieldController } from './AbstractFieldController';
-import { getByPlaceholderText, screen } from '@testing-library/react';
+import { getByPlaceholderText, getByRole, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { NumberFieldController } from './NumberFieldController';
@@ -13,7 +13,7 @@ export class ProductSelectorController extends AbstractFieldController {
         return this.resolve(inputElement) as ProductSelectorController;
     }
 
-    selectProduct(product: Partial<Product>, amount: number): ProductSelectorController {
+    selectProduct(product: Partial<Product>, amount: number): this {
         return this.then(async (inputElement: HTMLElement) => {
             await userEvent.type(inputElement, product.name || '');
             const option = screen.getByTestId(`option-${product.id}`);
@@ -27,7 +27,18 @@ export class ProductSelectorController extends AbstractFieldController {
 
             await flushPromises();
             return inputElement;
-        }) as ProductSelectorController;
+        }) as this;
+    }
+
+    removeAllProducts(): this {
+        return this.then(async (inputElement: HTMLElement) => {
+            const productRows = screen.getAllByTestId(/product-/);
+            productRows.forEach((productRow) => {
+                userEvent.click(getByRole(productRow, 'button', { name: 't:form.roomProductSelector.deleteButton.title' }));
+            });
+            await flushPromises();
+            return inputElement;
+        }) as this;
     }
 
 }

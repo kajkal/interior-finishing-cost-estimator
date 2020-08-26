@@ -6,12 +6,12 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import { ProjectDetailedDataFragment } from '../../../../../graphql/generated-types';
 import { projectUpdateModalAtom } from '../../../modals/project-update/projectUpdateModalAtom';
+import { CompleteProjectData } from '../../../../utils/mappers/projectMapper';
 
 
 export interface UpdateProjectButtonProps {
-    project: ProjectDetailedDataFragment;
+    project: CompleteProjectData;
 }
 
 /**

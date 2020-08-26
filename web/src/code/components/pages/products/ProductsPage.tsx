@@ -232,7 +232,7 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
                 <Button variant='outlined' size='small' onClick={handleDelete} startIcon={<DeleteIcon />}>
                     {t('form.common.delete')}
                 </Button>
-                <Button variant='outlined' size='small' color='primary' onClick={handleEdit} startIcon={<EditIcon />}>
+                <Button variant='outlined' size='small' onClick={handleEdit} startIcon={<EditIcon />}>
                     {t('form.common.update')}
                 </Button>
             </AccordionActions>

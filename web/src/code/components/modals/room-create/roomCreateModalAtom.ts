@@ -1,6 +1,15 @@
 import { atom } from 'recoil/dist';
-import { Project } from '../../../../graphql/generated-types';
 
+import { CreateRoomMutationVariables, Project, RoomType } from '../../../../graphql/generated-types';
+import { ProductAmountOption } from '../../common/form-fields/room/ProductSelector';
+import { InquiryOption } from '../../common/form-fields/room/InquirySelector';
+
+
+export interface RoomCreateFormData extends Omit<CreateRoomMutationVariables, 'type' | 'products' | 'inquiries'> {
+    type: RoomType | null;
+    products: ProductAmountOption[];
+    inquiries: InquiryOption[];
+}
 
 export interface RoomCreateModalAtomValue {
     open: boolean;

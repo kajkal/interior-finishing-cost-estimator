@@ -6,12 +6,12 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import { ProjectDetailedDataFragment } from '../../../../../graphql/generated-types';
 import { projectDeleteModalAtom } from '../../../modals/project-delete/projectDeleteModalAtom';
+import { CompleteProjectData } from '../../../../utils/mappers/projectMapper';
 
 
 export interface DeleteProjectButtonProps {
-    project: ProjectDetailedDataFragment;
+    project: CompleteProjectData;
 }
 
 /**

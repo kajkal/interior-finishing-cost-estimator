@@ -7,24 +7,22 @@ import { useSetRecoilState } from 'recoil/dist';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import ClearIcon from '@material-ui/icons/Clear';
-import Tooltip from '@material-ui/core/Tooltip';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 
-import { ProjectDetailedDataFragment, ResourceData, useDeleteProjectFileMutation } from '../../../../../graphql/generated-types';
+import { ResourceData, useDeleteProjectFileMutation } from '../../../../../graphql/generated-types';
 import { usePageLinearProgressRevealer } from '../../../common/progress-indicators/usePageLinearProgressRevealer';
 import { projectFileUploadModalAtom } from '../../../modals/project-file-upload/projectFileUploadModalAtom';
 import { ApolloErrorHandler } from '../../../../utils/error-handling/ApolloErrorHandler';
+import { CompleteProjectData } from '../../../../utils/mappers/projectMapper';
 import { ConsciousFileIcon } from '../../../common/icons/ConsciousFileIcon';
 import { UploadFileIcon } from '../../../common/icons/UploadFileIcon';
 import { Section } from '../../../common/section/Section';
+import { PaperButton } from '../../../common/misc/PaperButton';
 
 
 export interface FileSectionProps {
-    project: Pick<ProjectDetailedDataFragment, 'slug' | 'name' | 'files'>;
+    project: Pick<CompleteProjectData, 'slug' | 'name' | 'files'>;
 }
 
 export function FileSection({ project }: FileSectionProps): React.ReactElement {
@@ -39,7 +37,6 @@ export function FileSection({ project }: FileSectionProps): React.ReactElement {
                 projectSlug={project.slug}
                 projectName={project.name}
                 classes={{
-                    tile: clsx(classes.tile, classes.uploadFileTile),
                     previewIcon: classes.previewIcon,
                     textContainer: clsx(classes.textContainer, classes.uploadFileButtonLabel),
                 }}
@@ -55,7 +52,6 @@ export function FileSection({ project }: FileSectionProps): React.ReactElement {
                         fileData={file}
                         classes={{
                             tile: classes.tile,
-                            link: classes.link,
                             previewIcon: classes.previewIcon,
                             deleteButton: classes.deleteButton,
                             textContainer: classes.textContainer,
@@ -74,7 +70,6 @@ interface FileTileProps {
     fileData: ResourceData;
     classes: {
         tile: string;
-        link: string;
         previewIcon: string;
         deleteButton: string;
         textContainer: string;
@@ -111,48 +106,44 @@ function FileTile({ t, index, projectSlug, fileData, classes }: FileTileProps): 
     const descriptionId = `file-tile-${index}-description`;
 
     return (
-        <Paper variant='outlined' className={classes.tile}>
-            <Link
-                className={classes.link}
-                underline='none'
-                color='inherit'
-                href={fileData.url}
-                rel='noreferrer'
-                target='_blank'
-                aria-label={t('project.openFile', { filename: fileData.name })}
-                aria-describedby={descriptionId}
+        <PaperButton
+            className={classes.tile}
+            href={fileData.url}
+            rel='noreferrer'
+            target='_blank'
+            aria-label={t('project.openFile', { filename: fileData.name })}
+            aria-describedby={descriptionId}
+            disableRipple
+        >
+
+            <ConsciousFileIcon className={classes.previewIcon} filename={fileData.name} />
+
+            <IconButton
+                size='small'
+                className={classes.deleteButton}
+                onClick={handleFileDelete}
+                title={t('project.removeThisFile')}
+                aria-label={t('project.removeThisFile')}
             >
+                <ClearIcon />
+            </IconButton>
 
-                <ConsciousFileIcon className={classes.previewIcon} filename={fileData.name} />
+            <Divider />
 
-                <Tooltip title={t('project.removeThisFile')!}>
-                    <IconButton
-                        size='small'
-                        className={classes.deleteButton}
-                        onClick={handleFileDelete}
-                        aria-label={t('project.removeThisFile')}
-                    >
-                        <ClearIcon />
-                    </IconButton>
-                </Tooltip>
+            <div className={classes.textContainer}>
 
-                <Divider />
+                <Typography variant='body2' component='span' display='block'>
+                    {fileData.name}
+                </Typography>
 
-                <div className={classes.textContainer}>
+                <Typography id={descriptionId} variant='caption' component='span' color='textSecondary'
+                    display='block'>
+                    {fileData.description}
+                </Typography>
 
-                    <Typography variant='body2' component='span' display='block'>
-                        {fileData.name}
-                    </Typography>
+            </div>
 
-                    <Typography id={descriptionId} variant='caption' component='span' color='textSecondary'
-                        display='block'>
-                        {fileData.description}
-                    </Typography>
-
-                </div>
-
-            </Link>
-        </Paper>
+        </PaperButton>
     );
 }
 
@@ -161,15 +152,10 @@ interface UploadFileButtonProps {
     projectSlug: string;
     projectName: string;
     classes: {
-        tile: string;
         previewIcon: string;
         textContainer: string;
     },
 }
-
-const OutlinedPaper = React.forwardRef<any, any>((props, ref) => (
-    <Paper {...props} ref={ref} variant='outlined' />
-));
 
 function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileButtonProps): React.ReactElement {
     const setModalState = useSetRecoilState(projectFileUploadModalAtom);
@@ -184,11 +170,7 @@ function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileBu
     };
 
     return (
-        <ButtonBase
-            className={classes.tile}
-            onClick={handleClick}
-            component={OutlinedPaper}
-        >
+        <PaperButton onClick={handleClick}>
 
             <UploadFileIcon className={classes.previewIcon} />
 
@@ -200,7 +182,7 @@ function UploadFileButton({ t, projectSlug, projectName, classes }: UploadFileBu
                 </Typography>
             </div>
 
-        </ButtonBase>
+        </PaperButton>
     );
 }
 
@@ -209,22 +191,13 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-        gridGap: theme.spacing(2),
-        gap: theme.spacing(2),
+        gridGap: theme.spacing(1),
+        gap: theme.spacing(1),
         [ theme.breakpoints.up('sm') ]: {
             gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
         },
     },
     tile: {
-        transition: theme.transitions.create([ 'border' ], {
-            duration: theme.transitions.duration.short,
-        }),
-        '&:hover': {
-            border: `1px solid ${theme.palette.text.secondary}`,
-        },
-        '&:focus-within': {
-            border: `1px solid ${theme.palette.primary.main}`,
-        },
         '&:hover, &:focus-within': {
             '& $deleteButton': {
                 opacity: 1,
@@ -233,22 +206,6 @@ const useStyles = makeStyles((theme) => ({
                 color: theme.palette.text.primary,
             },
         },
-    },
-    uploadFileTile: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        backgroundColor: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: theme.shape.borderRadius,
-    },
-    link: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        position: 'relative',
-        outline: 'none',
-        height: '100%',
     },
     deleteButton: {
         position: 'absolute',

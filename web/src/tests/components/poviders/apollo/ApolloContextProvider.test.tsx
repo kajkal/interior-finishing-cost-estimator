@@ -237,6 +237,21 @@ describe('ApolloContextProvider component', () => {
             expect(toast).toHaveTextContent('t:project.projectNotFoundError');
         });
 
+        it('should globally handle {ROOM_NOT_FOUND} GraphQL errors', async () => {
+            const onErrorFn = await getOnErrorFunction();
+            onErrorFn({
+                operation,
+                forward: () => null!,
+                networkError: undefined,
+                graphQLErrors: [ new GraphQLError('ROOM_NOT_FOUND') ],
+            });
+
+            // verify if toast is visible
+            const toast = await screen.findByTestId('MockToast');
+            expect(toast).toHaveClass('error');
+            expect(toast).toHaveTextContent('t:project.roomNotFoundError');
+        });
+
         it('should globally handle {PRODUCT_NOT_FOUND} GraphQL errors', async () => {
             const onErrorFn = await getOnErrorFunction();
             onErrorFn({

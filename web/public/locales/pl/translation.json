@@ -112,6 +112,9 @@
     "createRoomModal": {
       "title": "Zdefiniuj pomieszczenie"
     },
+    "updateRoomModal": {
+      "title": "Edytuj pomieszczenie"
+    },
     "roomType": {
       "balcony": "Balkon",
       "bathroom": "Łazienka",
@@ -125,7 +128,8 @@
       "office": "Gabinet",
       "other": "Inne"
     },
-    "projectNotFoundError": "Projekt już nie istnieje"
+    "projectNotFoundError": "Projekt już nie istnieje",
+    "roomNotFoundError": "Pomieszczenie już nie istnieje"
   },
   "product": {
     "products": "Produkty",

@@ -5,10 +5,12 @@
  */
 
 import React from 'react';
+import { TFunction } from 'i18next';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
+import { mockTFunction } from '../../../__mocks__/libraries/react-i18next';
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ProductSelectorController } from '../../../__utils__/field-controllers/ProductSelectorController';
 import { InquirySelectorController } from '../../../__utils__/field-controllers/InquirySelectorController';
@@ -16,15 +18,16 @@ import { RoomTypeFieldController } from '../../../__utils__/field-controllers/Ro
 import { NumberFieldController } from '../../../__utils__/field-controllers/NumberFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { flushPromises } from '../../../__utils__/extendedUserEvent';
 
-import { Category, CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Inquiry, Product, Project, RoomType, User } from '../../../../graphql/generated-types';
-import { roomCreateModalAtom } from '../../../../code/components/modals/room-create/roomCreateModalAtom';
+import { Category, Inquiry, InquiryDataFragment, Product, ProductDataFragment, Project, RoomDataFragment, RoomType, UpdateRoomDocument, UpdateRoomMutation, UpdateRoomMutationVariables, User } from '../../../../graphql/generated-types';
+import { roomUpdateModalAtom } from '../../../../code/components/modals/room-update/roomUpdateModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
-import { RoomCreateModal } from '../../../../code/components/modals/room-create/RoomCreateModal';
+import { RoomUpdateModal } from '../../../../code/components/modals/room-update/RoomUpdateModal';
+import { mapCompleteRoomToRoomUpdateFormData } from '../../../../code/utils/mappers/roomMapper';
+import { CompleteRoom } from '../../../../code/utils/mappers/projectMapper';
 
 
-describe('RoomCreateModal component', () => {
+describe('RoomUpdateModal component', () => {
 
     const sampleProduct1: Partial<Product> = {
         id: 'sample-product-1',
@@ -51,14 +54,29 @@ describe('RoomCreateModal component', () => {
         products: [ sampleProduct1, sampleProduct2 ] as Product[],
         inquiries: [ sampleInquiry1, sampleInquiry2 ] as Inquiry[],
     };
-
+    const sampleRoom: RoomDataFragment = {
+        __typename: 'Room',
+        id: 'kitchen',
+        type: RoomType.KITCHEN,
+        name: 'Kitchen',
+        floor: 12,
+        wall: 17.5,
+        ceiling: 12,
+        products: [ { productId: sampleProduct1.id!, amount: 1 } ],
+        inquiries: [ { inquiryId: sampleInquiry1.id! } ],
+    };
+    const sampleCompleteRoom: CompleteRoom = {
+        ...sampleRoom,
+        products: [ { product: sampleProduct1 as ProductDataFragment, amount: 1 } ],
+        inquiries: [ sampleInquiry1 as InquiryDataFragment ],
+    };
     const sampleProject: Partial<Project> = {
         __typename: 'Project',
         slug: 'sample-project',
         name: 'Sample project',
         location: null,
         files: [],
-        rooms: null,
+        rooms: [ sampleRoom ],
     };
 
     beforeEach(() => {
@@ -67,18 +85,21 @@ describe('RoomCreateModal component', () => {
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
-            const setModalState = useSetRecoilState(roomCreateModalAtom);
+            const setModalState = useSetRecoilState(roomUpdateModalAtom);
             return (
                 <button
                     data-testid='open-modal-button'
-                    onClick={() => setModalState({ open: true, projectData: { slug: sampleProject.slug! } })}
+                    onClick={() => setModalState({
+                        open: true,
+                        formInitialValues: mapCompleteRoomToRoomUpdateFormData(sampleCompleteRoom, sampleProject.slug!, mockTFunction as TFunction),
+                    })}
                 />
             );
         };
         return render(
             <MockContextProvider mocks={mocks}>
                 <OpenModalButton />
-                <RoomCreateModal isMobile={false} />
+                <RoomUpdateModal isMobile={false} />
             </MockContextProvider>,
         );
     }
@@ -92,7 +113,7 @@ describe('RoomCreateModal component', () => {
 
     class ViewUnderTest {
         static get modal() {
-            return screen.queryByLabelText('t:project.createRoomModal.title');
+            return screen.queryByLabelText('t:project.updateRoomModal.title');
         }
         static get roomTypeSelect() {
             return screen.getByLabelText('t:form.roomType.label', { selector: 'input' });
@@ -119,21 +140,22 @@ describe('RoomCreateModal component', () => {
             return screen.getByRole('button', { name: 't:form.common.cancel' });
         }
         static get submitButton() {
-            return screen.getByRole('button', { name: 't:form.common.create' });
+            return screen.getByRole('button', { name: 't:form.common.update' });
         }
         static openModal() {
             userEvent.click(screen.getByTestId('open-modal-button'));
         }
-        static async fillAndSubmitForm(data: CreateRoomMutationVariables) {
+        static async fillAndSubmitForm(data: UpdateRoomMutationVariables) {
             ViewUnderTest.openModal();
 
-            await RoomTypeFieldController.from(ViewUnderTest.roomTypeSelect).selectRoomType(data.type);
             await TextFieldController.from(ViewUnderTest.roomNameInput).type(data.name);
-            await NumberFieldController.from(ViewUnderTest.roomFloorAreaInput).pasteAmount(`${data.floor || ''}`);
-            await NumberFieldController.from(ViewUnderTest.roomWallsAreaInput).pasteAmount(`${data.wall || ''}`);
             await NumberFieldController.from(ViewUnderTest.roomCeilingAreaInput).pasteAmount(`${data.ceiling || ''}`);
-            await ProductSelectorController.from(ViewUnderTest.roomProductSelector).selectProduct(sampleProduct1, 1);
-            await InquirySelectorController.from(ViewUnderTest.roomInquirySelector).selectInquiry(sampleInquiry1);
+            await ProductSelectorController.from(ViewUnderTest.roomProductSelector)
+                .removeAllProducts()
+                .selectProduct(sampleProduct2, 2);
+            await InquirySelectorController.from(ViewUnderTest.roomInquirySelector)
+                .removeAllInquiries()
+                .selectInquiry(sampleInquiry2);
 
             userEvent.click(this.submitButton);
         }
@@ -156,37 +178,37 @@ describe('RoomCreateModal component', () => {
         await waitForElementToBeRemoved(ViewUnderTest.modal);
     });
 
-    describe('room create form', () => {
+    describe('room update form', () => {
 
         const mockResponseGenerator = {
             success: () => ({
                 request: {
-                    query: CreateRoomDocument,
+                    query: UpdateRoomDocument,
                     variables: {
                         projectSlug: sampleProject.slug,
+                        roomId: sampleRoom.id,
                         type: RoomType.KITCHEN,
-                        name: 'Kitchen',
-                        floor: 12,
-                        wall: 17.5,
-                        ceiling: 12,
-                        products: [ { productId: sampleProduct1.id, amount: 1 } ],
-                        inquiries: [ { inquiryId: sampleInquiry1.id } ],
-                    } as CreateRoomMutationVariables,
+                        name: 'Kitchen updated name',
+                        floor: sampleRoom.floor,
+                        wall: sampleRoom.wall,
+                        products: [ { productId: sampleProduct2.id, amount: 2 } ],
+                        inquiries: [ { inquiryId: sampleInquiry2.id } ],
+                    } as UpdateRoomMutationVariables,
                 },
                 result: {
                     data: {
-                        createRoom: {
+                        updateRoom: {
                             __typename: 'Room',
                             id: 'kitchen',
                             type: RoomType.KITCHEN,
-                            name: 'Kitchen',
+                            name: 'Kitchen updated name',
                             floor: 12,
                             wall: 17.5,
-                            ceiling: 12,
-                            products: [ { productId: sampleProduct1.id, amount: 1 } ],
-                            inquiries: [ { inquiryId: sampleInquiry1.id } ],
+                            ceiling: null,
+                            products: [ { productId: sampleProduct2.id, amount: 2 } ],
+                            inquiries: [ { inquiryId: sampleInquiry2.id } ],
                         },
-                    } as CreateRoomMutation,
+                    } as UpdateRoomMutation,
                 },
             }),
         };
@@ -196,12 +218,8 @@ describe('RoomCreateModal component', () => {
             it('should validate room type input value', async () => {
                 renderInMockContext();
                 await ViewUnderTest.openModal();
-                expect(ViewUnderTest.roomTypeSelect).toHaveFocus();
-                fireEvent.blur(ViewUnderTest.roomTypeSelect);
-                await flushPromises();
 
                 await RoomTypeFieldController.from(ViewUnderTest.roomTypeSelect)
-                    .expectError('t:form.roomType.validation.required')
                     .selectRoomType(RoomType.KITCHEN).expectNoError();
             });
 
@@ -253,6 +271,7 @@ describe('RoomCreateModal component', () => {
                 await ViewUnderTest.openModal();
 
                 await ProductSelectorController.from(ViewUnderTest.roomProductSelector)
+                    .removeAllProducts().expectNoError()
                     .selectProduct(sampleProduct1, 1e6).expectNoError()
                     .selectProduct(sampleProduct2, 1e6 + 1).expectError('t:form.roomProductSelector.productAmount.validation.tooHigh');
             });
@@ -262,13 +281,14 @@ describe('RoomCreateModal component', () => {
                 await ViewUnderTest.openModal();
 
                 await ProductSelectorController.from(ViewUnderTest.roomProductSelector)
+                    .removeAllProducts().expectNoError()
                     .selectProduct(sampleProduct1, 1e6).expectNoError()
                     .selectProduct(sampleProduct2, 1e6 + 1).expectError('t:form.roomProductSelector.productAmount.validation.tooHigh');
             });
 
         });
 
-        it('should create room and close modal', async () => {
+        it('should update room and close modal', async () => {
             const cache = initApolloTestCache();
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ], apolloCache: cache });
@@ -286,15 +306,15 @@ describe('RoomCreateModal component', () => {
             await waitForElementToBeRemoved(ViewUnderTest.modal);
 
             // verify updated cache
-            const createdRoom = mockResponse.result.data.createRoom;
+            const updatedRoom = mockResponse.result.data.updateRoom;
             expect(cache.extract()).toEqual({
                 [ projectCacheRecordKey ]: {
                     ...sampleProject,
-                    rooms: [ createdRoom ],
+                    rooms: [ updatedRoom ],
                 },
                 ROOT_MUTATION: expect.any(Object),
             });
-        }, 7000);
+        });
 
     });
 

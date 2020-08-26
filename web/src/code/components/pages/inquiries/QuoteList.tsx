@@ -23,7 +23,7 @@ export function QuoteList({ quotes, inquiryId, userSlug, className }: QuoteListP
     const classes = useStyles();
     const { t, i18n } = useTranslation();
 
-    return (quotes && quotes.length)
+    return (quotes?.length)
         ? (
             <div className={clsx(classes.root, className)}>
                 {quotes.map((quote, index) => (
