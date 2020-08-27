@@ -15,6 +15,8 @@ import { InquiryAddQuoteModal } from './inquiry-add-quote/InquiryAddQuoteModal';
 import { RoomCreateModal } from './room-create/RoomCreateModal';
 import { RoomUpdateModal } from './room-update/RoomUpdateModal';
 import { RoomDeleteModal } from './room-delete/RoomDeleteModal';
+import { ProductModal } from './product/ProductModal';
+import { InquiryModal } from './inquiry/InquiryModal';
 
 
 export function Modals(): React.ReactElement {
@@ -35,6 +37,8 @@ export function Modals(): React.ReactElement {
             <RoomCreateModal isMobile={isMobile} />
             <RoomUpdateModal isMobile={isMobile} />
             <RoomDeleteModal />
+            <ProductModal isMobile={isMobile} />
+            <InquiryModal isMobile={isMobile} />
         </>
     );
 }
