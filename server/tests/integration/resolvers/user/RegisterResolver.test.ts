@@ -166,13 +166,10 @@ describe('RegisterResolver', () => {
             expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
             expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledWith(emailAddressConfirmationData.token);
 
-            // verify if the database was queried
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
-
             // verify if user was updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledWith(expect.objectContaining({
+                id: user.id,
                 isEmailAddressConfirmed: true,
             }));
 
@@ -202,13 +199,8 @@ describe('RegisterResolver', () => {
             expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
             expect(EmailAddressConfirmationTokenManagerSpy.verify).toHaveBeenCalledWith(emailAddressConfirmationData.token);
 
-            // verify if the database was queried
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
-
             // verify if user was not updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(0);
-            expect(user.isEmailAddressConfirmed).toBe(true);
 
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);

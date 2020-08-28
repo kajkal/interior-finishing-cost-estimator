@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb';
 import { QueryOrder } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { Args, Authorized, Ctx, FieldResolver, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
@@ -72,7 +73,7 @@ export class UserResolver {
     @UseMiddleware(logAccess)
     @Query(() => User, { description: 'Returns data of the currently authenticated user.' })
     async me(@Ctx() context: AuthorizedContext) {
-        return await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
+        return await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
     }
 
 }

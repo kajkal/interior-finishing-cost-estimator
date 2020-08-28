@@ -1,4 +1,5 @@
 import { extname } from 'path';
+import { ObjectID } from 'mongodb';
 import { randomBytes } from 'crypto';
 import { Inject, Service } from 'typedi';
 import { UserInputError } from 'apollo-server-express';
@@ -63,7 +64,7 @@ export class ProfileResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Profile)
     async updateProfile(@Args() { name: newName, avatar, removeCurrentAvatar, description, location }: ProfileUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Profile> {
-        const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
+        const user = await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
         const [ currentAvatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');
         let newAvatar: ResourceData | undefined = currentAvatar;
 

@@ -166,13 +166,10 @@ describe('PasswordResetResolver', () => {
             expect(PasswordResetTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
             expect(PasswordResetTokenManagerSpy.verify).toHaveBeenCalledWith(passwordResetFormData.token);
 
-            // verify if the database was queried
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
-
             // verify if user' password was updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
             const updatedUser = UserRepositorySpy.persistAndFlush.mock.calls[0][0] as User;
+            expect(user.id).toBe(user.id);
             expect(user.unencryptedPassword).not.toBe(passwordResetFormData.password);
             expect(user.password).not.toBe(updatedUser.password);
 

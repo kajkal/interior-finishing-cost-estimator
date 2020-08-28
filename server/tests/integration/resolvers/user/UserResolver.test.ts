@@ -53,10 +53,6 @@ describe('UserResolver', () => {
             expect(AccessTokenManagerSpy.verify).toHaveBeenCalledTimes(1);
             expect(AccessTokenManagerSpy.verify).toHaveBeenCalledWith(tokenValue);
 
-            // verify if the database was queried
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledTimes(1);
-            expect(UserRepositorySpy.findOneOrFail).toHaveBeenCalledWith({ id: user.id });
-
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));

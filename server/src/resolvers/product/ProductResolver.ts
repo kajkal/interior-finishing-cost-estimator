@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb';
 import { wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
@@ -47,7 +48,7 @@ export class ProductResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Product)
     async updateProduct(@Args() { productId, ...data }: ProductUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Product> {
-        const productToUpdate = await this.productRepository.findOne({ id: productId });
+        const productToUpdate = await this.productRepository.findOne({ _id: new ObjectID(productId) });
 
         if (productToUpdate) {
             if (productToUpdate.user.id === context.jwtPayload.sub) {
@@ -66,7 +67,7 @@ export class ProductResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async deleteProduct(@Args() { productId }: ProductDeleteFormData, @Ctx() context: AuthorizedContext): Promise<Boolean> {
-        const productToDelete = await this.productRepository.findOne({ id: productId });
+        const productToDelete = await this.productRepository.findOne({ _id: new ObjectID(productId) });
 
         if (productToDelete) {
             if (productToDelete.user.id === context.jwtPayload.sub) {

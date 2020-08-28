@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb';
 import { QueryOrder, wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
@@ -86,7 +87,7 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Inquiry)
     async updateInquiry(@Args() { inquiryId, ...data }: InquiryUpdateFormData, @Ctx() context: AuthorizedContext): Promise<Inquiry> {
-        const inquiryToUpdate = await this.inquiryRepository.findOne({ id: inquiryId });
+        const inquiryToUpdate = await this.inquiryRepository.findOne({ _id: new ObjectID(inquiryId) });
 
         if (inquiryToUpdate) {
             if (inquiryToUpdate.user.id === context.jwtPayload.sub) {
@@ -105,7 +106,7 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async deleteInquiry(@Args() { inquiryId }: InquiryDeleteFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const inquiryToDelete = await this.inquiryRepository.findOne({ id: inquiryId });
+        const inquiryToDelete = await this.inquiryRepository.findOne({ _id: new ObjectID(inquiryId) });
 
         if (inquiryToDelete) {
             if (inquiryToDelete.user.id === context.jwtPayload.sub) {
@@ -123,7 +124,7 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => [ PriceQuote ])
     async addQuote(@Args() { inquiryId, price }: InquiryAddQuoteFormData, @Ctx() context: AuthorizedContext): Promise<PriceQuote[]> {
-        const inquiry = await this.inquiryRepository.findOne({ id: inquiryId });
+        const inquiry = await this.inquiryRepository.findOne({ _id: new ObjectID(inquiryId) });
 
         if (inquiry) {
             const quotes = inquiry.quotes || [];
@@ -143,7 +144,7 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => [ PriceQuote ])
     async removeQuote(@Args() { inquiryId, quoteDate }: InquiryRemoveQuoteFormData, @Ctx() context: AuthorizedContext): Promise<PriceQuote[]> {
-        const inquiry = await this.inquiryRepository.findOne({ id: inquiryId });
+        const inquiry = await this.inquiryRepository.findOne({ _id: new ObjectID(inquiryId) });
 
         if (inquiry) {
             const quotes = inquiry.quotes || [];
@@ -159,8 +160,8 @@ export class InquiryResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => [ String ])
     async bookmarkInquiry(@Args() { inquiryId, bookmark }: InquirySetBookmarkFormData, @Ctx() context: AuthorizedContext): Promise<string[]> {
-        const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
-        const inquiry = await this.inquiryRepository.findOne({ id: inquiryId });
+        const user = await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
+        const inquiry = await this.inquiryRepository.findOne({ _id: new ObjectID(inquiryId) });
 
         if (inquiry) {
             if (inquiry.user.id !== user.id) {
@@ -180,8 +181,9 @@ export class InquiryResolver {
     }
 
     private async getInquiryPriceQuotes(quotes: Quote[]): Promise<PriceQuote[]> {
-        const authorIds = new Set(quotes.map(({ author }) => author));
-        const users = await this.userRepository.find({ id: { $in: [ ...authorIds ] } });
+        const authorSet = new Set(quotes.map(({ author }) => author));
+        const authorIds = [ ...authorSet ].map((id) => new ObjectID(id));
+        const users = await this.userRepository.find({ _id: { $in: authorIds } });
         const userIdAuthorMap = new Map<string, Author>();
         await Promise.all(users.map(async (user) => {
             const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');

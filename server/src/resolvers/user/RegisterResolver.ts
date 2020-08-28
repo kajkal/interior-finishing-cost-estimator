@@ -1,4 +1,5 @@
 import { hash } from 'argon2';
+import { ObjectID } from 'mongodb';
 import { Inject, Service } from 'typedi';
 import { Args, Ctx, Mutation, Resolver, UseMiddleware } from 'type-graphql';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
@@ -63,7 +64,7 @@ export class RegisterResolver {
 
         try {
             const { sub } = this.emailAddressConfirmationService.verifyEmailAddressConfirmationToken(data.token);
-            user = await this.userRepository.findOneOrFail({ id: sub });
+            user = await this.userRepository.findOneOrFail({ _id: new ObjectID(sub) });
         } catch (error) {
             throw new UserInputError('INVALID_EMAIL_ADDRESS_CONFIRMATION_TOKEN');
         }

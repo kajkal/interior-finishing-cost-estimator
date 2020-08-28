@@ -1,4 +1,5 @@
 import { hash } from 'argon2';
+import { ObjectID } from 'mongodb';
 import { Inject, Service } from 'typedi';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Args, Mutation, Resolver, UseMiddleware } from 'type-graphql';
@@ -53,7 +54,7 @@ export class PasswordResetResolver {
 
         try {
             const { sub } = this.passwordResetService.verifyPasswordResetToken(args.token);
-            user = await this.userRepository.findOneOrFail({ id: sub });
+            user = await this.userRepository.findOneOrFail({ _id: new ObjectID(sub) });
         } catch (error) {
             if (error instanceof TokenExpiredError) {
                 throw new UserInputError('EXPIRED_PASSWORD_RESET_TOKEN', { expiredAt: error.expiredAt });

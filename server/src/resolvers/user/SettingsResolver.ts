@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb';
 import { Inject, Service } from 'typedi';
 import { hash, verify } from 'argon2';
 import { UserInputError } from 'apollo-server-express';
@@ -27,7 +28,7 @@ export class SettingsResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async changeEmail(@Args() { email: newEmail }: ChangeEmailFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
+        const user = await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
 
         if (user.email !== newEmail) {
             if (await this.userRepository.isEmailTaken(newEmail)) {
@@ -46,7 +47,7 @@ export class SettingsResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async changePassword(@Args() { currentPassword, newPassword }: ChangePasswordFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
+        const user = await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
 
         const isPasswordCorrect = await verify(user.password, currentPassword);
         if (isPasswordCorrect) {
@@ -62,7 +63,7 @@ export class SettingsResolver {
     @UseMiddleware(logAccess)
     @Mutation(() => Boolean)
     async changeProfileSettings(@Args() { hidden }: ChangeProfileSettingsFormData, @Ctx() context: AuthorizedContext): Promise<boolean> {
-        const user = await this.userRepository.findOneOrFail({ id: context.jwtPayload.sub });
+        const user = await this.userRepository.findOneOrFail({ _id: new ObjectID(context.jwtPayload.sub) });
 
         if (user.hidden !== hidden) {
             user.hidden = hidden;
