@@ -8,5 +8,6 @@ import { isEqualTo } from './customAssertingTestFunctions';
  */
 export function createPasswordConfirmationSchema(t: TFunction) {
     return Yup.string()
-        .test('match', t('form.newPasswordConfirmation.validation.passwordsNotMatch'), isEqualTo('password'));
+        .test('match', t('form.newPasswordConfirmation.validation.passwordsNotMatch'), isEqualTo('password'))
+        .defined();
 }

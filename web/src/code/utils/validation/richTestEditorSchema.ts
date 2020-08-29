@@ -8,7 +8,7 @@ function isSlateChildNotEmpty({ text, children }: SlateDocumentDescendant) {
     return Array.isArray(children) && children.some(isSlateChildNotEmpty);
 }
 
-export function isSlateDocumentNotEmpty(document: SlateDocument): boolean {
+export function isSlateDocumentNotEmpty(document: SlateDocument): document is SlateDocument {
     return document.some(isSlateChildNotEmpty);
 }
 

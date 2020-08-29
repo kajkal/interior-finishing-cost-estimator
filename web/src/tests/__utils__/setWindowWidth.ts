@@ -1,4 +1,5 @@
 afterEach(() => {
+    // @ts-ignore
     delete window.matchMedia;
 });
 

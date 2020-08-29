@@ -7,17 +7,20 @@ import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockCon
 
 import { projectDeleteModalAtom } from '../../../../../code/components/modals/project-delete/projectDeleteModalAtom';
 import { DeleteProjectButton } from '../../../../../code/components/pages/project/elements/DeleteProjectButton';
+import { CompleteProjectData } from '../../../../../code/utils/mappers/projectMapper';
 import { Project } from '../../../../../graphql/generated-types';
 
 
 describe('DeleteProjectButton component', () => {
 
     const projectDeleteModalAtomSpy = jest.fn();
-    const sampleProject: Partial<Project> = {
+    const sampleProject: CompleteProjectData = {
         __typename: 'Project',
         slug: 'sample-project',
         name: 'Sample project',
+        location: null,
         files: [],
+        rooms: [],
     };
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -30,7 +33,7 @@ describe('DeleteProjectButton component', () => {
         return render(
             <MockContextProvider mocks={mocks}>
                 <Handle />
-                <DeleteProjectButton project={sampleProject as Project} />
+                <DeleteProjectButton project={sampleProject} />
             </MockContextProvider>,
         );
     }

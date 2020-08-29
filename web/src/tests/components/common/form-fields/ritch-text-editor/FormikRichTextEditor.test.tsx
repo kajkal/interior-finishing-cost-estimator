@@ -30,7 +30,8 @@ describe('FormikRichTextEditor component', () => {
                     content: config.node || emptyEditorValue,
                 }}
                 validationSchema={Yup.object({
-                    content: Yup.array().min(1).test('match', 'Required error', isSlateDocumentNotEmpty),
+                    content: Yup.mixed<SlateDocument>()
+                        .test('match', 'Required error', isSlateDocumentNotEmpty),
                 })}
                 onSubmit={config.onSubmit || jest.fn()}
             >

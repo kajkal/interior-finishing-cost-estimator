@@ -287,6 +287,7 @@ describe('ProfileUpdateModal component', () => {
 
         it('should reload page when user name changes', async () => {
             const { location } = window;
+            // @ts-ignore
             delete window.location;
             window.location = { ...location, reload: jest.fn() };
 

@@ -7,17 +7,20 @@ import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockCon
 
 import { projectUpdateModalAtom } from '../../../../../code/components/modals/project-update/projectUpdateModalAtom';
 import { UpdateProjectButton } from '../../../../../code/components/pages/project/elements/UpdateProjectButton';
+import { CompleteProjectData } from '../../../../../code/utils/mappers/projectMapper';
 import { Project } from '../../../../../graphql/generated-types';
 
 
 describe('UpdateProjectButton component', () => {
 
     const projectUpdateModalAtomSpy = jest.fn();
-    const sampleProject: Partial<Project> = {
+    const sampleProject: CompleteProjectData = {
         __typename: 'Project',
         slug: 'sample-project',
         name: 'Sample project',
+        location: null,
         files: [],
+        rooms: [],
     };
 
     function renderInMockContext(mocks?: ContextMocks) {
@@ -30,7 +33,7 @@ describe('UpdateProjectButton component', () => {
         return render(
             <MockContextProvider mocks={mocks}>
                 <Handle />
-                <UpdateProjectButton project={sampleProject as Project} />
+                <UpdateProjectButton project={sampleProject} />
             </MockContextProvider>,
         );
     }

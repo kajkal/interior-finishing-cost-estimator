@@ -101,7 +101,8 @@ function useChangePasswordFormValidationSchema(t: TFunction) {
         currentPassword: createPasswordSchema(t),
         newPassword: createPasswordSchema(t),
         newPasswordConfirmation: Yup.string()
-            .test('match', t('form.newPasswordConfirmation.validation.passwordsNotMatch'), isEqualTo('newPassword')),
+            .test('match', t('form.newPasswordConfirmation.validation.passwordsNotMatch'), isEqualTo('newPassword'))
+            .defined(),
     }).defined(), [ t ]);
 }
 
