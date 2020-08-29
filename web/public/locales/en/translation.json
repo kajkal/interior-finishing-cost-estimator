@@ -94,7 +94,8 @@
     "deleteThisProject": "Delete this project",
     "files": "Files",
     "openFile": "Open file {{filename}}",
-    "removeThisFile": "Remove this file",
+    "removeFile": "Remove file {{filename}}",
+    "fileHistory": "File history",
     "uploadFile": "Upload file",
     "fileUploadModal": {
       "title": "Upload file to project '{{projectName}}'",

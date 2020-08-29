@@ -94,7 +94,8 @@
     "deleteThisProject": "Usuń ten projekt",
     "files": "Pliki",
     "openFile": "Otwórz plik {{filename}}",
-    "removeThisFile": "Usuń ten plik",
+    "removeFile": "Usuń plik {{filename}}",
+    "fileHistory": "Historia pliku",
     "uploadFile": "Dodaj plik",
     "fileUploadModal": {
       "title": "Dodaj plik do projektu '{{projectName}}'",

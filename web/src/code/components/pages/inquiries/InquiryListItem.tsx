@@ -121,7 +121,6 @@ export function InquiryListItem({ inquiry, distance, isOwned, isBookmarked, user
                     createdAt={inquiry.createdAt}
                     updatedAt={inquiry.updatedAt}
                     ariaLabel={t('inquiry.inquiryHistory')}
-                    className={classes.historyButton}
                 />
                 {(isOwned) && (
                     <>
@@ -210,9 +209,6 @@ const useStyles = makeStyles((theme) => ({
     AccordionDetailsRoot: {
         padding: theme.spacing(0, 2),
         flexDirection: 'column',
-    },
-    historyButton: {
-        marginRight: 'auto',
     },
     section: {
         transition: theme.transitions.create([ 'margin' ], {

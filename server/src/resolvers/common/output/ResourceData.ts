@@ -13,4 +13,7 @@ export class ResourceData {
     @Field({ nullable: true })
     description?: string;
 
+    @Field()
+    createdAt!: Date;
+
 }

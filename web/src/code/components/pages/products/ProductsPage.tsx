@@ -227,7 +227,6 @@ export function ProductListItem({ product, selectedTags }: ProductListItemProps)
                     createdAt={product.createdAt}
                     updatedAt={product.updatedAt}
                     ariaLabel={t('product.productHistory')}
-                    className={classes.historyButton}
                 />
                 <Button variant='outlined' size='small' onClick={handleDelete} startIcon={<DeleteIcon />}>
                     {t('form.common.delete')}
@@ -355,9 +354,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     AccordionDetailsRoot: {
         padding: theme.spacing(0, 2),
         flexDirection: 'column',
-    },
-    historyButton: {
-        marginRight: 'auto',
     },
     section: {
         transition: theme.transitions.create(['margin'], {

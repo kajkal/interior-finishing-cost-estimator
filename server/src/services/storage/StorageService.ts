@@ -93,6 +93,7 @@ export class StorageService {
             url,
             name: file.name.split('/').slice(-1)[ 0 ],
             ...file.metadata.metadata,
+            createdAt: new Date(file.metadata.timeCreated),
         };
     }
 

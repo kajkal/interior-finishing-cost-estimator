@@ -36,7 +36,10 @@ describe('StorageService class', () => {
                     metadata: {},
                     getSignedUrl: () => [ 'sampleSignedUrl' ],
                     createWriteStream: mockCreateWriteStream.mockClear().mockImplementation((options: CreateWriteStreamOptions) => {
-                        fileData.metadata = options.metadata;
+                        fileData.metadata = {
+                            timeCreated: '2020-08-25T12:00:00.000Z',
+                            ...options.metadata,
+                        };
                         return new Writable({
                             write(chunk, encoding, callback) {
                                 uploadedDataChunks.push(chunk.toString());
@@ -108,6 +111,7 @@ describe('StorageService class', () => {
             expect(resourceData).toEqual({
                 name: 'sampleFilename.txt',
                 url: 'sampleSignedUrl',
+                createdAt: new Date('2020-08-25T12:00:00.000Z'),
             });
         });
 
@@ -143,6 +147,7 @@ describe('StorageService class', () => {
             expect(resourceData).toEqual({
                 name: 'sampleFilename.txt',
                 url: 'https://sample.api.com/sampleBucketId/sampleUserId/public/sampleFilename.txt',
+                createdAt: new Date('2020-08-25T12:00:00.000Z'),
             });
         });
 
@@ -160,6 +165,7 @@ describe('StorageService class', () => {
             expect(resourceData).toEqual({
                 url: 'sampleSignedUrl',
                 name: 'sampleFilename.txt',
+                createdAt: new Date('2020-08-25T12:00:00.000Z'),
             });
         });
 
@@ -180,6 +186,7 @@ describe('StorageService class', () => {
                 url: 'sampleSignedUrl',
                 name: 'sampleFilename.txt',
                 description: 'sampleDescription',
+                createdAt: new Date('2020-08-25T12:00:00.000Z'),
             });
         });
 
@@ -206,6 +213,7 @@ describe('StorageService class', () => {
                         },
                     },
                     metadata: {
+                        timeCreated: '2020-08-25T12:00:00.000Z',
                         metadata: {
                             description: 'sampleDescription',
                         },
@@ -225,6 +233,7 @@ describe('StorageService class', () => {
                 url: 'https://sample.api.com/sampleBucketId/sampleUserId/public/avatar.png',
                 name: 'avatar.png',
                 description: 'sampleDescription',
+                createdAt: new Date('2020-08-25T12:00:00.000Z'),
             } ]);
         });
 
@@ -236,6 +245,7 @@ describe('StorageService class', () => {
                     getSignedUrl: mockGetSignedUrl,
                     metadata: {
                         updated: '2020-07-23T16:08:06.019Z',
+                        timeCreated: '2020-07-23T16:08:06.019Z',
                     },
                 },
                 {
@@ -243,6 +253,7 @@ describe('StorageService class', () => {
                     getSignedUrl: mockGetSignedUrl,
                     metadata: {
                         updated: '2020-07-23T16:07:06.019Z',
+                        timeCreated: '2020-07-23T16:07:06.019Z',
                     },
                 },
             ] ]);
@@ -268,11 +279,13 @@ describe('StorageService class', () => {
                     url: 'sampleSignedUrl',
                     name: 'sampleFile1.pdf',
                     description: undefined,
+                    createdAt: new Date('2020-07-23T16:07:06.019Z'),
                 },
                 {
                     url: 'sampleSignedUrl',
                     name: 'sampleFile2.pdf',
                     description: undefined,
+                    createdAt: new Date('2020-07-23T16:08:06.019Z'),
                 },
             ]);
         });

@@ -1,51 +1,47 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { useRecoilValue } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { getByRole, render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
 
-import { DeleteProjectFileDocument, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment } from '../../../../../graphql/generated-types';
+import { DeleteProjectFileDocument, DeleteProjectFileMutation, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment, ResourceData } from '../../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
+import { InquiryCreateModalAtomValue } from '../../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
-import { FileSection } from '../../../../../code/components/pages/project/sections/FileSection';
+import { FileSection } from '../../../../../code/components/pages/project/sections/file/FileSection';
 
-
-// fixes 'TypeError: document.createRange is not a function' error - related with tooltip component
-jest.mock('@material-ui/core/Tooltip', () => ({
-    __esModule: true,
-    default: ({ children }: React.PropsWithChildren<{}>) => <>{children}</>,
-} as const));
 
 describe('FileSection component', () => {
 
-    const projectFileUploadModalAtomSpy = jest.fn();
-    const sampleProject: Pick<ProjectDetailedDataFragment, '__typename' | 'slug' | 'name' | 'files'> = {
+    let fileUploadState: InquiryCreateModalAtomValue;
+
+    const sampleFile1: ResourceData = {
+        __typename: 'ResourceData',
+        url: 'sample-url-1',
+        name: 'Sample-file-1.name',
+        description: 'Sample description',
+        createdAt: '2020-08-25T22:25:00.000Z',
+    };
+    const sampleFile2: ResourceData = {
+        __typename: 'ResourceData',
+        url: 'sample-url-2',
+        name: 'Sample-file-2.name',
+        description: null,
+        createdAt: '2020-08-25T22:30:00.000Z',
+    };
+    const sampleProject: ProjectDetailedDataFragment = {
         __typename: 'Project',
         slug: 'sample-project',
         name: 'Sample project',
-        files: [
-            {
-                __typename: 'ResourceData',
-                url: 'sample-url-1',
-                name: 'Sample-file-1.name',
-                description: 'Sample description',
-            },
-            {
-                __typename: 'ResourceData',
-                url: 'sample-url-2',
-                name: 'Sample-file-2.name',
-                description: null,
-            },
-        ],
+        location: null,
+        files: [ sampleFile1, sampleFile2 ],
+        rooms: null,
     };
 
     function renderInMockContext(mocks?: ContextMocks) {
-        projectFileUploadModalAtomSpy.mockClear();
         const Handle = () => {
-            const modalState = useRecoilValue(projectFileUploadModalAtom);
-            projectFileUploadModalAtomSpy(modalState);
+            fileUploadState = useRecoilValue(projectFileUploadModalAtom);
             return null;
         };
         return render(
@@ -60,45 +56,33 @@ describe('FileSection component', () => {
         static get uploadFileButton() {
             return screen.getByRole('button', { name: 't:project.uploadFile' });
         }
-        static get fileTiles() {
-            return screen.getAllByRole('link');
-        }
-        static clickDeleteFileButton(index: number) {
-            ViewUnderTest.expandSection();
-            const fileTile = ViewUnderTest.fileTiles[ index ];
-            expect(fileTile).toBeInstanceOf(HTMLAnchorElement);
-            expect(fileTile).toBeVisible();
-            const deleteButton = fileTile.querySelector('button[aria-label="t:project.removeThisFile"]');
-            expect(deleteButton).toBeInstanceOf(HTMLButtonElement);
-            userEvent.click(deleteButton!);
+        static get fileRows() {
+            return screen.getAllByTestId('file');
         }
         static expandSection() {
-            userEvent.click(screen.getByRole('button', { name: 't:project.files' }));
+            const sectionSummary = screen.getByRole('button', { name: 't:project.files' });
+            if (!sectionSummary.dataset.expanded) {
+                userEvent.click(screen.getByRole('button', { name: 't:project.files' }));
+            }
+        }
+        static getFileRowActions(fileRow: HTMLElement) {
+            return {
+                deleteButton: () => getByRole(fileRow, 'button', { name: /t:project.removeFile:{"filename":".*"}/ }),
+                openLink: () => getByRole(fileRow, 'link', { name: /t:project.openFile:{"filename":".*"}/ }),
+            };
         }
     }
 
     describe('upload file button', () => {
 
-        it('should render upload file button', () => {
-            renderInMockContext();
-
-            // verify if upload button is not visible when section is collapsed
-            expect(ViewUnderTest.uploadFileButton).not.toBeVisible();
-
-            ViewUnderTest.expandSection();
-
-            // verify if upload button is visible when section is expanded
-            expect(ViewUnderTest.uploadFileButton).toBeVisible();
-        });
-
-        it('should pass project data to ProjectFileUploadModal and open it', () => {
+        it('should open ProjectFileUploadModal', () => {
             renderInMockContext();
 
             ViewUnderTest.expandSection();
             userEvent.click(ViewUnderTest.uploadFileButton);
 
             // verify if upload project file modal atom state changed
-            expect(projectFileUploadModalAtomSpy).toHaveBeenLastCalledWith({
+            expect(fileUploadState).toEqual({
                 open: true,
                 projectData: {
                     slug: sampleProject.slug,
@@ -109,13 +93,7 @@ describe('FileSection component', () => {
 
     });
 
-    describe('file tile', () => {
-
-        const ProjectFilesFragment = gql`
-            fragment ProjectFiles on Project {
-                files { url, name, description }
-            }
-        `;
+    describe('file row', () => {
 
         const mockResponseGenerator = {
             success: () => ({
@@ -123,51 +101,61 @@ describe('FileSection component', () => {
                     query: DeleteProjectFileDocument,
                     variables: {
                         projectSlug: sampleProject.slug,
-                        resourceName: sampleProject.files[ 0 ].name,
+                        resourceName: sampleFile1.name,
                     } as DeleteProjectFileMutationVariables,
                 },
                 result: {
                     data: {
                         deleteProjectFile: true,
-                    },
+                    } as DeleteProjectFileMutation,
                 },
             }),
         };
 
-        it('should render separate tile for each file', () => {
+        it('should render separate row for each file', () => {
             renderInMockContext();
-
-            // verify if file tiles are not visible when section is collapsed
-            expect(ViewUnderTest.fileTiles).toHaveLength(2);
-            expect(ViewUnderTest.fileTiles[ 0 ]).not.toBeVisible();
-            expect(ViewUnderTest.fileTiles[ 1 ]).not.toBeVisible();
-
             ViewUnderTest.expandSection();
 
-            // verify if file tiles are  visible when section is expanded
-            expect(ViewUnderTest.fileTiles[ 0 ]).toBeVisible();
-            expect(ViewUnderTest.fileTiles[ 0 ]).toHaveAttribute('href', 'sample-url-1');
-            expect(ViewUnderTest.fileTiles[ 0 ]).toHaveTextContent('Sample-file-1.name');
-            expect(ViewUnderTest.fileTiles[ 0 ]).toHaveDescription('Sample description');
+            // verify if file rows are  visible when section is expanded
+            const firstRow = ViewUnderTest.fileRows[ 0 ];
+            expect(firstRow).toBeVisible();
+            expect(firstRow).toHaveTextContent(new RegExp(sampleFile1.name));
+            expect(firstRow).toHaveTextContent(new RegExp(sampleFile1.description!));
+            expect(ViewUnderTest.getFileRowActions(firstRow).openLink()).toHaveAttribute('href', sampleFile1.url);
 
-            expect(ViewUnderTest.fileTiles[ 1 ]).toBeVisible();
-            expect(ViewUnderTest.fileTiles[ 1 ]).toHaveAttribute('href', 'sample-url-2');
-            expect(ViewUnderTest.fileTiles[ 1 ]).toHaveTextContent('Sample-file-2.name');
-            expect(ViewUnderTest.fileTiles[ 1 ]).toHaveDescription('');
+            const secondRow = ViewUnderTest.fileRows[ 1 ];
+            expect(secondRow).toBeVisible();
+            expect(secondRow).toHaveTextContent(sampleFile2.name);
+            expect(ViewUnderTest.getFileRowActions(secondRow).openLink()).toHaveAttribute('href', sampleFile2.url);
         });
 
         it('should successfully delete file on delete button click', async () => {
             const cache = initApolloCache();
             cache.restore({ [ cache.identify(sampleProject)! ]: sampleProject });
             renderInMockContext({ mockResponses: [ mockResponseGenerator.success() ], apolloCache: cache });
-            ViewUnderTest.clickDeleteFileButton(0);
+            ViewUnderTest.expandSection();
 
-            // verify if cache was updated
-            const getProject = () => cache.readFragment<Pick<Project, 'files'>>({
-                fragment: ProjectFilesFragment,
-                id: cache.identify(sampleProject),
+            const projectCacheRecordKey = cache.identify(sampleProject)!;
+
+            // verify initial cache records
+            expect(cache.extract()).toEqual({
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    files: [ sampleFile1, sampleFile2 ],
+                },
             });
-            await waitFor(() => expect(getProject()?.files).toEqual([ sampleProject.files[ 1 ] ]));
+
+            const fileRow = ViewUnderTest.fileRows[ 0 ];
+            userEvent.click(ViewUnderTest.getFileRowActions(fileRow).deleteButton());
+
+            // verify updated cache
+            await waitFor(() => expect(cache.extract()).toEqual({
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    files: [ sampleFile2 ], // <- updated files list
+                },
+                ROOT_MUTATION: expect.any(Object),
+            }));
         });
 
     });

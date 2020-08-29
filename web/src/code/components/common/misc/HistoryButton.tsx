@@ -55,8 +55,20 @@ export function HistoryButton({ createdAt, updatedAt, ariaLabel, className }: Hi
     );
 
     return (
-        <Tooltip title={historyTooltip} open={open} onClose={handleClose} onOpen={handleOpen} interactive>
-            <IconButton size='small' className={className} aria-label={ariaLabel} onClick={handleToggle}>
+        <Tooltip
+            title={historyTooltip}
+            open={open}
+            onClose={handleClose}
+            onOpen={handleOpen}
+            interactive
+            leaveTouchDelay={5000}
+        >
+            <IconButton
+                size='small'
+                className={className || classes.defaultClass}
+                aria-label={ariaLabel}
+                onClick={handleToggle}
+            >
                 <HistoryIcon />
             </IconButton>
         </Tooltip>
@@ -64,6 +76,9 @@ export function HistoryButton({ createdAt, updatedAt, ariaLabel, className }: Hi
 }
 
 const useStyles = makeStyles((theme) => ({
+    defaultClass: {
+        marginRight: 'auto',
+    },
     datesContainer: {
         display: 'grid',
         gridTemplateColumns: 'auto 1fr',

@@ -11,6 +11,7 @@ fragment ProjectDetailedData on Project {
         url
         name
         description
+        createdAt
     }
     rooms {
         ...RoomData

@@ -99,9 +99,9 @@ const useStyles = makeStyles((theme) => ({
     MuiAccordionSummaryExpanded: {},
     MuiAccordionDetailsRoot: {
         flexDirection: 'column',
-        padding: theme.spacing(1, 2, 5, 1),
+        padding: theme.spacing(1, 0, 5, 1),
         [ theme.breakpoints.up('sm') ]: {
-            padding: theme.spacing(1, 2, 5, 4.75),
+            padding: theme.spacing(1, 0, 5, 4.75),
         },
     },
     projectSectionExpandIcon: {

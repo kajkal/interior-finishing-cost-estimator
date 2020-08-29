@@ -1,8 +1,7 @@
-import gql from 'graphql-tag';
-import * as ApolloReactCommon from '@apollo/client';
-import * as ApolloReactHooks from '@apollo/client';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -144,6 +143,7 @@ export type ResourceData = {
   url: Scalars['String'];
   name: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
 };
 
 export type Inquiry = {
@@ -698,7 +698,7 @@ export type ProjectDetailedDataFragment = (
     & Pick<Location, 'placeId' | 'main' | 'secondary' | 'lat' | 'lng'>
   )>, files: Array<(
     { __typename?: 'ResourceData' }
-    & Pick<ResourceData, 'url' | 'name' | 'description'>
+    & Pick<ResourceData, 'url' | 'name' | 'description' | 'createdAt'>
   )>, rooms?: Maybe<Array<(
     { __typename?: 'Room' }
     & RoomDataFragment
@@ -985,6 +985,7 @@ export const ProjectDetailedDataFragmentDoc = gql`
     url
     name
     description
+    createdAt
   }
   rooms {
     ...RoomData
@@ -1105,12 +1106,12 @@ export const ConfirmEmailAddressDocument = gql`
  *   },
  * });
  */
-export function useConfirmEmailAddressMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>) {
-        return ApolloReactHooks.useMutation<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>(ConfirmEmailAddressDocument, baseOptions);
+export function useConfirmEmailAddressMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>) {
+        return Apollo.useMutation<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>(ConfirmEmailAddressDocument, baseOptions);
       }
 export type ConfirmEmailAddressMutationHookResult = ReturnType<typeof useConfirmEmailAddressMutation>;
-export type ConfirmEmailAddressMutationResult = ApolloReactCommon.MutationResult<ConfirmEmailAddressMutation>;
-export type ConfirmEmailAddressMutationOptions = ApolloReactCommon.BaseMutationOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>;
+export type ConfirmEmailAddressMutationResult = Apollo.MutationResult<ConfirmEmailAddressMutation>;
+export type ConfirmEmailAddressMutationOptions = Apollo.BaseMutationOptions<ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -1140,12 +1141,12 @@ export const LoginDocument = gql`
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        return ApolloReactHooks.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
       }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = ApolloReactCommon.MutationResult<LoginMutation>;
-export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
   logout
@@ -1168,12 +1169,12 @@ export const LogoutDocument = gql`
  *   },
  * });
  */
-export function useLogoutMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        return ApolloReactHooks.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, baseOptions);
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, baseOptions);
       }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = ApolloReactCommon.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = ApolloReactCommon.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
     mutation Register($name: String!, $email: String!, $password: String!) {
   register(name: $name, email: $email, password: $password) {
@@ -1204,12 +1205,12 @@ export const RegisterDocument = gql`
  *   },
  * });
  */
-export function useRegisterMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
-        return ApolloReactHooks.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, baseOptions);
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, baseOptions);
       }
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
-export type RegisterMutationResult = ApolloReactCommon.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = ApolloReactCommon.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const ResetPasswordDocument = gql`
     mutation ResetPassword($token: String!, $password: String!) {
   resetPassword(token: $token, password: $password)
@@ -1234,12 +1235,12 @@ export const ResetPasswordDocument = gql`
  *   },
  * });
  */
-export function useResetPasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ResetPasswordMutation, ResetPasswordMutationVariables>) {
-        return ApolloReactHooks.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, baseOptions);
+export function useResetPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ResetPasswordMutation, ResetPasswordMutationVariables>) {
+        return Apollo.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, baseOptions);
       }
 export type ResetPasswordMutationHookResult = ReturnType<typeof useResetPasswordMutation>;
-export type ResetPasswordMutationResult = ApolloReactCommon.MutationResult<ResetPasswordMutation>;
-export type ResetPasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
+export type ResetPasswordMutationResult = Apollo.MutationResult<ResetPasswordMutation>;
+export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
 export const SendPasswordResetInstructionsDocument = gql`
     mutation SendPasswordResetInstructions($email: String!) {
   sendPasswordResetInstructions(email: $email)
@@ -1263,12 +1264,12 @@ export const SendPasswordResetInstructionsDocument = gql`
  *   },
  * });
  */
-export function useSendPasswordResetInstructionsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>) {
-        return ApolloReactHooks.useMutation<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>(SendPasswordResetInstructionsDocument, baseOptions);
+export function useSendPasswordResetInstructionsMutation(baseOptions?: Apollo.MutationHookOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>) {
+        return Apollo.useMutation<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>(SendPasswordResetInstructionsDocument, baseOptions);
       }
 export type SendPasswordResetInstructionsMutationHookResult = ReturnType<typeof useSendPasswordResetInstructionsMutation>;
-export type SendPasswordResetInstructionsMutationResult = ApolloReactCommon.MutationResult<SendPasswordResetInstructionsMutation>;
-export type SendPasswordResetInstructionsMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
+export type SendPasswordResetInstructionsMutationResult = Apollo.MutationResult<SendPasswordResetInstructionsMutation>;
+export type SendPasswordResetInstructionsMutationOptions = Apollo.BaseMutationOptions<SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables>;
 export const AddQuoteDocument = gql`
     mutation AddQuote($inquiryId: String!, $price: CurrencyAmountFormData!) {
   addQuote(inquiryId: $inquiryId, price: $price) {
@@ -1295,12 +1296,12 @@ export const AddQuoteDocument = gql`
  *   },
  * });
  */
-export function useAddQuoteMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddQuoteMutation, AddQuoteMutationVariables>) {
-        return ApolloReactHooks.useMutation<AddQuoteMutation, AddQuoteMutationVariables>(AddQuoteDocument, baseOptions);
+export function useAddQuoteMutation(baseOptions?: Apollo.MutationHookOptions<AddQuoteMutation, AddQuoteMutationVariables>) {
+        return Apollo.useMutation<AddQuoteMutation, AddQuoteMutationVariables>(AddQuoteDocument, baseOptions);
       }
 export type AddQuoteMutationHookResult = ReturnType<typeof useAddQuoteMutation>;
-export type AddQuoteMutationResult = ApolloReactCommon.MutationResult<AddQuoteMutation>;
-export type AddQuoteMutationOptions = ApolloReactCommon.BaseMutationOptions<AddQuoteMutation, AddQuoteMutationVariables>;
+export type AddQuoteMutationResult = Apollo.MutationResult<AddQuoteMutation>;
+export type AddQuoteMutationOptions = Apollo.BaseMutationOptions<AddQuoteMutation, AddQuoteMutationVariables>;
 export const BookmarkInquiryDocument = gql`
     mutation BookmarkInquiry($inquiryId: String!, $bookmark: Boolean!) {
   bookmarkInquiry(inquiryId: $inquiryId, bookmark: $bookmark)
@@ -1325,12 +1326,12 @@ export const BookmarkInquiryDocument = gql`
  *   },
  * });
  */
-export function useBookmarkInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>) {
-        return ApolloReactHooks.useMutation<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>(BookmarkInquiryDocument, baseOptions);
+export function useBookmarkInquiryMutation(baseOptions?: Apollo.MutationHookOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>) {
+        return Apollo.useMutation<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>(BookmarkInquiryDocument, baseOptions);
       }
 export type BookmarkInquiryMutationHookResult = ReturnType<typeof useBookmarkInquiryMutation>;
-export type BookmarkInquiryMutationResult = ApolloReactCommon.MutationResult<BookmarkInquiryMutation>;
-export type BookmarkInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>;
+export type BookmarkInquiryMutationResult = Apollo.MutationResult<BookmarkInquiryMutation>;
+export type BookmarkInquiryMutationOptions = Apollo.BaseMutationOptions<BookmarkInquiryMutation, BookmarkInquiryMutationVariables>;
 export const CreateInquiryDocument = gql`
     mutation CreateInquiry($title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
   createInquiry(title: $title, description: $description, location: $location, category: $category) {
@@ -1359,12 +1360,12 @@ export const CreateInquiryDocument = gql`
  *   },
  * });
  */
-export function useCreateInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateInquiryMutation, CreateInquiryMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateInquiryMutation, CreateInquiryMutationVariables>(CreateInquiryDocument, baseOptions);
+export function useCreateInquiryMutation(baseOptions?: Apollo.MutationHookOptions<CreateInquiryMutation, CreateInquiryMutationVariables>) {
+        return Apollo.useMutation<CreateInquiryMutation, CreateInquiryMutationVariables>(CreateInquiryDocument, baseOptions);
       }
 export type CreateInquiryMutationHookResult = ReturnType<typeof useCreateInquiryMutation>;
-export type CreateInquiryMutationResult = ApolloReactCommon.MutationResult<CreateInquiryMutation>;
-export type CreateInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateInquiryMutation, CreateInquiryMutationVariables>;
+export type CreateInquiryMutationResult = Apollo.MutationResult<CreateInquiryMutation>;
+export type CreateInquiryMutationOptions = Apollo.BaseMutationOptions<CreateInquiryMutation, CreateInquiryMutationVariables>;
 export const DeleteInquiryDocument = gql`
     mutation DeleteInquiry($inquiryId: String!) {
   deleteInquiry(inquiryId: $inquiryId)
@@ -1388,12 +1389,12 @@ export const DeleteInquiryDocument = gql`
  *   },
  * });
  */
-export function useDeleteInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteInquiryMutation, DeleteInquiryMutationVariables>(DeleteInquiryDocument, baseOptions);
+export function useDeleteInquiryMutation(baseOptions?: Apollo.MutationHookOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>) {
+        return Apollo.useMutation<DeleteInquiryMutation, DeleteInquiryMutationVariables>(DeleteInquiryDocument, baseOptions);
       }
 export type DeleteInquiryMutationHookResult = ReturnType<typeof useDeleteInquiryMutation>;
-export type DeleteInquiryMutationResult = ApolloReactCommon.MutationResult<DeleteInquiryMutation>;
-export type DeleteInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>;
+export type DeleteInquiryMutationResult = Apollo.MutationResult<DeleteInquiryMutation>;
+export type DeleteInquiryMutationOptions = Apollo.BaseMutationOptions<DeleteInquiryMutation, DeleteInquiryMutationVariables>;
 export const RemoveQuoteDocument = gql`
     mutation RemoveQuote($inquiryId: String!, $quoteDate: DateTime!) {
   removeQuote(inquiryId: $inquiryId, quoteDate: $quoteDate) {
@@ -1420,12 +1421,12 @@ export const RemoveQuoteDocument = gql`
  *   },
  * });
  */
-export function useRemoveQuoteMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>) {
-        return ApolloReactHooks.useMutation<RemoveQuoteMutation, RemoveQuoteMutationVariables>(RemoveQuoteDocument, baseOptions);
+export function useRemoveQuoteMutation(baseOptions?: Apollo.MutationHookOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>) {
+        return Apollo.useMutation<RemoveQuoteMutation, RemoveQuoteMutationVariables>(RemoveQuoteDocument, baseOptions);
       }
 export type RemoveQuoteMutationHookResult = ReturnType<typeof useRemoveQuoteMutation>;
-export type RemoveQuoteMutationResult = ApolloReactCommon.MutationResult<RemoveQuoteMutation>;
-export type RemoveQuoteMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>;
+export type RemoveQuoteMutationResult = Apollo.MutationResult<RemoveQuoteMutation>;
+export type RemoveQuoteMutationOptions = Apollo.BaseMutationOptions<RemoveQuoteMutation, RemoveQuoteMutationVariables>;
 export const UpdateInquiryDocument = gql`
     mutation UpdateInquiry($inquiryId: String!, $title: String!, $description: String!, $location: LocationFormData!, $category: Category!) {
   updateInquiry(inquiryId: $inquiryId, title: $title, description: $description, location: $location, category: $category) {
@@ -1455,12 +1456,12 @@ export const UpdateInquiryDocument = gql`
  *   },
  * });
  */
-export function useUpdateInquiryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateInquiryMutation, UpdateInquiryMutationVariables>(UpdateInquiryDocument, baseOptions);
+export function useUpdateInquiryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>) {
+        return Apollo.useMutation<UpdateInquiryMutation, UpdateInquiryMutationVariables>(UpdateInquiryDocument, baseOptions);
       }
 export type UpdateInquiryMutationHookResult = ReturnType<typeof useUpdateInquiryMutation>;
-export type UpdateInquiryMutationResult = ApolloReactCommon.MutationResult<UpdateInquiryMutation>;
-export type UpdateInquiryMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>;
+export type UpdateInquiryMutationResult = Apollo.MutationResult<UpdateInquiryMutation>;
+export type UpdateInquiryMutationOptions = Apollo.BaseMutationOptions<UpdateInquiryMutation, UpdateInquiryMutationVariables>;
 export const InquiriesDocument = gql`
     query Inquiries {
   allInquiries {
@@ -1484,15 +1485,15 @@ export const InquiriesDocument = gql`
  *   },
  * });
  */
-export function useInquiriesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
-        return ApolloReactHooks.useQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
+export function useInquiriesQuery(baseOptions?: Apollo.QueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
+        return Apollo.useQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
       }
-export function useInquiriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
+export function useInquiriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<InquiriesQuery, InquiriesQueryVariables>) {
+          return Apollo.useLazyQuery<InquiriesQuery, InquiriesQueryVariables>(InquiriesDocument, baseOptions);
         }
 export type InquiriesQueryHookResult = ReturnType<typeof useInquiriesQuery>;
 export type InquiriesLazyQueryHookResult = ReturnType<typeof useInquiriesLazyQuery>;
-export type InquiriesQueryResult = ApolloReactCommon.QueryResult<InquiriesQuery, InquiriesQueryVariables>;
+export type InquiriesQueryResult = Apollo.QueryResult<InquiriesQuery, InquiriesQueryVariables>;
 export const CreateProductDocument = gql`
     mutation CreateProduct($name: String!, $description: String!, $price: CurrencyAmountFormData, $tags: [String!]) {
   createProduct(name: $name, description: $description, price: $price, tags: $tags) {
@@ -1521,12 +1522,12 @@ export const CreateProductDocument = gql`
  *   },
  * });
  */
-export function useCreateProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateProductMutation, CreateProductMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateProductMutation, CreateProductMutationVariables>(CreateProductDocument, baseOptions);
+export function useCreateProductMutation(baseOptions?: Apollo.MutationHookOptions<CreateProductMutation, CreateProductMutationVariables>) {
+        return Apollo.useMutation<CreateProductMutation, CreateProductMutationVariables>(CreateProductDocument, baseOptions);
       }
 export type CreateProductMutationHookResult = ReturnType<typeof useCreateProductMutation>;
-export type CreateProductMutationResult = ApolloReactCommon.MutationResult<CreateProductMutation>;
-export type CreateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProductMutation, CreateProductMutationVariables>;
+export type CreateProductMutationResult = Apollo.MutationResult<CreateProductMutation>;
+export type CreateProductMutationOptions = Apollo.BaseMutationOptions<CreateProductMutation, CreateProductMutationVariables>;
 export const DeleteProductDocument = gql`
     mutation DeleteProduct($productId: String!) {
   deleteProduct(productId: $productId)
@@ -1550,12 +1551,12 @@ export const DeleteProductDocument = gql`
  *   },
  * });
  */
-export function useDeleteProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProductMutation, DeleteProductMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteProductMutation, DeleteProductMutationVariables>(DeleteProductDocument, baseOptions);
+export function useDeleteProductMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProductMutation, DeleteProductMutationVariables>) {
+        return Apollo.useMutation<DeleteProductMutation, DeleteProductMutationVariables>(DeleteProductDocument, baseOptions);
       }
 export type DeleteProductMutationHookResult = ReturnType<typeof useDeleteProductMutation>;
-export type DeleteProductMutationResult = ApolloReactCommon.MutationResult<DeleteProductMutation>;
-export type DeleteProductMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProductMutation, DeleteProductMutationVariables>;
+export type DeleteProductMutationResult = Apollo.MutationResult<DeleteProductMutation>;
+export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<DeleteProductMutation, DeleteProductMutationVariables>;
 export const UpdateProductDocument = gql`
     mutation UpdateProduct($productId: String!, $name: String!, $description: String!, $price: CurrencyAmountFormData, $tags: [String!]) {
   updateProduct(productId: $productId, name: $name, description: $description, price: $price, tags: $tags) {
@@ -1585,12 +1586,12 @@ export const UpdateProductDocument = gql`
  *   },
  * });
  */
-export function useUpdateProductMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProductMutation, UpdateProductMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateProductMutation, UpdateProductMutationVariables>(UpdateProductDocument, baseOptions);
+export function useUpdateProductMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProductMutation, UpdateProductMutationVariables>) {
+        return Apollo.useMutation<UpdateProductMutation, UpdateProductMutationVariables>(UpdateProductDocument, baseOptions);
       }
 export type UpdateProductMutationHookResult = ReturnType<typeof useUpdateProductMutation>;
-export type UpdateProductMutationResult = ApolloReactCommon.MutationResult<UpdateProductMutation>;
-export type UpdateProductMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProductMutation, UpdateProductMutationVariables>;
+export type UpdateProductMutationResult = Apollo.MutationResult<UpdateProductMutation>;
+export type UpdateProductMutationOptions = Apollo.BaseMutationOptions<UpdateProductMutation, UpdateProductMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($name: String!, $location: LocationFormData) {
   createProject(name: $name, location: $location) {
@@ -1617,12 +1618,12 @@ export const CreateProjectDocument = gql`
  *   },
  * });
  */
-export function useCreateProjectMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateProjectMutation, CreateProjectMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument, baseOptions);
+export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOptions<CreateProjectMutation, CreateProjectMutationVariables>) {
+        return Apollo.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument, baseOptions);
       }
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
-export type CreateProjectMutationResult = ApolloReactCommon.MutationResult<CreateProjectMutation>;
-export type CreateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
+export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
 export const DeleteProjectDocument = gql`
     mutation DeleteProject($projectSlug: String!) {
   deleteProject(projectSlug: $projectSlug)
@@ -1646,12 +1647,12 @@ export const DeleteProjectDocument = gql`
  *   },
  * });
  */
-export function useDeleteProjectMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProjectMutation, DeleteProjectMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteProjectMutation, DeleteProjectMutationVariables>(DeleteProjectDocument, baseOptions);
+export function useDeleteProjectMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProjectMutation, DeleteProjectMutationVariables>) {
+        return Apollo.useMutation<DeleteProjectMutation, DeleteProjectMutationVariables>(DeleteProjectDocument, baseOptions);
       }
 export type DeleteProjectMutationHookResult = ReturnType<typeof useDeleteProjectMutation>;
-export type DeleteProjectMutationResult = ApolloReactCommon.MutationResult<DeleteProjectMutation>;
-export type DeleteProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export type DeleteProjectMutationResult = Apollo.MutationResult<DeleteProjectMutation>;
+export type DeleteProjectMutationOptions = Apollo.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
 export const UpdateProjectDocument = gql`
     mutation UpdateProject($projectSlug: String!, $name: String!, $location: LocationFormData) {
   updateProject(projectSlug: $projectSlug, name: $name, location: $location) {
@@ -1679,12 +1680,12 @@ export const UpdateProjectDocument = gql`
  *   },
  * });
  */
-export function useUpdateProjectMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProjectMutation, UpdateProjectMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument, baseOptions);
+export function useUpdateProjectMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProjectMutation, UpdateProjectMutationVariables>) {
+        return Apollo.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument, baseOptions);
       }
 export type UpdateProjectMutationHookResult = ReturnType<typeof useUpdateProjectMutation>;
-export type UpdateProjectMutationResult = ApolloReactCommon.MutationResult<UpdateProjectMutation>;
-export type UpdateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
+export type UpdateProjectMutationResult = Apollo.MutationResult<UpdateProjectMutation>;
+export type UpdateProjectMutationOptions = Apollo.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
 export const DeleteProjectFileDocument = gql`
     mutation DeleteProjectFile($projectSlug: String!, $resourceName: String!) {
   deleteProjectFile(projectSlug: $projectSlug, resourceName: $resourceName)
@@ -1709,12 +1710,12 @@ export const DeleteProjectFileDocument = gql`
  *   },
  * });
  */
-export function useDeleteProjectFileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>(DeleteProjectFileDocument, baseOptions);
+export function useDeleteProjectFileMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>) {
+        return Apollo.useMutation<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>(DeleteProjectFileDocument, baseOptions);
       }
 export type DeleteProjectFileMutationHookResult = ReturnType<typeof useDeleteProjectFileMutation>;
-export type DeleteProjectFileMutationResult = ApolloReactCommon.MutationResult<DeleteProjectFileMutation>;
-export type DeleteProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>;
+export type DeleteProjectFileMutationResult = Apollo.MutationResult<DeleteProjectFileMutation>;
+export type DeleteProjectFileMutationOptions = Apollo.BaseMutationOptions<DeleteProjectFileMutation, DeleteProjectFileMutationVariables>;
 export const UploadProjectFileDocument = gql`
     mutation UploadProjectFile($projectSlug: String!, $file: Upload!, $description: String) {
   uploadProjectFile(projectSlug: $projectSlug, file: $file, description: $description) {
@@ -1744,12 +1745,12 @@ export const UploadProjectFileDocument = gql`
  *   },
  * });
  */
-export function useUploadProjectFileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>) {
-        return ApolloReactHooks.useMutation<UploadProjectFileMutation, UploadProjectFileMutationVariables>(UploadProjectFileDocument, baseOptions);
+export function useUploadProjectFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>) {
+        return Apollo.useMutation<UploadProjectFileMutation, UploadProjectFileMutationVariables>(UploadProjectFileDocument, baseOptions);
       }
 export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadProjectFileMutation>;
-export type UploadProjectFileMutationResult = ApolloReactCommon.MutationResult<UploadProjectFileMutation>;
-export type UploadProjectFileMutationOptions = ApolloReactCommon.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
+export type UploadProjectFileMutationResult = Apollo.MutationResult<UploadProjectFileMutation>;
+export type UploadProjectFileMutationOptions = Apollo.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
 export const CreateRoomDocument = gql`
     mutation CreateRoom($projectSlug: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $products: [LinkedProductFormData!], $inquiries: [LinkedInquiryFormData!]) {
   createRoom(projectSlug: $projectSlug, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, products: $products, inquiries: $inquiries) {
@@ -1782,12 +1783,12 @@ export const CreateRoomDocument = gql`
  *   },
  * });
  */
-export function useCreateRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateRoomMutation, CreateRoomMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateRoomMutation, CreateRoomMutationVariables>(CreateRoomDocument, baseOptions);
+export function useCreateRoomMutation(baseOptions?: Apollo.MutationHookOptions<CreateRoomMutation, CreateRoomMutationVariables>) {
+        return Apollo.useMutation<CreateRoomMutation, CreateRoomMutationVariables>(CreateRoomDocument, baseOptions);
       }
 export type CreateRoomMutationHookResult = ReturnType<typeof useCreateRoomMutation>;
-export type CreateRoomMutationResult = ApolloReactCommon.MutationResult<CreateRoomMutation>;
-export type CreateRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateRoomMutation, CreateRoomMutationVariables>;
+export type CreateRoomMutationResult = Apollo.MutationResult<CreateRoomMutation>;
+export type CreateRoomMutationOptions = Apollo.BaseMutationOptions<CreateRoomMutation, CreateRoomMutationVariables>;
 export const DeleteRoomDocument = gql`
     mutation DeleteRoom($projectSlug: String!, $roomId: String!) {
   deleteRoom(projectSlug: $projectSlug, roomId: $roomId)
@@ -1812,12 +1813,12 @@ export const DeleteRoomDocument = gql`
  *   },
  * });
  */
-export function useDeleteRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteRoomMutation, DeleteRoomMutationVariables>) {
-        return ApolloReactHooks.useMutation<DeleteRoomMutation, DeleteRoomMutationVariables>(DeleteRoomDocument, baseOptions);
+export function useDeleteRoomMutation(baseOptions?: Apollo.MutationHookOptions<DeleteRoomMutation, DeleteRoomMutationVariables>) {
+        return Apollo.useMutation<DeleteRoomMutation, DeleteRoomMutationVariables>(DeleteRoomDocument, baseOptions);
       }
 export type DeleteRoomMutationHookResult = ReturnType<typeof useDeleteRoomMutation>;
-export type DeleteRoomMutationResult = ApolloReactCommon.MutationResult<DeleteRoomMutation>;
-export type DeleteRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteRoomMutation, DeleteRoomMutationVariables>;
+export type DeleteRoomMutationResult = Apollo.MutationResult<DeleteRoomMutation>;
+export type DeleteRoomMutationOptions = Apollo.BaseMutationOptions<DeleteRoomMutation, DeleteRoomMutationVariables>;
 export const UpdateRoomDocument = gql`
     mutation UpdateRoom($projectSlug: String!, $roomId: String!, $type: RoomType!, $name: String!, $floor: Float, $wall: Float, $ceiling: Float, $products: [LinkedProductFormData!], $inquiries: [LinkedInquiryFormData!]) {
   updateRoom(projectSlug: $projectSlug, roomId: $roomId, type: $type, name: $name, floor: $floor, wall: $wall, ceiling: $ceiling, products: $products, inquiries: $inquiries) {
@@ -1851,12 +1852,12 @@ export const UpdateRoomDocument = gql`
  *   },
  * });
  */
-export function useUpdateRoomMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateRoomMutation, UpdateRoomMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateRoomMutation, UpdateRoomMutationVariables>(UpdateRoomDocument, baseOptions);
+export function useUpdateRoomMutation(baseOptions?: Apollo.MutationHookOptions<UpdateRoomMutation, UpdateRoomMutationVariables>) {
+        return Apollo.useMutation<UpdateRoomMutation, UpdateRoomMutationVariables>(UpdateRoomDocument, baseOptions);
       }
 export type UpdateRoomMutationHookResult = ReturnType<typeof useUpdateRoomMutation>;
-export type UpdateRoomMutationResult = ApolloReactCommon.MutationResult<UpdateRoomMutation>;
-export type UpdateRoomMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateRoomMutation, UpdateRoomMutationVariables>;
+export type UpdateRoomMutationResult = Apollo.MutationResult<UpdateRoomMutation>;
+export type UpdateRoomMutationOptions = Apollo.BaseMutationOptions<UpdateRoomMutation, UpdateRoomMutationVariables>;
 export const ProjectDetailsDocument = gql`
     query ProjectDetails($slug: String!) {
   me {
@@ -1884,15 +1885,15 @@ export const ProjectDetailsDocument = gql`
  *   },
  * });
  */
-export function useProjectDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
-        return ApolloReactHooks.useQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
+export function useProjectDetailsQuery(baseOptions?: Apollo.QueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
+        return Apollo.useQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
       }
-export function useProjectDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
+export function useProjectDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
+          return Apollo.useLazyQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
         }
 export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQuery>;
 export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
-export type ProjectDetailsQueryResult = ApolloReactCommon.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
+export type ProjectDetailsQueryResult = Apollo.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
 export const ChangeEmailDocument = gql`
     mutation ChangeEmail($email: String!) {
   changeEmail(email: $email)
@@ -1916,12 +1917,12 @@ export const ChangeEmailDocument = gql`
  *   },
  * });
  */
-export function useChangeEmailMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeEmailMutation, ChangeEmailMutationVariables>) {
-        return ApolloReactHooks.useMutation<ChangeEmailMutation, ChangeEmailMutationVariables>(ChangeEmailDocument, baseOptions);
+export function useChangeEmailMutation(baseOptions?: Apollo.MutationHookOptions<ChangeEmailMutation, ChangeEmailMutationVariables>) {
+        return Apollo.useMutation<ChangeEmailMutation, ChangeEmailMutationVariables>(ChangeEmailDocument, baseOptions);
       }
 export type ChangeEmailMutationHookResult = ReturnType<typeof useChangeEmailMutation>;
-export type ChangeEmailMutationResult = ApolloReactCommon.MutationResult<ChangeEmailMutation>;
-export type ChangeEmailMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangeEmailMutation, ChangeEmailMutationVariables>;
+export type ChangeEmailMutationResult = Apollo.MutationResult<ChangeEmailMutation>;
+export type ChangeEmailMutationOptions = Apollo.BaseMutationOptions<ChangeEmailMutation, ChangeEmailMutationVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
   changePassword(currentPassword: $currentPassword, newPassword: $newPassword)
@@ -1946,12 +1947,12 @@ export const ChangePasswordDocument = gql`
  *   },
  * });
  */
-export function useChangePasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
-        return ApolloReactHooks.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
       }
 export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
-export type ChangePasswordMutationResult = ApolloReactCommon.MutationResult<ChangePasswordMutation>;
-export type ChangePasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const ChangeProfileSettingsDocument = gql`
     mutation ChangeProfileSettings($hidden: Boolean!) {
   changeProfileSettings(hidden: $hidden)
@@ -1975,12 +1976,12 @@ export const ChangeProfileSettingsDocument = gql`
  *   },
  * });
  */
-export function useChangeProfileSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>) {
-        return ApolloReactHooks.useMutation<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>(ChangeProfileSettingsDocument, baseOptions);
+export function useChangeProfileSettingsMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>) {
+        return Apollo.useMutation<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>(ChangeProfileSettingsDocument, baseOptions);
       }
 export type ChangeProfileSettingsMutationHookResult = ReturnType<typeof useChangeProfileSettingsMutation>;
-export type ChangeProfileSettingsMutationResult = ApolloReactCommon.MutationResult<ChangeProfileSettingsMutation>;
-export type ChangeProfileSettingsMutationOptions = ApolloReactCommon.BaseMutationOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>;
+export type ChangeProfileSettingsMutationResult = Apollo.MutationResult<ChangeProfileSettingsMutation>;
+export type ChangeProfileSettingsMutationOptions = Apollo.BaseMutationOptions<ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables>;
 export const UpdateProfileDocument = gql`
     mutation UpdateProfile($name: String, $description: String, $location: LocationFormData, $avatar: Upload, $removeCurrentAvatar: Boolean) {
   updateProfile(name: $name, description: $description, location: $location, avatar: $avatar, removeCurrentAvatar: $removeCurrentAvatar) {
@@ -2010,12 +2011,12 @@ export const UpdateProfileDocument = gql`
  *   },
  * });
  */
-export function useUpdateProfileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, baseOptions);
+export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, baseOptions);
       }
 export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
-export type UpdateProfileMutationResult = ApolloReactCommon.MutationResult<UpdateProfileMutation>;
-export type UpdateProfileMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -2039,15 +2040,15 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        return ApolloReactHooks.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
       }
-export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
         }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
-export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const ProfileDocument = gql`
     query Profile($userSlug: String!) {
   profile(userSlug: $userSlug) {
@@ -2072,12 +2073,12 @@ export const ProfileDocument = gql`
  *   },
  * });
  */
-export function useProfileQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
-        return ApolloReactHooks.useQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
+export function useProfileQuery(baseOptions?: Apollo.QueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
+        return Apollo.useQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
       }
-export function useProfileLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
+export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProfileQuery, ProfileQueryVariables>) {
+          return Apollo.useLazyQuery<ProfileQuery, ProfileQueryVariables>(ProfileDocument, baseOptions);
         }
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
-export type ProfileQueryResult = ApolloReactCommon.QueryResult<ProfileQuery, ProfileQueryVariables>;
+export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
