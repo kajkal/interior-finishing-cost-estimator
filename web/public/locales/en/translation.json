@@ -133,6 +133,14 @@
       "title": "Delete room '{{roomName}}'",
       "firstLine": "Are you sure you want to permanently delete this room?"
     },
+    "rooms": "Rooms",
+    "floorArea": "Floor area:",
+    "wallsArea": "Walls area:",
+    "ceilingArea": "Ceiling area:",
+    "noRoomProducts": "No products",
+    "noRoomInquiries": "No inquiries",
+    "addRoom": "Add room",
+    "summary": "Summary",
     "projectNotFoundError": "Project no longer exists",
     "roomNotFoundError": "Room no longer exists"
   },

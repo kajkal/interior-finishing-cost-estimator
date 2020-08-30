@@ -3,13 +3,13 @@ import { useRecoilValue } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { getByRole, render, screen, waitFor } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../../__utils__/MockContextProvider';
 
-import { DeleteProjectFileDocument, DeleteProjectFileMutation, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment, ResourceData } from '../../../../../graphql/generated-types';
-import { projectFileUploadModalAtom } from '../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
-import { InquiryCreateModalAtomValue } from '../../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
-import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
-import { FileSection } from '../../../../../code/components/pages/project/sections/file/FileSection';
+import { DeleteProjectFileDocument, DeleteProjectFileMutation, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment, ResourceData } from '../../../../../../graphql/generated-types';
+import { projectFileUploadModalAtom } from '../../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
+import { InquiryCreateModalAtomValue } from '../../../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
+import { initApolloCache } from '../../../../../../code/components/providers/apollo/client/initApolloClient';
+import { FileSection } from '../../../../../../code/components/pages/project/sections/file/FileSection';
 
 
 describe('FileSection component', () => {
@@ -73,24 +73,20 @@ describe('FileSection component', () => {
         }
     }
 
-    describe('upload file button', () => {
+    it('should open ProjectFileUploadModal', () => {
+        renderInMockContext();
 
-        it('should open ProjectFileUploadModal', () => {
-            renderInMockContext();
+        ViewUnderTest.expandSection();
+        userEvent.click(ViewUnderTest.uploadFileButton);
 
-            ViewUnderTest.expandSection();
-            userEvent.click(ViewUnderTest.uploadFileButton);
-
-            // verify if upload project file modal atom state changed
-            expect(fileUploadState).toEqual({
-                open: true,
-                projectData: {
-                    slug: sampleProject.slug,
-                    name: sampleProject.name,
-                },
-            });
+        // verify if upload project file modal atom state changed
+        expect(fileUploadState).toEqual({
+            open: true,
+            projectData: {
+                slug: sampleProject.slug,
+                name: sampleProject.name,
+            },
         });
-
     });
 
     describe('file row', () => {
@@ -116,7 +112,9 @@ describe('FileSection component', () => {
             renderInMockContext();
             ViewUnderTest.expandSection();
 
-            // verify if file rows are  visible when section is expanded
+            // verify if file rows are visible when section is expanded
+            expect(ViewUnderTest.fileRows).toHaveLength(2);
+
             const firstRow = ViewUnderTest.fileRows[ 0 ];
             expect(firstRow).toBeVisible();
             expect(firstRow).toHaveTextContent(new RegExp(sampleFile1.name));

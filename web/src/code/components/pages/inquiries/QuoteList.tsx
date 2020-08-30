@@ -16,7 +16,7 @@ export interface QuoteListProps {
     quotes?: PriceQuoteDataFragment[] | null;
     inquiryId: string;
     userSlug?: string;
-    className: string;
+    className?: string;
 }
 
 export function QuoteList({ quotes, inquiryId, userSlug, className }: QuoteListProps): React.ReactElement {

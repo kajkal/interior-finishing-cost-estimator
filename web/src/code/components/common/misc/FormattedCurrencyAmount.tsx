@@ -8,25 +8,26 @@ import { CurrencyAmount } from '../../../../graphql/generated-types';
 import { formatAmount } from '../../../config/supportedCurrencies';
 
 
-export interface FormattedCurrencyAmountProps {
+export interface FormattedCurrencyAmountProps extends React.HTMLProps<HTMLDivElement> {
     currencyAmount: CurrencyAmount;
-    className?: string;
 }
 
-export function FormattedCurrencyAmount({ currencyAmount, className }: FormattedCurrencyAmountProps): React.ReactElement {
-    const classes = useStyles();
+export const FormattedCurrencyAmount = React.forwardRef<HTMLDivElement, FormattedCurrencyAmountProps>(
+    function FormattedCurrencyAmount({ currencyAmount, className, ...rest }: FormattedCurrencyAmountProps, ref): React.ReactElement {
+        const classes = useStyles();
 
-    return (
-        <div className={clsx(classes.root, className)}>
-            <Typography>
-                {formatAmount(currencyAmount)}
-            </Typography>
-            <Typography className={classes.currency} variant='caption'>
-                {currencyAmount.currency}
-            </Typography>
-        </div>
-    );
-}
+        return (
+            <div className={clsx(classes.root, className)} ref={ref} {...rest}>
+                <Typography>
+                    {formatAmount(currencyAmount)}
+                </Typography>
+                <Typography className={classes.currency} variant='caption'>
+                    {currencyAmount.currency}
+                </Typography>
+            </div>
+        );
+    },
+);
 
 const useStyles = makeStyles({
     root: {
@@ -35,5 +36,6 @@ const useStyles = makeStyles({
     currency: {
         verticalAlign: 'super',
         marginLeft: 5,
+        width: 24,
     },
 });

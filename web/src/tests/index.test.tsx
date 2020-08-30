@@ -4,7 +4,7 @@ import path from 'path';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import I18nReact from 'react-i18next';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import i18n, { BackendModule, i18n as I18n, ReadCallback } from 'i18next';
 
 import { MockServiceWorker } from './__mocks__/other/serviceWorker';
@@ -144,10 +144,10 @@ describe('index file', () => {
             }));
 
             // wait for spinner to disappear (should disappear when the translation data is fetched by i18n module)
-            await waitFor(() => expect(screen.queryByTestId('MockSpinner')).toBe(null));
+            await waitForElementToBeRemoved(screen.getByTestId('mock-Spinner'));
 
             // verify if child component is visible and if it's translation is correct
-            expect(screen.queryByTestId('child-component')).toHaveTextContent('Translated text');
+            expect(screen.getByTestId('child-component')).toHaveTextContent('Translated text');
         });
 
         /**
@@ -172,7 +172,7 @@ describe('index file', () => {
             const localeNames = locales.map(l => l.name);
 
             // verify if all supported languages are really supported
-            expect(localeNames.length).toBe(supportedLocaleNames.length);
+            expect(localeNames).toHaveLength(supportedLocaleNames.length);
             expect(localeNames).toEqual(expect.arrayContaining(localeNames));
 
             // verify if all translations contains correct structure

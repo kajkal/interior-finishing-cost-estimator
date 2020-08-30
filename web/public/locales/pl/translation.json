@@ -133,6 +133,14 @@
       "office": "Gabinet",
       "other": "Inne"
     },
+    "rooms": "Pomieszczenia",
+    "floorArea": "Powierzchnia podłogi:",
+    "wallsArea": "Powierzchnia ścian:",
+    "ceilingArea": "Powierzchnia sufitu:",
+    "noRoomProducts": "Brak produktów",
+    "noRoomInquiries": "Brak zapytań",
+    "addRoom": "Dodaj pomieszczenie",
+    "summary": "Podsumowanie",
     "projectNotFoundError": "Projekt już nie istnieje",
     "roomNotFoundError": "Pomieszczenie już nie istnieje"
   },
