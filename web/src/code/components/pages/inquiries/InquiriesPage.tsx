@@ -149,6 +149,7 @@ const useStyles = makeStyles((theme) => ({
     },
     categoriesField: {
         gridArea: 'categories',
+        overflow: 'hidden',
     },
     typeField: {
         gridArea: 'type',

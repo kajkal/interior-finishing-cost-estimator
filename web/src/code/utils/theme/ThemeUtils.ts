@@ -136,6 +136,9 @@ export class ThemeUtils {
                 },
             },
             MuiChip: {
+                root: {
+                    maxWidth: '100%',
+                },
                 clickable: {
                     '&:active': {
                         boxShadow: 'none',

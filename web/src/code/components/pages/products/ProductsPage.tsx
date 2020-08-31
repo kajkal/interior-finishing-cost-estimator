@@ -283,6 +283,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     tagsField: {
         gridArea: 'tags',
+        overflow: 'hidden',
     },
 
     MuiAccordionRoot: {

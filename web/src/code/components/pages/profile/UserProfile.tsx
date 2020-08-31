@@ -21,7 +21,9 @@ export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
     return (
         <>
             {profile.location && (
-                <LocationChip location={profile.location} />
+                <div className={classes.tagsContainer}>
+                    <LocationChip location={profile.location} className={classes.noWrap} />
+                </div>
             )}
 
             <div className={classes.profile}>
@@ -53,6 +55,13 @@ export function UserProfile({ profile }: UserProfileProps): React.ReactElement {
 }
 
 const useStyles = makeStyles((theme) => ({
+    tagsContainer: {
+        display: 'grid',
+        justifyContent: 'start',
+    },
+    noWrap: {
+        overflow: 'hidden',
+    },
     profile: {
         marginTop: theme.spacing(3),
         display: 'grid',
