@@ -8,7 +8,6 @@ import TextField, { FilledTextFieldProps } from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteRenderOptionState } from '@material-ui/lab/Autocomplete';
 import { FilterOptionsState } from '@material-ui/lab/useAutocomplete';
 import FormControl from '@material-ui/core/FormControl';
-import Typography from '@material-ui/core/Typography';
 import ClearIcon from '@material-ui/icons/Clear';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -16,7 +15,6 @@ import Paper from '@material-ui/core/Paper';
 import { InquiryDataFragment } from '../../../../../graphql/generated-types';
 import { stripDiacritics } from '../../../../utils/filters/filtersUtils';
 import { InquiryPreview } from '../../misc/InquiryPreview';
-import { TagChip } from '../../misc/TagChip';
 
 
 export interface InquiryOption extends InquiryDataFragment {
@@ -143,21 +141,17 @@ function optionRenderer(option: InquiryOption, { inputValue }: AutocompleteRende
     const parts = parse(option.title, matches);
 
     return (
-        <div data-testid={`option-${option.id}`}>
-            <Typography>
-                {parts.map((part, index) => (
-                    <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                        {part.text}
-                    </span>
-                ))}
-            </Typography>
-            <div>
-                <TagChip
-                    label={option.translatedCategory}
-                    color={isCategoryAffectsFilter(option.translatedCategory, normalizedInputValue) ? 'primary' : 'default'}
-                />
-            </div>
-        </div>
+        <InquiryPreview
+            data-testid={`option-${option.id}`}
+            inquiry={option}
+            component='div'
+            titleRenderer={() => parts.map((part, index) => (
+                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                    {part.text}
+                </span>
+            ))}
+            isTagActive={() => isCategoryAffectsFilter(option.translatedCategory, normalizedInputValue)}
+        />
     );
 }
 
@@ -189,6 +183,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopRightRadius: theme.shape.borderRadius,
     },
     inquiryPreview: {
+        padding: theme.spacing(1),
         gridArea: 'preview',
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,

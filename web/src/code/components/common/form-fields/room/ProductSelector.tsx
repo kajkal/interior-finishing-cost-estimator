@@ -17,7 +17,6 @@ import { ProductDataFragment } from '../../../../../graphql/generated-types';
 import { stripDiacritics } from '../../../../utils/filters/filtersUtils';
 import { ProductPreview } from '../../misc/ProductPreview';
 import { NumberField } from '../number/NumberField';
-import { TagChip } from '../../misc/TagChip';
 
 
 export interface ProductAmountOption {
@@ -169,30 +168,23 @@ function tagsRenderer() {
     return null;
 }
 
-function optionRenderer(option: ProductAmountOption, { inputValue }: AutocompleteRenderOptionState): React.ReactNode {
+function optionRenderer({ product }: ProductAmountOption, { inputValue }: AutocompleteRenderOptionState): React.ReactNode {
     const normalizedInputValue = stripDiacritics(inputValue.trim().toLowerCase());
-    const matches = match(option.product.name, inputValue);
-    const parts = parse(option.product.name, matches);
+    const matches = match(product.name, inputValue);
+    const parts = parse(product.name, matches);
 
     return (
-        <div data-testid={`option-${option.product.id}`}>
-            <Typography>
-                {parts.map((part, index) => (
-                    <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                        {part.text}
-                    </span>
-                ))}
-            </Typography>
-            <div>
-                {option.product.tags?.map((tag) => (
-                    <TagChip
-                        key={tag}
-                        label={tag}
-                        color={isTagAffectsFilter(tag, normalizedInputValue) ? 'primary' : 'default'}
-                    />
-                ))}
-            </div>
-        </div>
+        <ProductPreview
+            data-testid={`option-${product.id}`}
+            product={product}
+            component='div'
+            nameRenderer={() => parts.map((part, index) => (
+                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                    {part.text}
+                </span>
+            ))}
+            isTagActive={(tag) => isTagAffectsFilter(tag, normalizedInputValue)}
+        />
     );
 }
 
@@ -222,6 +214,7 @@ const useStyles = makeStyles((theme) => ({
         borderTopRightRadius: theme.shape.borderRadius,
     },
     productPreview: {
+        padding: theme.spacing(1),
         gridArea: 'preview',
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
