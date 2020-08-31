@@ -8,6 +8,7 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
+    "@nivo/sunburst": "^0.62.0",
     "@udecode/slate-plugins": "^0.66.7",
     "apollo-upload-client": "^14.1.1",
     "autosuggest-highlight": "^3.1.1",
@@ -87,7 +88,8 @@
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "node-sass": "^4.14.1",
     "react-test-renderer": "^16.13.1",
-    "typescript": "~3.9.7"
+    "typescript": "~3.9.7",
+    "use-resize-observer": "^6.1.0"
   },
   "jest": {
     "collectCoverageFrom": [

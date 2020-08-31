@@ -4,8 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { getByRole, render, screen, waitFor } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../../__utils__/MockContextProvider';
+import { generator } from '../../../../../__utils__/generator';
 
-import { DeleteProjectFileDocument, DeleteProjectFileMutation, DeleteProjectFileMutationVariables, Project, ProjectDetailedDataFragment, ResourceData } from '../../../../../../graphql/generated-types';
+import { DeleteProjectFileDocument, DeleteProjectFileMutation, DeleteProjectFileMutationVariables, ResourceData } from '../../../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
 import { InquiryCreateModalAtomValue } from '../../../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
 import { initApolloCache } from '../../../../../../code/components/providers/apollo/client/initApolloClient';
@@ -30,14 +31,7 @@ describe('FileSection component', () => {
         description: null,
         createdAt: '2020-08-25T22:30:00.000Z',
     };
-    const sampleProject: ProjectDetailedDataFragment = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [ sampleFile1, sampleFile2 ],
-        rooms: null,
-    };
+    const sampleProject = generator.project({ files: [ sampleFile1, sampleFile2 ] });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const Handle = () => {

@@ -4,24 +4,17 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { generator } from '../../../../__utils__/generator';
 
 import { projectUpdateModalAtom } from '../../../../../code/components/modals/project-update/projectUpdateModalAtom';
 import { UpdateProjectButton } from '../../../../../code/components/pages/project/elements/UpdateProjectButton';
-import { CompleteProjectData } from '../../../../../code/utils/mappers/projectMapper';
-import { Project } from '../../../../../graphql/generated-types';
+import { mapProjectDataToCompleteProjectData } from '../../../../../code/utils/mappers/projectMapper';
 
 
 describe('UpdateProjectButton component', () => {
 
     const projectUpdateModalAtomSpy = jest.fn();
-    const sampleProject: CompleteProjectData = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [],
-        rooms: [],
-    };
+    const sampleProject = mapProjectDataToCompleteProjectData(generator.project(), { products: [], inquiries: [] });
 
     function renderInMockContext(mocks?: ContextMocks) {
         projectUpdateModalAtomSpy.mockClear();

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { getByRole, getByTestId, render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../../__utils__/MockContextProvider';
+import { generator } from '../../../../../__utils__/generator';
 
 import { productUpdateModalAtom, ProductUpdateModalAtomValue } from '../../../../../../code/components/modals/product-update/productUpdateModalAtom';
 import { inquiryUpdateModalAtom, InquiryUpdateModalAtomValue } from '../../../../../../code/components/modals/inquiry-update/inquiryUpdateModalAtom';
@@ -12,9 +13,9 @@ import { roomUpdateModalAtom, RoomUpdateModalAtomValue } from '../../../../../..
 import { roomDeleteModalAtom, RoomDeleteModalAtomValue } from '../../../../../../code/components/modals/room-delete/roomDeleteModalAtom';
 import { productModalAtom, ProductModalAtomValue } from '../../../../../../code/components/modals/product/productModalAtom';
 import { inquiryModalAtom, InquiryModalAtomValue } from '../../../../../../code/components/modals/inquiry/inquiryModalAtom';
+import { mapProjectDataToCompleteProjectData } from '../../../../../../code/utils/mappers/projectMapper';
 import { RoomSection } from '../../../../../../code/components/pages/project/sections/room/RoomSection';
-import { Category, Inquiry, Product, Room, RoomType } from '../../../../../../graphql/generated-types';
-import { CompleteProjectData, CompleteRoom } from '../../../../../../code/utils/mappers/projectMapper';
+import { Category } from '../../../../../../graphql/generated-types';
 
 
 describe('RoomSection component', () => {
@@ -27,87 +28,26 @@ describe('RoomSection component', () => {
     let productModalState: ProductModalAtomValue;
     let inquiryModalState: InquiryModalAtomValue;
 
-    const sampleProduct1: Product = {
-        __typename: 'Product',
-        id: 'sample-product-1',
-        name: 'Sample product 1',
-        description: '[{"children":[{"type":"p","children":[{"text":"sample product description 1"}]}]}]',
-        price: {
-            __typename: 'CurrencyAmount',
-            currency: 'PLN',
-            amount: 4.5,
-        },
-        tags: [ 'tag A', 'tag B' ],
-        createdAt: null,
-        updatedAt: null,
-    };
-    const sampleInquiry1: Inquiry = {
-        __typename: 'Inquiry',
-        id: 'sample-inquiry-1',
-        title: 'Sample inquiry 1',
-        description: '[{"children":[{"type":"p","children":[{"text":"sample inquiry description 1"}]}]}]',
+    const sampleProduct1 = generator.product({ tags: [ 'tag A', 'tag B' ] });
+    const sampleInquiry1 = generator.inquiry({
         category: Category.DESIGNING,
-        author: null!,
-        location: {
-            __typename: 'Location',
-            placeId: 'sample-place-id',
-            main: 'City',
-            secondary: 'Country',
-            lat: 50,
-            lng: 20,
-        },
         quotes: [
-            {
-                __typename: 'PriceQuote',
-                author: null!,
-                date: '2020-08-17T01:00:00.000Z',
-                price: {
-                    __typename: 'CurrencyAmount',
-                    amount: 50,
-                    currency: 'PLN',
-                },
-            },
-            {
-                __typename: 'PriceQuote',
-                author: null!,
-                date: '2020-08-17T02:00:00.000Z',
-                price: {
-                    __typename: 'CurrencyAmount',
-                    amount: 45,
-                    currency: 'PLN',
-                },
-            },
+            generator.quote({ price: { currency: 'PLN', amount: 50 } }),
+            generator.quote({ price: { currency: 'PLN', amount: 45 } }),
         ],
-        createdAt: null,
-        updatedAt: null,
-    };
-    const sampleRoom1: CompleteRoom = {
-        __typename: 'Room',
-        id: 'kitchen',
-        type: RoomType.KITCHEN,
-        name: 'Kitchen',
+    });
+    const sampleRoom1 = generator.room({
         floor: 12,
         wall: 17.5,
         ceiling: 12,
-        products: [ { product: sampleProduct1, amount: 3 } ],
-        inquiries: [ sampleInquiry1 ],
-    };
-    const sampleRoom2: CompleteRoom = {
-        __typename: 'Room',
-        id: 'kitchen-1',
-        type: RoomType.BALCONY,
-        name: 'Balcony',
-        floor: null,
-        wall: null,
-        ceiling: null,
-        products: [],
-        inquiries: [],
-    };
-    const sampleProject: Pick<CompleteProjectData, 'slug' | 'name' | 'rooms'> = {
-        slug: 'sample-project',
-        name: 'Sample project',
-        rooms: [ sampleRoom1, sampleRoom2 ],
-    };
+        products: [ { __typename: 'LinkedProduct', productId: sampleProduct1.id, amount: 3 } ],
+        inquiries: [ { __typename: 'LinkedInquiry', inquiryId: sampleInquiry1.id } ],
+    });
+    const sampleRoom2 = generator.room();
+    const sampleProject = mapProjectDataToCompleteProjectData(
+        generator.project({ rooms: [ sampleRoom1, sampleRoom2 ] }),
+        { products: [ sampleProduct1 ], inquiries: [ sampleInquiry1 ] },
+    );
 
     function renderInMockContext(mocks?: ContextMocks) {
         const Handle = () => {
@@ -222,17 +162,14 @@ describe('RoomSection component', () => {
             open: true,
             formInitialValues: {
                 projectSlug: sampleProject.slug,
-                roomId: 'kitchen',
-                type: RoomType.KITCHEN,
-                name: 'Kitchen',
-                floor: 12,
-                wall: 17.5,
-                ceiling: 12,
+                roomId: sampleRoom1.id,
+                type: sampleRoom1.type,
+                name: sampleRoom1.name,
+                floor: sampleRoom1.floor,
+                wall: sampleRoom1.wall,
+                ceiling: sampleRoom1.ceiling,
                 products: [ { product: sampleProduct1, amount: 3 } ],
-                inquiries: [ {
-                    ...sampleInquiry1,
-                    translatedCategory: 't:inquiry.categories.designing',
-                } ],
+                inquiries: [ { ...sampleInquiry1, translatedCategory: 't:inquiry.categories.designing' } ],
             },
         });
     });
@@ -288,8 +225,8 @@ describe('RoomSection component', () => {
                 name: sampleProduct1.name,
                 description: JSON.parse(sampleProduct1.description),
                 price: {
-                    currency: 'PLN',
-                    amount: 4.5,
+                    currency: sampleProduct1.price!.currency,
+                    amount: sampleProduct1.price!.amount,
                 },
                 tags: [ { name: 'tag A' }, { name: 'tag B' } ],
             },

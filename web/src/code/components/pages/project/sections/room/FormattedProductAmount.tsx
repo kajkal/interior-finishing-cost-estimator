@@ -64,9 +64,9 @@ export function FormattedProductAmount({ currencyAmount, quantity, className }: 
             <FormattedCurrencyAmount
                 onClick={handleToggle}
                 className={className}
-                currencyAmount={{
-                    currency: currencyAmount?.currency || '',
-                    amount: (quantity * (currencyAmount?.amount || 0)) || 0,
+                currencyAmount={currencyAmount && {
+                    currency: currencyAmount.currency,
+                    amount: (quantity * currencyAmount.amount),
                 }}
             />
         </Tooltip>

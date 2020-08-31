@@ -9,7 +9,7 @@ import { formatAmount } from '../../../config/supportedCurrencies';
 
 
 export interface FormattedCurrencyAmountProps extends React.HTMLProps<HTMLDivElement> {
-    currencyAmount: CurrencyAmount;
+    currencyAmount?: CurrencyAmount | null;
 }
 
 export const FormattedCurrencyAmount = React.forwardRef<HTMLDivElement, FormattedCurrencyAmountProps>(
@@ -18,12 +18,20 @@ export const FormattedCurrencyAmount = React.forwardRef<HTMLDivElement, Formatte
 
         return (
             <div className={clsx(classes.root, className)} ref={ref} {...rest}>
-                <Typography>
-                    {formatAmount(currencyAmount)}
-                </Typography>
-                <Typography className={classes.currency} variant='caption'>
-                    {currencyAmount.currency}
-                </Typography>
+                {(currencyAmount)
+                    ? (
+                        <>
+                            <Typography component='span'>
+                                {formatAmount(currencyAmount)}
+                            </Typography>
+                            <Typography component='span' className={classes.currency} variant='caption'>
+                                {currencyAmount.currency}
+                            </Typography>
+                        </>
+                    )
+                    : (
+                        <Typography component='span' className={classes.missingCurrencyAmount}>-</Typography>
+                    )}
             </div>
         );
     },
@@ -37,5 +45,8 @@ const useStyles = makeStyles({
         verticalAlign: 'super',
         marginLeft: 5,
         width: 24,
+    },
+    missingCurrencyAmount: {
+        marginRight: 29,
     },
 });

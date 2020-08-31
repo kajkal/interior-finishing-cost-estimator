@@ -14,9 +14,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import Divider from '@material-ui/core/Divider';
 
 import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../../../modals/product-update/productUpdateModalAtom';
+import { findLowestQuote, mapInquiryToInquiryUpdateFormData } from '../../../../../utils/mappers/inquiryMapper';
 import { InquiryDataFragment, ProductDataFragment } from '../../../../../../graphql/generated-types';
 import { inquiryUpdateModalAtom } from '../../../../modals/inquiry-update/inquiryUpdateModalAtom';
-import { mapInquiryToInquiryUpdateFormData } from '../../../../../utils/mappers/inquiryMapper';
 import { CompleteProjectData, CompleteRoom } from '../../../../../utils/mappers/projectMapper';
 import { mapCompleteRoomToRoomUpdateFormData } from '../../../../../utils/mappers/roomMapper';
 import { FormattedCurrencyAmount } from '../../../../common/misc/FormattedCurrencyAmount';
@@ -35,9 +35,10 @@ import { TagChip } from '../../../../common/misc/TagChip';
 
 export interface RoomSectionProps {
     project: Pick<CompleteProjectData, 'slug' | 'name' | 'rooms'>;
+    defaultExpanded?: boolean;
 }
 
-export function RoomSection({ project }: RoomSectionProps): React.ReactElement {
+export function RoomSection({ project, defaultExpanded }: RoomSectionProps): React.ReactElement {
     const { t } = useTranslation();
     const classes = useStyles();
     const setRoomCreateModalState = useSetRecoilState(roomCreateModalAtom);
@@ -101,7 +102,7 @@ export function RoomSection({ project }: RoomSectionProps): React.ReactElement {
     };
 
     return (
-        <Section id='rooms' title={t('project.rooms')} defaultExpanded className={classes.roomList}>
+        <Section id='rooms' title={t('project.rooms')} className={classes.roomList} defaultExpanded={defaultExpanded}>
             {project.rooms?.map((room) => (
                 <Paper key={room.id} variant='outlined' data-testid='room'>
 
@@ -201,9 +202,7 @@ export function RoomSection({ project }: RoomSectionProps): React.ReactElement {
                         <div className={clsx(classes.roomSectionContent, classes.inquiryList)} data-testid='inquiry-list'>
                             {(room.inquiries?.length)
                                 ? (room.inquiries.map((inquiry) => {
-                                    const minQuote = [ ...inquiry.quotes || [] ]
-                                        .sort((a, b) => a.price.amount - b.price.amount)
-                                        .find(Boolean);
+                                    const minQuote = findLowestQuote(inquiry);
                                     return (
                                         <React.Fragment key={inquiry.id}>
                                             <div>

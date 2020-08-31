@@ -1,7 +1,7 @@
-import { MeQuery, useMeQuery } from '../../../graphql/generated-types';
+import { useMeQuery, UserDetailedDataFragment } from '../../../graphql/generated-types';
 
 
-export function useCurrentUserCachedData(): MeQuery['me'] | undefined {
+export function useCurrentUserCachedData(): UserDetailedDataFragment | undefined {
     const { data } = useMeQuery({ fetchPolicy: 'cache-only' });
     return data?.me;
 }

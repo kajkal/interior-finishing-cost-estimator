@@ -1,6 +1,6 @@
 import { InquiryUpdateFormData } from '../../components/modals/inquiry-update/inquiryUpdateModalAtom';
+import { Inquiry, PriceQuoteDataFragment } from '../../../graphql/generated-types';
 import { mapLocationToLocationOption } from './locationMapper';
-import { Inquiry } from '../../../graphql/generated-types';
 
 
 export function mapInquiryToInquiryUpdateFormData(inquiry: Inquiry): InquiryUpdateFormData {
@@ -11,4 +11,9 @@ export function mapInquiryToInquiryUpdateFormData(inquiry: Inquiry): InquiryUpda
         location: mapLocationToLocationOption(inquiry.location),
         category: inquiry.category,
     };
+}
+
+export function findLowestQuote(inquiry: Inquiry): PriceQuoteDataFragment | undefined {
+    const quotesCopy = inquiry.quotes?.length ? [ ...inquiry.quotes ] : [];
+    return quotesCopy.sort((a, b) => a.price.amount - b.price.amount).find(Boolean);
 }

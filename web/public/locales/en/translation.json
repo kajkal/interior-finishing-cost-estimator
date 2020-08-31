@@ -141,6 +141,8 @@
     "noRoomInquiries": "No inquiries",
     "addRoom": "Add room",
     "summary": "Summary",
+    "total": "Total:",
+    "noData": "No data",
     "projectNotFoundError": "Project no longer exists",
     "roomNotFoundError": "Room no longer exists"
   },

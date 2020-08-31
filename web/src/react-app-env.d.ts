@@ -12,3 +12,11 @@ declare namespace NodeJS {
     }
 
 }
+
+declare module '@nivo/sunburst' {
+
+    import React from 'react';
+    declare const ResponsiveSunburst: React.ComponentType<any, any>;
+    declare const Sunburst: React.ComponentType<any, any>;
+
+}

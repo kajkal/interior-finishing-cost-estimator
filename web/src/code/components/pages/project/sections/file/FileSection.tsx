@@ -23,9 +23,10 @@ import { Section } from '../../../../common/section/Section';
 
 export interface FileSectionProps {
     project: Pick<CompleteProjectData, 'slug' | 'name' | 'files'>;
+    defaultExpanded?: boolean;
 }
 
-export function FileSection({ project }: FileSectionProps): React.ReactElement {
+export function FileSection({ project, defaultExpanded }: FileSectionProps): React.ReactElement {
     const classes = useStyles();
     const { t } = useTranslation();
     const setFileUploadModalState = useSetRecoilState(projectFileUploadModalAtom);
@@ -68,7 +69,7 @@ export function FileSection({ project }: FileSectionProps): React.ReactElement {
     };
 
     return (
-        <Section id='files' title={t('project.files')} className={classes.fileList} defaultExpanded>
+        <Section id='files' title={t('project.files')} className={classes.fileList} defaultExpanded={defaultExpanded}>
             {project.files.map((file) => (
                 <Paper key={file.name} variant='outlined' data-testid='file'>
 

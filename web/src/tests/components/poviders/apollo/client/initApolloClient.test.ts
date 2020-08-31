@@ -36,7 +36,7 @@ describe('initApolloClient function', () => {
         // verify HttpLink/UploadLink
         expect(createUploadLinkSpy).toHaveBeenCalledTimes(1);
         expect(createUploadLinkSpy).toHaveBeenCalledWith({
-            uri: "http://192.168.0.73:4000/graphql",
+            uri: 'http://192.168.0.73:4000/graphql',
             credentials: 'include',
         });
 
