@@ -4,8 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { DeleteRoomDocument, DeleteRoomMutation, DeleteRoomMutationVariables, Project, ProjectDetailedDataFragment, Room, RoomDataFragment, RoomType } from '../../../../graphql/generated-types';
+import { DeleteRoomDocument, DeleteRoomMutation, DeleteRoomMutationVariables } from '../../../../graphql/generated-types';
 import { roomDeleteModalAtom } from '../../../../code/components/modals/room-delete/roomDeleteModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { RoomDeleteModal } from '../../../../code/components/modals/room-delete/RoomDeleteModal';
@@ -13,25 +14,8 @@ import { RoomDeleteModal } from '../../../../code/components/modals/room-delete/
 
 describe('RoomDeleteModal component', () => {
 
-    const sampleRoom: RoomDataFragment = {
-        __typename: 'Room',
-        id: 'kitchen',
-        type: RoomType.KITCHEN,
-        name: 'Kitchen',
-        floor: null,
-        wall: null,
-        ceiling: null,
-        products: null,
-        inquiries: null,
-    };
-    const sampleProject: ProjectDetailedDataFragment = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [],
-        rooms: [ sampleRoom ],
-    };
+    const sampleRoom = generator.room();
+    const sampleProject = generator.project({ rooms: [ sampleRoom ] });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
@@ -138,7 +122,7 @@ describe('RoomDeleteModal component', () => {
             expect(cache.extract()).toEqual({
                 [ projectCacheRecordKey ]: {
                     ...sampleProject,
-                    rooms: [],
+                    rooms: [], // <- updated room list
                 },
                 ROOT_MUTATION: expect.any(Object),
             });

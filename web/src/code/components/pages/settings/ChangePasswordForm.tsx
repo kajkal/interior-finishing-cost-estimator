@@ -137,6 +137,6 @@ const useStyles = makeStyles((theme) => ({
     },
     hiddenEmailFieldForSakeOfAccessibility: {
         display: 'none',
-    }
+    },
 }));
 

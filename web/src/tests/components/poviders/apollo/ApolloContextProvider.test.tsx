@@ -9,13 +9,14 @@ import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
 import { AuthUtilsSpiesManager } from '../../../__utils__/spies-managers/AuthUtilsSpiesManager';
 import { ApolloClientSpy } from '../../../__utils__/spies-managers/ApolloClientSpy';
 import { MockToastProvider } from '../../../__utils__/mocks/MockToastProvider';
+import { generator } from '../../../__utils__/generator';
 
 import * as initApolloClientModule from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { LoginSessionAction, LogoutSessionAction } from '../../../../code/utils/communication/SessionChannel';
 import { accessTokenVar } from '../../../../code/components/providers/apollo/client/accessTokenVar';
 import { SessionActionType } from '../../../../code/utils/communication/SessionActionType';
 import { UnauthorizedError } from '../../../../code/utils/auth/UnauthorizedError';
-import { LoginMutation, MeDocument } from '../../../../graphql/generated-types';
+import { MeDocument } from '../../../../graphql/generated-types';
 
 
 describe('ApolloContextProvider component', () => {
@@ -309,7 +310,7 @@ describe('ApolloContextProvider component', () => {
                 type: SessionActionType.LOGIN,
                 initialData: {
                     __typename: 'InitialData',
-                    user: {} as LoginMutation['login']['user'],
+                    user: generator.user(),
                     accessToken: 'ACCESS_TOKEN_FROM_LOGIN_EVENT',
                 },
             };

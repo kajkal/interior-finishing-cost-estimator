@@ -16,7 +16,6 @@ import { OfficeIcon } from '../components/common/icons/room-type/OfficeIcon';
 import { OtherIcon } from '../components/common/icons/room-type/OtherIcon';
 
 
-
 export interface RoomTypeConfig {
     tKey: string;
     Icon: React.ComponentType<SvgIconProps>;
@@ -67,6 +66,6 @@ export const roomTypeConfigMap: Record<keyof typeof RoomType, RoomTypeConfig> = 
         tKey: 'project.roomType.other',
         Icon: OtherIcon,
     },
-}
+};
 
 export const supportedRoomTypes = Object.keys(RoomType) as RoomType[];

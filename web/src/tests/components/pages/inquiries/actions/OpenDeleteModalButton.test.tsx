@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../../__utils__/generator';
 
 import { inquiryDeleteModalAtom, InquiryDeleteModalAtomValue } from '../../../../../code/components/modals/inquiry-delete/inquiryDeleteModalAtom';
 import { OpenDeleteModalButton } from '../../../../../code/components/pages/inquiries/actions/OpenDeleteModalButton';
@@ -28,17 +29,14 @@ describe('OpenDeleteModalButton component', () => {
     }
 
     it('should open delete inquiry confirmation modal on click', () => {
-        renderInMockContext({
-            __typename: 'Inquiry',
-            id: 'sample_id',
-            title: 'sample title',
-        });
+        const sampleInquiry = generator.inquiry();
+        renderInMockContext(sampleInquiry);
         userEvent.click(screen.getByRole('button', { name: 't:form.common.delete' }));
         expect(deleteState).toEqual({
             open: true,
             inquiryData: {
-                id: 'sample_id',
-                title: 'sample title',
+                id: sampleInquiry.id,
+                title: sampleInquiry.title,
             },
         });
     });

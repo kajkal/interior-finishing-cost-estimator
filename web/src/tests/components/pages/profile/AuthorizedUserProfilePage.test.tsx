@@ -5,22 +5,19 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { profileUpdateModalAtom, ProfileUpdateModalAtomValue } from '../../../../code/components/modals/profile-update/profileUpdateModalAtom';
-import { ProfileDocument, ProfileQuery, ProfileQueryVariables, User } from '../../../../graphql/generated-types';
 import { AuthorizedUserProfilePage } from '../../../../code/components/pages/profile/AuthorizedUserProfilePage';
 import { emptyEditorValue } from '../../../../code/components/common/form-fields/ritch-text-editor/options';
+import { ProfileDocument, ProfileQuery, ProfileQueryVariables } from '../../../../graphql/generated-types';
 
 
 describe('AuthorizedUserProfilePage component', () => {
 
     let updateState: ProfileUpdateModalAtomValue;
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        name: 'Sample Name',
-    };
+    const sampleUser = generator.user();
 
     const mockResponseGenerator = {
         success: () => ({
@@ -79,7 +76,7 @@ describe('AuthorizedUserProfilePage component', () => {
             open: true,
             withExistingAvatar: false,
             profileData: {
-                name: 'Sample Name',
+                name: sampleUser.name,
                 avatar: null,
                 description: emptyEditorValue,
                 location: null,

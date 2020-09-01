@@ -11,12 +11,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { productCreateModalAtom, ProductCreateModalAtomValue } from '../../../../code/components/modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom, ProductDeleteModalAtomValue } from '../../../../code/components/modals/product-delete/productDeleteModalAtom';
 import { productUpdateModalAtom, ProductUpdateModalAtomValue } from '../../../../code/components/modals/product-update/productUpdateModalAtom';
 import { ProductsPage } from '../../../../code/components/pages/products/ProductsPage';
-import { Product, User } from '../../../../graphql/generated-types';
 
 
 describe('ProductsPage component', () => {
@@ -25,34 +25,23 @@ describe('ProductsPage component', () => {
     let updateState: ProductUpdateModalAtomValue;
     let deleteState: ProductDeleteModalAtomValue;
 
-    const product1: Product = {
-        id: 'id_1',
-        name: 'Product 1',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description 1"}]}]}]',
-        price: { currency: 'PLN', amount: 4.5 },
+    const product1 = generator.product({
+        name: 'Product-1',
+        description: 'Sample description 1',
+        price: generator.currencyAmount({ currency: 'PLN', amount: 4.5 }),
         tags: [ 'tag a' ],
         createdAt: '2020-08-05T12:00:00.000Z',
         updatedAt: '2020-08-06T12:05:00.000Z',
-    };
-    const product2: Product = {
-        id: 'id_2',
-        name: 'Product 2',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description 2"}]}]}]',
+    });
+    const product2 = generator.product({
         tags: null,
         createdAt: '2020-08-06T12:00:00.000Z',
-    };
-    const product3: Product = {
-        id: 'id_3',
-        name: 'Product 3',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description 3"}]}]}]',
+    });
+    const product3 = generator.product({
         tags: [ 'tag a', 'tag b' ],
         createdAt: '2020-08-07T12:00:00.000Z',
-    };
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        products: [ product1, product2, product3 ],
-    };
+    });
+    const sampleUser = generator.user({ products: [ product1, product2, product3 ] });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -101,7 +90,7 @@ describe('ProductsPage component', () => {
 
         userEvent.click(ViewUnderTest.createProductButton);
 
-        await waitFor(() => expect(createState).toEqual({ open: true}));
+        await waitFor(() => expect(createState).toEqual({ open: true }));
     });
 
     it('should render page with filters and product list', async () => {
@@ -114,16 +103,16 @@ describe('ProductsPage component', () => {
         expect(ViewUnderTest.filterTags).toBeVisible();
 
         // verify if all product panels are visible
-        const panel1 = ViewUnderTest.getProductPanel('Product 1');
-        const panel2 = ViewUnderTest.getProductPanel('Product 2');
-        const panel3 = ViewUnderTest.getProductPanel('Product 3');
+        const panel1 = ViewUnderTest.getProductPanel(product1.name);
+        const panel2 = ViewUnderTest.getProductPanel(product2.name);
+        const panel3 = ViewUnderTest.getProductPanel(product3.name);
         expect(panel1).toBeVisible();
         expect(panel2).toBeVisible();
         expect(panel3).toBeVisible();
 
         // verify panel 1
         userEvent.click(panel1);
-        expect(panel1).toHaveTextContent('14.50PLNtag a'); // price + tags
+        expect(panel1).toHaveTextContent('Product-14.50PLNtag a'); // name + price + tags
         expect(screen.getByText('Sample description 1')).toBeVisible();
 
         // verify delete button

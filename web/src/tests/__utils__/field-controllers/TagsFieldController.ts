@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { fireEvent, getByText, getAllByRole, screen } from '@testing-library/react';
+import { fireEvent, getAllByRole, getByText, screen } from '@testing-library/react';
 
 import { AbstractFieldController } from './AbstractFieldController';
 import { flushPromises } from '../extendedUserEvent';

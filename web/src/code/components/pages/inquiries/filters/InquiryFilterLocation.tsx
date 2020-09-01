@@ -34,7 +34,7 @@ export function InquiryFilterLocation({ location, setFilters, className }: Inqui
             placeholder={t('inquiry.filters.locationPlaceholder')}
             aria-label={t('inquiry.filters.locationAriaLabel')}
             autocompleteClasses={{
-                inputRoot: classes.inputWithoutLabel
+                inputRoot: classes.inputWithoutLabel,
             }}
         />
     );

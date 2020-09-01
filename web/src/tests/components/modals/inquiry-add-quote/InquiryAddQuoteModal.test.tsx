@@ -10,8 +10,9 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { CurrencyAmountFieldController } from '../../../__utils__/field-controllers/CurrencyAmountFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { AddQuoteDocument, AddQuoteMutation, AddQuoteMutationVariables, Category, Inquiry } from '../../../../graphql/generated-types';
+import { AddQuoteDocument, AddQuoteMutation, AddQuoteMutationVariables } from '../../../../graphql/generated-types';
 import { inquiryAddQuoteModalAtom } from '../../../../code/components/modals/inquiry-add-quote/inquiryAddQuoteModalAtom';
 import { InquiryAddQuoteModal } from '../../../../code/components/modals/inquiry-add-quote/InquiryAddQuoteModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -19,30 +20,7 @@ import { initApolloCache } from '../../../../code/components/providers/apollo/cl
 
 describe('InquiryAddQuoteModal component', () => {
 
-    const sampleInquiry: Inquiry = {
-        __typename: 'Inquiry',
-        id: '5f09e24646904045d48e5598',
-        title: 'Sample inquiry title',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-        location: {
-            __typename: 'Location',
-            placeId: '',
-            main: '',
-            secondary: '',
-            lat: -1,
-            lng: -1,
-        },
-        category: Category.DESIGNING,
-        author: {
-            __typename: 'Author',
-            userSlug: '',
-            name: '',
-            avatar: null,
-        },
-        quotes: null,
-        createdAt: '',
-        updatedAt: null,
-    };
+    const sampleInquiry = generator.inquiry({ id: '5f09e24646904045d48e5598' });
 
     function initApolloTestCache() {
         const cache = initApolloCache();
@@ -178,7 +156,10 @@ describe('InquiryAddQuoteModal component', () => {
 
             // verify initial cache records
             expect(cache.extract()).toEqual({
-                [ inquiryCacheRecordKey ]: sampleInquiry,
+                [ inquiryCacheRecordKey ]: {
+                    ...sampleInquiry,
+                    quotes: null,
+                },
             });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -192,7 +173,7 @@ describe('InquiryAddQuoteModal component', () => {
                 // <- updated inquiry record
                 [ inquiryCacheRecordKey ]: {
                     ...sampleInquiry,
-                    quotes: updatedQuotes,
+                    quotes: updatedQuotes, // <- updated quote list
                 },
                 ROOT_MUTATION: expect.any(Object),
             });

@@ -21,7 +21,7 @@ describe('InquiryFilterType component', () => {
     it('should mark active type', () => {
         const mockAtomUpdater = jest.fn();
         const { rerender } = render(
-            <InquiryFilterType selectedType={null} setFilters={mockAtomUpdater} className='' />
+            <InquiryFilterType selectedType={null} setFilters={mockAtomUpdater} className='' />,
         );
 
         // verify if there are not active type checkboxes
@@ -29,7 +29,7 @@ describe('InquiryFilterType component', () => {
         expect(ViewUnderTest.selectBookmarkedInquiriesCheckbox).not.toBeChecked();
 
         rerender(
-            <InquiryFilterType selectedType='OWNED' setFilters={mockAtomUpdater} className='' />
+            <InquiryFilterType selectedType='OWNED' setFilters={mockAtomUpdater} className='' />,
         );
 
         // verify if own inquiries checkbox is active
@@ -37,7 +37,7 @@ describe('InquiryFilterType component', () => {
         expect(ViewUnderTest.selectBookmarkedInquiriesCheckbox).not.toBeChecked();
 
         rerender(
-            <InquiryFilterType selectedType='BOOKMARKED' setFilters={mockAtomUpdater} className='' />
+            <InquiryFilterType selectedType='BOOKMARKED' setFilters={mockAtomUpdater} className='' />,
         );
 
         // verify if bookmarked inquiries checkbox is active

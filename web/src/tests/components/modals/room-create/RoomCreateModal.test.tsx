@@ -17,8 +17,9 @@ import { NumberFieldController } from '../../../__utils__/field-controllers/Numb
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { flushPromises } from '../../../__utils__/extendedUserEvent';
+import { generator } from '../../../__utils__/generator';
 
-import { Category, CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Inquiry, Product, Project, RoomType, User } from '../../../../graphql/generated-types';
+import { CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, RoomType } from '../../../../graphql/generated-types';
 import { roomCreateModalAtom } from '../../../../code/components/modals/room-create/roomCreateModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { RoomCreateModal } from '../../../../code/components/modals/room-create/RoomCreateModal';
@@ -26,40 +27,15 @@ import { RoomCreateModal } from '../../../../code/components/modals/room-create/
 
 describe('RoomCreateModal component', () => {
 
-    const sampleProduct1: Partial<Product> = {
-        id: 'sample-product-1',
-        name: 'Sample product 1',
-        tags: [ 'tag A', 'tag B' ],
-    };
-    const sampleProduct2: Partial<Product> = {
-        id: 'sample-product-2',
-        name: 'Sample product 2',
-        tags: [ 'tag C' ],
-    };
-    const sampleInquiry1: Partial<Inquiry> = {
-        id: 'sample-inquiry-1',
-        title: 'Sample inquiry 1',
-        category: Category.DESIGNING,
-    };
-    const sampleInquiry2: Partial<Inquiry> = {
-        id: 'sample-inquiry-2',
-        title: 'Sample inquiry 2',
-        category: Category.ELECTRICAL,
-    };
-
-    const sampleUser: Partial<User> = {
-        products: [ sampleProduct1, sampleProduct2 ] as Product[],
-        inquiries: [ sampleInquiry1, sampleInquiry2 ] as Inquiry[],
-    };
-
-    const sampleProject: Partial<Project> = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [],
-        rooms: null,
-    };
+    const sampleProduct1 = generator.product({ tags: [ 'tag A', 'tag B' ] });
+    const sampleProduct2 = generator.product({ tags: [ 'tag C' ] });
+    const sampleInquiry1 = generator.inquiry();
+    const sampleInquiry2 = generator.inquiry();
+    const sampleProject = generator.project();
+    const sampleUser = generator.user({
+        products: [ sampleProduct1, sampleProduct2 ],
+        inquiries: [ sampleInquiry1, sampleInquiry2 ],
+    });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -71,7 +47,7 @@ describe('RoomCreateModal component', () => {
             return (
                 <button
                     data-testid='open-modal-button'
-                    onClick={() => setModalState({ open: true, projectData: { slug: sampleProject.slug! } })}
+                    onClick={() => setModalState({ open: true, projectData: { slug: sampleProject.slug } })}
                 />
             );
         };
@@ -277,7 +253,10 @@ describe('RoomCreateModal component', () => {
 
             // verify initial cache records
             expect(cache.extract()).toEqual({
-                [ projectCacheRecordKey ]: sampleProject,
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    rooms: [],
+                },
             });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -290,7 +269,7 @@ describe('RoomCreateModal component', () => {
             expect(cache.extract()).toEqual({
                 [ projectCacheRecordKey ]: {
                     ...sampleProject,
-                    rooms: [ createdRoom ],
+                    rooms: [ createdRoom ], // <- updated room list
                 },
                 ROOT_MUTATION: expect.any(Object),
             });

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../../__utils__/generator';
 
 import { inquiryAddQuoteModalAtom, InquiryAddQuoteModalAtomValue } from '../../../../../code/components/modals/inquiry-add-quote/inquiryAddQuoteModalAtom';
 import { OpenAddQuoteModalButton } from '../../../../../code/components/pages/inquiries/actions/OpenAddQuoteModalButton';
@@ -28,17 +29,12 @@ describe('OpenAddQuoteModalButton component', () => {
     }
 
     it('should open inquiry add quote modal on click', () => {
-        renderInMockContext({
-            __typename: 'Inquiry',
-            id: 'sample_id',
-        });
+        const sampleInquiry = generator.inquiry();
+        renderInMockContext(sampleInquiry);
         userEvent.click(screen.getByRole('button', { name: 't:inquiry.addQuote' }));
         expect(addQuoteState).toEqual({
             open: true,
-            inquiryData: {
-                __typename: 'Inquiry',
-                id: 'sample_id',
-            },
+            inquiryData: sampleInquiry,
         });
     });
 

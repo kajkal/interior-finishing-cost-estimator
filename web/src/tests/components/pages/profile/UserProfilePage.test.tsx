@@ -33,6 +33,7 @@ describe('UserProfilePage component', () => {
                         avatar: null,
                         description: null,
                         location: {
+                            __typename: 'Location',
                             placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
                             main: 'Kraków',
                             secondary: 'Poland',

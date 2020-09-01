@@ -1,19 +1,16 @@
 import { renderHook } from '@testing-library/react-hooks';
 
 import { mockUseCurrentUserCachedData } from '../../__mocks__/code/mockUseCurrentUserCachedData';
+import { generator } from '../../__utils__/generator';
 
 import { CurrentUserDataSelectors, useCurrentUserDataSelectors } from '../../../code/utils/hooks/useCurrentUserDataSelectors';
-import { Product, User } from '../../../graphql/generated-types';
 
 
 describe('useCurrentUserDataSelectors hook', () => {
 
     const memorySetterSpy = jest.spyOn(WeakMap.prototype, 'set');
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-    };
+    const sampleUser = generator.user();
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -26,9 +23,9 @@ describe('useCurrentUserDataSelectors hook', () => {
             mockUseCurrentUserCachedData.mockReturnValue({
                 ...sampleUser,
                 products: [
-                    { tags: null } as Product,
-                    { tags: [ 'C', 'A' ] } as Product,
-                    { tags: [ 'A', 'B' ] } as Product,
+                    generator.product({ tags: null }),
+                    generator.product({ tags: [ 'C', 'A' ] }),
+                    generator.product({ tags: [ 'A', 'B' ] }),
                 ],
             });
             const { result, rerender } = renderHook(useCurrentUserDataSelectors);
@@ -60,7 +57,7 @@ describe('useCurrentUserDataSelectors hook', () => {
             mockUseCurrentUserCachedData.mockReturnValue({
                 ...sampleUser,
                 products: [
-                    { tags: [ 'C', 'A' ] } as Product,
+                    generator.product({ tags: [ 'C', 'A' ] }),
                 ],
             });
 
@@ -90,9 +87,9 @@ describe('useCurrentUserDataSelectors hook', () => {
             mockUseCurrentUserCachedData.mockReturnValue({
                 ...sampleUser,
                 products: [
-                    { createdAt: '2020-08-06T14:00:00.000Z' } as Product,
-                    { createdAt: '2020-08-06T15:00:00.000Z' } as Product,
-                    { createdAt: '2020-08-06T12:00:00.000Z' } as Product,
+                    generator.product({ createdAt: '2020-08-06T14:00:00.000Z' }),
+                    generator.product({ createdAt: '2020-08-06T15:00:00.000Z' }),
+                    generator.product({ createdAt: '2020-08-06T12:00:00.000Z' }),
                 ],
             });
             const { result, rerender } = renderHook(useCurrentUserDataSelectors);
@@ -123,7 +120,7 @@ describe('useCurrentUserDataSelectors hook', () => {
             mockUseCurrentUserCachedData.mockReturnValue({
                 ...sampleUser,
                 products: [
-                    { createdAt: '2020-08-06T14:00:00.000Z' } as Product,
+                    generator.product({ createdAt: '2020-08-06T14:00:00.000Z' }),
                 ],
             });
 

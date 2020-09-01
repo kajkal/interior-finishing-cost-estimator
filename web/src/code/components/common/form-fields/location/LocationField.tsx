@@ -55,7 +55,7 @@ export function LocationField({ id, value, onChange, disabled, types, className,
 
         getPlacePredictions({ input: inputValue, types }, (results) => {
             const newOptions = (value) ? [ value ] : [];
-            setOptions([ ...newOptions, ...results.filter(({place_id}) => place_id !== value?.place_id) ]);
+            setOptions([ ...newOptions, ...results.filter(({ place_id }) => place_id !== value?.place_id) ]);
         });
 
         return () => {

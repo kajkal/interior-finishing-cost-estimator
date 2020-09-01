@@ -13,10 +13,9 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
 import { usePageLinearProgressRevealer } from '../../common/progress-indicators/usePageLinearProgressRevealer';
-import { FormikCurrencyAmountField } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
+import { CurrencyAmount, FormikCurrencyAmountField } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { CurrencyAmountFormData, useUpdateProductMutation } from '../../../../graphql/generated-types';
 import { FormikRichTextEditor } from '../../common/form-fields/ritch-text-editor/FormikRichTextEditor';
-import { CurrencyAmount } from '../../common/form-fields/currency-amount/FormikCurrencyAmountField';
 import { useCurrentUserDataSelectors } from '../../../utils/hooks/useCurrentUserDataSelectors';
 import { useModalNavigationBlocker } from '../../../utils/hooks/useModalNavigationBlocker';
 import { ProductUpdateFormData, productUpdateModalAtom } from './productUpdateModalAtom';

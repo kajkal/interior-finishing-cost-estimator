@@ -74,7 +74,7 @@ describe('ProductFilterTags component', () => {
             return (
                 <>
                     <div data-testid='filter-state'>
-                        {JSON.stringify((selectedTags === 'ALL') ? selectedTags : [...selectedTags])}
+                        {JSON.stringify((selectedTags === 'ALL') ? selectedTags : [ ...selectedTags ])}
                     </div>
                     <ProductFilterTags
                         tags={tags} setFilters={setFilters as SetterOrUpdater<ProductsFiltersAtomValue>} className=''
@@ -83,7 +83,7 @@ describe('ProductFilterTags component', () => {
                 </>
             );
         };
-        render(<ControlledFilter/>);
+        render(<ControlledFilter />);
         expect(screen.getByTestId('filter-state')).toHaveTextContent('ALL');
 
         userEvent.click(ViewUnderTest.selectAllTagsCheckbox);

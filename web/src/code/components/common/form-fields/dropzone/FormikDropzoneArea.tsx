@@ -44,7 +44,10 @@ export function FormikDropzoneArea({ name, label, accept, multiple = false, auto
             case 'file-invalid-type':
                 return t('form.common.dropzone.validation.invalidType');
             case 'file-too-large':
-                return t('form.common.dropzone.validation.tooLarge', { filename: name, maxSizeInMb: maxSizeInB / 1e+6 });
+                return t('form.common.dropzone.validation.tooLarge', {
+                    filename: name,
+                    maxSizeInMb: maxSizeInB / 1e+6,
+                });
             case 'too-many-files':
                 return t('form.common.dropzone.validation.toManyFiles');
             default:

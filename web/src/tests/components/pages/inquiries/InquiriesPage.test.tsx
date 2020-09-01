@@ -11,62 +11,28 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { inquiryCreateModalAtom, InquiryCreateModalAtomValue } from '../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
-import { Category, InquiriesDocument, InquiriesQuery, Inquiry, User } from '../../../../graphql/generated-types';
 import { InquiriesPage } from '../../../../code/components/pages/inquiries/InquiriesPage';
+import { InquiriesDocument, InquiriesQuery } from '../../../../graphql/generated-types';
 
 
 describe('InquiriesPage component', () => {
 
     let createState: InquiryCreateModalAtomValue;
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        bookmarkedInquiries: [],
-    };
-
-    const sampleInquiry: Inquiry = {
-        __typename: 'Inquiry',
+    const sampleUser = generator.user({ bookmarkedInquiries: [] });
+    const sampleInquiry1 = generator.inquiry({
         id: '5f09e24646904045d48e5598',
-        title: 'Sample inquiry title',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-        location: {
-            __typename: 'Location',
-            placeId: 'sample-place-id',
-            main: 'City',
-            secondary: 'Country',
-            lat: 50,
-            lng: 20,
-        },
-        category: Category.DESIGNING,
-        author: {
-            __typename: 'Author',
-            userSlug: 'sample-inquiry-author',
-            name: 'Sample Inquiry Author',
-            avatar: null,
-        },
-        quotes: [
-            {
-                __typename: 'PriceQuote',
-                author: {
-                    __typename: 'Author',
-                    userSlug: 'sample-quote-author',
-                    name: 'Sample Quote Author',
-                    avatar: null,
-                },
-                date: '2020-08-17T01:00:00.000Z',
-                price: {
-                    __typename: 'CurrencyAmount',
-                    amount: 50,
-                    currency: 'PLN',
-                },
-            },
-        ],
+        quotes: [ generator.quote() ],
         createdAt: '2020-08-16T21:00:00.000Z',
-        updatedAt: null,
-    };
+    });
+    const sampleInquiry2 = generator.inquiry({
+        id: '5f09e24646904045d48e5599',
+        quotes: [ generator.quote(), generator.quote() ],
+        createdAt: '2020-08-16T20:00:00.000Z',
+    });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -92,7 +58,7 @@ describe('InquiriesPage component', () => {
             },
             result: {
                 data: {
-                    allInquiries: [ sampleInquiry ],
+                    allInquiries: [ sampleInquiry1, sampleInquiry2 ],
                 } as InquiriesQuery,
             },
         }),
@@ -128,7 +94,8 @@ describe('InquiriesPage component', () => {
         renderInMockContext({ mockResponses: [ mockResponse ] });
         await ViewUnderTest.waitForPageToLoad();
 
-        expect(ViewUnderTest.getInquiryPanel(sampleInquiry.title)).toBeVisible();
+        expect(ViewUnderTest.getInquiryPanel(sampleInquiry1.title)).toBeVisible();
+        expect(ViewUnderTest.getInquiryPanel(sampleInquiry2.title)).toBeVisible();
     });
 
 });

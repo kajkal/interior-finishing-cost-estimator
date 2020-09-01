@@ -99,8 +99,8 @@ export const InquirySelector = React.memo(
                 </div>
             </FormControl>
         );
-    }
-)
+    },
+);
 
 /**
  * Utils

@@ -6,18 +6,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { ChangePasswordDocument, ChangePasswordMutation, ChangePasswordMutationVariables, User } from '../../../../graphql/generated-types';
+import { ChangePasswordDocument, ChangePasswordMutation, ChangePasswordMutationVariables } from '../../../../graphql/generated-types';
 import { ChangePasswordForm } from '../../../../code/components/pages/settings/ChangePasswordForm';
 
 
 describe('ChangePasswordForm component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        email: 'current-email@domain.com',
-    };
+    const sampleUser = generator.user({ email: 'current-email@domain.com' });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

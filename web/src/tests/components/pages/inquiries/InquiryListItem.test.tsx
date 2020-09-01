@@ -6,55 +6,44 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { InquiryListItem } from '../../../../code/components/pages/inquiries/InquiryListItem';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
-import { Category, Inquiry } from '../../../../graphql/generated-types';
-import { nav } from '../../../../code/config/nav';
 import userEvent from '@testing-library/user-event';
+
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
+
+import { InquiryListItem } from '../../../../code/components/pages/inquiries/InquiryListItem';
+import { Category } from '../../../../graphql/generated-types';
+import { nav } from '../../../../code/config/nav';
 
 
 describe('InquiryListItem component', () => {
 
-    const sampleInquiry: Inquiry = {
-        __typename: 'Inquiry',
+    const sampleInquiry = generator.inquiry({
         id: '5f09e24646904045d48e5598',
         title: 'Sample inquiry title',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-        location: {
-            __typename: 'Location',
+        description: 'Sample description',
+        location: generator.location({
             placeId: 'sample-place-id',
             main: 'City',
             secondary: 'Country',
             lat: 50,
             lng: 20,
-        },
+        }),
         category: Category.DESIGNING,
-        author: {
-            __typename: 'Author',
+        author: generator.author({
             userSlug: 'sample-inquiry-author',
             name: 'Sample Inquiry Author',
-            avatar: null,
-        },
+        }),
         quotes: [
-            {
-                __typename: 'PriceQuote',
-                author: {
-                    __typename: 'Author',
+            generator.quote({
+                author: generator.author({
                     userSlug: 'sample-quote-author',
                     name: 'Sample Quote Author',
-                    avatar: null,
-                },
-                date: '2020-08-17T01:00:00.000Z',
-                price: {
-                    __typename: 'CurrencyAmount',
-                    amount: 50,
-                    currency: 'PLN',
-                },
-            },
+                }),
+            }),
         ],
         createdAt: '2020-08-16T21:00:00.000Z',
-        updatedAt: null,
-    };
+    });
 
     function createWrapper(mocks?: ContextMocks): React.ComponentType {
         return ({ children }) => (
@@ -196,10 +185,7 @@ describe('InquiryListItem component', () => {
 
     it('should render no offers message', () => {
         render(<InquiryListItem
-            inquiry={{
-                ...sampleInquiry,
-                quotes: null,
-            }}
+            inquiry={{ ...sampleInquiry, quotes: null }}
             isBookmarked={false}
             isOwned={false}
             distance={undefined}

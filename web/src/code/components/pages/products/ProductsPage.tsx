@@ -333,7 +333,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     productName: {
         gridArea: 'name',
         marginBottom: theme.spacing(0.5),
-        transition: theme.transitions.create(['font-size', 'margin'], {
+        transition: theme.transitions.create([ 'font-size', 'margin' ], {
             duration: theme.transitions.duration.shortest,
         }),
     },
@@ -357,7 +357,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
     },
     section: {
-        transition: theme.transitions.create(['margin'], {
+        transition: theme.transitions.create([ 'margin' ], {
             duration: theme.transitions.duration.shortest,
         }),
     },

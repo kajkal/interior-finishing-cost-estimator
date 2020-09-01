@@ -26,7 +26,7 @@ export function DateField({ InputLabelProps, InputProps, ...rest }: DateFieldPro
                 disableUnderline: true,
                 classes: {
                     input: clsx(classes.input, {
-                        [classes.inputWithoutLabel]: !rest.label,
+                        [ classes.inputWithoutLabel ]: !rest.label,
                     }),
                 },
                 ...InputProps,

@@ -1,9 +1,10 @@
 import { BroadcastChannelSpiesManager } from '../../__utils__/spies-managers/BroadcastChannelSpiesManager';
 import { waitUntil } from '../../__utils__/waitUntil';
+import { generator } from '../../__utils__/generator';
 
 import { SessionActionType } from '../../../code/utils/communication/SessionActionType';
 import { SessionChannel } from '../../../code/utils/communication/SessionChannel';
-import { LoginMutation } from '../../../graphql/generated-types';
+import { InitialData } from '../../../graphql/generated-types';
 
 
 describe('SessionChannel class', () => {
@@ -30,9 +31,9 @@ describe('SessionChannel class', () => {
 
     it('should notify listeners about login event', async () => {
         const mockListener = jest.fn();
-        const sampleInitialData: LoginMutation['login'] = {
+        const sampleInitialData: InitialData = {
             __typename: 'InitialData',
-            user: {} as LoginMutation['login']['user'],
+            user: generator.user(),
             accessToken: 'accessTokenTestValue',
         };
 

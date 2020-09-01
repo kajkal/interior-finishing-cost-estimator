@@ -8,19 +8,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import { LocationFieldController } from '../../../../__utils__/field-controllers/LocationFieldController';
+import { generator } from '../../../../__utils__/generator';
 
 import { InquiryFilterLocation } from '../../../../../code/components/pages/inquiries/filters/InquiryFilterLocation';
 
 
 describe('InquiryFilterLocation component', () => {
 
-    const sampleLocation = {
-            placeId: 'ChIJ0RhONcBEFkcRv4pHdrW2a7Q',
-            main: 'Kraków',
-            secondary: 'Poland',
-            lat: 50,
-            lng: 20,
-    };
+    const sampleLocation = generator.location({ lat: undefined, lng: undefined });
+    const sampleLatLng = { lat: 50, lng: 20 };
 
     class ViewUnderTest {
         static get locationSelect() {
@@ -35,24 +31,24 @@ describe('InquiryFilterLocation component', () => {
         expect(ViewUnderTest.locationSelect).toBeVisible();
         expect(ViewUnderTest.locationSelect).toHaveValue('');
 
-        await LocationFieldController.from(ViewUnderTest.locationSelect).selectLocation(sampleLocation);
+        await LocationFieldController.from(ViewUnderTest.locationSelect).selectLocation(sampleLocation, sampleLatLng);
 
         expect(mockAtomUpdater).toHaveBeenCalledTimes(1);
         const updateFn = mockAtomUpdater.mock.calls[ 0 ][ 0 ];
         expect(updateFn({})).toEqual({
             location: {
-                place_id: "ChIJ0RhONcBEFkcRv4pHdrW2a7Q",
-                description: "Kraków, Poland",
-                structured_formatting: {
-                    main_text: "Kraków",
-                    main_text_matched_substrings: [],
-                    secondary_text: "Poland"
-                },
+                place_id: sampleLocation.placeId,
+                description: `${sampleLocation.main}, ${sampleLocation.secondary}`,
                 latLng: {
-                    lat: 50,
-                    lng: 20
+                    lat: sampleLatLng.lat,
+                    lng: sampleLatLng.lng,
                 },
-            }
+                structured_formatting: {
+                    main_text: sampleLocation.main,
+                    secondary_text: sampleLocation.secondary,
+                    main_text_matched_substrings: [],
+                },
+            },
         });
     });
 

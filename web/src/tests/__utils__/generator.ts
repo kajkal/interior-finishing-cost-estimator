@@ -1,6 +1,6 @@
 import { Chance } from 'chance';
 
-import { Author, CurrencyAmount, Inquiry, Location, PriceQuote, Product, Project, Room, User } from '../../graphql/generated-types';
+import { Author, CurrencyAmount, Inquiry, Location, PriceQuote, Product, Project, ResourceData, Room, User } from '../../graphql/generated-types';
 import { supportedCurrencies, supportedCurrenciesInfoMap } from '../../code/config/supportedCurrencies';
 import { supportedCategories } from '../../code/config/supportedCategories';
 import { supportedRoomTypes } from '../../code/config/supportedRoomTypes';
@@ -34,6 +34,19 @@ function createSampleLocation(data?: Partial<Location> | null): Location {
         lat: chance.latitude(),
         lng: chance.longitude(),
         ...data,
+    };
+}
+
+function createSampleResourceData(data?: Partial<ResourceData> | null): ResourceData {
+    const { name, ...rest } = data || {};
+    const _name = name || chance.word({ length: 5 }) + chance.pickone([ '.jpg', '.png' ]);
+    return {
+        __typename: 'ResourceData',
+        url: `${chance.url({ protocol: 'https' })}/${_name}`,
+        name: _name,
+        description: null,
+        createdAt: new Date().toISOString(),
+        ...rest,
     };
 }
 
@@ -156,6 +169,7 @@ function createSampleUser(data?: Partial<User> | null): User {
 chance.mixin({
     currencyAmount: createSampleCurrencyAmount,
     location: createSampleLocation,
+    file: createSampleResourceData,
     product: createSampleProduct,
     author: createSampleAuthor,
     quote: createSampleQuote,
@@ -176,6 +190,11 @@ export interface Generator extends Chance.Chance {
      * @see createSampleLocation
      */
     location: (data?: Partial<Location> | null) => Location;
+
+    /**
+     * @see createSampleResourceData
+     */
+    file: (data?: Partial<ResourceData> | null) => ResourceData;
 
     /**
      * @see createSampleProduct

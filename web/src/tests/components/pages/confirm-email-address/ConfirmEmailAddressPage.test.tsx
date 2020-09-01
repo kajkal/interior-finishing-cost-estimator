@@ -9,7 +9,7 @@ import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/Mock
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';
-import { ConfirmEmailAddressDocument } from '../../../../graphql/generated-types';
+import { ConfirmEmailAddressDocument, ConfirmEmailAddressMutation, ConfirmEmailAddressMutationVariables } from '../../../../graphql/generated-types';
 import { nav } from '../../../../code/config/nav';
 
 
@@ -45,18 +45,22 @@ describe('ConfirmEmailAddressPage component', () => {
         success: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: validEmailAddressConfirmationToken },
+                variables: {
+                    token: validEmailAddressConfirmationToken,
+                } as ConfirmEmailAddressMutationVariables,
             },
             result: {
                 data: {
                     confirmEmailAddress: true,
-                },
+                } as ConfirmEmailAddressMutation,
             },
         }),
         emailAddressAlreadyConfirmed: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: validEmailAddressConfirmationToken },
+                variables: {
+                    token: validEmailAddressConfirmationToken,
+                } as ConfirmEmailAddressMutationVariables,
             },
             result: {
                 data: null,
@@ -68,7 +72,9 @@ describe('ConfirmEmailAddressPage component', () => {
         invalidEmailConfirmationToken: () => ({
             request: {
                 query: ConfirmEmailAddressDocument,
-                variables: { token: validEmailAddressConfirmationToken },
+                variables: {
+                    token: validEmailAddressConfirmationToken,
+                } as ConfirmEmailAddressMutationVariables,
             },
             result: {
                 data: null,

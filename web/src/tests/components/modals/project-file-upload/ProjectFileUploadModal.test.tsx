@@ -1,14 +1,14 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
+import { generator } from '../../../__utils__/generator';
 
-import { Project, UploadProjectFileDocument, UploadProjectFileMutationVariables } from '../../../../graphql/generated-types';
+import { UploadProjectFileDocument, UploadProjectFileMutation, UploadProjectFileMutationVariables } from '../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
 import { ProjectFileUploadModal } from '../../../../code/components/modals/project-file-upload/ProjectFileUploadModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -16,12 +16,15 @@ import { initApolloCache } from '../../../../code/components/providers/apollo/cl
 
 describe('ProjectFileUploadModal component', () => {
 
-    const sampleProject: Partial<Project> = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        files: [],
-    };
+    const sampleFile = generator.file();
+    const sampleProject = generator.project({ files: [ sampleFile ] });
+
+    function initApolloTestCache() {
+        const cache = initApolloCache();
+        return cache.restore({
+            [ cache.identify(sampleProject)! ]: sampleProject,
+        });
+    }
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
@@ -32,8 +35,8 @@ describe('ProjectFileUploadModal component', () => {
                     onClick={() => setModalState({
                         open: true,
                         projectData: {
-                            name: sampleProject.name!,
-                            slug: sampleProject.slug!,
+                            name: sampleProject.name,
+                            slug: sampleProject.slug,
                         },
                     })}
                 />
@@ -93,12 +96,6 @@ describe('ProjectFileUploadModal component', () => {
 
     describe('project file upload form', () => {
 
-        const ProjectFilesFragment = gql`
-            fragment ProjectFiles on Project {
-                files { url, name, description }
-            }
-        `;
-
         const mockResponseGenerator = {
             success: () => ({
                 request: {
@@ -112,12 +109,12 @@ describe('ProjectFileUploadModal component', () => {
                 result: {
                     data: {
                         uploadProjectFile: {
+                            __typename: 'ResourceData',
                             url: 'URL_TEST_VALUE',
                             name: 'document.pdf',
                             description: null,
-                            __typename: 'ResourceData',
                         },
-                    },
+                    } as UploadProjectFileMutation,
                 },
             }),
         };
@@ -146,24 +143,34 @@ describe('ProjectFileUploadModal component', () => {
         });
 
         it('should successfully upload file and close modal', async () => {
-            const cache = initApolloCache();
-            cache.restore({ [ cache.identify(sampleProject)! ]: sampleProject });
+            const cache = initApolloTestCache();
             const mockResponse = mockResponseGenerator.success();
             renderInMockContext({ mockResponses: [ mockResponse ], apolloCache: cache });
+
+            const projectCacheRecordKey = cache.identify(sampleProject)!;
+
+            // verify initial cache records
+            expect(cache.extract()).toEqual({
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    files: [ sampleFile ],
+                },
+            });
+
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
 
             // verify if modal was closed
-            await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
+            await waitForElementToBeRemoved(ViewUnderTest.modal);
 
-            // verify if project cache was updated with new file
-            const project = cache.readFragment<Pick<Project, 'files'>>({
-                fragment: ProjectFilesFragment,
-                id: cache.identify(sampleProject),
+            // verify updated cache
+            const uploadedFile = mockResponse.result.data.uploadProjectFile;
+            expect(cache.extract()).toEqual({
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    files: [ sampleFile, uploadedFile ], // <- updated file list
+                },
+                ROOT_MUTATION: expect.any(Object),
             });
-            expect(project).not.toBeNull();
-            expect(project!.files).toEqual([
-                mockResponse.result.data.uploadProjectFile,
-            ]);
         });
 
     });

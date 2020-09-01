@@ -1,12 +1,13 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { DeleteProjectDocument, DeleteProjectMutation, DeleteProjectMutationVariables, Project, User } from '../../../../graphql/generated-types';
+import { DeleteProjectDocument, DeleteProjectMutation, DeleteProjectMutationVariables } from '../../../../graphql/generated-types';
 import { projectDeleteModalAtom } from '../../../../code/components/modals/project-delete/projectDeleteModalAtom';
 import { ProjectDeleteModal } from '../../../../code/components/modals/project-delete/ProjectDeleteModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -15,17 +16,8 @@ import { nav } from '../../../../code/config/nav';
 
 describe('ProjectDeleteModal component', () => {
 
-    const sampleProject: Partial<Project> = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        files: [],
-    };
-
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-    };
+    const sampleUser = generator.user();
+    const sampleProject = generator.project();
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -40,8 +32,8 @@ describe('ProjectDeleteModal component', () => {
                     onClick={() => setModalState({
                         open: true,
                         projectData: {
-                            slug: sampleProject.slug!,
-                            name: sampleProject.name!,
+                            slug: sampleProject.slug,
+                            name: sampleProject.name,
                         },
                     })}
                 />
@@ -143,7 +135,7 @@ describe('ProjectDeleteModal component', () => {
             userEvent.click(ViewUnderTest.deleteButton);
 
             // verify if modal was closed
-            await waitFor(() => expect(ViewUnderTest.modal).toBeNull());
+            await waitForElementToBeRemoved(ViewUnderTest.modal);
 
             // verify updated cache
             expect(cache.extract()).toEqual({

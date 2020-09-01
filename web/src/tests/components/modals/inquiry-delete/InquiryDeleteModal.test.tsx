@@ -4,8 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { Category, DeleteInquiryDocument, DeleteInquiryMutation, DeleteInquiryMutationVariables, Inquiry } from '../../../../graphql/generated-types';
+import { DeleteInquiryDocument, DeleteInquiryMutation, DeleteInquiryMutationVariables } from '../../../../graphql/generated-types';
 import { inquiryDeleteModalAtom } from '../../../../code/components/modals/inquiry-delete/inquiryDeleteModalAtom';
 import { InquiryDeleteModal } from '../../../../code/components/modals/inquiry-delete/InquiryDeleteModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -13,30 +14,7 @@ import { initApolloCache } from '../../../../code/components/providers/apollo/cl
 
 describe('InquiryDeleteModal component', () => {
 
-    const sampleInquiry: Inquiry = {
-        __typename: 'Inquiry',
-        id: '5f09e24646904045d48e5598',
-        title: 'Sample inquiry title',
-        description: '',
-        location: {
-            __typename: 'Location',
-            placeId: '',
-            main: '',
-            secondary: '',
-            lat: -1,
-            lng: -1,
-        },
-        category: Category.DESIGNING,
-        author: {
-            __typename: 'Author',
-            userSlug: '',
-            name: '',
-            avatar: null,
-        },
-        quotes: null,
-        createdAt: '',
-        updatedAt: null,
-    };
+    const sampleInquiry = generator.inquiry({ id: '5f09e24646904045d48e5598' });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {

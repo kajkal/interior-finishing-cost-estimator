@@ -3,20 +3,18 @@ import { render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { SettingsPage } from '../../../../code/components/pages/settings/SettingsPage';
-import { User } from '../../../../graphql/generated-types';
 
 
 describe('SettingsPage component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
+    const sampleUser = generator.user({
         email: 'sample-email@domain.com',
         isEmailAddressConfirmed: false,
         hidden: false,
-    };
+    });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

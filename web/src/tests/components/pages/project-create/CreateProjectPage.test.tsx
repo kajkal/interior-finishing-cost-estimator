@@ -6,8 +6,9 @@ import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCur
 import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { CreateProjectDocument, CreateProjectMutation, CreateProjectMutationVariables, MutationCreateProjectArgs, Project, User } from '../../../../graphql/generated-types';
+import { CreateProjectDocument, CreateProjectMutation, CreateProjectMutationVariables, MutationCreateProjectArgs, Project } from '../../../../graphql/generated-types';
 import { CreateProjectPage } from '../../../../code/components/pages/project-create/CreateProjectPage';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { nav } from '../../../../code/config/nav';
@@ -15,11 +16,7 @@ import { nav } from '../../../../code/config/nav';
 
 describe('CreateProjectPage component', () => {
 
-    const sampleUser: Pick<User, '__typename' | 'slug' | 'projects'> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        projects: [],
-    };
+    const sampleUser = generator.user({ projects: [] });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

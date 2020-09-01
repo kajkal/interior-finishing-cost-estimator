@@ -237,9 +237,8 @@ function RoomUpdateFormSubmitHandler(onModalClose: () => void) {
                             id: cache.identify({ __typename: 'Project', slug: rest.projectSlug }),
                             fields: {
                                 rooms: (existingRooms: Room[] | null) => existingRooms?.map((room) => (
-                                        (room.id === rest.roomId) ? updatedRoom : room
-                                    )
-                                ),
+                                    (room.id === rest.roomId) ? updatedRoom : room
+                                )),
                             },
                         });
                     }

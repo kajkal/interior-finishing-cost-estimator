@@ -44,7 +44,7 @@ export class LocationFieldController extends AbstractFieldController {
         }) as this;
     }
 
-    selectLocation(location?: Location | null): this {
+    selectLocation(location?: Location | null, latLng?: google.maps.LatLngLiteral): this {
         return this.then(async (inputElement: HTMLElement) => {
             if (location) {
                 mockGetPlacePredictions.mockImplementation((_request, callback) => {
@@ -55,8 +55,8 @@ export class LocationFieldController extends AbstractFieldController {
                         return [ {
                             geometry: {
                                 location: {
-                                    lat: () => location.lat,
-                                    lng: () => location.lng,
+                                    lat: () => latLng?.lat || location.lat,
+                                    lng: () => latLng?.lng || location.lng,
                                 },
                             },
                         } ] as google.maps.GeocoderResult[];

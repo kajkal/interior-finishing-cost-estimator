@@ -161,6 +161,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
         '& > :not(:first-child)': {
             marginLeft: theme.spacing(1),
-        }
+        },
     },
 }));

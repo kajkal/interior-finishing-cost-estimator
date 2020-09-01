@@ -4,19 +4,16 @@ import { render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { ChangeProfileSettingsDocument, ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables, User } from '../../../../graphql/generated-types';
+import { ChangeProfileSettingsDocument, ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables } from '../../../../graphql/generated-types';
 import { ChangeProfileSettingsForm } from '../../../../code/components/pages/settings/ChangeProfileSettingsForm';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 
 
 describe('ChangeProfileSettingsForm component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        hidden: false,
-    };
+    const sampleUser = generator.user({ hidden: false });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

@@ -52,12 +52,12 @@ export class AuthUtils {
 
         if (response.ok) {
             const { accessToken } = await response.json();
-            console.log('%crefreshAccessToken token refreshed!', 'color: deepskyblue;', { accessToken });
+            console.debug('%crefreshAccessToken success', 'color: #FF00FF;');
             return accessToken;
         }
 
         const { errorMessage } = await response.json();
-        console.log('%crefreshAccessToken error', 'color: deepskyblue;', { errorMessage });
+        console.debug('%crefreshAccessToken error', 'color: #FF00FF;', { errorMessage });
         throw new UnauthorizedError(errorMessage);
     }
 

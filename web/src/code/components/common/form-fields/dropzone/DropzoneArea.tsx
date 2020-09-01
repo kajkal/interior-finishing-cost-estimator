@@ -73,7 +73,7 @@ export function DropzoneArea({ name, label, error, files, onDelete, onTouched, a
                         }
                         {
                             (files.length === 0) && (
-                                <CloudUploadIcon className={classes.uploadIcon}/>
+                                <CloudUploadIcon className={classes.uploadIcon} />
                             )
                         }
                     </div>

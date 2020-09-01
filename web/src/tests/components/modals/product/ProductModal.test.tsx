@@ -10,27 +10,15 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { ProductModal } from '../../../../code/components/modals/product/ProductModal';
 import { productModalAtom } from '../../../../code/components/modals/product/productModalAtom';
-import { Product } from '../../../../graphql/generated-types';
 
 
 describe('ProductModal component', () => {
 
-    const sampleProduct: Product = {
-        __typename: 'Product',
-        id: '5f09e24646904045d48e5598',
-        name: 'Sample product name',
-        description: JSON.stringify([ {
-            children: [
-                { type: 'p', children: [ { text: 'Sample description' } ] },
-            ],
-        } ]),
-        price: { currency: 'PLN', amount: 4.5 },
-        tags: [ 'Sample tag', 'Other tag' ],
-        createdAt: '2020-08-06T12:00:00.000Z',
-    };
+    const sampleProduct = generator.product({ tags: [ 'Sample tag', 'Other tag' ] });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {

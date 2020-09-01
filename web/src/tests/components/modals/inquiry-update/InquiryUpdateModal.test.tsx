@@ -14,6 +14,7 @@ import { LocationFieldController } from '../../../__utils__/field-controllers/Lo
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { Category, CreateInquiryMutationVariables, Inquiry, UpdateInquiryDocument, UpdateInquiryMutation, UpdateInquiryMutationVariables } from '../../../../graphql/generated-types';
 import { inquiryUpdateModalAtom } from '../../../../code/components/modals/inquiry-update/inquiryUpdateModalAtom';
@@ -24,29 +25,11 @@ import { mapInquiryToInquiryUpdateFormData } from '../../../../code/utils/mapper
 
 describe('InquiryUpdateModal component', () => {
 
-    const sampleInquiry: Inquiry = {
-        __typename: 'Inquiry',
+    const sampleInquiry = generator.inquiry({
         id: '5f09e24646904045d48e5598',
-        title: 'Sample inquiry title',
-        description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-        location: {
-            __typename: 'Location',
-            placeId: '',
-            main: '',
-            secondary: '',
-            lat: -1,
-            lng: -1,
-        },
-        category: Category.DESIGNING,
-        author: {
-            __typename: 'Author',
-            userSlug: '',
-            name: '',
-            avatar: null,
-        },
-        createdAt: '',
-        updatedAt: null,
-    };
+        title: 'Old inquiry title',
+        description: 'Old inquiry description',
+    });
 
     function renderInMockContext(mocks?: ContextMocks) {
         const OpenModalButton = () => {
@@ -175,6 +158,7 @@ describe('InquiryUpdateModal component', () => {
                             },
                             category: Category.DESIGNING,
                             author: sampleInquiry.author,
+                            quotes: null,
                             createdAt: '2020-08-16T12:00:00.000Z',
                             updatedAt: null,
                         },

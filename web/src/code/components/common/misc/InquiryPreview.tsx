@@ -50,7 +50,7 @@ export function InquiryPreview({ inquiry, component, titleRenderer, className, i
     );
 }
 
-const DefaultContainer: React.ComponentType = ({ ...props}) => <Paper variant='outlined' {...props} />
+const DefaultContainer: React.ComponentType = ({ ...props }) => <Paper variant='outlined' {...props} />;
 
 const useStyles = makeStyles({
     root: {

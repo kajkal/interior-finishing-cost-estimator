@@ -6,8 +6,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { extendedUserEvent, flushPromises } from '../../../../__utils__/extendedUserEvent';
 
-import { FormikCurrencyAmountField } from '../../../../../code/components/common/form-fields/currency-amount/FormikCurrencyAmountField';
-import { CurrencyAmount } from '../../../../../code/components/common/form-fields/currency-amount/FormikCurrencyAmountField';
+import { CurrencyAmount, FormikCurrencyAmountField } from '../../../../../code/components/common/form-fields/currency-amount/FormikCurrencyAmountField';
 
 
 jest.mock('../../../../../code/config/supportedCurrencies', () => ({

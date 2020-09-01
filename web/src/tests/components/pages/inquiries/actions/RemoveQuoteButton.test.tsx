@@ -3,38 +3,26 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../../__utils__/generator';
 
-import { Inquiry, PriceQuote, PriceQuoteDataFragment, RemoveQuoteDocument, RemoveQuoteMutation, RemoveQuoteMutationVariables } from '../../../../../graphql/generated-types';
+import { RemoveQuoteDocument, RemoveQuoteMutation, RemoveQuoteMutationVariables } from '../../../../../graphql/generated-types';
 import { RemoveQuoteButton } from '../../../../../code/components/pages/inquiries/actions/RemoveQuoteButton';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
 
 
 describe('RemoveQuoteButton component', () => {
 
-    const sampleQuote1: PriceQuoteDataFragment = {
-        __typename: 'PriceQuote',
-        author: { __typename: 'Author', userSlug: 'sample-quote-author', name: 'Sample Quote Author', avatar: null },
-        date: '2020-08-17T01:00:00.000Z',
-        price: { __typename: 'CurrencyAmount', amount: 50, currency: 'PLN' },
-    };
-
-    const sampleQuote2: PriceQuoteDataFragment = {
-        __typename: 'PriceQuote',
-        author: { __typename: 'Author', userSlug: 'sample-quote-author', name: 'Sample Quote Author', avatar: null },
-        date: '2020-08-17T23:00:00.000Z',
-        price: { __typename: 'CurrencyAmount', amount: 55, currency: 'PLN' },
-    };
-
-    const sampleInquiry: Partial<Inquiry> = {
-        __typename: 'Inquiry',
+    const sampleQuote1 = generator.quote({ date: '2020-08-17T01:00:00.000Z' });
+    const sampleQuote2 = generator.quote({ date: '2020-08-17T23:00:00.000Z' });
+    const sampleInquiry = generator.inquiry({
         id: '5f09e24646904045d48e5598',
         quotes: [ sampleQuote1, sampleQuote2 ],
-    };
+    });
 
     function renderInMockContext(mocks?: ContextMocks) {
         return render(
             <MockContextProvider mocks={{ ...mocks }}>
-                <RemoveQuoteButton inquiryId='5f09e24646904045d48e5598' quoteDate='2020-08-17T23:00:00.000Z' />
+                <RemoveQuoteButton inquiryId={sampleInquiry.id} quoteDate={sampleQuote1.date} />
             </MockContextProvider>,
         );
     }
@@ -51,8 +39,8 @@ describe('RemoveQuoteButton component', () => {
             request: {
                 query: RemoveQuoteDocument,
                 variables: {
-                    inquiryId: '5f09e24646904045d48e5598',
-                    quoteDate: '2020-08-17T23:00:00.000Z',
+                    inquiryId: sampleInquiry.id,
+                    quoteDate: sampleQuote1.date,
                 } as RemoveQuoteMutationVariables,
             },
             result: {
@@ -73,8 +61,7 @@ describe('RemoveQuoteButton component', () => {
         // verify initial cache records
         expect(cache.extract()).toEqual({
             [ inquiryCacheRecordKey ]: {
-                __typename: 'Inquiry',
-                id: '5f09e24646904045d48e5598',
+                ...sampleInquiry,
                 quotes: [ sampleQuote1, sampleQuote2 ],
             },
         });
@@ -85,8 +72,7 @@ describe('RemoveQuoteButton component', () => {
         // verify updated cache
         expect(cache.extract()).toEqual({
             [ inquiryCacheRecordKey ]: {
-                __typename: 'Inquiry',
-                id: '5f09e24646904045d48e5598',
+                ...sampleInquiry,
                 quotes: [ sampleQuote2 ], // <- updated quotes list
             },
             ROOT_MUTATION: expect.any(Object),

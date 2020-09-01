@@ -15,9 +15,10 @@ import { EditorFieldController } from '../../../__utils__/field-controllers/Edit
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { TagsFieldController } from '../../../__utils__/field-controllers/TagsFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
 import { mapProductToProductUpdateFormData, productUpdateModalAtom } from '../../../../code/components/modals/product-update/productUpdateModalAtom';
-import { Product, UpdateProductDocument, UpdateProductMutation, UpdateProductMutationVariables, User } from '../../../../graphql/generated-types';
+import { Product, UpdateProductDocument, UpdateProductMutation, UpdateProductMutationVariables } from '../../../../graphql/generated-types';
 import { ProductUpdateModal } from '../../../../code/components/modals/product-update/ProductUpdateModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { supportedCurrencies } from '../../../../code/config/supportedCurrencies';
@@ -25,25 +26,8 @@ import { supportedCurrencies } from '../../../../code/config/supportedCurrencies
 
 describe('ProductUpdateModal component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        products: [ /* relation with sampleProduct is created on apollo cache level */ ],
-    };
-
-    const sampleProduct: Product = {
-        __typename: 'Product',
-        id: '5f09e24646904045d48e5598',
-        name: 'Sample product name',
-        description: JSON.stringify([ {
-            children: [
-                { type: 'p', children: [ { text: 'Sample description' } ] },
-            ],
-        } ]),
-        price: { currency: 'PLN', amount: 4.5 },
-        tags: [ 'Sample tag', 'Other tag' ],
-        createdAt: '2020-08-06T12:00:00.000Z',
-    };
+    const sampleUser = generator.user({ products: [ /* relation with sampleProduct is created on apollo cache level */ ] });
+    const sampleProduct = generator.product({ id: '5f09e24646904045d48e5598', tags: [ 'Sample tag', 'Other tag' ] });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -165,6 +149,7 @@ describe('ProductUpdateModal component', () => {
                             price: null,
                             tags: null,
                             createdAt: '2020-08-06T12:00:00.000Z',
+                            updatedAt: null,
                         },
                     } as UpdateProductMutation,
                 },

@@ -7,7 +7,7 @@ import { TextFieldController } from '../../../__utils__/field-controllers/TextFi
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { generator } from '../../../__utils__/generator';
 
-import { MutationSendPasswordResetInstructionsArgs, SendPasswordResetInstructionsDocument } from '../../../../graphql/generated-types';
+import { MutationSendPasswordResetInstructionsArgs, SendPasswordResetInstructionsDocument, SendPasswordResetInstructionsMutation, SendPasswordResetInstructionsMutationVariables } from '../../../../graphql/generated-types';
 import { PasswordResetRequestPage } from '../../../../code/components/pages/password-reset/PasswordResetRequestPage';
 import { nav } from '../../../../code/config/nav';
 
@@ -52,12 +52,12 @@ describe('PasswordResetRequestPage component', () => {
                     query: SendPasswordResetInstructionsDocument,
                     variables: {
                         email: generator.email(),
-                    },
+                    } as SendPasswordResetInstructionsMutationVariables,
                 },
                 result: {
                     data: {
                         sendPasswordResetInstructions: true,
-                    },
+                    } as SendPasswordResetInstructionsMutation,
                 },
             }),
         };

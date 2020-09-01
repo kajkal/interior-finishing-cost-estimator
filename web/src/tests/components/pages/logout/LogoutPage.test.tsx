@@ -4,8 +4,8 @@ import { render, waitFor } from '@testing-library/react';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
 
+import { LogoutDocument, LogoutMutation } from '../../../../graphql/generated-types';
 import { LogoutPage } from '../../../../code/components/pages/logout/LogoutPage';
-import { LogoutDocument } from '../../../../graphql/generated-types';
 
 
 describe('LogoutPage component', () => {
@@ -30,7 +30,7 @@ describe('LogoutPage component', () => {
             result: {
                 data: {
                     logout: true,
-                },
+                } as LogoutMutation,
             },
         }),
     };

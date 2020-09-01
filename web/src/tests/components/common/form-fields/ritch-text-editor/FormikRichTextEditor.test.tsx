@@ -265,17 +265,16 @@ describe('FormikRichTextEditor component', () => {
             observe: jest.fn(),
             unobserve: jest.fn(),
             disconnect: jest.fn(),
-        }
+        };
         window.IntersectionObserver = jest.fn().mockImplementation(() => mockIntersectionObserver);
 
         renderInFormikContext({
             node: [ {
-                children: [{
+                children: [ {
                     type: 'img',
                     url: 'sample-image-url',
                     children: [ { text: '' } ],
-                }
-                ],
+                } ],
             } ],
         });
         expect(screen.getByRole('img')).toBeVisible();

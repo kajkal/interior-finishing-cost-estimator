@@ -11,7 +11,7 @@ import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { generator } from '../../../__utils__/generator';
 
-import { MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
+import { MutationRegisterArgs, RegisterDocument, RegisterMutation, RegisterMutationVariables } from '../../../../graphql/generated-types';
 import { SignupPage } from '../../../../code/components/pages/signup/SignupPage';
 import { nav } from '../../../../code/config/nav';
 
@@ -87,16 +87,16 @@ describe('SignupPage component', () => {
                         name: generator.name(),
                         email: generator.email(),
                         password: generator.string({ length: 8 }),
-                    },
+                    } as RegisterMutationVariables,
                 },
                 result: {
                     data: {
                         register: {
+                            __typename: 'InitialData',
                             accessToken: 'ACCESS_TOKEN_TEST_VALUE',
-                            user: { userData: '...' },
-                            '__typename': 'InitialData',
+                            user: generator.user(),
                         },
-                    },
+                    } as RegisterMutation,
                 },
             }),
             emailNotAvailable: () => ({
@@ -106,7 +106,7 @@ describe('SignupPage component', () => {
                         name: generator.name(),
                         email: generator.email(),
                         password: generator.string({ length: 8 }),
-                    },
+                    } as RegisterMutationVariables,
                 },
                 result: {
                     data: null,

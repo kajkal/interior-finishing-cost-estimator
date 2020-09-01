@@ -16,8 +16,9 @@ import { DropzoneAreaController } from '../../../__utils__/field-controllers/Dro
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { Profile, UpdateProfileDocument, UpdateProfileMutation, UpdateProfileMutationVariables, User } from '../../../../graphql/generated-types';
+import { Profile, UpdateProfileDocument, UpdateProfileMutation, UpdateProfileMutationVariables } from '../../../../graphql/generated-types';
 import { profileUpdateModalAtom } from '../../../../code/components/modals/profile-update/profileUpdateModalAtom';
 import { ProfileUpdateModal } from '../../../../code/components/modals/profile-update/ProfileUpdateModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -26,12 +27,11 @@ import { mapProfileToProfileUpdateFormData } from '../../../../code/utils/mapper
 
 describe('ProfileUpdateModal component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
+    const sampleUser = generator.user({
         slug: 'sample-user',
         name: 'Sample Name',
         avatar: null,
-    };
+    });
 
     const sampleProfile: Profile = {
         __typename: 'Profile',

@@ -7,7 +7,8 @@ import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/M
 
 import { inquiryUpdateModalAtom, InquiryUpdateModalAtomValue } from '../../../../../code/components/modals/inquiry-update/inquiryUpdateModalAtom';
 import { OpenUpdateModalButton } from '../../../../../code/components/pages/inquiries/actions/OpenUpdateModalButton';
-import { Category, InquiryDataFragment } from '../../../../../graphql/generated-types';
+import { InquiryDataFragment } from '../../../../../graphql/generated-types';
+import { generator } from '../../../../__utils__/generator';
 
 
 describe('OpenUpdateModalButton component', () => {
@@ -28,39 +29,29 @@ describe('OpenUpdateModalButton component', () => {
     }
 
     it('should open update inquiry modal on click', () => {
-        renderInMockContext({
-            __typename: 'Inquiry',
-            id: 'sample_id',
-            title: 'sample title',
-            description: '[{"children":[{"type":"p","children":[{"text":"Sample description"}]}]}]',
-            location: {
-                __typename: 'Location',
-                placeId: 'sample-place-id',
-                main: 'City',
-                secondary: 'Country',
-                lat: 50,
-                lng: 20,
-            },
-            category: Category.DESIGNING,
-        });
+        const sampleInquiry = generator.inquiry();
+        renderInMockContext(sampleInquiry);
         userEvent.click(screen.getByRole('button', { name: 't:form.common.update' }));
         expect(updateState).toEqual({
             open: true,
             inquiryData: {
-                inquiryId: 'sample_id',
-                title: 'sample title',
-                description: [ { children: [ { children: [ { text: 'Sample description' } ], type: 'p' } ] } ],
+                inquiryId: sampleInquiry.id,
+                title: sampleInquiry.title,
+                description: JSON.parse(sampleInquiry.description),
                 location: {
-                    description: 'City, Country',
-                    latLng: { lat: 50, lng: 20 },
-                    place_id: 'sample-place-id',
+                    place_id: sampleInquiry.location.placeId,
+                    description: `${sampleInquiry.location.main}, ${sampleInquiry.location.secondary}`,
+                    latLng: {
+                        lat: sampleInquiry.location.lat,
+                        lng: sampleInquiry.location.lng,
+                    },
                     structured_formatting: {
-                        main_text: 'City',
+                        main_text: sampleInquiry.location.main,
+                        secondary_text: sampleInquiry.location.secondary,
                         main_text_matched_substrings: [],
-                        secondary_text: 'Country',
                     },
                 },
-                category: 'DESIGNING',
+                category: sampleInquiry.category,
             },
         });
     });

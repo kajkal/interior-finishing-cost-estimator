@@ -3,19 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../../__utils__/generator';
 
-import { BookmarkInquiryDocument, BookmarkInquiryMutation, BookmarkInquiryMutationVariables, User } from '../../../../../graphql/generated-types';
+import { BookmarkInquiryDocument, BookmarkInquiryMutation, BookmarkInquiryMutationVariables } from '../../../../../graphql/generated-types';
 import { ToggleBookmarkButton } from '../../../../../code/components/pages/inquiries/actions/ToggleBookmarkButton';
 import { initApolloCache } from '../../../../../code/components/providers/apollo/client/initApolloClient';
 
 
 describe('ToggleBookmarkButton component', () => {
 
-    const sampleUser: Pick<User, '__typename' | 'slug' | 'bookmarkedInquiries'> = {
-        __typename: 'User',
-        slug: 'sample-user',
+    const sampleUser = generator.user({
         bookmarkedInquiries: [ 'inquiry-id-1', 'inquiry-id-2' ],
-    };
+    });
 
     function renderInMockContext(mocks?: ContextMocks) {
         return render(
@@ -59,8 +58,7 @@ describe('ToggleBookmarkButton component', () => {
         // verify initial cache records
         expect(cache.extract()).toEqual({
             [ userCacheRecordKey ]: {
-                __typename: 'User',
-                slug: 'sample-user',
+                ...sampleUser,
                 bookmarkedInquiries: [ 'inquiry-id-1', 'inquiry-id-2' ],
             },
         });
@@ -71,8 +69,7 @@ describe('ToggleBookmarkButton component', () => {
         // verify updated cache
         expect(cache.extract()).toEqual({
             [ userCacheRecordKey ]: {
-                __typename: 'User',
-                slug: 'sample-user',
+                ...sampleUser,
                 bookmarkedInquiries: [ 'inquiry-id-2' ], // <- updated bookmarks list
             },
             ROOT_MUTATION: expect.any(Object),

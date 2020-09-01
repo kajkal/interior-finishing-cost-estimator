@@ -11,7 +11,3 @@ function isSlateChildNotEmpty({ text, children }: SlateDocumentDescendant) {
 export function isSlateDocumentNotEmpty(document: SlateDocument): document is SlateDocument {
     return document.some(isSlateChildNotEmpty);
 }
-
-export function isSlateDocumentEmpty(document: SlateDocument): boolean {
-    return !isSlateDocumentNotEmpty(document);
-}

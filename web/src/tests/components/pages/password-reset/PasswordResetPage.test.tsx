@@ -11,7 +11,7 @@ import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifie
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
 import { generator } from '../../../__utils__/generator';
 
-import { MutationResetPasswordArgs, ResetPasswordDocument } from '../../../../graphql/generated-types';
+import { MutationResetPasswordArgs, ResetPasswordDocument, ResetPasswordMutation, ResetPasswordMutationVariables } from '../../../../graphql/generated-types';
 import { PasswordResetPage } from '../../../../code/components/pages/password-reset/PasswordResetPage';
 import { nav } from '../../../../code/config/nav';
 
@@ -114,12 +114,12 @@ describe('PasswordResetPage component', () => {
                     variables: {
                         token: validPasswordResetToken,
                         password: generator.string({ length: 8 }),
-                    },
+                    } as ResetPasswordMutationVariables,
                 },
                 result: {
                     data: {
                         resetPassword: true,
-                    },
+                    } as ResetPasswordMutation,
                 },
             }),
             invalidPasswordResetToken: () => ({
@@ -128,7 +128,7 @@ describe('PasswordResetPage component', () => {
                     variables: {
                         token: validPasswordResetToken, // although token is valid server believes otherwise (for test sake)
                         password: generator.string({ length: 8 }),
-                    },
+                    } as ResetPasswordMutationVariables,
                 },
                 result: {
                     data: null,
@@ -143,7 +143,7 @@ describe('PasswordResetPage component', () => {
                     variables: {
                         token: validPasswordResetToken, // although token is valid server believes otherwise (for test sake)
                         password: generator.string({ length: 8 }),
-                    },
+                    } as ResetPasswordMutationVariables,
                 },
                 result: {
                     data: null,

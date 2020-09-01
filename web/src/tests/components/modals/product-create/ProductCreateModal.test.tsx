@@ -15,8 +15,9 @@ import { EditorFieldController } from '../../../__utils__/field-controllers/Edit
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { TagsFieldController } from '../../../__utils__/field-controllers/TagsFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { CreateProductDocument, CreateProductMutation, CreateProductMutationVariables, User } from '../../../../graphql/generated-types';
+import { CreateProductDocument, CreateProductMutation, CreateProductMutationVariables } from '../../../../graphql/generated-types';
 import { productCreateModalAtom } from '../../../../code/components/modals/product-create/productCreateModalAtom';
 import { ProductCreateModal } from '../../../../code/components/modals/product-create/ProductCreateModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -25,11 +26,7 @@ import { supportedCurrencies } from '../../../../code/config/supportedCurrencies
 
 describe('ProductCreateModal component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        products: [],
-    };
+    const sampleUser = generator.user();
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -202,7 +199,10 @@ describe('ProductCreateModal component', () => {
             const userCacheRecordKey = cache.identify(sampleUser)!;
             // verify initial cache records
             expect(cache.extract()).toEqual({
-                [ userCacheRecordKey ]: sampleUser,
+                [ userCacheRecordKey ]: {
+                    ...sampleUser,
+                    products: [],
+                },
             });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);

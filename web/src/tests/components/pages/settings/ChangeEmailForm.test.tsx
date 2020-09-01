@@ -6,20 +6,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { ChangeEmailDocument, ChangeEmailMutation, ChangeEmailMutationVariables, User } from '../../../../graphql/generated-types';
+import { ChangeEmailDocument, ChangeEmailMutation, ChangeEmailMutationVariables } from '../../../../graphql/generated-types';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { ChangeEmailForm } from '../../../../code/components/pages/settings/ChangeEmailForm';
 
 
 describe('ChangeEmailForm component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-        email: 'current-email@domain.com',
-        isEmailAddressConfirmed: true,
-    };
+    const sampleUser = generator.user({ email: 'current-email@domain.com', isEmailAddressConfirmed: true });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

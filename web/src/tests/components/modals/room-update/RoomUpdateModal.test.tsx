@@ -18,8 +18,9 @@ import { RoomTypeFieldController } from '../../../__utils__/field-controllers/Ro
 import { NumberFieldController } from '../../../__utils__/field-controllers/NumberFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { Category, Inquiry, InquiryDataFragment, Product, ProductDataFragment, Project, RoomDataFragment, RoomType, UpdateRoomDocument, UpdateRoomMutation, UpdateRoomMutationVariables, User } from '../../../../graphql/generated-types';
+import { RoomType, UpdateRoomDocument, UpdateRoomMutation, UpdateRoomMutationVariables } from '../../../../graphql/generated-types';
 import { roomUpdateModalAtom } from '../../../../code/components/modals/room-update/roomUpdateModalAtom';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
 import { RoomUpdateModal } from '../../../../code/components/modals/room-update/RoomUpdateModal';
@@ -29,54 +30,28 @@ import { CompleteRoom } from '../../../../code/utils/mappers/projectMapper';
 
 describe('RoomUpdateModal component', () => {
 
-    const sampleProduct1: Partial<Product> = {
-        id: 'sample-product-1',
-        name: 'Sample product 1',
-        tags: [ 'tag A', 'tag B' ],
-    };
-    const sampleProduct2: Partial<Product> = {
-        id: 'sample-product-2',
-        name: 'Sample product 2',
-        tags: [ 'tag C' ],
-    };
-    const sampleInquiry1: Partial<Inquiry> = {
-        id: 'sample-inquiry-1',
-        title: 'Sample inquiry 1',
-        category: Category.DESIGNING,
-    };
-    const sampleInquiry2: Partial<Inquiry> = {
-        id: 'sample-inquiry-2',
-        title: 'Sample inquiry 2',
-        category: Category.ELECTRICAL,
-    };
-
-    const sampleUser: Partial<User> = {
-        products: [ sampleProduct1, sampleProduct2 ] as Product[],
-        inquiries: [ sampleInquiry1, sampleInquiry2 ] as Inquiry[],
-    };
-    const sampleRoom: RoomDataFragment = {
-        __typename: 'Room',
-        id: 'kitchen',
+    const sampleProduct1 = generator.product({ tags: [ 'tag A', 'tag B' ] });
+    const sampleProduct2 = generator.product({ tags: [ 'tag C' ] });
+    const sampleInquiry1 = generator.inquiry();
+    const sampleInquiry2 = generator.inquiry();
+    const sampleRoom = generator.room({
         type: RoomType.KITCHEN,
         name: 'Kitchen',
         floor: 12,
         wall: 17.5,
         ceiling: 12,
-        products: [ { productId: sampleProduct1.id!, amount: 1 } ],
-        inquiries: [ { inquiryId: sampleInquiry1.id! } ],
-    };
+        products: [ { __typename: 'LinkedProduct', productId: sampleProduct1.id, amount: 1 } ],
+        inquiries: [ { __typename: 'LinkedInquiry', inquiryId: sampleInquiry1.id } ],
+    });
+    const sampleUser = generator.user({
+        products: [ sampleProduct1, sampleProduct2 ],
+        inquiries: [ sampleInquiry1, sampleInquiry2 ],
+    });
+    const sampleProject = generator.project({ rooms: [ sampleRoom ] });
     const sampleCompleteRoom: CompleteRoom = {
         ...sampleRoom,
-        products: [ { product: sampleProduct1 as ProductDataFragment, amount: 1 } ],
-        inquiries: [ sampleInquiry1 as InquiryDataFragment ],
-    };
-    const sampleProject: Partial<Project> = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [],
-        rooms: [ sampleRoom ],
+        products: [ { product: sampleProduct1, amount: 1 } ],
+        inquiries: [ sampleInquiry1 ],
     };
 
     beforeEach(() => {
@@ -91,7 +66,7 @@ describe('RoomUpdateModal component', () => {
                     data-testid='open-modal-button'
                     onClick={() => setModalState({
                         open: true,
-                        formInitialValues: mapCompleteRoomToRoomUpdateFormData(sampleCompleteRoom, sampleProject.slug!, mockTFunction as TFunction),
+                        formInitialValues: mapCompleteRoomToRoomUpdateFormData(sampleCompleteRoom, sampleProject.slug, mockTFunction as TFunction),
                     })}
                 />
             );
@@ -297,7 +272,10 @@ describe('RoomUpdateModal component', () => {
 
             // verify initial cache records
             expect(cache.extract()).toEqual({
-                [ projectCacheRecordKey ]: sampleProject,
+                [ projectCacheRecordKey ]: {
+                    ...sampleProject,
+                    rooms: [ sampleRoom ],
+                },
             });
 
             await ViewUnderTest.fillAndSubmitForm(mockResponse.request.variables);
@@ -310,7 +288,7 @@ describe('RoomUpdateModal component', () => {
             expect(cache.extract()).toEqual({
                 [ projectCacheRecordKey ]: {
                     ...sampleProject,
-                    rooms: [ updatedRoom ],
+                    rooms: [ updatedRoom ], // <- updated room list
                 },
                 ROOT_MUTATION: expect.any(Object),
             });

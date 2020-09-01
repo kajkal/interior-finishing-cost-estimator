@@ -5,8 +5,9 @@ import { render, screen, waitForElementToBeRemoved } from '@testing-library/reac
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { DeleteProductDocument, DeleteProductMutation, DeleteProductMutationVariables, Product, User } from '../../../../graphql/generated-types';
+import { DeleteProductDocument, DeleteProductMutation, DeleteProductMutationVariables } from '../../../../graphql/generated-types';
 import { productDeleteModalAtom } from '../../../../code/components/modals/product-delete/productDeleteModalAtom';
 import { ProductDeleteModal } from '../../../../code/components/modals/product-delete/ProductDeleteModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -14,16 +15,8 @@ import { initApolloCache } from '../../../../code/components/providers/apollo/cl
 
 describe('ProductDeleteModal component', () => {
 
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-    };
-
-    const sampleProduct: Pick<Product, '__typename' | 'id' | 'name'> = {
-        __typename: 'Product',
-        id: '5f09e24646904045d48e5598',
-        name: 'Sample product name',
-    };
+    const sampleUser = generator.user();
+    const sampleProduct = generator.product({ id: '5f09e24646904045d48e5598' });
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);

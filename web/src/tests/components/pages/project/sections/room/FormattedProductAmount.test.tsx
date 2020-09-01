@@ -6,7 +6,7 @@
 
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitForElementToBeRemoved, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { FormattedProductAmount } from '../../../../../../code/components/pages/project/sections/room/FormattedProductAmount';
 
 

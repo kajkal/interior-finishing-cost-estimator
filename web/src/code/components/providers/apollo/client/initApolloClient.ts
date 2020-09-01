@@ -24,7 +24,7 @@ export function initApolloClient(): ApolloClient<unknown> {
              */
             setContext(async (operation, prevContext) => {
                 const { headers = {}, forceAuth } = prevContext;
-                console.log('%cprepareOperation', 'color: deepskyblue;', operation.operationName);
+                console.debug('%cprepareOperation', 'color: deepskyblue;', operation.operationName);
 
                 if (AuthUtils.isProtectedOperation(operation.operationName) || forceAuth) {
                     const validAccessToken = AuthUtils.verifyAccessToken(accessTokenVar()) || await AuthUtils.refreshAccessToken();
@@ -84,7 +84,7 @@ export function initApolloCache() {
             },
             Room: {
                 keyFields: false,
-            }
+            },
         },
     });
 }

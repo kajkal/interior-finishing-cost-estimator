@@ -40,7 +40,7 @@ export function ProductPreview({ product, component, nameRenderer, className, is
     );
 }
 
-const DefaultContainer: React.ComponentType = ({ ...props}) => <Paper variant='outlined' {...props} />
+const DefaultContainer: React.ComponentType = ({ ...props }) => <Paper variant='outlined' {...props} />;
 
 const useStyles = makeStyles({
     root: {
