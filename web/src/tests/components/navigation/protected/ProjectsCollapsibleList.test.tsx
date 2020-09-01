@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { MockRouter } from '../../../__utils__/context-providers/MockRouter';
+import { MockRouter } from '../../../__utils__/mocks/MockRouter';
 
 import { ProjectsCollapsibleList } from '../../../../code/components/navigation/protected/ProjectsCollapsibleList';
 import { nav } from '../../../../code/config/nav';

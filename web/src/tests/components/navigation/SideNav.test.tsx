@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../__mocks__/code/mockUseCurrentUserCachedData';
 import { mockUseSideNavController } from '../../__mocks__/code/mockUseSideNavController';
-import { ContextMocks, MockContextProvider } from '../../__utils__/MockContextProvider';
-import { mockComponent } from '../../__utils__/mockComponent';
+import { ContextMocks, MockContextProvider } from '../../__utils__/mocks/MockContextProvider';
+import { mockComponent } from '../../__utils__/mocks/mockComponent';
 
 import { SideNav } from '../../../code/components/navigation/SideNav';
 import { nav } from '../../../code/config/nav';

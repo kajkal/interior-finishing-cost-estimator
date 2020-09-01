@@ -2,9 +2,9 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
-import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
 import { MutationSendPasswordResetInstructionsArgs, SendPasswordResetInstructionsDocument } from '../../../../graphql/generated-types';
@@ -66,10 +66,10 @@ describe('PasswordResetRequestPage component', () => {
 
             it('should validate email input value', async () => {
                 renderInMockContext();
-                await InputValidator.basedOn(ViewUnderTest.emailInput)
-                    .expectError('', 't:form.email.validation.required')
-                    .expectError('invalid-email-address', 't:form.email.validation.invalid')
-                    .expectNoError('validEmail@domain.com');
+                await TextFieldController.from(ViewUnderTest.emailInput)
+                    .type('').expectError('t:form.email.validation.required')
+                    .type('invalid-email-address').expectError('t:form.email.validation.invalid')
+                    .type('validEmail@domain.com').expectNoError();
             });
 
         });

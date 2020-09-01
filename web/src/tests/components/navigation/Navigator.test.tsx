@@ -4,8 +4,8 @@ import { NavigateFunction, useNavigate } from 'react-router';
 import { act, render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../__mocks__/code/mockUseCurrentUserCachedData';
-import { MockContextProvider } from '../../__utils__/MockContextProvider';
-import { mockComponent } from '../../__utils__/mockComponent';
+import { MockContextProvider } from '../../__utils__/mocks/MockContextProvider';
+import { mockComponent } from '../../__utils__/mocks/mockComponent';
 
 import { Navigator } from '../../../code/components/navigation/Navigator';
 import { nav } from '../../../code/config/nav';

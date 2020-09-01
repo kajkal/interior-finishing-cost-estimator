@@ -3,7 +3,7 @@ import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { Category, DeleteInquiryDocument, DeleteInquiryMutation, DeleteInquiryMutationVariables, Inquiry } from '../../../../graphql/generated-types';
 import { inquiryDeleteModalAtom } from '../../../../code/components/modals/inquiry-delete/inquiryDeleteModalAtom';

@@ -4,7 +4,7 @@ import { useSetRecoilState } from 'recoil/dist';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { DeleteProductDocument, DeleteProductMutation, DeleteProductMutationVariables, Product, User } from '../../../../graphql/generated-types';
 import { productDeleteModalAtom } from '../../../../code/components/modals/product-delete/productDeleteModalAtom';

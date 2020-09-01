@@ -15,7 +15,7 @@ export class CategoryFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as CategoryFieldController;
     }
 
-    clearCategory(): CategoryFieldController {
+    clearCategory(): this {
         return this.then(async (inputElement: HTMLElement) => {
             userEvent.click(inputElement);
             userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.clear'));
@@ -23,7 +23,7 @@ export class CategoryFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as CategoryFieldController;
+        }) as this;
     }
 
     selectCategory(category: string) {
@@ -39,7 +39,7 @@ export class CategoryFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as CategoryFieldController;
+        }) as this;
     }
 
 }

@@ -9,7 +9,7 @@ import { useSetRecoilState } from 'recoil';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { ProductModal } from '../../../../code/components/modals/product/ProductModal';
 import { productModalAtom } from '../../../../code/components/modals/product/productModalAtom';

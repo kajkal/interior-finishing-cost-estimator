@@ -4,9 +4,9 @@ import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
-import { InputValidator } from '../../../__utils__/InputValidator';
 
 import { Project, UploadProjectFileDocument, UploadProjectFileMutationVariables } from '../../../../graphql/generated-types';
 import { projectFileUploadModalAtom } from '../../../../code/components/modals/project-file-upload/projectFileUploadModalAtom';
@@ -136,10 +136,11 @@ describe('ProjectFileUploadModal component', () => {
             it('should validate description input value', async () => {
                 renderInMockContext();
                 ViewUnderTest.openModal();
-                await InputValidator.basedOn(ViewUnderTest.descriptionInput)
-                    .expectError('a'.repeat(256), 't:form.projectFileDescription.validation.tooLong')
-                    .expectNoError('')
-                    .expectNoError('valid description');
+                await TextFieldController.from(ViewUnderTest.descriptionInput)
+                    .type('').expectNoError()
+                    .type('a'.repeat(1)).expectNoError()
+                    .paste('a'.repeat(255)).expectNoError()
+                    .paste('a'.repeat(256)).expectError('t:form.projectFileDescription.validation.tooLong');
             });
 
         });

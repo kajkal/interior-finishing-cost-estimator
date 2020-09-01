@@ -5,10 +5,10 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
-import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
 import { MutationRegisterArgs, RegisterDocument } from '../../../../graphql/generated-types';
@@ -121,36 +121,40 @@ describe('SignupPage component', () => {
 
             it('should validate name input value', async () => {
                 renderInMockContext();
-                await InputValidator.basedOn(ViewUnderTest.nameInput)
-                    .expectError('', 't:form.name.validation.required')
-                    .expectError(':<', 't:form.name.validation.tooShort')
-                    .expectNoError('Valid Name');
+                await TextFieldController.from(ViewUnderTest.nameInput)
+                    .type('').expectError('t:form.name.validation.required')
+                    .type('a'.repeat(2)).expectError('t:form.name.validation.tooShort')
+                    .type('a'.repeat(3)).expectNoError()
+                    .paste('a'.repeat(50)).expectNoError()
+                    .paste('a'.repeat(51)).expectError('t:form.name.validation.tooLong');
             });
 
             it('should validate email input value', async () => {
                 renderInMockContext();
-                await InputValidator.basedOn(ViewUnderTest.emailInput)
-                    .expectError('', 't:form.email.validation.required')
-                    .expectError('invalid-email-address', 't:form.email.validation.invalid')
-                    .expectNoError('validEmail@domain.com');
+                await TextFieldController.from(ViewUnderTest.emailInput)
+                    .type('').expectError('t:form.email.validation.required')
+                    .type('invalid-email-address').expectError('t:form.email.validation.invalid')
+                    .type('validEmail@domain.com').expectNoError();
             });
 
             it('should validate password input value', async () => {
                 renderInMockContext();
-                await InputValidator.basedOn(ViewUnderTest.passwordInput)
-                    .expectError('', 't:form.password.validation.required')
-                    .expectError('bad', 't:form.password.validation.tooShort')
-                    .expectNoError('better password');
+                await TextFieldController.from(ViewUnderTest.passwordInput)
+                    .type('').expectError('t:form.password.validation.required')
+                    .type('a'.repeat(5)).expectError('t:form.password.validation.tooShort')
+                    .type('a'.repeat(6)).expectNoError()
+                    .paste('a'.repeat(50)).expectNoError()
+                    .paste('a'.repeat(51)).expectError('t:form.password.validation.tooLong');
             });
 
             it('should validate password confirmation input value', async () => {
                 renderInMockContext();
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
-                await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
-                    .expectError('', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
-                    .expectError('not equal', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
-                    .expectNoError(passwordValue);
+                await TextFieldController.from(ViewUnderTest.passwordConfirmationInput)
+                    .type(passwordValue).expectNoError()
+                    .type('').expectError('t:form.newPasswordConfirmation.validation.passwordsNotMatch')
+                    .type('not equal').expectError('t:form.newPasswordConfirmation.validation.passwordsNotMatch');
             });
 
         });

@@ -13,7 +13,7 @@ import { LocationFieldController } from '../../../__utils__/field-controllers/Lo
 import { CategoryFieldController } from '../../../__utils__/field-controllers/CategoryFieldController';
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { flushPromises } from '../../../__utils__/extendedUserEvent';
 
 import { Category, CreateInquiryDocument, CreateInquiryMutation, CreateInquiryMutationVariables } from '../../../../graphql/generated-types';

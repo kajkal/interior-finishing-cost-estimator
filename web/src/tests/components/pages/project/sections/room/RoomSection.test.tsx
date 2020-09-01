@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import userEvent from '@testing-library/user-event';
 import { getByRole, getByTestId, render, screen } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../../__utils__/mocks/MockContextProvider';
 import { generator } from '../../../../../__utils__/generator';
 
 import { productUpdateModalAtom, ProductUpdateModalAtomValue } from '../../../../../../code/components/modals/product-update/productUpdateModalAtom';

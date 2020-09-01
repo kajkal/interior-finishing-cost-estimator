@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { MockRouter } from '../../../__utils__/context-providers/MockRouter';
+import { MockRouter } from '../../../__utils__/mocks/MockRouter';
 
 import { SimpleNavigationItem } from '../../../../code/components/navigation/basic/SimpleNavigationItem';
 

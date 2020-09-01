@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 
-import { setWindowWidth } from '../../__utils__/setWindowWidth';
+import { setWindowWidth } from '../../__utils__/mocks/setWindowWidth';
 
 import { useMobileDetect } from '../../../code/utils/hooks/useMobileDetect';
 

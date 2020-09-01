@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { ChangeProfileSettingsDocument, ChangeProfileSettingsMutation, ChangeProfileSettingsMutationVariables, User } from '../../../../graphql/generated-types';
 import { ChangeProfileSettingsForm } from '../../../../code/components/pages/settings/ChangeProfileSettingsForm';

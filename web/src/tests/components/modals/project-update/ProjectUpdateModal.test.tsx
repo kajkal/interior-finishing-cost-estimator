@@ -7,15 +7,15 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { InputValidator } from '../../../__utils__/InputValidator';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { generator } from '../../../__utils__/generator';
 
-import { MutationUpdateProjectArgs, Project, UpdateProjectDocument, UpdateProjectMutation, UpdateProjectMutationVariables, User } from '../../../../graphql/generated-types';
+import { MutationUpdateProjectArgs, Project, UpdateProjectDocument, UpdateProjectMutation, UpdateProjectMutationVariables } from '../../../../graphql/generated-types';
 import { projectUpdateModalAtom } from '../../../../code/components/modals/project-update/projectUpdateModalAtom';
 import { ProjectUpdateModal } from '../../../../code/components/modals/project-update/ProjectUpdateModal';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';
@@ -24,18 +24,8 @@ import { nav } from '../../../../code/config/nav';
 
 describe('ProjectUpdateModal component', () => {
 
-    const sampleProject: Partial<Project> = {
-        __typename: 'Project',
-        slug: 'sample-project',
-        name: 'Sample project',
-        location: null,
-        files: [],
-    };
-
-    const sampleUser: Partial<User> = {
-        __typename: 'User',
-        slug: 'sample-user',
-    };
+    const sampleProject = generator.project({ location: null });
+    const sampleUser = generator.user();
 
     beforeEach(() => {
         mockUseCurrentUserCachedData.mockReturnValue(sampleUser);
@@ -50,8 +40,8 @@ describe('ProjectUpdateModal component', () => {
                     onClick={() => setModalState({
                         open: true,
                         projectData: {
-                            name: sampleProject.name!,
-                            slug: sampleProject.slug!,
+                            name: sampleProject.name,
+                            slug: sampleProject.slug,
                             location: sampleProject.location,
                         },
                     })}
@@ -175,13 +165,13 @@ describe('ProjectUpdateModal component', () => {
                 ViewUnderTest.openModal();
                 expect(ViewUnderTest.projectNameInput).toHaveFocus();
 
-                await InputValidator.basedOn(ViewUnderTest.projectNameInput)
-                    .expectError('', 't:form.projectName.validation.required')
-                    .expectError('aa', 't:form.projectName.validation.tooShort')
-                    .expectError('a'.repeat(51), 't:form.projectName.validation.tooLong')
-                    .expectNoError('a'.repeat(50), 't:project.updateModal.urlWillChange')
-                    .expectNoError('valid project name', 't:project.updateModal.urlWillChange')
-                    .expectNoError(sampleProject.name!);
+                await TextFieldController.from(ViewUnderTest.projectNameInput)
+                    .type(sampleProject.name).expectNoError()
+                    .type('').expectError('t:form.projectName.validation.required')
+                    .type('a'.repeat(2)).expectError('t:form.projectName.validation.tooShort')
+                    .type('a'.repeat(3)).expectNoError('t:project.updateModal.urlWillChange')
+                    .paste('a'.repeat(50)).expectNoError('t:project.updateModal.urlWillChange')
+                    .paste('a'.repeat(51)).expectError('t:form.projectName.validation.tooLong');
             });
 
         });

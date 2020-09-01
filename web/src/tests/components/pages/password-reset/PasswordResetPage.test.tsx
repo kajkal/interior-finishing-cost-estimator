@@ -5,10 +5,10 @@ import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 import { extendedUserEvent } from '../../../__utils__/extendedUserEvent';
-import { InputValidator } from '../../../__utils__/InputValidator';
 import { generator } from '../../../__utils__/generator';
 
 import { MutationResetPasswordArgs, ResetPasswordDocument } from '../../../../graphql/generated-types';
@@ -166,20 +166,22 @@ describe('PasswordResetPage component', () => {
 
             it('should validate password input value', async () => {
                 renderInMockContext({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
-                await InputValidator.basedOn(ViewUnderTest.passwordInput)
-                    .expectError('', 't:form.password.validation.required')
-                    .expectError('bad', 't:form.password.validation.tooShort')
-                    .expectNoError('better password');
+                await TextFieldController.from(ViewUnderTest.passwordInput)
+                    .type('').expectError('t:form.password.validation.required')
+                    .type('a'.repeat(5)).expectError('t:form.password.validation.tooShort')
+                    .type('a'.repeat(6)).expectNoError()
+                    .paste('a'.repeat(50)).expectNoError()
+                    .paste('a'.repeat(51)).expectError('t:form.password.validation.tooLong');
             });
 
             it('should validate password confirmation input value', async () => {
                 renderInMockContext({ initialEntries: [ `/?token=${validPasswordResetToken}` ] });
                 const passwordValue = 'first password';
                 await extendedUserEvent.type(ViewUnderTest.passwordInput, passwordValue);
-                await InputValidator.basedOn(ViewUnderTest.passwordConfirmationInput)
-                    .expectError('', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
-                    .expectError('not equal', 't:form.newPasswordConfirmation.validation.passwordsNotMatch')
-                    .expectNoError(passwordValue);
+                await TextFieldController.from(ViewUnderTest.passwordConfirmationInput)
+                    .type(passwordValue).expectNoError()
+                    .type('').expectError('t:form.newPasswordConfirmation.validation.passwordsNotMatch')
+                    .type('not equal').expectError('t:form.newPasswordConfirmation.validation.passwordsNotMatch');
             });
 
         });

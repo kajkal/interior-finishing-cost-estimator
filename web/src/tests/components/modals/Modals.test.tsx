@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { mockComponent } from '../../__utils__/mockComponent';
+import { mockComponent } from '../../__utils__/mocks/mockComponent';
 
 import { Modals } from '../../../code/components/modals/Modals';
 

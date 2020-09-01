@@ -15,7 +15,7 @@ import { InquirySelectorController } from '../../../__utils__/field-controllers/
 import { RoomTypeFieldController } from '../../../__utils__/field-controllers/RoomTypeFieldController';
 import { NumberFieldController } from '../../../__utils__/field-controllers/NumberFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { flushPromises } from '../../../__utils__/extendedUserEvent';
 
 import { Category, CreateRoomDocument, CreateRoomMutation, CreateRoomMutationVariables, Inquiry, Product, Project, RoomType, User } from '../../../../graphql/generated-types';

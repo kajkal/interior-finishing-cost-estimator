@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
 
 import { BookmarkInquiryDocument, BookmarkInquiryMutation, BookmarkInquiryMutationVariables, User } from '../../../../../graphql/generated-types';
 import { ToggleBookmarkButton } from '../../../../../code/components/pages/inquiries/actions/ToggleBookmarkButton';

@@ -5,8 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { LocationFieldController } from '../../../__utils__/field-controllers/LocationFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { InputValidator } from '../../../__utils__/InputValidator';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { CreateProjectDocument, CreateProjectMutation, CreateProjectMutationVariables, MutationCreateProjectArgs, Project, User } from '../../../../graphql/generated-types';
 import { CreateProjectPage } from '../../../../code/components/pages/project-create/CreateProjectPage';
@@ -79,11 +78,12 @@ describe('CreateProjectPage component', () => {
 
             it('should validate projectName input value', async () => {
                 renderInMockContext();
-                await InputValidator.basedOn(ViewUnderTest.projectNameInput)
-                    .expectError('', 't:form.projectName.validation.required')
-                    .expectError('aa', 't:form.projectName.validation.tooShort')
-                    .expectError('a'.repeat(51), 't:form.projectName.validation.tooLong')
-                    .expectNoError('valid project name');
+                await TextFieldController.from(ViewUnderTest.projectNameInput)
+                    .type('').expectError('t:form.projectName.validation.required')
+                    .type('a'.repeat(2)).expectError('t:form.projectName.validation.tooShort')
+                    .type('a'.repeat(3)).expectNoError()
+                    .paste('a'.repeat(50)).expectNoError()
+                    .paste('a'.repeat(51)).expectError('t:form.projectName.validation.tooLong');
             });
 
         });

@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { InquiryListItem } from '../../../../code/components/pages/inquiries/InquiryListItem';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { Category, Inquiry } from '../../../../graphql/generated-types';
 import { nav } from '../../../../code/config/nav';
 import userEvent from '@testing-library/user-event';

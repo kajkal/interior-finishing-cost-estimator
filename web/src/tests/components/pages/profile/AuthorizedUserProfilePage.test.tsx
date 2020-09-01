@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { profileUpdateModalAtom, ProfileUpdateModalAtomValue } from '../../../../code/components/modals/profile-update/profileUpdateModalAtom';
 import { ProfileDocument, ProfileQuery, ProfileQueryVariables, User } from '../../../../graphql/generated-types';

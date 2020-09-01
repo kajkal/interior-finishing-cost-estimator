@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { setWindowWidth } from '../../__utils__/setWindowWidth';
+import { setWindowWidth } from '../../__utils__/mocks/setWindowWidth';
+import { mockComponent } from '../../__utils__/mocks/mockComponent';
 
 import { Layout } from '../../../code/components/layout/Layout';
-import { mockComponent } from '../../__utils__/mockComponent';
 
 
 describe('Layout component', () => {

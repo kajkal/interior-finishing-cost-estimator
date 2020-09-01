@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { generator } from '../../../__utils__/generator';
 
 import { ProjectDetailsDocument, ProjectDetailsQuery, ProjectDetailsQueryVariables, User } from '../../../../graphql/generated-types';

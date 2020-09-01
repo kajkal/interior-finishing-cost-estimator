@@ -15,7 +15,7 @@ import { LocationFieldController } from '../../../__utils__/field-controllers/Lo
 import { DropzoneAreaController } from '../../../__utils__/field-controllers/DropzoneAreaController';
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { Profile, UpdateProfileDocument, UpdateProfileMutation, UpdateProfileMutationVariables, User } from '../../../../graphql/generated-types';
 import { profileUpdateModalAtom } from '../../../../code/components/modals/profile-update/profileUpdateModalAtom';

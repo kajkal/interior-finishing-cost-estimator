@@ -9,7 +9,7 @@ import React from 'react';
  * @return component spy, could be used to change mock implementation
  */
 export function mockComponent(modulePath: string, componentName = mapPathToComponentName(modulePath)) {
-    const relativeModulePath = '../..' + modulePath;
+    const relativeModulePath = '../../..' + modulePath;
     const componentSpy: jest.SpyInstance<React.ReactElement> = jest.spyOn(require(relativeModulePath), componentName);
     componentSpy.mockName(`mock-${componentName}`);
     componentSpy.mockImplementation(({ children }) => (

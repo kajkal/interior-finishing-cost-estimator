@@ -3,7 +3,7 @@ import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { DeleteRoomDocument, DeleteRoomMutation, DeleteRoomMutationVariables, Project, ProjectDetailedDataFragment, Room, RoomDataFragment, RoomType } from '../../../../graphql/generated-types';
 import { roomDeleteModalAtom } from '../../../../code/components/modals/room-delete/roomDeleteModalAtom';

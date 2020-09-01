@@ -14,7 +14,7 @@ import { CurrencyAmountFieldController } from '../../../__utils__/field-controll
 import { EditorFieldController } from '../../../__utils__/field-controllers/EditorFieldController';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
 import { TagsFieldController } from '../../../__utils__/field-controllers/TagsFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { CreateProductDocument, CreateProductMutation, CreateProductMutationVariables, User } from '../../../../graphql/generated-types';
 import { productCreateModalAtom } from '../../../../code/components/modals/product-create/productCreateModalAtom';

@@ -35,16 +35,16 @@ export class LocationFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as LocationFieldController;
     }
 
-    clearLocation(): LocationFieldController {
+    clearLocation(): this {
         return this.then(async (inputElement: HTMLElement) => {
             userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.clear'));
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as LocationFieldController;
+        }) as this;
     }
 
-    selectLocation(location?: Location | null): LocationFieldController {
+    selectLocation(location?: Location | null): this {
         return this.then(async (inputElement: HTMLElement) => {
             if (location) {
                 mockGetPlacePredictions.mockImplementation((_request, callback) => {
@@ -76,7 +76,7 @@ export class LocationFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as LocationFieldController;
+        }) as this;
     }
 
 

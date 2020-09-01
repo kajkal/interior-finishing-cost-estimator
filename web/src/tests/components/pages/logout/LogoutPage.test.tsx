@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { MockSessionChannel } from '../../../__mocks__/code/MockSessionChannel';
 
 import { LogoutPage } from '../../../../code/components/pages/logout/LogoutPage';

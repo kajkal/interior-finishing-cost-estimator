@@ -3,8 +3,8 @@ import { GraphQLError } from 'graphql';
 import { Route, Routes } from 'react-router';
 import { render, screen } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
-import { muteConsole } from '../../../__utils__/muteConsole';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
+import { muteConsole } from '../../../__utils__/mocks/muteConsole';
 
 import { ProfileDocument, ProfileQuery, ProfileQueryVariables } from '../../../../graphql/generated-types';
 import { UserProfilePage } from '../../../../code/components/pages/profile/UserProfilePage';

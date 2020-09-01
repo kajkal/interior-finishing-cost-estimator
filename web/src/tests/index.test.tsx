@@ -8,7 +8,7 @@ import { render, screen, waitForElementToBeRemoved } from '@testing-library/reac
 import i18n, { BackendModule, i18n as I18n, ReadCallback } from 'i18next';
 
 import { MockServiceWorker } from './__mocks__/other/serviceWorker';
-import { mockComponent } from './__utils__/mockComponent';
+import { mockComponent } from './__utils__/mocks/mockComponent';
 
 import { supportedLanguages } from '../code/config/supportedLanguages';
 

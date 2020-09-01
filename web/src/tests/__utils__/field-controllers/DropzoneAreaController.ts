@@ -17,19 +17,19 @@ export class DropzoneAreaController extends AbstractFieldController {
         return fileChip;
     }
 
-    dropFiles(files: File[] | undefined | null): DropzoneAreaController {
+    dropFiles(files: File[] | undefined | null): this {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.drop(inputElement, files || []);
             return inputElement;
-        }) as DropzoneAreaController;
+        }) as this;
     }
 
-    removeFile(filename: string): DropzoneAreaController {
+    removeFile(filename: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             const fileChip = DropzoneAreaController.getFileChip(inputElement, filename);
             userEvent.click(fileChip.querySelector('svg')!);
             return inputElement;
-        }) as DropzoneAreaController;
+        }) as this;
     }
 
 }

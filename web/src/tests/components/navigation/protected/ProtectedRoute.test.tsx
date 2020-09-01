@@ -4,7 +4,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { ProtectedRoute } from '../../../../code/components/navigation/protected/ProtectedRoute';
 

@@ -5,7 +5,7 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import { MockedResponse } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 import { TokenVerifierSpy } from '../../../__utils__/spies-managers/TokenVerifierSpy';
 
 import { ConfirmEmailAddressPage } from '../../../../code/components/pages/confirm-email-address/ConfirmEmailAddressPage';

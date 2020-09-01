@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { productCreateModalAtom, ProductCreateModalAtomValue } from '../../../../code/components/modals/product-create/productCreateModalAtom';
 import { productDeleteModalAtom, ProductDeleteModalAtomValue } from '../../../../code/components/modals/product-delete/productDeleteModalAtom';

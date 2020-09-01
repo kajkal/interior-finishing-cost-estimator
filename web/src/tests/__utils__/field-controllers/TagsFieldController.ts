@@ -17,23 +17,23 @@ export class TagsFieldController extends AbstractFieldController {
         return tagChip;
     }
 
-    addNewTag(tagName: string): TagsFieldController {
+    addNewTag(tagName: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await userEvent.paste(inputElement, tagName);
             return this.selectTagOption(tagName);
-        }) as TagsFieldController;
+        }) as this;
     }
 
-    addNewTags(tagNames: string[] | undefined | null): TagsFieldController {
+    addNewTags(tagNames: string[] | undefined | null): this {
         return this.then(async (inputElement: HTMLElement) => {
             for (const tagName of tagNames || []) {
                 await this.addNewTag(tagName);
             }
             return inputElement;
-        }) as TagsFieldController;
+        }) as this;
     }
 
-    selectTagOption(tagName: string): TagsFieldController {
+    selectTagOption(tagName: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await userEvent.type(inputElement, '');
             const optionList = screen.getByRole('listbox');
@@ -45,15 +45,15 @@ export class TagsFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as TagsFieldController;
+        }) as this;
     }
 
-    removeTag(tagName: string): TagsFieldController {
+    removeTag(tagName: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             const tagChip = TagsFieldController.getTagChip(inputElement, tagName);
             userEvent.click(tagChip.querySelector('svg')!);
             return inputElement;
-        }) as TagsFieldController;
+        }) as this;
     }
 
     removeAllTags(): TagsFieldController {

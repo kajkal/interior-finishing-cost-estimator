@@ -10,13 +10,13 @@ export class NumberFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as NumberFieldController;
     }
 
-    pasteAmount(value: string): NumberFieldController {
+    pasteAmount(value: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.paste(inputElement, value);
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as NumberFieldController;
+        }) as this;
     }
 
 }

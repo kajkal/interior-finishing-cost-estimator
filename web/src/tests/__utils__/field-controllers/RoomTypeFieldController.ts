@@ -15,7 +15,7 @@ export class RoomTypeFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as RoomTypeFieldController;
     }
 
-    clearCategory(): RoomTypeFieldController {
+    clearCategory(): this {
         return this.then(async (inputElement: HTMLElement) => {
             userEvent.click(inputElement);
             userEvent.click(getByTitle(inputElement.parentElement!, 't:form.common.clear'));
@@ -23,10 +23,10 @@ export class RoomTypeFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as RoomTypeFieldController;
+        }) as this;
     }
 
-    selectRoomType(roomType: string) {
+    selectRoomType(roomType: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             if (!supportedRoomTypes.includes(roomType as RoomType)) {
                 throw new Error(`Invalid room type: '${roomType}' is not one of the supported types: [${supportedRoomTypes.join(', ')}]`);
@@ -49,7 +49,7 @@ export class RoomTypeFieldController extends AbstractFieldController {
             fireEvent.blur(inputElement);
             await flushPromises();
             return inputElement;
-        }) as RoomTypeFieldController;
+        }) as this;
     }
 
 }

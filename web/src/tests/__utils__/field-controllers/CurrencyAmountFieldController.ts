@@ -12,15 +12,15 @@ export class CurrencyAmountFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as CurrencyAmountFieldController;
     }
 
-    pasteAmount(value: string): CurrencyAmountFieldController {
+    pasteAmount(value: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.paste(inputElement, value);
             fireEvent.blur(inputElement);
             return inputElement;
-        }) as CurrencyAmountFieldController;
+        }) as this;
     }
 
-    selectCurrency(currency?: typeof supportedCurrencies[number]) {
+    selectCurrency(currency?: typeof supportedCurrencies[number]): this {
         return this.then(async (inputElement: HTMLElement) => {
             if (!currency) {
                 return inputElement;
@@ -41,7 +41,7 @@ export class CurrencyAmountFieldController extends AbstractFieldController {
 
             await flushPromises();
             return inputElement;
-        }) as CurrencyAmountFieldController;
+        }) as this;
     }
 
 }

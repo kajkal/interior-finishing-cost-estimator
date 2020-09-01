@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { ApolloError } from '@apollo/client';
 
-import { muteConsole } from '../../__utils__/muteConsole';
+import { muteConsole } from '../../__utils__/mocks/muteConsole';
 
 import { ApolloErrorHandler } from '../../../code/utils/error-handling/ApolloErrorHandler';
 

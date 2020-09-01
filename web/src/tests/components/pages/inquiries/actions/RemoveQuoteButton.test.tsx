@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
 
 import { Inquiry, PriceQuote, PriceQuoteDataFragment, RemoveQuoteDocument, RemoveQuoteMutation, RemoveQuoteMutationVariables } from '../../../../../graphql/generated-types';
 import { RemoveQuoteButton } from '../../../../../code/components/pages/inquiries/actions/RemoveQuoteButton';

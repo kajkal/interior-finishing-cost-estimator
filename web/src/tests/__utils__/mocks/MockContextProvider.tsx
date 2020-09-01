@@ -4,9 +4,9 @@ import { ApolloCache } from '@apollo/client';
 import { RecoilRoot, RecoilRootProps, useRecoilValue } from 'recoil/dist';
 import { MockedProvider, MockedResponse } from '@apollo/client/testing';
 
-import { pageProgressAtom } from '../../code/components/atoms/page-progress/pageProgressAtom';
-import { MockToastProvider } from './mocks/MockToastProvider';
-import { MockRouter } from './context-providers/MockRouter';
+import { pageProgressAtom } from '../../../code/components/atoms/page-progress/pageProgressAtom';
+import { MockToastProvider } from './MockToastProvider';
+import { MockRouter } from './MockRouter';
 
 
 export interface ContextMocks {

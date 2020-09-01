@@ -1,3 +1,6 @@
+/**
+ * Test helper class used to control and verify input validation.
+ */
 export abstract class AbstractFieldController extends Promise<HTMLElement> {
 
     expectError(expectedErrorMessage: string): this {

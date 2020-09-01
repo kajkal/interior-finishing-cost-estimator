@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 
-import { ContextMocks, MockContextProvider } from '../../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../../__utils__/mocks/MockContextProvider';
 
 import { inquiryDeleteModalAtom, InquiryDeleteModalAtomValue } from '../../../../../code/components/modals/inquiry-delete/inquiryDeleteModalAtom';
 import { OpenDeleteModalButton } from '../../../../../code/components/pages/inquiries/actions/OpenDeleteModalButton';

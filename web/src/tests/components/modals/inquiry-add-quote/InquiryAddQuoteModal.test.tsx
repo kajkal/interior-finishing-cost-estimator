@@ -9,7 +9,7 @@ import { useSetRecoilState } from 'recoil/dist';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { CurrencyAmountFieldController } from '../../../__utils__/field-controllers/CurrencyAmountFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { AddQuoteDocument, AddQuoteMutation, AddQuoteMutationVariables, Category, Inquiry } from '../../../../graphql/generated-types';
 import { inquiryAddQuoteModalAtom } from '../../../../code/components/modals/inquiry-add-quote/inquiryAddQuoteModalAtom';

@@ -10,7 +10,7 @@ import { useRecoilValue } from 'recoil/dist';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { inquiryCreateModalAtom, InquiryCreateModalAtomValue } from '../../../../code/components/modals/inquiry-create/inquiryCreateModalAtom';
 import { Category, InquiriesDocument, InquiriesQuery, Inquiry, User } from '../../../../graphql/generated-types';

@@ -5,7 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { mockUseCurrentUserCachedData } from '../../../__mocks__/code/mockUseCurrentUserCachedData';
 import { TextFieldController } from '../../../__utils__/field-controllers/TextFieldController';
-import { ContextMocks, MockContextProvider } from '../../../__utils__/MockContextProvider';
+import { ContextMocks, MockContextProvider } from '../../../__utils__/mocks/MockContextProvider';
 
 import { ChangeEmailDocument, ChangeEmailMutation, ChangeEmailMutationVariables, User } from '../../../../graphql/generated-types';
 import { initApolloCache } from '../../../../code/components/providers/apollo/client/initApolloClient';

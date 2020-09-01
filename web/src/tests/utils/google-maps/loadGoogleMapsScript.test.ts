@@ -1,6 +1,6 @@
 import { fireEvent } from '@testing-library/react';
 
-import { muteConsole } from '../../__utils__/muteConsole';
+import { muteConsole } from '../../__utils__/mocks/muteConsole';
 
 
 describe('loadGoogleMapsScript function', () => {

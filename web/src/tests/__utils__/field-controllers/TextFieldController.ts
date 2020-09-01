@@ -8,18 +8,18 @@ export class TextFieldController extends AbstractFieldController {
         return this.resolve(inputElement) as TextFieldController;
     }
 
-    type(value: string): TextFieldController {
+    type(value: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.type(inputElement, value);
             return inputElement;
-        }) as TextFieldController;
+        }) as this;
     }
 
-    paste(value: string): TextFieldController {
+    paste(value: string): this {
         return this.then(async (inputElement: HTMLElement) => {
             await extendedUserEvent.paste(inputElement, value);
             return inputElement;
-        }) as TextFieldController;
+        }) as this;
     }
 
 }
