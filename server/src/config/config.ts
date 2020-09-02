@@ -77,7 +77,7 @@ export const config = {
                     path: '/refresh_token',
                     maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'none',
+                    sameSite: (process.env.NODE_ENV === 'test') ? 'strict' : 'none',
                 } as CookieOptions,
             },
         },

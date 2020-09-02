@@ -288,8 +288,10 @@ describe('ApolloContextProvider component', () => {
     describe('session state synchronization', () => {
 
         it('should add session event listener on mount and remove session event listener on unmount', async () => {
-            AuthUtilsSpiesManager.refreshAccessToken.mockResolvedValue('');
+            const { throwError } = deferRefreshAccessTokenPromise();
+
             const { unmount } = renderInMockContext();
+            throwError(new UnauthorizedError('NO_EXISTING_SESSION'));
 
             // verify if provider' children are visible
             expect(await screen.findByTestId('SampleApolloClientConsumer')).toBeInTheDocument();

@@ -140,6 +140,7 @@ describe('InquiryResolver', () => {
                         url: `url:${userId}/${directory}/${prefix}_sample.png`,
                         name: `${prefix}_sample.png`,
                         description: undefined,
+                        createdAt: new Date(),
                     } ])
                     : Promise.resolve([])
             ));

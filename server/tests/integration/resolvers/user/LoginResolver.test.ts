@@ -59,7 +59,7 @@ describe('LoginResolver', () => {
             expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledTimes(1);
             expect(RefreshTokenManagerSpy.generate).toHaveBeenCalledWith({ sub: existingUser.id });
             expect(response.header[ 'set-cookie' ]).toEqual([
-                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly; SameSite=None$/),
+                expect.stringMatching(/^rt=.+; Path=\/refresh_token; Expires=.+; HttpOnly; SameSite=Strict$/),
             ]);
 
             // verify if access token was generated
@@ -149,7 +149,7 @@ describe('LoginResolver', () => {
             // verify if refresh token was invalidated
             expect(AuthServiceSpy.invalidateRefreshToken).toHaveBeenCalledTimes(1);
             expect(response.header[ 'set-cookie' ]).toEqual([
-                expect.stringMatching(/^rt=; Max-Age=0; Path=\/refresh_token; Expires=.+; HttpOnly; SameSite=None$/),
+                expect.stringMatching(/^rt=; Max-Age=0; Path=\/refresh_token; Expires=.+; HttpOnly; SameSite=Strict$/),
             ]);
 
             // verify if access was logged
