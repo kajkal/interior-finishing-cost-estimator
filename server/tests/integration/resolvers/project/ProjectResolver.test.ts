@@ -71,6 +71,9 @@ describe('ProjectResolver', () => {
               createProject(name: $name, location: $location) {
                 name
                 slug
+                files {
+                  name
+                }
               }
             }
         `;
@@ -125,6 +128,7 @@ describe('ProjectResolver', () => {
         });
 
         it('should create project', async () => {
+            StorageServiceSpy.getResources.mockResolvedValue([]);
             const user = await testUtils.db.populateWithUser();
             const projectCreateFormData: ProjectCreateFormData = {
                 name: generator.sentence({ words: 5 }).replace(/\./g, ''),
@@ -138,6 +142,10 @@ describe('ProjectResolver', () => {
             expect(ProjectRepositorySpy.create).toHaveBeenCalledTimes(1);
             expect(ProjectRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
 
+            // verify if project files were queried
+            expect(StorageServiceSpy.getResources).toHaveBeenCalledTimes(1);
+            expect(StorageServiceSpy.getResources).toHaveBeenCalledWith(user.id, expect.any(String));
+
             // verify if access was logged
             expect(MockLogger.info).toHaveBeenCalledTimes(1);
             expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
@@ -148,6 +156,7 @@ describe('ProjectResolver', () => {
                     createProject: {
                         name: projectCreateFormData.name,
                         slug: projectCreateFormData.name.toLowerCase().replace(/\s/g, '-'),
+                        files: [],
                     },
                 },
             });
@@ -408,6 +417,7 @@ describe('ProjectResolver', () => {
                 url: `url:${resource.userId}/${resource.directory}/${resource.filename}`,
                 name: resource.filename,
                 description: resource.metadata?.description,
+                createdAt: new Date(),
             }));
         });
 

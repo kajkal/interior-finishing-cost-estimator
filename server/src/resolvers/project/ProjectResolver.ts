@@ -1,7 +1,7 @@
 import { wrap } from 'mikro-orm';
 import { Inject, Service } from 'typedi';
 import { ForbiddenError, UserInputError } from 'apollo-server-express';
-import { Args, Authorized, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { Args, Authorized, Ctx, FieldResolver, Mutation, Resolver, Root, UseMiddleware } from 'type-graphql';
 
 import { ProjectRepository } from '../../repositories/ProjectRepository';
 import { AuthorizedContext } from '../../types/context/AuthorizedContext';
@@ -32,13 +32,6 @@ export class ProjectResolver {
         return await this.storageService.getResources(project.user.id, project.id);
     }
 
-
-    @Authorized()
-    @UseMiddleware(logAccess)
-    @Query(() => [ Project ])
-    async projects(@Ctx() context: AuthorizedContext): Promise<Project[]> {
-        return this.projectRepository.findAll();
-    }
 
     @Authorized()
     @UseMiddleware(logAccess)

@@ -78,6 +78,7 @@ describe('ProfileResolver', () => {
                     url: `url:${userId}/${directory}/${prefix}_sample.png`,
                     name: `${prefix}_sample.png`,
                     description: undefined,
+                    createdAt: new Date(),
                 },
             ]));
             const user = await testUtils.db.populateWithUser({
@@ -240,6 +241,7 @@ describe('ProfileResolver', () => {
                 url: `url:${resource.userId}/${resource.directory}/${resource.filename}`,
                 name: resource.filename,
                 description: resource.metadata?.description,
+                createdAt: new Date(),
             }));
         });
 
@@ -252,6 +254,7 @@ describe('ProfileResolver', () => {
                 url: `url:${userId}/${directory}/${prefix}_sample.png`,
                 name: `${prefix}_sample.png`,
                 description: undefined,
+                createdAt: new Date(),
             } ]);
         }
 

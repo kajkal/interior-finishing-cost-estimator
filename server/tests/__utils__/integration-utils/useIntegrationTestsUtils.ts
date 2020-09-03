@@ -41,11 +41,11 @@ export function useIntegrationTestsUtils(): IntegrationTestUtils {
     beforeAll(async () => {
         testUtils.orm = await connectToDatabase();
         testUtils.db = await TestDatabaseManager.connect(config.dataBase.mongodbUrl);
+        await testUtils.db.clear();
         testUtils.apolloServer = await createApolloServer();
     });
     afterAll(async () => {
         await testUtils.apolloServer.stop();
-        await testUtils.db.clear();
         await testUtils.db.disconnect();
         await testUtils.orm.close();
     });

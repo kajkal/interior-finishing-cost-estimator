@@ -417,6 +417,15 @@ describe('RoomResolver', () => {
                     ceiling: null,
                     products: null,
                     inquiries: null,
+                }, {
+                    id: 'living-room',
+                    type: RoomType.LIVING_ROOM,
+                    name: 'Living Room',
+                    floor: null,
+                    wall: null,
+                    ceiling: null,
+                    products: null,
+                    inquiries: null,
                 } ],
             });
             const formData: RoomUpdateFormData = {
@@ -597,6 +606,30 @@ describe('RoomResolver', () => {
                     inquiries: null,
                 } ],
             });
+            const formData: RoomDeleteFormData = {
+                projectSlug: projectToUpdate.slug,
+                roomId: 'kitchen',
+            };
+            const response = await testUtils.postGraphQL({
+                query: deleteRoomMutation,
+                variables: formData,
+            }).set('Authorization', getAuthHeader(user));
+
+            // verify if access was logged
+            expect(MockLogger.info).toHaveBeenCalledTimes(1);
+            expect(MockLogger.info).toHaveBeenCalledWith(expect.objectContaining({ message: 'access' }));
+
+            // verify mutation response
+            expect(response.body).toEqual({
+                data: {
+                    deleteRoom: true,
+                },
+            });
+        });
+        
+        it('should return true when room is already deleted', async () => {
+            const user = await testUtils.db.populateWithUser();
+            const projectToUpdate = await testUtils.db.populateWithProject(user.id);
             const formData: RoomDeleteFormData = {
                 projectSlug: projectToUpdate.slug,
                 roomId: 'kitchen',

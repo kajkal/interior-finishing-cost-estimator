@@ -129,7 +129,7 @@ describe('InquiryResolver', () => {
             const inquiryB = await testUtils.db.populateWithInquiry(userB.id, {
                 quotes: [ {
                     author: userA.id,
-                    date: new Date(Date.parse('2020-08-16T21:00:00.000Z')),
+                    date: new Date('2020-08-16T21:00:00.000Z'),
                     price: { currency: 'PLN', amount: 4.5 },
                 } ],
             });
@@ -793,13 +793,13 @@ describe('InquiryResolver', () => {
             const inquiry = await testUtils.db.populateWithInquiry(user.id, {
                 quotes: [ {
                     author: user.id,
-                    date: new Date(Date.parse('2020-08-16T23:00:00.000Z')),
+                    date: new Date('2020-08-16T23:00:00.000Z'),
                     price: { currency: 'PLN', amount: 4.5 },
                 } ],
             });
             const formData: InquiryRemoveQuoteFormData = {
                 inquiryId: inquiry.id,
-                quoteDate: '2020-08-16T23:00:00.000Z' as any,
+                quoteDate: new Date('2020-08-16T23:00:00.000Z'),
             };
             const response = await testUtils.postGraphQL({
                 query: removeQuoteMutation,

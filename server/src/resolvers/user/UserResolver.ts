@@ -33,12 +33,6 @@ export class UserResolver {
         return products.getItems();
     }
 
-    // @FieldResolver(() => Int)
-    // async productCount(@Root() user: User) {
-    //     await user.products.init();
-    //     return user.products.count();
-    // }
-
     @FieldResolver(() => String, { nullable: true, description: 'User\' avatar url' })
     async avatar(@Root() user: User): Promise<string | null> {
         const [ avatar ] = await this.storageService.getResources(user.id, 'public', 'avatar');

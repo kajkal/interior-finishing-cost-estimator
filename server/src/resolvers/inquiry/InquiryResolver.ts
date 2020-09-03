@@ -128,11 +128,11 @@ export class InquiryResolver {
 
         if (inquiry) {
             const quotes = inquiry.quotes || [];
-            inquiry.quotes = [ ...quotes, {
-                author: context.jwtPayload.sub,
-                date: new Date(),
-                price,
-            } ];
+            const newQuote = new Quote();
+            newQuote.author = context.jwtPayload.sub;
+            newQuote.date = new Date();
+            newQuote.price = price;
+            inquiry.quotes = [ ...quotes, newQuote ];
             await this.inquiryRepository.persistAndFlush(inquiry);
             return this.getInquiryPriceQuotes(inquiry.quotes);
         }
