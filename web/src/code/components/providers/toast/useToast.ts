@@ -22,7 +22,7 @@ export function useToast() {
             setToast({
                 severity: 'info',
                 open: true,
-                key: Math.random(),
+                key: toastUniqueKey++,
                 Toast,
                 autoHideDuration: config?.disableAutoHide ? null : 4000,
             });
@@ -31,7 +31,7 @@ export function useToast() {
             setToast({
                 severity: 'success',
                 open: true,
-                key: Math.random(),
+                key: toastUniqueKey++,
                 Toast,
                 autoHideDuration: config?.disableAutoHide ? null : 6000,
             });
@@ -40,7 +40,7 @@ export function useToast() {
             setToast({
                 severity: 'warning',
                 open: true,
-                key: Math.random(),
+                key: toastUniqueKey++,
                 Toast,
                 autoHideDuration: config?.disableAutoHide ? null : 10000,
             });
@@ -49,10 +49,12 @@ export function useToast() {
             setToast({
                 severity: 'error',
                 open: true,
-                key: Math.random(),
+                key: toastUniqueKey++,
                 Toast,
                 autoHideDuration: config?.disableAutoHide ? null : 15000,
             });
         },
     }), [ setToast ]);
 }
+
+let toastUniqueKey = 0;
