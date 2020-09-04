@@ -50,7 +50,7 @@ describe('ExpressServer', () => {
             });
         }
 
-        it('should responds with status 200 and new access token when refresh token\' cookie is valid', async (done) => {
+        it('should responds with status 200 and new access token when refresh token\' cookie is valid', async () => {
             // given
             const userData = { id: 'TEST_USER_ID' };
             const validRefreshTokenCookie = await createRefreshTokenCookie(userData);
@@ -66,10 +66,9 @@ describe('ExpressServer', () => {
             expect(AuthServiceSpy.generateRefreshToken).toHaveBeenCalledWith(expect.any(Object), userData);
             expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledTimes(1);
             expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledWith(userData);
-            done();
         });
 
-        it('should responds with status 401 and JSON error object when refresh token\' cookie is invalid', async (done) => {
+        it('should responds with status 401 and JSON error object when refresh token\' cookie is invalid', async () => {
             // given
             const invalidRefreshTokenCookie = 'invalid=refresh_token';
 
@@ -83,12 +82,11 @@ describe('ExpressServer', () => {
             expect(AuthServiceSpy.generateRefreshToken).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpy.generateAccessToken).toHaveBeenCalledTimes(0);
             expect(AuthServiceSpy.invalidateRefreshToken).toHaveBeenCalledTimes(1);
-            done();
         });
 
     });
 
-    it('should responds with status 404 and JSON error object', async (done) => {
+    it('should responds with status 404 and JSON error object', async () => {
         // given
         const url = '/not-registered-path';
 
@@ -102,7 +100,6 @@ describe('ExpressServer', () => {
             method: 'GET',
             path: url,
         });
-        done();
     });
 
 });

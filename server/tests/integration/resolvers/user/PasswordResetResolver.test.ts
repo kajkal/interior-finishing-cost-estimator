@@ -3,14 +3,17 @@ import { sign } from 'jsonwebtoken';
 
 import { MockLogger } from '../../../__mocks__/utils/logger';
 
+import { PasswordResetTokenManagerSpy } from '../../../__utils__/spies/services/password-reset/PasswordResetTokenManagerSpy';
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
 import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
 import { EmailServiceSpy } from '../../../__utils__/spies/services/email/EmailServiceSpy';
-import { PasswordResetTokenManagerSpy } from '../../../__utils__/spies/services/password-reset/PasswordResetTokenManagerSpy';
+import { useValidationUtils } from '../../../__utils__/integration-utils/useValidationUtils';
 import { generator } from '../../../__utils__/generator';
 
+import { PasswordResetRequestFormData } from '../../../../src/resolvers/user/input/PasswordResetRequestFormData';
 import { PasswordResetService } from '../../../../src/services/password-reset/PasswordResetService';
 import { PasswordResetFormData } from '../../../../src/resolvers/user/input/PasswordResetFormData';
+import { PasswordResetResolver } from '../../../../src/resolvers/user/PasswordResetResolver';
 import { User } from '../../../../src/entities/user/User';
 
 
@@ -38,6 +41,34 @@ describe('PasswordResetResolver', () => {
               sendPasswordResetInstructions(email: $email)
             }
         `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<PasswordResetRequestFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(PasswordResetResolver.prototype, 'sendPasswordResetInstructions'),
+                query: sendPasswordResetInstructionsMutation,
+                validFormData: {
+                    email: 'valid.email@domain.com',
+                },
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+            it('should validate email', async () => {
+                // should accept valid
+                await send.withAuth({ email: 'valid.email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email+1@domain.com' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ email: 'invalid-email' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email@domain' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email.domain.com' }).expectValidationError('email');
+            });
+
+        });
 
         it('should send email with password reset instructions when user email address is confirmed', async () => {
             const user = await testUtils.db.populateWithUser({ isEmailAddressConfirmed: true });
@@ -147,6 +178,42 @@ describe('PasswordResetResolver', () => {
             }
         `;
 
+        describe('validation', () => {
+
+            const send = useValidationUtils<PasswordResetFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(PasswordResetResolver.prototype, 'resetPassword'),
+                query: resetPasswordMutation,
+                validFormData: {
+                    token: sign({}, 'shhh'),
+                    password: 'Secure password',
+                },
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+            it('should validate token', async () => {
+                // should accept valid
+                await send.withAuth({ token: sign({}, 'shhh') }).expectValidationSuccess();
+                await send.withAuth({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoZWxsbyJ9._' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ token: '' }).expectValidationError('token');
+                await send.withAuth({ token: 'invalid-token' }).expectValidationError('token');
+            });
+
+            it('should validate password', async () => {
+                // should accept valid
+                await send.withAuth({ password: 'a'.repeat(6) }).expectValidationSuccess();
+                await send.withAuth({ password: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ password: 'a'.repeat(5) }).expectValidationError('password');
+                await send.withAuth({ password: 'a'.repeat(256) }).expectValidationError('password');
+            });
+
+        });
+
         function createSamplePasswordResetToken(userData: Pick<User, 'id'>) {
             return Container.get(PasswordResetService).generatePasswordResetToken(userData);
         }
@@ -168,7 +235,7 @@ describe('PasswordResetResolver', () => {
 
             // verify if user' password was updated
             expect(UserRepositorySpy.persistAndFlush).toHaveBeenCalledTimes(1);
-            const updatedUser = UserRepositorySpy.persistAndFlush.mock.calls[0][0] as User;
+            const updatedUser = UserRepositorySpy.persistAndFlush.mock.calls[ 0 ][ 0 ] as User;
             expect(user.id).toBe(user.id);
             expect(user.unencryptedPassword).not.toBe(passwordResetFormData.password);
             expect(user.password).not.toBe(updatedUser.password);
@@ -225,7 +292,7 @@ describe('PasswordResetResolver', () => {
             jest.spyOn(Date, 'now').mockRestore();
         });
 
-        it('should return error if token is invalid', async () => {
+        it('should return error if token is untrustworthy', async () => {
             const passwordResetFormData: PasswordResetFormData = {
                 token: sign({ id: 'sample id' }, 'WRONG_PRIVATE_KEY'),
                 password: generator.string({ length: 8 }),

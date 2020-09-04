@@ -1,6 +1,5 @@
 import 'reflect-metadata';
-
-import { expectValidationErrors } from '../../__utils__/validation-utils/validationUtils';
+import { validateSync } from 'class-validator';
 
 import { IsSlug } from '../../../src/decorators/IsSlug';
 
@@ -25,7 +24,8 @@ describe('IsSlug decorator', () => {
             'valid-slug-1',
         ];
         validSlugs.forEach((slug) => {
-            expectValidationErrors(new SampleClass(slug), []);
+            const validationErrors = validateSync(new SampleClass(slug));
+            expect(validationErrors).toEqual([]);
         });
 
         const invalidSlugs = [
@@ -42,9 +42,14 @@ describe('IsSlug decorator', () => {
             [],
         ];
         invalidSlugs.forEach((slug) => {
-            expectValidationErrors(new SampleClass(slug), [ {
-                'isSlug': 'slug must be a valid slug',
-            } ]);
+            const validationErrors = validateSync(new SampleClass(slug));
+            expect(validationErrors).toEqual([
+                expect.objectContaining({
+                    constraints: {
+                        'isSlug': 'slug must be a valid slug',
+                    },
+                }),
+            ]);
         });
     });
 

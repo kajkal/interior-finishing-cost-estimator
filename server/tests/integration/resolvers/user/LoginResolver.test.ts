@@ -1,12 +1,14 @@
 import { MockLogger } from '../../../__mocks__/utils/logger';
 
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { useValidationUtils } from '../../../__utils__/integration-utils/useValidationUtils';
 import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
 import { AuthServiceSpy } from '../../../__utils__/spies/services/auth/AuthServiceSpy';
-import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
-import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
 
 import { LoginFormData } from '../../../../src/resolvers/user/input/LoginFormData';
+import { LoginResolver } from '../../../../src/resolvers/user/LoginResolver';
 
 
 describe('LoginResolver', () => {
@@ -41,7 +43,45 @@ describe('LoginResolver', () => {
             }
         `;
 
-        it('should login user and return initial data if credentials are correct', async (done) => {
+        describe('validation', () => {
+
+            const send = useValidationUtils<LoginFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(LoginResolver.prototype, 'login'),
+                query: loginMutation,
+                validFormData: {
+                    email: 'valid.email@domain.com',
+                    password: 'Secure password',
+                },
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+            it('should validate email', async () => {
+                // should accept valid
+                await send.withAuth({ email: 'valid.email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email+1@domain.com' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ email: 'invalid-email' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email@domain' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email.domain.com' }).expectValidationError('email');
+            });
+
+            it('should validate password', async () => {
+                // should accept valid
+                await send.withAuth({ password: 'a'.repeat(6) }).expectValidationSuccess();
+                await send.withAuth({ password: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ password: 'a'.repeat(5) }).expectValidationError('password');
+                await send.withAuth({ password: 'a'.repeat(256) }).expectValidationError('password');
+            });
+
+        });
+
+        it('should login user and return initial data if credentials are correct', async () => {
             const existingUser = await testUtils.db.populateWithUser();
             const response = await testUtils.postGraphQL({
                 query: loginMutation,
@@ -82,7 +122,6 @@ describe('LoginResolver', () => {
                     },
                 },
             });
-            done();
         });
 
         async function expectBadCredentialsError(loginFormData: LoginFormData) {
@@ -114,21 +153,19 @@ describe('LoginResolver', () => {
             });
         }
 
-        it('should return error if provided password is incorrect', async (done) => {
+        it('should return error if provided password is incorrect', async () => {
             const existingUser = await testUtils.db.populateWithUser();
             await expectBadCredentialsError({
                 email: existingUser.email,
                 password: 'wrong password',
             });
-            done();
         });
 
-        it('should return error if there is no registered user with provided email', async (done) => {
+        it('should return error if there is no registered user with provided email', async () => {
             await expectBadCredentialsError({
                 email: 'not.registered@domain.com',
                 password: 'Secure password',
             });
-            done();
         });
 
     });
@@ -141,7 +178,22 @@ describe('LoginResolver', () => {
             }
         `;
 
-        it('should invalidate refresh token cookie', async (done) => {
+        describe('validation', () => {
+
+            const send = useValidationUtils<undefined>({
+                testUtils,
+                resolverSpy: jest.spyOn(LoginResolver.prototype, 'logout'),
+                query: logoutMutation,
+                validFormData: undefined,
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+        });
+
+        it('should invalidate refresh token cookie', async () => {
             const response = await testUtils.postGraphQL({
                 query: logoutMutation,
             });
@@ -162,7 +214,6 @@ describe('LoginResolver', () => {
                     logout: true,
                 },
             });
-            done();
         });
 
     });

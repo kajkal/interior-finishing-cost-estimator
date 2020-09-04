@@ -3,17 +3,19 @@ import { sign } from 'jsonwebtoken';
 
 import { MockLogger } from '../../../__mocks__/utils/logger';
 
+import { EmailAddressConfirmationTokenManagerSpy } from '../../../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationTokenManagerSpy';
 import { useIntegrationTestsUtils } from '../../../__utils__/integration-utils/useIntegrationTestsUtils';
+import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
+import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
+import { useValidationUtils } from '../../../__utils__/integration-utils/useValidationUtils';
 import { UserRepositorySpy } from '../../../__utils__/spies/repositories/UserRepositorySpy';
 import { EmailServiceSpy } from '../../../__utils__/spies/services/email/EmailServiceSpy';
-import { AccessTokenManagerSpy } from '../../../__utils__/spies/services/auth/AccessTokenManagerSpy';
-import { RefreshTokenManagerSpy } from '../../../__utils__/spies/services/auth/RefreshTokenManagerSpy';
-import { EmailAddressConfirmationTokenManagerSpy } from '../../../__utils__/spies/services/email-address-confirmation/EmailAddressConfirmationTokenManagerSpy';
 import { generator } from '../../../__utils__/generator';
 
 import { EmailAddressConfirmationService } from '../../../../src/services/email-address-confirmation/EmailAddressConfirmationService';
 import { EmailAddressConfirmationData } from '../../../../src/resolvers/user/input/EmailAddressConfirmationData';
 import { RegisterFormData } from '../../../../src/resolvers/user/input/RegisterFormData';
+import { RegisterResolver } from '../../../../src/resolvers/user/RegisterResolver';
 import { User } from '../../../../src/entities/user/User';
 
 
@@ -50,6 +52,54 @@ describe('RegisterResolver', () => {
               }
             }
         `;
+
+        describe('validation', () => {
+
+            const send = useValidationUtils<RegisterFormData>({
+                testUtils,
+                resolverSpy: jest.spyOn(RegisterResolver.prototype, 'register'),
+                query: registerMutation,
+                validFormData: {
+                    name: 'valid name',
+                    email: 'valid.email@domain.com',
+                    password: 'Secure password',
+                },
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+            it('should validate name', async () => {
+                // should accept valid
+                await send.withAuth({ name: 'a'.repeat(3) }).expectValidationSuccess();
+                await send.withAuth({ name: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ name: 'a'.repeat(2) }).expectValidationError('name');
+                await send.withAuth({ name: 'a'.repeat(256) }).expectValidationError('name');
+            });
+
+            it('should validate email', async () => {
+                // should accept valid
+                await send.withAuth({ email: 'valid.email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email@domain.com' }).expectValidationSuccess();
+                await send.withAuth({ email: 'valid_email+1@domain.com' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ email: 'invalid-email' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email@domain' }).expectValidationError('email');
+                await send.withAuth({ email: 'invalid.email.domain.com' }).expectValidationError('email');
+            });
+
+            it('should validate password', async () => {
+                // should accept valid
+                await send.withAuth({ password: 'a'.repeat(6) }).expectValidationSuccess();
+                await send.withAuth({ password: 'a'.repeat(255) }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ password: 'a'.repeat(5) }).expectValidationError('password');
+                await send.withAuth({ password: 'a'.repeat(256) }).expectValidationError('password');
+            });
+
+        });
 
         it('should create new user and return initial data if form data are valid', async () => {
             const registerFormData: RegisterFormData = {
@@ -148,6 +198,32 @@ describe('RegisterResolver', () => {
             }
         `;
 
+        describe('validation', () => {
+
+            const send = useValidationUtils<EmailAddressConfirmationData>({
+                testUtils,
+                resolverSpy: jest.spyOn(RegisterResolver.prototype, 'confirmEmailAddress'),
+                query: confirmEmailAddressMutation,
+                validFormData: {
+                    token: sign({}, 'shhh'),
+                },
+            });
+
+            it('should be accessible for unauthenticated users', async () => {
+                await send.withoutAuth().expectValidationSuccess();
+            });
+
+            it('should validate token', async () => {
+                // should accept valid
+                await send.withAuth({ token: sign({}, 'shhh') }).expectValidationSuccess();
+                await send.withAuth({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoZWxsbyJ9._' }).expectValidationSuccess();
+                // should reject invalid
+                await send.withAuth({ token: '' }).expectValidationError('token');
+                await send.withAuth({ token: 'invalid-token' }).expectValidationError('token');
+            });
+
+        });
+
         function createSampleEmailAddressConfirmationToken(userData: Pick<User, 'id'>) {
             return Container.get(EmailAddressConfirmationService).generateEmailAddressConfirmationToken(userData);
         }
@@ -217,7 +293,7 @@ describe('RegisterResolver', () => {
             });
         });
 
-        it('should return error if token is invalid', async () => {
+        it('should return error if token is untrustworthy', async () => {
             const emailAddressConfirmationData: EmailAddressConfirmationData = {
                 token: sign({ id: 'sample id' }, 'WRONG_PRIVATE_KEY'),
             };
