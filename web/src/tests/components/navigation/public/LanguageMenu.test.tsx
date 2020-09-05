@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { getAllByRole, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { mockTFunction, mockUseTranslation } from '../../../__mocks__/libraries/react-i18next';
 import { LanguageMenu } from '../../../../code/components/navigation/public/LanguageMenu';
@@ -16,16 +16,24 @@ jest.mock('../../../../code/config/supportedLanguages', () => ({
 
 describe('LanguageMenu component', () => {
 
-    const mockChangeLanguage = jest.fn();
+    const changeLanguageSpy = jest.fn();
 
     beforeEach(() => {
+        changeLanguageSpy.mockClear();
         mockUseTranslation.mockClear();
-        mockUseTranslation.mockReturnValue({
-            t: mockTFunction,
-            i18n: {
-                language: 'de',
-                changeLanguage: mockChangeLanguage,
-            },
+        mockUseTranslation.mockImplementation(() => {
+            const [ lng, setLng ] = React.useState('de');
+            const handleLngChange = React.useCallback((newLng: string) => {
+                setLng(newLng);
+                changeLanguageSpy(newLng);
+            }, [ setLng ]);
+            return {
+                t: mockTFunction,
+                i18n: {
+                    language: lng,
+                    changeLanguage: handleLngChange,
+                },
+            };
         });
     });
 
@@ -38,18 +46,25 @@ describe('LanguageMenu component', () => {
     });
 
     it('should display available options and change language on option select', async () => {
-        render(<LanguageMenu isSideNavOpen={true} />);
+        render(<LanguageMenu isSideNavOpen={false} />);
 
-        const triggerLanguageMenuButton = screen.getByRole('button', { name: 't:common.changeLanguage' });
-        expect(triggerLanguageMenuButton).toHaveTextContent('Deutsch');
+        const changeLanguageButton = screen.getByRole('button', { name: 't:common.changeLanguage' });
+        expect(changeLanguageButton).toHaveTextContent('Deutsch');
 
-        userEvent.click(triggerLanguageMenuButton);
-        userEvent.click(screen.getByRole('menuitem', { name: 'Polski' }));
+        userEvent.click(changeLanguageButton);
+        const languageMenu = screen.getByRole('menu');
+        const languageOptions = getAllByRole(languageMenu, 'menuitem');
+        expect(languageOptions).toHaveLength(3);
+        expect(languageOptions[ 0 ]).toHaveTextContent('English');
+        expect(languageOptions[ 1 ]).toHaveTextContent('Polski');
+        expect(languageOptions[ 2 ]).toHaveTextContent('Deutsch');
 
-        expect(mockChangeLanguage).toHaveBeenCalledTimes(1);
-        expect(mockChangeLanguage).toHaveBeenCalledWith('pl');
+        userEvent.click(languageOptions[ 1 ]);
+        expect(changeLanguageSpy).toHaveBeenCalledTimes(1);
+        expect(changeLanguageSpy).toHaveBeenCalledWith('pl');
 
-        await waitFor(() => expect(screen.queryByRole('menu')).toBe(null));
+        await waitForElementToBeRemoved(languageMenu);
+        expect(changeLanguageButton).toHaveTextContent('Polski');
     });
 
 });
